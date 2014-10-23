@@ -4,9 +4,9 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
+            java.srcDirs = ['src/main/java']
+            aidl.srcDirs = ['src/main/java']
+            renderscript.srcDirs = ['src/main/java']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
         }
@@ -60,6 +60,7 @@ task run(type: Exec) {
         }
     } else {
         path = "$System.env.ANDROID_HOME"
+		println path
     }
 
     def adb = path + "/platform-tools/adb"
@@ -72,13 +73,13 @@ eclipse {
     // ignores any nodes added in classpath.file.withXml
     sourceSets {
         main {
-            java.srcDirs "src", 'gen'
+            java.srcDirs "src/main/java", 'gen'
         }
     }
 
     jdt {
-        sourceCompatibility = 1.6
-        targetCompatibility = 1.6
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
     }
 
     classpath {
@@ -100,7 +101,7 @@ eclipse {
 // sets up the Android Idea project, using the old Ant based build.
 idea {
     module {
-        sourceDirs += file("src");
+        sourceDirs += file("src/main/java");
         scopes = [ COMPILE: [plus:[project.configurations.compile]]]        
 
         iml {
