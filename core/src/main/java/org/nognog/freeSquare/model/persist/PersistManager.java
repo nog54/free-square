@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Json;
  * @author goshi 2014/10/28
  */
 class PersistManager {
-	private static final String CHAR_SET = "UTF-8"; //$NON-NLS-1$
+	private static final String charSet = "UTF-8"; //$NON-NLS-1$
 	private static final Json json = new Json();
 
 	private PersistManager() {
@@ -98,7 +98,7 @@ class PersistManager {
 		}
 		String saveJson = json.toJson(saveObject);
 		try {
-			byte[] encryptedSaveJson = encrypt(saveJson.getBytes(CHAR_SET));
+			byte[] encryptedSaveJson = encrypt(saveJson.getBytes(charSet));
 			synchronized (saveItem) {
 				FileHandle file = Gdx.files.local((saveItem.getFileName()));
 				file.writeBytes(encryptedSaveJson, false);
@@ -142,7 +142,7 @@ class PersistManager {
 			synchronized (loadItem) {
 				enctyptedLoadJson = Gdx.files.local(loadItem.getFileName()).readBytes();
 			}
-			String loadJson = new String(decrypt(enctyptedLoadJson), CHAR_SET);
+			String loadJson = new String(decrypt(enctyptedLoadJson), charSet);
 			T loadData = json.fromJson(loadItem.getSaveClass(), loadJson);
 			if (!(loadData.isValid())) {
 				throw new InvalidLoadDataException();

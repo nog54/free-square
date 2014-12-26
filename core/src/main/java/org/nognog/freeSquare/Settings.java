@@ -1,33 +1,71 @@
 package org.nognog.freeSquare;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 
 /**
  * @author goshi
  *
  */
 public class Settings {
+	private Settings() {
 
-	private static final String preferenceName = "org.nognog.freeSquare"; //$NON-NLS-1$
-	private static final Preferences PREFERENCES = Gdx.app.getPreferences(preferenceName);
+	}
 
-	private static final String exampleKey = "example"; //$NON-NLS-1$
+	static {
+		initialize();
+	}
+	private static int physicalDisplayWidth;
+	private static int physicalDisplayHeight;
+	private static float aspectRatio;
+	private static int defaultLogicalCameraWidth;
+	private static int defaultLogicalCameraHeight;
 
 	/**
-	 * @return サンプル値
+	 * 
 	 */
-	public static int getPreferenceExample() {
-		return PREFERENCES.getInteger(exampleKey);
+	public static void initialize() {
+		physicalDisplayWidth = Gdx.graphics.getWidth();
+		physicalDisplayHeight = Gdx.graphics.getHeight();
+		aspectRatio = (float) physicalDisplayHeight / physicalDisplayWidth;
+		defaultLogicalCameraWidth = 1024;
+		defaultLogicalCameraHeight = (int) (defaultLogicalCameraWidth * aspectRatio);
 	}
 
 	/**
-	 * サンプル値を設定します。
-	 * 
-	 * @param value
+	 * @return physical display width when {@link Settings#initialize()} is
+	 *         called
 	 */
-	public static void setPreferenceExample(int value) {
-		PREFERENCES.putInteger(exampleKey, value);
-		PREFERENCES.flush();
+	public static int getPhysicalDisplayWidth() {
+		return physicalDisplayWidth;
+	}
+
+	/**
+	 * @return physical display height when {@link Settings#initialize()} is
+	 *         called
+	 */
+	public static int getPhysicalDisplayHeight() {
+		return physicalDisplayHeight;
+	}
+
+	/**
+	 * @return aspect ratio when {@link Settings#initialize()} is called
+	 */
+	public static float getAspectRatio() {
+		return aspectRatio;
+	}
+
+	/**
+	 * @return logical camera width when {@link Settings#initialize()} is called
+	 */
+	public static int getDefaultLogicalCameraWidth() {
+		return defaultLogicalCameraWidth;
+	}
+
+	/**
+	 * @return logical camera height when {@link Settings#initialize()} is
+	 *         called
+	 */
+	public static int getDefaultLogicalCameraHeight() {
+		return defaultLogicalCameraHeight;
 	}
 }

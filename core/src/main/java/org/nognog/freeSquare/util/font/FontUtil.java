@@ -44,7 +44,7 @@ public class FontUtil {
 	 * @return M_PLUS_FONTのBitmapFont
 	 */
 	public static BitmapFont createMPlusFont(int fontSize) {
-		FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal(Resources.M_PLUS_FONT_PATH));
+		FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal(Resources.mPlusFontPath));
 		BitmapFont font = fontGenerator.generateFont(FontUtil.createFontParameter(fontSize));
 		fontGenerator.dispose();
 		return font;

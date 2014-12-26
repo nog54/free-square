@@ -5,13 +5,13 @@ package org.nognog.freeSquare;
  */
 public class Resources {
 	/** フォントファイルへのパス */
-	public static final String M_PLUS_FONT_PATH = "fonts/mplus-1c-medium.ttf"; //$NON-NLS-1$
+	public static final String mPlusFontPath = "fonts/mplus-1c-medium.ttf"; //$NON-NLS-1$
 
 	/** Grassy1へのパス */
-	public static final String GRASSY1_PATH = "image/Grassy1.png"; //$NON-NLS-1$
+	public static final String grassy1Path = "image/Grassy1.png"; //$NON-NLS-1$
 	
 	/** rikiへのパス */
-	public static final String RIKI_PATH = "image/riki.png"; //$NON-NLS-1$	
+	public static final String rikiPath = "image/riki.png"; //$NON-NLS-1$	
 	
 
 }
