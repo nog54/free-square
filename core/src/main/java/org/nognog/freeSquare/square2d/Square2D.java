@@ -5,18 +5,24 @@ import static org.nognog.freeSquare.square2d.Square2D.Vertex.vertex;
 import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.nognog.freeSquare.square.Square;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
+import com.badlogic.gdx.utils.TimeUtils;
 
 /**
  * @author goshi 2014/12/10
@@ -37,9 +43,24 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	private Array<SquareObject2D> objects;
 
 	private ExecutorService pool = Executors.newCachedThreadPool();
+	private Future<?> future;
 
 	private boolean isRequestedDrawOrderUpdate = false;
 	private boolean isDisposed = false;
+
+	private static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
+
+		@Override
+		public int compare(Actor actor1, Actor actor2) {
+			if (actor1.getY() < actor2.getY()) {
+				return 1;
+			} else if (actor1.getY() > actor2.getY()) {
+				return -1;
+			}
+			return 0;
+		}
+
+	};
 
 	/**
 	 * @param size
@@ -71,10 +92,38 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 
 		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		this.squareImage = new Image(texture);
-		this.squareImage.setScale(scale);
+		this.squareImage.setWidth(width);
+		this.squareImage.setHeight(this.squareImage.getHeight() * scale);
 		this.squareImage.setY(squareImagePositionOffsetY);
+		this.squareImage.setName("squareImage"); //$NON-NLS-1$
 		this.addActor(this.squareImage);
 		this.objects = new SnapshotArray<>();
+
+		this.addCaptureListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				if (Square2D.this.containsInSquareArea(x, y) || this.isTouchingSquareObject(x,y)) {
+					return false;
+				}
+				event.stop();
+				return false;
+			}
+
+			private boolean isTouchingSquareObject(float x, float y) {
+				Actor touchedActor = Square2D.this.hit(x, y, true);
+				return touchedActor != Square2D.this.getSquareImage();
+			}
+		});
+	}
+
+	@Override
+	public float getWidth() {
+		return this.squareImage.getWidth();
+	}
+
+	@Override
+	public float getHeight() {
+		return this.squareImage.getHeight();
 	}
 
 	private boolean isInvalidVertex() {
@@ -92,7 +141,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	@Override
 	public void draw(com.badlogic.gdx.graphics.g2d.Batch batch, float parentAlpha) {
 		if (this.isRequestedDrawOrderUpdate) {
-			this.getChildren().sort(ActorComparator.getInstance());
+			this.getChildren().sort(actorComparator);
 			moveSquareImageToBack();
 			this.isRequestedDrawOrderUpdate = false;
 		}
@@ -138,7 +187,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	/**
 	 * @return size
 	 */
-	public Square2DSize getSize() {
+	public Square2DSize getSquareSize() {
 		return this.size;
 	}
 
@@ -152,7 +201,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	/**
 	 * @return square image
 	 */
-	public Image getImage() {
+	public Image getSquareImage() {
 		return this.squareImage;
 	}
 
@@ -161,6 +210,19 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 */
 	public boolean isConcave() {
 		return this.isConcave;
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @return true if (x, y) is contained in square of vertex1, vertex2,
+	 *         vertex3 and vertex4
+	 */
+	public boolean containsInSquareArea(float x, float y) {
+		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x,
+				this.vertex3.y, this.vertex4.x, this.vertex4.y };
+		Polygon p = new Polygon(vertices);
+		return p.contains(x, y);
 	}
 
 	/**
@@ -182,6 +244,44 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 */
 	public boolean isDisposed() {
 		return this.isDisposed;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.vertex1).append("-").append(this.vertex2).append("-").append(this.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				.append(this.vertex4);
+		return sb.toString();
+	}
+
+	@Override
+	public void addAction(Action action) {
+		super.addAction(action);
+		if (this.future == null || this.future.isDone()) {
+			this.future = this.getPool().submit(new Runnable() {
+				private static final long interval = 60;
+				private long previousActionTime = TimeUtils.millis();
+
+				@Override
+				public void run() {
+					while (Square2D.this.getActions().size != 0) {
+						final long currentTime = TimeUtils.millis();
+						final float delta = (currentTime - this.previousActionTime) / 1000f;
+						Square2D.this.act(delta);
+						this.previousActionTime = currentTime;
+						if (Thread.currentThread().isInterrupted()) {
+							break;
+						}
+						try {
+							Thread.sleep(interval);
+						} catch (InterruptedException e) {
+							break;
+						}
+					}
+				}
+
+			});
+		}
 	}
 
 	/**
@@ -220,34 +320,6 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 			StringBuilder sb = new StringBuilder();
 			return sb.append("(").append(this.x).append(",").append(this.y).append(")").toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
-	}
-}
-
-/**
- * @author goshi 2014/12/19
- */
-class ActorComparator implements Comparator<Actor> {
-
-	private static ActorComparator instance = new ActorComparator();
-
-	private ActorComparator() {
-	}
-
-	@Override
-	public int compare(Actor actor1, Actor actor2) {
-		if (actor1.getY() < actor2.getY()) {
-			return -1;
-		} else if (actor1.getY() > actor2.getY()) {
-			return 1;
-		}
-		return 0;
-	}
-
-	/**
-	 * @return get singleton instance
-	 */
-	public static ActorComparator getInstance() {
-		return instance;
 	}
 
 }

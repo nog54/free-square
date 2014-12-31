@@ -14,4 +14,6 @@ public class SaveFailureException extends Exception {
 	SaveFailureException(Throwable t) {
 		super(t);
 	}
+	
+	
 }

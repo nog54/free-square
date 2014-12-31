@@ -13,5 +13,8 @@ public class Resources {
 	/** rikiへのパス */
 	public static final String rikiPath = "image/riki.png"; //$NON-NLS-1$	
 	
+	/** frame1へのパス */
+	public static final String frame1Path = "image/Frame1.png"; //$NON-NLS-1$
+	
 
 }
