@@ -16,5 +16,6 @@ public class Resources {
 	/** frame1へのパス */
 	public static final String frame1Path = "image/Frame1.png"; //$NON-NLS-1$
 	
+	
 
 }
