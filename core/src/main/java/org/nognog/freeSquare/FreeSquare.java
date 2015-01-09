@@ -2,6 +2,7 @@ package org.nognog.freeSquare;
 
 import java.util.Date;
 
+import org.nognog.freeSquare.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
@@ -39,6 +40,7 @@ public class FreeSquare extends ApplicationAdapter {
 
 	private static final float MAX_ZOOM = 1f;
 	private static final float MIN_ZOOM = 0.5f;
+	private boolean isShowingMenu;
 	Vector2 cameraRangeLowerLeft;
 	Vector2 cameraRangeUpperRight;
 	Stage mainStage;
@@ -50,7 +52,7 @@ public class FreeSquare extends ApplicationAdapter {
 	Date lastRun;
 	String now;
 	ShapeRenderer shapeRenderer;
-	MenuTable menu;
+	FlickButtonController menu;
 
 	@Override
 	public void create() {
@@ -72,8 +74,7 @@ public class FreeSquare extends ApplicationAdapter {
 		this.mainStage.getCamera().position.x -= this.mainStage.getCamera().viewportWidth / 2;
 
 		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
-		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY()
-				+ Math.max(this.square.getHeight(), logicalCameraHeight));
+		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY() + Math.max(this.square.getHeight(), logicalCameraHeight));
 		setupPersistItems();
 		GestureListener gestureListener = new GestureDetector.GestureAdapter() {
 
@@ -108,7 +109,13 @@ public class FreeSquare extends ApplicationAdapter {
 
 			@Override
 			public boolean zoom(float initialDistance, float distance) {
+				if (FreeSquare.this.square.getTouchable() == Touchable.disabled) {
+					return false;
+				}
 				if (this.isLastTouchSquareObjectOrMenu()) {
+					return false;
+				}
+				if (FreeSquare.this.isShowingMenu()) {
 					return false;
 				}
 				float ratio = initialDistance / distance;
@@ -127,32 +134,22 @@ public class FreeSquare extends ApplicationAdapter {
 				if (this.tapsSquare(x, y)) {
 					return false;
 				}
-				this.switchShowMenu(x, y);
-				return true;
-			}
 
-			private void switchShowMenu(float x, float y) {
-				boolean isRemoveMenu = FreeSquare.this.mainStage.getRoot().removeActor(FreeSquare.this.menu);
-				if (isRemoveMenu) {
-					FreeSquare.this.square.getColor().a = 1;
-					FreeSquare.this.square.setTouchable(Touchable.enabled);
-					return;
+				if (FreeSquare.this.isShowingMenu()) {
+					FreeSquare.this.hideMenu();
+					return true;
 				}
 				Vector2 menuPosition = FreeSquare.this.mainStage.screenToStageCoordinates(new Vector2(x, y));
-				FreeSquare.this.menu.setPosition(menuPosition.x, menuPosition.y);
-				FreeSquare.this.mainStage.getRoot().addActor(FreeSquare.this.menu);
-				FreeSquare.this.square.getColor().a = 0.75f;
-				FreeSquare.this.square.setTouchable(Touchable.disabled);
+				FreeSquare.this.showMenu(menuPosition.x, menuPosition.y);
+				return true;
 			}
 
 			private boolean tapsSquare(float x, float y) {
 				if (FreeSquare.this.square.getTouchable() == Touchable.disabled) {
 					return false;
 				}
-				Vector2 squareCoordinateTapPosition = FreeSquare.this.square
-						.screenToLocalCoordinates(new Vector2(x, y));
-				return FreeSquare.this.square.containsInSquareArea(squareCoordinateTapPosition.x,
-						squareCoordinateTapPosition.y);
+				Vector2 squareCoordinateTapPosition = FreeSquare.this.square.screenToLocalCoordinates(new Vector2(x, y));
+				return FreeSquare.this.square.containsInSquareArea(squareCoordinateTapPosition.x, squareCoordinateTapPosition.y);
 			}
 
 			private void adjustCameraPositionIfRangeOver() {
@@ -175,7 +172,62 @@ public class FreeSquare extends ApplicationAdapter {
 		multiplexer.addProcessor(this.mainStage);
 		Gdx.input.setInputProcessor(multiplexer);
 		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 32);
-		this.menu = new MenuTable(this.font, logicalCameraWidth, logicalCameraHeight);
+		this.menu = new FlickButtonController(this.font, logicalCameraWidth / 6, new FlickInputListener() {
+
+			@Override
+			public void up() {
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.mainStage.getCamera().translate(0, 10, 0);
+			}
+
+			@Override
+			public void right() {
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.mainStage.getCamera().translate(10, 0, 0);
+			}
+
+			@Override
+			public void left() {
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.mainStage.getCamera().translate(-10, 0, 0);
+			}
+
+			@Override
+			public void down() {
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.mainStage.getCamera().translate(0, -10, 0);
+			}
+
+			@Override
+			public void center() {
+				FreeSquare.this.hideMenu();
+			}
+		});
+	}
+
+	/**
+	 * @return true if menu is showing
+	 */
+	public boolean isShowingMenu() {
+		return this.isShowingMenu;
+	}
+
+	void showMenu(float x, float y) {
+		this.mainStage.getRoot().removeActor(this.menu);
+		this.menu.setPosition(x, y);
+		final float currentCameraZoom = ((OrthographicCamera) this.mainStage.getCamera()).zoom;
+		this.menu.setScale(currentCameraZoom);
+		this.mainStage.getRoot().addActor(FreeSquare.this.menu);
+		this.square.getColor().a = 0.75f;
+		this.square.setTouchable(Touchable.disabled);
+		this.isShowingMenu = true;
+	}
+
+	void hideMenu() {
+		this.mainStage.getRoot().removeActor(this.menu);
+		this.square.getColor().a = 1;
+		this.square.setTouchable(Touchable.enabled);
+		this.isShowingMenu = false;
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class Riki extends FreeRunningObject {
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if(count == 2){
-					System.out.println("double tap");
+					//
 				}
 			}
 		});

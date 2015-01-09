@@ -75,7 +75,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		this.size = size;
 		final float width = size.getWidth();
 		final float scale = width / texture.getWidth();
-		final float squareImagePositionOffsetY = width / 16;
+		final float squareImagePositionOffsetY = width / 12;
 		this.vertex1 = vertex(baseVertex1.x * scale, baseVertex1.y * scale + squareImagePositionOffsetY);
 		this.vertex2 = vertex(baseVertex2.x * scale, baseVertex2.y * scale + squareImagePositionOffsetY);
 		this.vertex3 = vertex(baseVertex3.x * scale, baseVertex3.y * scale + squareImagePositionOffsetY);
