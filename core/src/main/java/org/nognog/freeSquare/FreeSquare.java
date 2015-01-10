@@ -65,7 +65,7 @@ public class FreeSquare extends ApplicationAdapter {
 
 		this.square = new GrassySquare1(Square2DSize.SMALL);
 		this.square.setX(-this.square.getWidth() / 2);
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 1; i++) {
 			this.square.addAndRunObject(new Riki());
 		}
 
