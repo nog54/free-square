@@ -18,79 +18,73 @@ import com.badlogic.gdx.utils.TimeUtils;
  */
 public abstract class SquareObject2D extends Group implements SquareObject<Square2D> {
 
-	private Square2D square;
+	private final float logicalWidth;
+	private final float logicalHeight;
 
-	private Image image;
+	protected Square2D square;
+	private final Image image;
 
 	private Future<?> future;
 
-	private boolean enablesIndependentAction;
-
+	boolean enablesIndependentAction;
 	boolean isPerformingIndependentAction;
 
 	private boolean isDisposed = false;
 
 	/**
 	 * @param texture
-	 */
-	public SquareObject2D(Texture texture) {
-		this(texture, true);
-	}
-
-	/**
-	 * @param texture
+	 * @param logicalWidth
 	 * @param performIndependentAction
 	 */
-	public SquareObject2D(Texture texture, boolean performIndependentAction) {
+	public SquareObject2D(Texture texture, float logicalWidth, boolean performIndependentAction) {
 		this.image = new Image(texture);
-		final float logicalWidth = this.getLogicalWidth();
-		final float logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
+		this.logicalWidth = logicalWidth;
+		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
 		this.setWidth(logicalWidth);
-		this.setHeight(logicalHeight);
+		this.setHeight(this.getLogicalHeight());
 		this.setOriginX(logicalWidth / 2);
 		this.image.setWidth(logicalWidth);
-		this.image.setHeight(logicalHeight);
+		this.image.setHeight(this.getLogicalHeight());
 		this.addActor(this.image);
 		this.image.setOriginX(logicalWidth / 2);
 		this.enablesIndependentAction = performIndependentAction;
 		this.isPerformingIndependentAction = false;
-		this.addListener(new ActorGestureListener(){
+		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				event.stop();
 			}
-			
+
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 				event.stop();
 			}
-			
+
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				event.stop();
 			}
-			
+
 			@Override
 			public void zoom(InputEvent event, float initialDistance, float distance) {
 				event.stop();
 			}
-			
+
 			@Override
 			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
 				event.stop();
 			}
-			
+
 			@Override
 			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
 				event.stop();
 			}
-			
+
 			@Override
-			public void pinch(InputEvent event, Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
-					Vector2 pointer2) {
+			public void pinch(InputEvent event, Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
 				event.stop();
 			}
-			
+
 		});
 	}
 
@@ -116,6 +110,20 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	}
 
 	/**
+	 * @return logical width
+	 */
+	public float getLogicalWidth() {
+		return this.logicalWidth;
+	}
+
+	/**
+	 * @return logical height
+	 */
+	public float getLogicalHeight() {
+		return this.logicalHeight;
+	}
+
+	/**
 	 * start independent action in new thread
 	 */
 	public void startIndependentAction() {
@@ -135,8 +143,7 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 					while (true) {
 						final long currentTime = TimeUtils.millis();
 						final float delta = (currentTime - this.previousActionTime) / 1000f;
-						final long requestInterval = this.actionTarget.independentAction(delta, previousInterval,
-								minInterval);
+						final long requestInterval = this.actionTarget.independentAction(delta, previousInterval, minInterval);
 						this.previousActionTime = currentTime;
 						final long interval = Math.max(minInterval, requestInterval);
 						if (Thread.currentThread().isInterrupted()) {
@@ -201,6 +208,4 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	 * @return interval to next action [ms]
 	 */
 	protected abstract long independentAction(float delta, long previousInterval, long minInterval);
-
-	protected abstract float getLogicalWidth();
 }

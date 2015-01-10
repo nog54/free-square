@@ -1,7 +1,6 @@
 package org.nognog.freeSquare.square2d;
 
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import org.nognog.sence2d.action.KeepMovingToTargetPositionAction;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,8 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 
 /**
@@ -27,7 +24,7 @@ public abstract class FreeRunningObject extends LifeObject {
 		}
 	};
 
-	private MoveToAction freeRunAction = null;
+	private KeepMovingToTargetPositionAction freeRunAction = null;
 
 	private boolean isEnableFreeRun;
 	private float moveSpeed; // [logicalWidth / sec]
@@ -36,22 +33,22 @@ public abstract class FreeRunningObject extends LifeObject {
 	private StopTimeGenerator stopTimeGenerator;
 	private float stoppingTime;
 
-	protected FreeRunningObject(Texture texture) {
-		this(texture, defaultMoveSpeed);
+	protected FreeRunningObject(Texture texture, float width) {
+		this(texture, width, defaultMoveSpeed);
 	}
 
-	protected FreeRunningObject(Texture texture, float moveSpeed) {
-		this(texture, moveSpeed, defaultGenerator);
+	protected FreeRunningObject(Texture texture, float width, float moveSpeed) {
+		this(texture, width, moveSpeed, defaultGenerator);
 	}
 
-	protected FreeRunningObject(Texture texture, float moveSpeed, StopTimeGenerator generator) {
-		super(texture);
+	protected FreeRunningObject(Texture texture, float width, float moveSpeed, StopTimeGenerator generator) {
+		super(texture, width);
 		this.isEnableFreeRun = true;
 		this.moveSpeed = moveSpeed;
 		this.stopTimeGenerator = generator;
 		this.stopTime = this.stopTimeGenerator.generateStopTime();
 		this.stoppingTime = 0;
-		
+
 		this.addListener(new ActorGestureListener() {
 			FreeRunningObject target = FreeRunningObject.this;
 			boolean isLongTapped;
@@ -90,11 +87,10 @@ public abstract class FreeRunningObject extends LifeObject {
 			if (this.stoppingTime > this.stopTime) {
 				this.stoppingTime = 0;
 				this.stopTime = this.stopTimeGenerator.generateStopTime();
-				final Vector2 dest = Square2DUtils.getRandomPointOn(this.getSquare());
-				final float distance = (float) sqrt(pow(this.getX() - dest.x, 2) + pow(this.getY() - dest.y, 2));
-				final float moveTime = distance / this.moveSpeed;
-				this.freeRunAction = Actions.moveTo(dest.x - this.getOriginX(), dest.y, moveTime);
+				final Vector2 dest = this.generateNextTargetPosition();
+				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x - this.getOriginX(), dest.y, this.moveSpeed);
 				this.freeRunAction.setActor(this);
+				System.out.println(dest);
 			}
 			return minInterval;
 		}
@@ -149,6 +145,12 @@ public abstract class FreeRunningObject extends LifeObject {
 		return this.isEnableFreeRun;
 	}
 
+	protected Vector2 generateNextTargetPosition() {
+		final float x = MathUtils.random(0, this.square.getWidth());
+		final float y = MathUtils.random(0, this.square.getHeight());
+		return new Vector2(x, y);
+	}
+
 	/**
 	 * @author goshi 2015/01/03
 	 */
@@ -158,4 +160,5 @@ public abstract class FreeRunningObject extends LifeObject {
 		 */
 		float generateStopTime();
 	}
+
 }

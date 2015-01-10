@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d.objects;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.FreeRunningObject;
+import org.nognog.freeSquare.square2d.FreeRunningLandObject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/19
  */
-public class Riki extends FreeRunningObject {
+public class Riki extends FreeRunningLandObject {
 
 	private static final float logicalWidth = 100;
 
@@ -20,7 +20,7 @@ public class Riki extends FreeRunningObject {
 	 * create Riki
 	 */
 	public Riki() {
-		super(new Texture(Gdx.files.internal(Resources.rikiPath)), 100);
+		super(new Texture(Gdx.files.internal(Resources.rikiPath)), logicalWidth, logicalWidth);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
@@ -35,10 +35,4 @@ public class Riki extends FreeRunningObject {
 			}
 		});
 	}
-
-	@Override
-	protected float getLogicalWidth() {
-		return logicalWidth;
-	}
-
 }

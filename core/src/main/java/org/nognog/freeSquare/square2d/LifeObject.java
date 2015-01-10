@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/31
  */
-public abstract class LifeObject extends SquareObject2D {
+public class LifeObject extends SquareObject2D {
 
 	private Image frame;
 
@@ -25,9 +25,11 @@ public abstract class LifeObject extends SquareObject2D {
 
 	/**
 	 * @param texture
+	 * @param logicalWidth
+	 * @param performIndependentAction
 	 */
-	public LifeObject(Texture texture) {
-		super(texture);
+	public LifeObject(Texture texture, float logicalWidth) {
+		super(texture, logicalWidth, true);
 		final float degree = 5;
 		final float cycleTime = 4;
 		Action foreverRotate = Square2DActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
@@ -42,7 +44,7 @@ public abstract class LifeObject extends SquareObject2D {
 		this.frame.setHeight(this.getHeight());
 		this.frame.setName(Resources.frame1Path);
 		this.addActor(this.frame);
-		
+
 		this.addListener(new ActorGestureListener() {
 			LifeObject target = LifeObject.this;
 			boolean isLongTapped;
@@ -64,6 +66,11 @@ public abstract class LifeObject extends SquareObject2D {
 				this.isLongTapped = true;
 				this.target.setEnableUpDownRoutine(false);
 				return true;
+			}
+
+			@Override
+			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
+				this.target.moveBy(deltaX, deltaY);
 			}
 
 		});
