@@ -95,13 +95,33 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 		}
 		this.square = square;
 		Vector2 randomPoint = Square2DUtils.getRandomPointOn(this.square);
-		this.setX(randomPoint.x - this.getOriginX());
+		this.setX(randomPoint.x);
 		this.setY(randomPoint.y);
 	}
 
 	@Override
 	public void setX(float x) {
-		super.setX(x - this.getWidth() / 2);
+		super.setX(x - this.getOriginX());
+	}
+
+	@Override
+	public void setPosition(float x, float y) {
+		super.setPosition(x - this.getOriginX(), y);
+	}
+
+	@Override
+	public void setPosition(float x, float y, int align) {
+		super.setPosition(x - this.getOriginX(), y, align);
+	}
+
+	@Override
+	public float getX() {
+		return super.getX() + this.getOriginX();
+	}
+
+	@Override
+	public float getX(int align) {
+		return super.getX(align) + this.getOriginX();
 	}
 
 	@Override
@@ -132,7 +152,7 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 		}
 		if (this.future == null) {
 			Runnable repeatIndependentAction = new Runnable() {
-				private static final long minInterval = 60;
+				private static final long defaultInterval = 10;
 				private SquareObject2D actionTarget = SquareObject2D.this;
 				private long previousActionTime = TimeUtils.millis();
 
@@ -143,17 +163,19 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 					while (true) {
 						final long currentTime = TimeUtils.millis();
 						final float delta = (currentTime - this.previousActionTime) / 1000f;
-						final long requestInterval = this.actionTarget.independentAction(delta, previousInterval, minInterval);
+						final long requestedInterval = this.actionTarget.independentAction(delta, previousInterval, defaultInterval);
+						this.actionTarget.act(delta);
 						this.previousActionTime = currentTime;
-						final long interval = Math.max(minInterval, requestInterval);
 						if (Thread.currentThread().isInterrupted()) {
 							break;
 						}
-						try {
-							Thread.sleep(interval);
-							previousInterval = interval;
-						} catch (InterruptedException e) {
-							break;
+						if (requestedInterval > 0) {
+							try {
+								Thread.sleep(requestedInterval);
+								previousInterval = requestedInterval;
+							} catch (InterruptedException e) {
+								break;
+							}
 						}
 					}
 					this.actionTarget.isPerformingIndependentAction = false;
@@ -196,6 +218,16 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	}
 
 	/**
+	 * @return true if this is landing on square
+	 */
+	public boolean isLandingOnSquare() {
+		if (this.square == null) {
+			return false;
+		}
+		return this.square.containsInSquareArea(this.getX(), this.getY());
+	}
+
+	/**
 	 * @return true if this is disposed.
 	 */
 	public boolean isDisposed() {
@@ -203,9 +235,12 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	}
 
 	/**
+	 * {@link #act(float)} will be called after this method.
+	 * 
 	 * @param delta
 	 * @param previousInterval
 	 * @return interval to next action [ms]
+	 * 
 	 */
-	protected abstract long independentAction(float delta, long previousInterval, long minInterval);
+	protected abstract long independentAction(float delta, long previousInterval, long defaultInterval);
 }

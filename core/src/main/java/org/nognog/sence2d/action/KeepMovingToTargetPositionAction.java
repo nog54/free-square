@@ -11,6 +11,7 @@ public class KeepMovingToTargetPositionAction extends Action {
 	private float targetPositionX;
 	private float targetPositionY;
 	private float speed;
+	private boolean isFinished = false;
 
 	/**
 	 * @param x
@@ -26,6 +27,9 @@ public class KeepMovingToTargetPositionAction extends Action {
 
 	@Override
 	public boolean act(float delta) {
+		if(this.isFinished){
+			return true;
+		}
 		final float remainingDistanceX = this.targetPositionX - this.actor.getX();
 		final float remainingDistanceY = this.targetPositionY - this.actor.getY();
 		final float theta = MathUtils.atan2(this.targetPositionY - this.actor.getY(), this.targetPositionX - this.actor.getX());
@@ -33,11 +37,13 @@ public class KeepMovingToTargetPositionAction extends Action {
 		final float moveX = r * MathUtils.cos(theta);
 		if (Math.abs(remainingDistanceX) < Math.abs(moveX)) {
 			this.actor.setPosition(this.targetPositionX, this.targetPositionY);
+			this.isFinished = true;
 			return true;
 		}
 		final float moveY = r * MathUtils.sin(theta);
 		if (Math.abs(remainingDistanceY) < Math.abs(moveY)) {
 			this.actor.setPosition(this.targetPositionX, this.targetPositionY);
+			this.isFinished = true;
 			return true;
 		}
 
@@ -71,6 +77,18 @@ public class KeepMovingToTargetPositionAction extends Action {
 	 */
 	public void setTargetPositionX(float targetPositionX) {
 		this.targetPositionX = targetPositionX;
+	}
+
+	/**
+	 * @return true if this action have completed.
+	 */
+	public boolean isFinished() {
+		return this.isFinished;
+	}
+	
+	@Override
+	public void reset() {
+		this.isFinished = false;
 	}
 
 }

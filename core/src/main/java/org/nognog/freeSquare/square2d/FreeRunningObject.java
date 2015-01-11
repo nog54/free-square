@@ -15,11 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  */
 public abstract class FreeRunningObject extends LifeObject {
 
-	private static final float defaultMoveSpeed = 32;
+	protected static final float defaultMoveSpeed = 32;
 
-	private static final StopTimeGenerator defaultGenerator = new StopTimeGenerator() {
+	protected static final StopTimeGenerator defaultGenerator = new StopTimeGenerator() {
 		@Override
-		public float generateStopTime() {
+		public float generateNextStopTime() {
 			return MathUtils.random(0, 1f);
 		}
 	};
@@ -46,7 +46,7 @@ public abstract class FreeRunningObject extends LifeObject {
 		this.isEnableFreeRun = true;
 		this.moveSpeed = moveSpeed;
 		this.stopTimeGenerator = generator;
-		this.stopTime = this.stopTimeGenerator.generateStopTime();
+		this.stopTime = this.stopTimeGenerator.generateNextStopTime();
 		this.stoppingTime = 0;
 
 		this.addListener(new ActorGestureListener() {
@@ -76,31 +76,31 @@ public abstract class FreeRunningObject extends LifeObject {
 	}
 
 	@Override
-	protected long independentAction(float delta, long previousInterval, long minInterval) {
-		super.independentAction(delta, previousInterval, minInterval);
+	protected long independentAction(float delta, long previousInterval, long defaultInterval) {
+		super.independentAction(delta, previousInterval, defaultInterval);
 		if (!this.isEnableFreeRun) {
-			return minInterval;
+			return defaultInterval;
 		}
 
-		if (this.freeRunAction == null) {
+		if (this.freeRunActionIsAlreadyEnded() || this.freeRunAction == null) {
 			this.stoppingTime += delta;
 			if (this.stoppingTime > this.stopTime) {
 				this.stoppingTime = 0;
-				this.stopTime = this.stopTimeGenerator.generateStopTime();
+				this.stopTime = this.stopTimeGenerator.generateNextStopTime();
 				final Vector2 dest = this.generateNextTargetPosition();
-				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x - this.getOriginX(), dest.y, this.moveSpeed);
-				this.freeRunAction.setActor(this);
-				System.out.println(dest);
+				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x, dest.y, this.moveSpeed);
+				this.addAction(this.freeRunAction);
 			}
-			return minInterval;
+			return defaultInterval;
 		}
-		boolean isDoneFreeAction = this.freeRunAction.act(delta);
-		if (isDoneFreeAction) {
-			this.freeRunAction = null;
-		}
+
 		Gdx.graphics.requestRendering();
 		this.getSquare().requestDrawOrderUpdate();
-		return minInterval;
+		return defaultInterval;
+	}
+
+	private boolean freeRunActionIsAlreadyEnded() {
+		return !this.getActions().contains(this.freeRunAction, true);
 	}
 
 	/**
@@ -128,14 +128,16 @@ public abstract class FreeRunningObject extends LifeObject {
 	 * @param enable
 	 * 
 	 */
-	public void setEnableFreeRun(boolean enable) {
-		this.isEnableFreeRun = enable;
-		if (enable == false) {
-			if (this.getActions().contains(this.freeRunAction, true)) {
-				this.removeAction(this.freeRunAction);
+	public synchronized void setEnableFreeRun(boolean enable) {
+		if (this.freeRunAction != null) {
+			if (!enable && this.getActions().contains(this.freeRunAction, true)) {
+				this.getActions().removeValue(this.freeRunAction, true);
+			}
+			if (enable && !this.freeRunAction.isFinished()) {
+				this.getActions().add(this.freeRunAction);
 			}
 		}
-
+		this.isEnableFreeRun = enable;
 	}
 
 	/**
@@ -158,7 +160,7 @@ public abstract class FreeRunningObject extends LifeObject {
 		/**
 		 * @return generated stop time
 		 */
-		float generateStopTime();
+		float generateNextStopTime();
 	}
 
 }

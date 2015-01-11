@@ -70,8 +70,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 * @param baseVertex4
 	 * @param texture
 	 */
-	public Square2D(Square2DSize size, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4,
-			Texture texture) {
+	public Square2D(Square2DSize size, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Texture texture) {
 		this.size = size;
 		final float width = size.getWidth();
 		final float scale = width / texture.getWidth();
@@ -83,8 +82,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		if (this.isInvalidVertex()) {
 			throw new RuntimeException("Square corners are invalid."); //$NON-NLS-1$
 		}
-		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex3.x, this.vertex3.y,
-				this.vertex2.x, this.vertex2.y, this.vertex4.x, this.vertex4.y, null)) {
+		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex3.x, this.vertex3.y, this.vertex2.x, this.vertex2.y, this.vertex4.x, this.vertex4.y, null)) {
 			this.isConcave = false;
 		} else {
 			this.isConcave = true;
@@ -102,7 +100,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		this.addCaptureListener(new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				if (Square2D.this.containsInSquareArea(x, y) || this.isTouchingSquareObject(x,y)) {
+				if (Square2D.this.containsInSquareArea(x, y) || this.isTouchingSquareObject(x, y)) {
 					return false;
 				}
 				event.stop();
@@ -127,12 +125,10 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	}
 
 	private boolean isInvalidVertex() {
-		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y,
-				this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y, null)) {
+		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y, null)) {
 			return true;
 		}
-		if (Intersector.intersectSegments(this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y,
-				this.vertex4.x, this.vertex4.y, this.vertex1.x, this.vertex1.y, null)) {
+		if (Intersector.intersectSegments(this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y, this.vertex1.x, this.vertex1.y, null)) {
 			return true;
 		}
 		return false;
@@ -219,8 +215,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 *         vertex3 and vertex4
 	 */
 	public boolean containsInSquareArea(float x, float y) {
-		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x,
-				this.vertex3.y, this.vertex4.x, this.vertex4.y };
+		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y };
 		Polygon p = new Polygon(vertices);
 		return p.contains(x, y);
 	}
@@ -304,6 +299,16 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 			this.y = y;
 		}
 
+		/**
+		 * @param x1
+		 * @param y1
+		 * @return sqrt((this.x - x) ^ 2 + (this.y - y) ^ 2 )
+		 */
+		public float calculateR(float x1, float y1){
+			final float diffX = this.x - x1;
+			final float diffY = this.y - y1;
+			return (float) Math.sqrt(diffX * diffX + diffY * diffY);
+		}
 		/**
 		 * factory method
 		 * 

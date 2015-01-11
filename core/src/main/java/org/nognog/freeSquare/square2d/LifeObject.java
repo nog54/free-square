@@ -20,7 +20,6 @@ public class LifeObject extends SquareObject2D {
 
 	private Image frame;
 
-	private boolean enableUpDownRoutine;
 	private Action upDownRoutineAction;
 
 	/**
@@ -36,8 +35,7 @@ public class LifeObject extends SquareObject2D {
 		final float upDownAmount = 5;
 		Action foreverUpDown = Square2DActionUtils.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
 		this.upDownRoutineAction = Actions.parallel(foreverRotate, foreverUpDown);
-		this.upDownRoutineAction.setActor(this);
-		this.enableUpDownRoutine = true;
+		this.addAction(this.upDownRoutineAction);
 
 		this.frame = new Image(new Texture(Gdx.files.internal(Resources.frame1Path)));
 		this.frame.setWidth(this.getWidth());
@@ -77,25 +75,27 @@ public class LifeObject extends SquareObject2D {
 	}
 
 	@Override
-	protected long independentAction(float delta, long previousInterval, long minInterval) {
-		if (this.enableUpDownRoutine) {
-			this.upDownRoutineAction.act(delta);
-			Gdx.graphics.requestRendering();
-		}
-		return minInterval;
+	protected long independentAction(float delta, long previousInterval, long defaultInterval) {
+		Gdx.graphics.requestRendering();
+		return defaultInterval;
 	}
 
 	/**
 	 * @return true if up-down routine is enable
 	 */
 	public boolean isEnableUpDownRoutine() {
-		return this.enableUpDownRoutine;
+		return this.getActions().contains(this.upDownRoutineAction, true);
 	}
 
 	/**
-	 * @param isEnable
+	 * @param enable
 	 */
-	public void setEnableUpDownRoutine(boolean isEnable) {
-		this.enableUpDownRoutine = isEnable;
+	public synchronized void setEnableUpDownRoutine(boolean enable) {
+		final boolean currentEnable = this.isEnableUpDownRoutine();
+		if (enable && !currentEnable) {
+			this.getActions().add(this.upDownRoutineAction);
+		} else if (!enable && currentEnable) {
+			this.getActions().removeValue(this.upDownRoutineAction, true);
+		}
 	}
 }
