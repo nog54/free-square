@@ -8,7 +8,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.nognog.freeSquare.square.Square;
+import org.nognog.freeSquare.square.SquareObserver;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Intersector;
@@ -21,7 +23,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**
@@ -40,6 +41,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	private final Square2DSize size;
 	private Image squareImage;
 
+	private Array<SquareObserver> observers;
 	private Array<SquareObject2D> objects;
 
 	private ExecutorService pool = Executors.newCachedThreadPool();
@@ -95,7 +97,8 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		this.squareImage.setY(squareImagePositionOffsetY);
 		this.squareImage.setName("squareImage"); //$NON-NLS-1$
 		this.addActor(this.squareImage);
-		this.objects = new SnapshotArray<>();
+		this.observers = new Array<>();
+		this.objects = new Array<>();
 
 		this.addCaptureListener(new InputListener() {
 			@Override
@@ -254,15 +257,19 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		super.addAction(action);
 		if (this.future == null || this.future.isDone()) {
 			this.future = this.getPool().submit(new Runnable() {
-				private static final long interval = 60;
+				private static final long interval = 10;
 				private long previousActionTime = TimeUtils.millis();
 
 				@Override
 				public void run() {
+					this.actUntilAllActionFinished();
+				}
+
+				private void actUntilAllActionFinished() {
 					while (Square2D.this.getActions().size != 0) {
 						final long currentTime = TimeUtils.millis();
 						final float delta = (currentTime - this.previousActionTime) / 1000f;
-						Square2D.this.act(delta);
+						Square2D.this.getSquareImage().act(delta);
 						this.previousActionTime = currentTime;
 						if (Thread.currentThread().isInterrupted()) {
 							break;
@@ -304,11 +311,12 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		 * @param y1
 		 * @return sqrt((this.x - x) ^ 2 + (this.y - y) ^ 2 )
 		 */
-		public float calculateR(float x1, float y1){
+		public float calculateR(float x1, float y1) {
 			final float diffX = this.x - x1;
 			final float diffY = this.y - y1;
 			return (float) Math.sqrt(diffX * diffX + diffY * diffY);
 		}
+
 		/**
 		 * factory method
 		 * 
@@ -327,4 +335,20 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		}
 	}
 
+	@Override
+	public void addSquareObserver(SquareObserver observer) {
+		this.observers.add(observer);
+	}
+
+	@Override
+	public void removeSquareObserver(SquareObserver observer) {
+		this.observers.removeValue(observer, true);
+	}
+
+	@Override
+	public void notifyObservers() {
+		for (int i = 0; i < this.observers.size; i++) {
+			this.observers.get(i).update();
+		}
+	}
 }

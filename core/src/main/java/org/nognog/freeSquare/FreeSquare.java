@@ -8,6 +8,7 @@ import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2D;
 import org.nognog.freeSquare.square2d.Square2DSize;
 import org.nognog.freeSquare.square2d.SquareObject2D;
@@ -36,7 +37,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 /**
  * @author goshi 2014/10/23
  */
-public class FreeSquare extends ApplicationAdapter {
+public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	private static final float MAX_ZOOM = 1f;
 	private static final float MIN_ZOOM = 0.5f;
@@ -63,9 +64,10 @@ public class FreeSquare extends ApplicationAdapter {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = new GrassySquare1(Square2DSize.SMALL);
+		this.square = new GrassySquare1(Square2DSize.MEDIUM);
+		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 15; i++) {
 			this.square.addAndRunObject(new Riki());
 		}
 
@@ -232,10 +234,16 @@ public class FreeSquare extends ApplicationAdapter {
 
 	@Override
 	public void render() {
+
 		Gdx.gl.glClearColor(0.4f, 0.4f, 1.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		writeWorldCoordinate();
-		this.mainStage.draw();
+		try {
+			this.mainStage.draw();
+		} catch (Throwable t) {
+			Gdx.app.error(this.getClass().getName(), "error occured in draw", t); //$NON-NLS-1$
+			throw t;
+		}
 	}
 
 	private void writeWorldCoordinate() {
@@ -253,25 +261,35 @@ public class FreeSquare extends ApplicationAdapter {
 
 	@Override
 	public void pause() {
-		super.pause();
-		this.performedObjectWhenPause = new SnapshotArray<>();
-		for (SquareObject2D object : this.square.getObjects()) {
-			if (object.isPerformingIndependentAction()) {
-				object.haltIndependentAction();
-				this.performedObjectWhenPause.add(object);
-			}
+		try {
+			super.pause();
+			this.performedObjectWhenPause = new SnapshotArray<>();
+			for (SquareObject2D object : this.square.getObjects()) {
+				if (object.isPerformingIndependentAction()) {
+					object.haltIndependentAction();
+					this.performedObjectWhenPause.add(object);
+				}
 
+			}
+		} catch (Throwable t) {
+			Gdx.app.error(this.getClass().getName(), "error occured in pause", t); //$NON-NLS-1$
+			throw t;
 		}
 	}
 
 	@Override
 	public void resume() {
-		super.resume();
-		if (this.performedObjectWhenPause == null) {
-			return;
-		}
-		for (SquareObject2D object : this.performedObjectWhenPause) {
-			object.startIndependentAction();
+		try {
+			super.resume();
+			if (this.performedObjectWhenPause == null) {
+				return;
+			}
+			for (SquareObject2D object : this.performedObjectWhenPause) {
+				object.startIndependentAction();
+			}
+		} catch (Throwable t) {
+			Gdx.app.error(this.getClass().getName(), "error occured in resume", t); //$NON-NLS-1$
+			throw t;
 		}
 	}
 
@@ -282,13 +300,18 @@ public class FreeSquare extends ApplicationAdapter {
 
 	@Override
 	public void dispose() {
-		System.out.println("end up: " + LastPlay.update()); //$NON-NLS-1$
-		if (this.font != null) {
-			this.font.dispose();
+		try {
+			System.out.println("end up: " + LastPlay.update()); //$NON-NLS-1$
+			if (this.font != null) {
+				this.font.dispose();
+			}
+			this.mainStage.dispose();
+			this.square.dispose();
+			this.shapeRenderer.dispose();
+		} catch (Throwable t) {
+			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
+			throw t;
 		}
-		this.mainStage.dispose();
-		this.square.dispose();
-		this.shapeRenderer.dispose();
 	}
 
 	private void setupPersistItems() {
@@ -313,4 +336,10 @@ public class FreeSquare extends ApplicationAdapter {
 
 		PersistItem.LIFE1.save(this.life);
 	}
+
+	@Override
+	public void update() {
+		Gdx.graphics.requestRendering();
+	}
+
 }

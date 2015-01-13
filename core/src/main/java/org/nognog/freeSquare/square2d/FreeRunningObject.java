@@ -2,7 +2,6 @@ package org.nognog.freeSquare.square2d;
 
 import org.nognog.sence2d.action.KeepMovingToTargetPositionAction;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -94,7 +93,7 @@ public abstract class FreeRunningObject extends LifeObject {
 			return defaultInterval;
 		}
 
-		Gdx.graphics.requestRendering();
+		this.square.notifyObservers();
 		this.getSquare().requestDrawOrderUpdate();
 		return defaultInterval;
 	}

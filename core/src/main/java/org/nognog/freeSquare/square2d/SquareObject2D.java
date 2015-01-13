@@ -164,6 +164,7 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 						final long currentTime = TimeUtils.millis();
 						final float delta = (currentTime - this.previousActionTime) / 1000f;
 						final long requestedInterval = this.actionTarget.independentAction(delta, previousInterval, defaultInterval);
+
 						this.actionTarget.act(delta);
 						this.previousActionTime = currentTime;
 						if (Thread.currentThread().isInterrupted()) {
@@ -178,6 +179,7 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 							}
 						}
 					}
+
 					this.actionTarget.isPerformingIndependentAction = false;
 				}
 
@@ -232,6 +234,13 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	 */
 	public boolean isDisposed() {
 		return this.isDisposed;
+	}
+
+	/**
+	 * notify all observers
+	 */
+	public void notifyObservers() {
+		this.square.notifyObservers();
 	}
 
 	/**

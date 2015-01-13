@@ -76,7 +76,7 @@ public class LifeObject extends SquareObject2D {
 
 	@Override
 	protected long independentAction(float delta, long previousInterval, long defaultInterval) {
-		Gdx.graphics.requestRendering();
+		this.square.notifyObservers();
 		return defaultInterval;
 	}
 

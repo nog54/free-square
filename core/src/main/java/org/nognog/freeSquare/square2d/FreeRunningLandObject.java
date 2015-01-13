@@ -56,10 +56,6 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 				final float r2 = this.target.square.vertex2.calculateR(this.target.getX(), this.target.getY());
 				final float r3 = this.target.square.vertex3.calculateR(this.target.getX(), this.target.getY());
 				final float r4 = this.target.square.vertex4.calculateR(this.target.getX(), this.target.getY());
-				System.out.println(r1);
-				System.out.println(r2);
-				System.out.println(r3);
-				System.out.println(r4);
 				final float minR = Math.min(Math.min(Math.min(r1, r2), r3), r4);
 				if (minR == r1) {
 					return this.target.square.vertex1;
