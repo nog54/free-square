@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.square2d.objects;
+package org.nognog.freeSquare.square2d;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;

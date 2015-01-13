@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.objects.Square2DActionUtils;
+import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,12 +23,10 @@ public class LifeObject extends SquareObject2D {
 	private Action upDownRoutineAction;
 
 	/**
-	 * @param texture
-	 * @param logicalWidth
-	 * @param performIndependentAction
+	 * @param info 
 	 */
-	public LifeObject(Texture texture, float logicalWidth) {
-		super(texture, logicalWidth, true);
+	public LifeObject(SquareObjectInfo info) {
+		super(info);
 		final float degree = 5;
 		final float cycleTime = 4;
 		Action foreverRotate = Square2DActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
@@ -75,9 +73,9 @@ public class LifeObject extends SquareObject2D {
 	}
 
 	@Override
-	protected float independentAction(float delta, float defaultNextMinInterval) {
+	protected float independentAction(float delta, float defaultIntervalToNext) {
 		this.square.notifyObservers();
-		return defaultNextMinInterval;
+		return defaultIntervalToNext;
 	}
 
 	/**

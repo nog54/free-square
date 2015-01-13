@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.square2d.Square2D.Vertex;
+import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
@@ -15,30 +16,27 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 public class FreeRunningLandObject extends FreeRunningObject implements LandObject {
 
 	/**
-	 * @param texture
-	 * @param width
+	 * @param info
 	 */
-	public FreeRunningLandObject(Texture texture, float width) {
-		this(texture, width, defaultMoveSpeed);
+	public FreeRunningLandObject(SquareObjectInfo info) {
+		this(info, defaultMoveSpeed);
 	}
 
 	/**
-	 * @param texture
-	 * @param width
+	 * @param info
 	 * @param moveSpeed
 	 */
-	public FreeRunningLandObject(Texture texture, float width, float moveSpeed) {
-		this(texture, width, moveSpeed, defaultGenerator);
+	public FreeRunningLandObject(SquareObjectInfo info, float moveSpeed) {
+		this(info, moveSpeed, defaultGenerator);
 	}
 
 	/**
-	 * @param texture
-	 * @param width
+	 * @param info
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FreeRunningLandObject(Texture texture, float width, float moveSpeed, StopTimeGenerator generator) {
-		super(texture, width, moveSpeed, generator);
+	public FreeRunningLandObject(SquareObjectInfo info, float moveSpeed, StopTimeGenerator generator) {
+		super(info, moveSpeed, generator);
 		this.addListener(new ActorGestureListener() {
 			FreeRunningObject target = FreeRunningLandObject.this;
 

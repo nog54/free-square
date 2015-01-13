@@ -11,13 +11,16 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2D;
 import org.nognog.freeSquare.square2d.Square2DSize;
-import org.nognog.freeSquare.square2d.objects.Riki;
+import org.nognog.freeSquare.square2d.SquareObject2D;
+import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
+import org.nognog.freeSquare.square2d.objects.life.Riki;
 import org.nognog.freeSquare.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -66,6 +69,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		for (int i = 0; i < 15; i++) {
 			this.square.addSquareObject(new Riki());
 		}
+		SquareObject2D tofu = new SquareObject2D(SquareObjectInfo.TOFU);
+		tofu.setColor(Color.RED);
+		this.square.addSquareObject(tofu);
 
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.mainStage.addActor(this.square);
@@ -230,7 +236,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void render() {
-
 		Gdx.gl.glClearColor(0.4f, 0.4f, 1.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		writeWorldCoordinate();

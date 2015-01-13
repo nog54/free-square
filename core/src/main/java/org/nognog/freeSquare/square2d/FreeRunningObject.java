@@ -1,8 +1,8 @@
 package org.nognog.freeSquare.square2d;
 
+import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 import org.nognog.sence2d.action.KeepMovingToTargetPositionAction;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2015/01/03
  */
-public abstract class FreeRunningObject extends LifeObject {
+public class FreeRunningObject extends LifeObject {
 
 	protected static final float defaultMoveSpeed = 32;
 
@@ -32,16 +32,28 @@ public abstract class FreeRunningObject extends LifeObject {
 	private StopTimeGenerator stopTimeGenerator;
 	private float stoppingTime;
 
-	protected FreeRunningObject(Texture texture, float width) {
-		this(texture, width, defaultMoveSpeed);
+	/**
+	 * @param info
+	 */
+	public FreeRunningObject(SquareObjectInfo info) {
+		this(info, defaultMoveSpeed);
 	}
 
-	protected FreeRunningObject(Texture texture, float width, float moveSpeed) {
-		this(texture, width, moveSpeed, defaultGenerator);
+	/**
+	 * @param info
+	 * @param moveSpeed
+	 */
+	public FreeRunningObject(SquareObjectInfo info, float moveSpeed) {
+		this(info, moveSpeed, defaultGenerator);
 	}
 
-	protected FreeRunningObject(Texture texture, float width, float moveSpeed, StopTimeGenerator generator) {
-		super(texture, width);
+	/**
+	 * @param info
+	 * @param moveSpeed
+	 * @param generator
+	 */
+	public FreeRunningObject(SquareObjectInfo info, float moveSpeed, StopTimeGenerator generator) {
+		super(info);
 		this.isEnableFreeRun = true;
 		this.moveSpeed = moveSpeed;
 		this.stopTimeGenerator = generator;
@@ -75,10 +87,10 @@ public abstract class FreeRunningObject extends LifeObject {
 	}
 
 	@Override
-	protected float independentAction(float delta, float defaultNextMinInterval) {
-		super.independentAction(delta, defaultNextMinInterval);
+	protected float independentAction(float delta, float defaultIntervalToNext) {
+		super.independentAction(delta, defaultIntervalToNext);
 		if (!this.isEnableFreeRun) {
-			return defaultNextMinInterval;
+			return defaultIntervalToNext;
 		}
 
 		if (this.freeRunActionIsAlreadyEnded() || this.freeRunAction == null) {
@@ -90,12 +102,12 @@ public abstract class FreeRunningObject extends LifeObject {
 				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x, dest.y, this.moveSpeed);
 				this.addAction(this.freeRunAction);
 			}
-			return defaultNextMinInterval;
+			return defaultIntervalToNext;
 		}
 
 		this.square.notifyObservers();
 		this.getSquare().requestDrawOrderUpdate();
-		return defaultNextMinInterval;
+		return defaultIntervalToNext;
 	}
 
 	private boolean freeRunActionIsAlreadyEnded() {

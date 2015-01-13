@@ -1,7 +1,9 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.square.SquareObject;
+import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -13,25 +15,34 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 /**
  * @author goshi 2014/12/03
  */
-public abstract class SquareObject2D extends Group implements SquareObject<Square2D> {
+public class SquareObject2D extends Group implements SquareObject<Square2D> {
 
+	private String name;
 	private final float logicalWidth;
 	private final float logicalHeight;
 
 	protected Square2D square;
 	private final Image image;
 
-	private float minIntevalToNextAction;
+	private float minIntevalToNextIndependentAction;
 	private float actionStoppingTime;
 
 	private boolean isDisposed = false;
 
 	/**
+	 * @param info
+	 */
+	public SquareObject2D(SquareObjectInfo info) {
+		this(info.getName(), new Texture(info.getTexturePath()), info.getLogicalWidth());
+	}
+
+	/**
+	 * @param name
 	 * @param texture
 	 * @param logicalWidth
-	 * @param performIndependentAction
 	 */
-	public SquareObject2D(Texture texture, float logicalWidth, boolean performIndependentAction) {
+	private SquareObject2D(String name, Texture texture, float logicalWidth) {
+		this.name = name;
 		this.image = new Image(texture);
 		this.logicalWidth = logicalWidth;
 		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
@@ -174,11 +185,17 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	@Override
 	public void act(float delta) {
 		this.actionStoppingTime += delta;
-		if (this.actionStoppingTime >= this.minIntevalToNextAction) {
-			this.minIntevalToNextAction = this.independentAction(this.actionStoppingTime, 0);
+		if (this.actionStoppingTime >= this.minIntevalToNextIndependentAction) {
+			this.minIntevalToNextIndependentAction = this.independentAction(this.actionStoppingTime, 0);
 			this.actionStoppingTime = 0;
 		}
 		super.act(delta);
+	}
+	
+	@Override
+	public void setColor(Color color) {
+		super.setColor(color);
+		this.image.setColor(color);
 	}
 
 	/**
@@ -187,5 +204,13 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	 * @return min interval to next act [ms]
 	 * 
 	 */
-	protected abstract float independentAction(float delta, float defaultNextMinInterval);
+	@SuppressWarnings("static-method")
+	protected float independentAction(float delta, float defaultIntervalToNext) {
+		return defaultIntervalToNext;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
 }
