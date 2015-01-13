@@ -7,7 +7,7 @@ package org.nognog.freeSquare.square;
 public interface SquareObject<T extends Square<?>> {
 
 	/**
-	 * This method should only be involed via {@link Square#addObject(SquareObject)}
+	 * This method should only be involed via {@link Square#addSquareObject(SquareObject)}
 	 * @param square
 	 */
 	void setSquare(T square);

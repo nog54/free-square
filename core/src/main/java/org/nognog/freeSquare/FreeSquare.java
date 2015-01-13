@@ -11,12 +11,10 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2D;
 import org.nognog.freeSquare.square2d.Square2DSize;
-import org.nognog.freeSquare.square2d.SquareObject2D;
 import org.nognog.freeSquare.square2d.objects.Riki;
 import org.nognog.freeSquare.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -31,7 +29,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
@@ -42,6 +39,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private static final float MAX_ZOOM = 1f;
 	private static final float MIN_ZOOM = 0.5f;
 	private boolean isShowingMenu;
+
+	private boolean isRequestedToRedraw;
 	Vector2 cameraRangeLowerLeft;
 	Vector2 cameraRangeUpperRight;
 	Stage mainStage;
@@ -57,9 +56,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void create() {
-		if (Gdx.app.getType() != ApplicationType.iOS) {
-			Gdx.graphics.setContinuousRendering(false);
-		}
 		this.shapeRenderer = new ShapeRenderer();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
@@ -68,7 +64,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 		for (int i = 0; i < 15; i++) {
-			this.square.addAndRunObject(new Riki());
+			this.square.addSquareObject(new Riki());
 		}
 
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
@@ -239,7 +235,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		writeWorldCoordinate();
 		try {
-			this.mainStage.draw();
+			this.mainStage.act();
+			if (this.isRequestedToRedraw) {
+				this.mainStage.draw();
+				this.isRequestedToRedraw = false;
+			}
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in draw", t); //$NON-NLS-1$
 			throw t;
@@ -257,45 +257,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	}
 
-	private SnapshotArray<SquareObject2D> performedObjectWhenPause;
-
 	@Override
 	public void pause() {
-		try {
-			super.pause();
-			this.performedObjectWhenPause = new SnapshotArray<>();
-			for (SquareObject2D object : this.square.getObjects()) {
-				if (object.isPerformingIndependentAction()) {
-					object.haltIndependentAction();
-					this.performedObjectWhenPause.add(object);
-				}
-
-			}
-		} catch (Throwable t) {
-			Gdx.app.error(this.getClass().getName(), "error occured in pause", t); //$NON-NLS-1$
-			throw t;
-		}
+		Gdx.graphics.setContinuousRendering(false);
 	}
 
 	@Override
 	public void resume() {
-		try {
-			super.resume();
-			if (this.performedObjectWhenPause == null) {
-				return;
-			}
-			for (SquareObject2D object : this.performedObjectWhenPause) {
-				object.startIndependentAction();
-			}
-		} catch (Throwable t) {
-			Gdx.app.error(this.getClass().getName(), "error occured in resume", t); //$NON-NLS-1$
-			throw t;
-		}
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		Gdx.graphics.requestRendering();
+		Gdx.graphics.setContinuousRendering(true);
 	}
 
 	@Override
@@ -339,7 +308,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void update() {
-		Gdx.graphics.requestRendering();
+		this.isRequestedToRedraw = true;
 	}
 
 }

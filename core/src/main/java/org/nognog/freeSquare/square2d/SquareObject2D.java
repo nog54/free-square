@@ -1,7 +1,5 @@
 package org.nognog.freeSquare.square2d;
 
-import java.util.concurrent.Future;
-
 import org.nognog.freeSquare.square.SquareObject;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -11,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.TimeUtils;
 
 /**
  * @author goshi 2014/12/03
@@ -24,10 +21,8 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	protected Square2D square;
 	private final Image image;
 
-	private Future<?> future;
-
-	boolean enablesIndependentAction;
-	boolean isPerformingIndependentAction;
+	private float minIntevalToNextAction;
+	private float actionStoppingTime;
 
 	private boolean isDisposed = false;
 
@@ -47,8 +42,6 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 		this.image.setHeight(this.getLogicalHeight());
 		this.addActor(this.image);
 		this.image.setOriginX(logicalWidth / 2);
-		this.enablesIndependentAction = performIndependentAction;
-		this.isPerformingIndependentAction = false;
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -144,63 +137,6 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 	}
 
 	/**
-	 * start independent action in new thread
-	 */
-	public void startIndependentAction() {
-		if (!this.enablesIndependentAction) {
-			return;
-		}
-		if (this.future == null) {
-			Runnable repeatIndependentAction = new Runnable() {
-				private static final long defaultInterval = 10;
-				private SquareObject2D actionTarget = SquareObject2D.this;
-				private long previousActionTime = TimeUtils.millis();
-
-				@Override
-				public void run() {
-					this.actionTarget.isPerformingIndependentAction = true;
-					long previousInterval = 0;
-					while (true) {
-						final long currentTime = TimeUtils.millis();
-						final float delta = (currentTime - this.previousActionTime) / 1000f;
-						final long requestedInterval = this.actionTarget.independentAction(delta, previousInterval, defaultInterval);
-
-						this.actionTarget.act(delta);
-						this.previousActionTime = currentTime;
-						if (Thread.currentThread().isInterrupted()) {
-							break;
-						}
-						if (requestedInterval > 0) {
-							try {
-								Thread.sleep(requestedInterval);
-								previousInterval = requestedInterval;
-							} catch (InterruptedException e) {
-								break;
-							}
-						}
-					}
-
-					this.actionTarget.isPerformingIndependentAction = false;
-				}
-
-			};
-
-			this.future = this.square.getPool().submit(repeatIndependentAction);
-		}
-	}
-
-	/**
-	 * halt IndependentAction
-	 */
-	public void haltIndependentAction() {
-		if (this.future == null) {
-			return;
-		}
-		this.future.cancel(true);
-		this.future = null;
-	}
-
-	/**
 	 * dispose
 	 */
 	public void dispose() {
@@ -208,15 +144,7 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 			return;
 		}
 		((TextureRegionDrawable) (this.image.getDrawable())).getRegion().getTexture().dispose();
-		this.haltIndependentAction();
 		this.isDisposed = true;
-	}
-
-	/**
-	 * @return true if this is performing independent action
-	 */
-	public boolean isPerformingIndependentAction() {
-		return this.isPerformingIndependentAction;
 	}
 
 	/**
@@ -243,13 +171,21 @@ public abstract class SquareObject2D extends Group implements SquareObject<Squar
 		this.square.notifyObservers();
 	}
 
+	@Override
+	public void act(float delta) {
+		this.actionStoppingTime += delta;
+		if (this.actionStoppingTime >= this.minIntevalToNextAction) {
+			this.minIntevalToNextAction = this.independentAction(this.actionStoppingTime, 0);
+			this.actionStoppingTime = 0;
+		}
+		super.act(delta);
+	}
+
 	/**
-	 * {@link #act(float)} will be called after this method.
+	 * This method will be called by {@link #act(float)}.
 	 * 
-	 * @param delta
-	 * @param previousInterval
-	 * @return interval to next action [ms]
+	 * @return min interval to next act [ms]
 	 * 
 	 */
-	protected abstract long independentAction(float delta, long previousInterval, long defaultInterval);
+	protected abstract float independentAction(float delta, float defaultNextMinInterval);
 }

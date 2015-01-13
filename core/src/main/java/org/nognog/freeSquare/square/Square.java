@@ -9,7 +9,7 @@ public interface Square<T extends SquareObject<?>> {
 	/**
 	 * @param object
 	 */
-	void addObject(T object);
+	void addSquareObject(T object);
 
 	/**
 	 * @return square objects

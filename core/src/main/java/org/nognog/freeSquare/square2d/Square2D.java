@@ -44,9 +44,6 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	private Array<SquareObserver> observers;
 	private Array<SquareObject2D> objects;
 
-	private ExecutorService pool = Executors.newCachedThreadPool();
-	private Future<?> future;
-
 	private boolean isRequestedDrawOrderUpdate = false;
 	private boolean isDisposed = false;
 
@@ -157,18 +154,10 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 * @param object
 	 */
 	@Override
-	public void addObject(SquareObject2D object) {
+	public void addSquareObject(SquareObject2D object) {
 		this.objects.add(object);
 		this.addActor(object);
 		object.setSquare(this);
-	}
-
-	/**
-	 * @param object
-	 */
-	public void addAndRunObject(SquareObject2D object) {
-		this.addObject(object);
-		object.startIndependentAction();
 	}
 
 	@Override
@@ -188,13 +177,6 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 */
 	public Square2DSize getSquareSize() {
 		return this.size;
-	}
-
-	/**
-	 * @return pool
-	 */
-	public ExecutorService getPool() {
-		return this.pool;
 	}
 
 	/**
@@ -227,7 +209,6 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 * dispose
 	 */
 	public void dispose() {
-		this.pool.shutdownNow();
 		((TextureRegionDrawable) (this.squareImage.getDrawable())).getRegion().getTexture().dispose();
 		for (SquareObject2D object : this.objects) {
 			if (!object.isDisposed()) {
@@ -250,40 +231,6 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		sb.append(this.vertex1).append("-").append(this.vertex2).append("-").append(this.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				.append(this.vertex4);
 		return sb.toString();
-	}
-
-	@Override
-	public void addAction(Action action) {
-		super.addAction(action);
-		if (this.future == null || this.future.isDone()) {
-			this.future = this.getPool().submit(new Runnable() {
-				private static final long interval = 10;
-				private long previousActionTime = TimeUtils.millis();
-
-				@Override
-				public void run() {
-					this.actUntilAllActionFinished();
-				}
-
-				private void actUntilAllActionFinished() {
-					while (Square2D.this.getActions().size != 0) {
-						final long currentTime = TimeUtils.millis();
-						final float delta = (currentTime - this.previousActionTime) / 1000f;
-						Square2D.this.getSquareImage().act(delta);
-						this.previousActionTime = currentTime;
-						if (Thread.currentThread().isInterrupted()) {
-							break;
-						}
-						try {
-							Thread.sleep(interval);
-						} catch (InterruptedException e) {
-							break;
-						}
-					}
-				}
-
-			});
-		}
 	}
 
 	/**

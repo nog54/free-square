@@ -75,9 +75,9 @@ public class LifeObject extends SquareObject2D {
 	}
 
 	@Override
-	protected long independentAction(float delta, long previousInterval, long defaultInterval) {
+	protected float independentAction(float delta, float defaultNextMinInterval) {
 		this.square.notifyObservers();
-		return defaultInterval;
+		return defaultNextMinInterval;
 	}
 
 	/**
