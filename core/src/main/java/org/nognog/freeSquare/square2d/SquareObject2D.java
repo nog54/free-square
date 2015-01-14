@@ -33,26 +33,19 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 	 * @param info
 	 */
 	public SquareObject2D(SquareObjectInfo info) {
-		this(info.getName(), new Texture(info.getTexturePath()), info.getLogicalWidth());
-	}
-
-	/**
-	 * @param name
-	 * @param texture
-	 * @param logicalWidth
-	 */
-	private SquareObject2D(String name, Texture texture, float logicalWidth) {
-		this.name = name;
+		this.name = info.getName();
+		final Texture texture = new Texture(info.getTexturePath());
 		this.image = new Image(texture);
-		this.logicalWidth = logicalWidth;
+		this.logicalWidth = info.getLogicalWidth();
 		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		this.setWidth(logicalWidth);
+		this.setColor(info.getColor());
+		this.setWidth(this.logicalWidth);
 		this.setHeight(this.getLogicalHeight());
-		this.setOriginX(logicalWidth / 2);
-		this.image.setWidth(logicalWidth);
+		this.setOriginX(this.logicalWidth / 2);
+		this.image.setWidth(this.logicalWidth);
 		this.image.setHeight(this.getLogicalHeight());
 		this.addActor(this.image);
-		this.image.setOriginX(logicalWidth / 2);
+		this.image.setOriginX(this.logicalWidth / 2);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -191,7 +184,7 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 		}
 		super.act(delta);
 	}
-	
+
 	@Override
 	public void setColor(Color color) {
 		super.setColor(color);

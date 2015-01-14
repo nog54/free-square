@@ -20,7 +20,6 @@ import org.nognog.freeSquare.util.font.FontUtil;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -69,9 +68,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		for (int i = 0; i < 15; i++) {
 			this.square.addSquareObject(new Riki());
 		}
-		SquareObject2D tofu = new SquareObject2D(SquareObjectInfo.TOFU);
-		tofu.setColor(Color.RED);
-		this.square.addSquareObject(tofu);
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.RED_PEPPER_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.MINT_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.WORMWOOD_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.FREEZE_DRIED_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.MASTATD_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.ICE_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.GOLD_SESAME_TOFU));
+		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.BLACK_SESAME_TOFU));
 
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.mainStage.addActor(this.square);
@@ -205,6 +210,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			@Override
 			public void center() {
 				FreeSquare.this.hideMenu();
+				((OrthographicCamera) FreeSquare.this.mainStage.getCamera()).zoom -= 0.2;
 			}
 		});
 	}

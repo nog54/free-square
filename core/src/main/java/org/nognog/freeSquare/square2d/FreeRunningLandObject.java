@@ -3,7 +3,6 @@ package org.nognog.freeSquare.square2d;
 import org.nognog.freeSquare.square2d.Square2D.Vertex;
 import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
