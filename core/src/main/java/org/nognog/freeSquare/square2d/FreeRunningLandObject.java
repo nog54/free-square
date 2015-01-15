@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
-import org.nognog.freeSquare.square2d.Square2D.Vertex;
-import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
+import org.nognog.freeSquare.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -17,7 +17,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	/**
 	 * @param info
 	 */
-	public FreeRunningLandObject(SquareObjectInfo info) {
+	public FreeRunningLandObject(Square2dObjectKind info) {
 		this(info, defaultMoveSpeed);
 	}
 
@@ -25,7 +25,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param info
 	 * @param moveSpeed
 	 */
-	public FreeRunningLandObject(SquareObjectInfo info, float moveSpeed) {
+	public FreeRunningLandObject(Square2dObjectKind info, float moveSpeed) {
 		this(info, moveSpeed, defaultGenerator);
 	}
 
@@ -34,7 +34,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FreeRunningLandObject(SquareObjectInfo info, float moveSpeed, StopTimeGenerator generator) {
+	public FreeRunningLandObject(Square2dObjectKind info, float moveSpeed, StopTimeGenerator generator) {
 		super(info, moveSpeed, generator);
 		this.addListener(new ActorGestureListener() {
 			FreeRunningObject target = FreeRunningLandObject.this;
@@ -71,7 +71,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 
 	@Override
 	protected Vector2 generateNextTargetPosition() {
-		return Square2DUtils.getRandomPointOn(this.square);
+		return Square2dUtils.getRandomPointOn(this.square);
 	}
 
 }

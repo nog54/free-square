@@ -1,7 +1,6 @@
-package org.nognog.freeSquare.square2d.objects.life;
+package org.nognog.freeSquare.square2d.objects;
 
 import org.nognog.freeSquare.square2d.FreeRunningLandObject;
-import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,7 +17,7 @@ public class Riki extends FreeRunningLandObject {
 	 * create Riki
 	 */
 	public Riki() {
-		super(SquareObjectInfo.RIKI, moveSpeed);
+		super(Square2dObjectKind.RIKI, moveSpeed);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {

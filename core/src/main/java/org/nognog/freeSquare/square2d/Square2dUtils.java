@@ -8,15 +8,15 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * @author goshi 2014/12/24
  */
-public class Square2DUtils {
-	private Square2DUtils() {
+public class Square2dUtils {
+	private Square2dUtils() {
 	}
 
 	/**
 	 * @param square
 	 * @return random point in square2d
 	 */
-	public static Vector2 getRandomPointOn(Square2D square) {
+	public static Vector2 getRandomPointOn(Square2d square) {
 		if (square.isConcave()) {
 			throw new UnsupportedYetException("concave square is not supported yet"); //$NON-NLS-1$
 		}
@@ -33,7 +33,7 @@ public class Square2DUtils {
 	 * @param v3
 	 * @return random point in 3 points triangle
 	 */
-	public static Vector2 getRandomPointOn(Square2D.Vertex v1, Square2D.Vertex v2, Square2D.Vertex v3) {
+	public static Vector2 getRandomPointOn(Square2d.Vertex v1, Square2d.Vertex v2, Square2d.Vertex v3) {
 		double sqrtR1 = Math.sqrt(MathUtils.random());
 		double r2 = MathUtils.random();
 		double x = (1 - sqrtR1) * v1.x + (sqrtR1 * (1 - r2)) * v2.x + (sqrtR1 * r2) * v3.x;

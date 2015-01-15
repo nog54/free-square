@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.square.SquareObject;
-import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,13 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 /**
  * @author goshi 2014/12/03
  */
-public class SquareObject2D extends Group implements SquareObject<Square2D> {
+public class Square2dObject extends Group implements SquareObject<Square2d> {
 
-	private String name;
+	private Square2dObjectKind kind;
 	private final float logicalWidth;
 	private final float logicalHeight;
 
-	protected Square2D square;
+	protected Square2d square;
 	private final Image image;
 
 	private float minIntevalToNextIndependentAction;
@@ -30,15 +30,15 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 	private boolean isDisposed = false;
 
 	/**
-	 * @param info
+	 * @param kind
 	 */
-	public SquareObject2D(SquareObjectInfo info) {
-		this.name = info.getName();
-		final Texture texture = new Texture(info.getTexturePath());
+	public Square2dObject(Square2dObjectKind kind) {
+		this.kind = kind;
+		final Texture texture = new Texture(kind.getTexturePath());
 		this.image = new Image(texture);
-		this.logicalWidth = info.getLogicalWidth();
+		this.logicalWidth = kind.getLogicalWidth();
 		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		this.setColor(info.getColor());
+		this.setColor(kind.getColor());
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.getLogicalHeight());
 		this.setOriginX(this.logicalWidth / 2);
@@ -86,12 +86,12 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 	}
 
 	@Override
-	public void setSquare(Square2D square) {
+	public void setSquare(Square2d square) {
 		if (this.square != null) {
 			throw new RuntimeException("square already setted."); //$NON-NLS-1$
 		}
 		this.square = square;
-		Vector2 randomPoint = Square2DUtils.getRandomPointOn(this.square);
+		Vector2 randomPoint = Square2dUtils.getRandomPointOn(this.square);
 		this.setX(randomPoint.x);
 		this.setY(randomPoint.y);
 	}
@@ -111,6 +111,13 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 		super.setPosition(x - this.getOriginX(), y, align);
 	}
 
+	/**
+	 * @return kind of this object
+	 */
+	public Square2dObjectKind getKind() {
+		return this.kind;
+	}
+
 	@Override
 	public float getX() {
 		return super.getX() + this.getOriginX();
@@ -122,7 +129,7 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 	}
 
 	@Override
-	public Square2D getSquare() {
+	public Square2d getSquare() {
 		return this.square;
 	}
 
@@ -204,6 +211,6 @@ public class SquareObject2D extends Group implements SquareObject<Square2D> {
 
 	@Override
 	public String toString() {
-		return this.name;
+		return this.kind.name();
 	}
 }

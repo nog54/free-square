@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d;
 
-import static org.nognog.freeSquare.square2d.Square2D.Vertex.vertex;
+import static org.nognog.freeSquare.square2d.Square2d.Vertex.vertex;
 
 import java.util.Comparator;
 
@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2014/12/10
  */
-public class Square2D extends Group implements Square<SquareObject2D> {
+public class Square2d extends Group implements Square<Square2dObject> {
 	/** vertex1 of Square */
 	public final Vertex vertex1;
 	/** vertex2 of Square */
@@ -32,11 +32,11 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	/** vertex4 of Square */
 	public final Vertex vertex4;
 	private final boolean isConcave;
-	private final Square2DSize size;
+	private final Square2dSize size;
 	private Image squareImage;
 
 	private Array<SquareObserver> observers;
-	private Array<SquareObject2D> objects;
+	private Array<Square2dObject> objects;
 
 	private boolean isRequestedDrawOrderUpdate = false;
 	private boolean isDisposed = false;
@@ -63,7 +63,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 * @param baseVertex4
 	 * @param texture
 	 */
-	public Square2D(Square2DSize size, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Texture texture) {
+	public Square2d(Square2dSize size, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Texture texture) {
 		this.size = size;
 		final float width = size.getWidth();
 		final float scale = width / texture.getWidth();
@@ -94,7 +94,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 		this.addCaptureListener(new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				if (Square2D.this.containsInSquareArea(x, y) || this.isTouchingSquareObject(x, y)) {
+				if (Square2d.this.containsInSquareArea(x, y) || this.isTouchingSquareObject(x, y)) {
 					return false;
 				}
 				event.stop();
@@ -102,8 +102,8 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 			}
 
 			private boolean isTouchingSquareObject(float x, float y) {
-				Actor touchedActor = Square2D.this.hit(x, y, true);
-				return touchedActor != Square2D.this.getSquareImage();
+				Actor touchedActor = Square2d.this.hit(x, y, true);
+				return touchedActor != Square2d.this.getSquareImage();
 			}
 		});
 	}
@@ -148,14 +148,14 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 * @param object
 	 */
 	@Override
-	public void addSquareObject(SquareObject2D object) {
+	public void addSquareObject(Square2dObject object) {
 		this.objects.add(object);
 		this.addActor(object);
 		object.setSquare(this);
 	}
 
 	@Override
-	public Iterable<SquareObject2D> getObjects() {
+	public Iterable<Square2dObject> getObjects() {
 		return this.objects;
 	}
 
@@ -169,7 +169,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	/**
 	 * @return size
 	 */
-	public Square2DSize getSquareSize() {
+	public Square2dSize getSquareSize() {
 		return this.size;
 	}
 
@@ -204,7 +204,7 @@ public class Square2D extends Group implements Square<SquareObject2D> {
 	 */
 	public void dispose() {
 		((TextureRegionDrawable) (this.squareImage.getDrawable())).getRegion().getTexture().dispose();
-		for (SquareObject2D object : this.objects) {
+		for (Square2dObject object : this.objects) {
 			if (!object.isDisposed()) {
 				object.dispose();
 			}

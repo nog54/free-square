@@ -1,10 +1,10 @@
 package org.nognog.freeSquare.square2d.squares;
 
-import static org.nognog.freeSquare.square2d.Square2D.Vertex.vertex;
+import static org.nognog.freeSquare.square2d.Square2d.Vertex.vertex;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.Square2D;
-import org.nognog.freeSquare.square2d.Square2DSize;
+import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.Square2dSize;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/15
  */
-public class GrassySquare1 extends Square2D {
+public class GrassySquare1 extends Square2d {
 
 	private static final Vertex baseVertex1 = vertex(511.5f, 64f);
 	private static final Vertex baseVertex2 = vertex(1010f, 272f);
@@ -26,7 +26,7 @@ public class GrassySquare1 extends Square2D {
 	/**
 	 * @param size
 	 */
-	public GrassySquare1(Square2DSize size) {
+	public GrassySquare1(Square2dSize size) {
 		super(size, baseVertex1, baseVertex2, baseVertex3, baseVertex4, new Texture(
 				Gdx.files.internal(Resources.grassy1Path)));
 		this.addListener(new ActorGestureListener() {

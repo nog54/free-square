@@ -9,11 +9,9 @@ import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.square.SquareObserver;
-import org.nognog.freeSquare.square2d.Square2D;
-import org.nognog.freeSquare.square2d.Square2DSize;
-import org.nognog.freeSquare.square2d.SquareObject2D;
-import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
-import org.nognog.freeSquare.square2d.objects.life.Riki;
+import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.Square2dSize;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
 import org.nognog.freeSquare.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -46,7 +44,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	Vector2 cameraRangeLowerLeft;
 	Vector2 cameraRangeUpperRight;
 	Stage mainStage;
-	Square2D square;
+	Square2d square;
 	BitmapFont font;
 	Player player;
 	Life life;
@@ -62,21 +60,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = new GrassySquare1(Square2DSize.MEDIUM);
+		this.square = new GrassySquare1(Square2dSize.MEDIUM);
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
-		for (int i = 0; i < 15; i++) {
-			this.square.addSquareObject(new Riki());
+
+		for (Square2dObjectKind object : Square2dObjectKind.values()) {
+			this.square.addSquareObject(object.create());
 		}
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.RED_PEPPER_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.MINT_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.WORMWOOD_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.FREEZE_DRIED_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.MASTATD_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.ICE_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.GOLD_SESAME_TOFU));
-		this.square.addSquareObject(new SquareObject2D(SquareObjectInfo.BLACK_SESAME_TOFU));
 
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.mainStage.addActor(this.square);

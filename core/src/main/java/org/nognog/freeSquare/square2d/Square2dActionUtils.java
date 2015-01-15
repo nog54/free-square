@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 /**
  * @author goshi 2014/12/23
  */
-public class Square2DActionUtils {
-	private Square2DActionUtils() {
+public class Square2dActionUtils {
+	private Square2dActionUtils() {
 	}
 
 	/**

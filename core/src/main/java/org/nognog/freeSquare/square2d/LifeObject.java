@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.objects.SquareObjectInfo;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/31
  */
-public class LifeObject extends SquareObject2D {
+public class LifeObject extends Square2dObject {
 
 	private Image frame;
 
@@ -25,13 +25,13 @@ public class LifeObject extends SquareObject2D {
 	/**
 	 * @param info 
 	 */
-	public LifeObject(SquareObjectInfo info) {
+	public LifeObject(Square2dObjectKind info) {
 		super(info);
 		final float degree = 5;
 		final float cycleTime = 4;
-		Action foreverRotate = Square2DActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
+		Action foreverRotate = Square2dActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
 		final float upDownAmount = 5;
-		Action foreverUpDown = Square2DActionUtils.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
+		Action foreverUpDown = Square2dActionUtils.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
 		this.upDownRoutineAction = Actions.parallel(foreverRotate, foreverUpDown);
 		this.addAction(this.upDownRoutineAction);
 
