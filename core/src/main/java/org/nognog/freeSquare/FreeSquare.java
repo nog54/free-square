@@ -7,11 +7,13 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
+import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.model.player.item.Square2dObjectItem;
 import org.nognog.freeSquare.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dSize;
-import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -46,6 +48,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	Stage mainStage;
 	Square2d square;
 	BitmapFont font;
+	PlayLog playlog;
 	Player player;
 	Life life;
 	Date start;
@@ -56,6 +59,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void create() {
+		setupPersistItems();
+		System.out.println(this.player.getItemBox());
 		this.shapeRenderer = new ShapeRenderer();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
@@ -64,17 +69,21 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 
-		for (Square2dObjectKind object : Square2dObjectKind.values()) {
+		for (Square2dObjectType object : Square2dObjectType.values()) {
 			this.square.addSquareObject(object.create());
 		}
 
+		this.player.getItemBox().increaseItem(new Square2dObjectItem(Square2dObjectType.ICE_TOFU), 1);
+		this.player.getItemBox().increaseItem(new Square2dObjectItem(Square2dObjectType.MINT_TOFU), 2);
+		
+		
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.mainStage.addActor(this.square);
 		this.mainStage.getCamera().position.x -= this.mainStage.getCamera().viewportWidth / 2;
 
 		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
 		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY() + Math.max(this.square.getHeight(), logicalCameraHeight));
-		setupPersistItems();
+
 		GestureListener gestureListener = new GestureDetector.GestureAdapter() {
 
 			private float initialScale = 1;
@@ -271,7 +280,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void dispose() {
 		try {
-			System.out.println("end up: " + LastPlay.update()); //$NON-NLS-1$
+			LastPlay.update();
+			PersistItem.PLAYER.save(this.player);
 			if (this.font != null) {
 				this.font.dispose();
 			}
@@ -285,6 +295,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void setupPersistItems() {
+		this.playlog = PersistItem.PLAY_LOG.load();
+		if (this.playlog == null) {
+			System.out.println("new playlog"); //$NON-NLS-1$
+			this.playlog = PlayLog.create();
+			PersistItem.PLAY_LOG.save(this.playlog);
+		}
 		this.player = PersistItem.PLAYER.load();
 		if (this.player == null) {
 			System.out.println("new player"); //$NON-NLS-1$

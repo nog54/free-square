@@ -3,6 +3,7 @@ package org.nognog.freeSquare.model.persist;
 import org.nognog.freeSquare.model.Savable;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.player.LastPlay;
+import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 
 /**
@@ -20,8 +21,13 @@ public class PersistItem<T extends Savable> {
 	/** ライフ1 */
 	public static final PersistItem<Life> LIFE1 = new PersistItem<>(Life.class, "life1"); //$NON-NLS-1$
 
+	/** 最終プレイ */
+	public static final PersistItem<LastPlay> LAST_PLAY = new PersistItem<>(LastPlay.class, "lastPlay"); //$NON-NLS-1$
+
 	/** プレイ記録 */
-	public static final PersistItem<LastPlay> LAST_PLAY = new PersistItem<>(LastPlay.class, "playinglog"); //$NON-NLS-1$
+	public static final PersistItem<PlayLog> PLAY_LOG = new PersistItem<>(PlayLog.class, "playlog"); //$NON-NLS-1$
+
+	private static final PersistItem<?>[] items = new PersistItem[] { PLAYER, LIFE1, LAST_PLAY, PLAY_LOG };
 
 	private final Class<T> saveClass;
 	private final String fileName;
@@ -86,6 +92,17 @@ public class PersistItem<T extends Savable> {
 	 */
 	public String getFileName() {
 		return this.fileName;
+	}
+
+	void changeSaveEncryptionKey(byte[] oldKey, byte[] newKey) throws SaveFailureException, LoadFailureException {
+		PersistManager.save(this, PersistManager.load(this, oldKey), newKey);
+	}
+
+	/**
+	 * @return all persist item
+	 */
+	public static PersistItem<?>[] values() {
+		return items;
 	}
 
 }

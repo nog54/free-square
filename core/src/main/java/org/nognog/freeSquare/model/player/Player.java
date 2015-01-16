@@ -13,9 +13,10 @@ public class Player implements Savable {
 	private String name;
 	private long startDate;
 
+	private ItemBox itemBox;
+
 	@SuppressWarnings("unused")
 	private Player() {
-		// used by json
 		this(defaultName);
 	}
 
@@ -29,6 +30,7 @@ public class Player implements Savable {
 			this.name = name;
 		}
 		this.startDate = new Date().getTime();
+		this.itemBox = new ItemBox();
 	}
 
 	/**
@@ -52,6 +54,13 @@ public class Player implements Savable {
 	@Override
 	public boolean isValid() {
 		return this.name != null;
+	}
+
+	/**
+	 * @return itemBox
+	 */
+	public ItemBox getItemBox() {
+		return this.itemBox;
 	}
 
 }

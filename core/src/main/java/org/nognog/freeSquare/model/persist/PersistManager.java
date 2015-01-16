@@ -9,7 +9,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.nognog.freeSquare.model.Savable;
-import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.model.player.PlayLog;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -30,8 +30,8 @@ class PersistManager {
 
 	static {
 		try {
-			Player player = loadPlayer();
-			encryptionKey = toEncryptKey(player);
+			PlayLog playlog = loadPlayLog();
+			encryptionKey = toEncryptKey(playlog);
 		} catch (Throwable t) {
 			encryptionKey = null;
 		}
@@ -41,11 +41,9 @@ class PersistManager {
 		return new StringBuffer(target).reverse().toString();
 	}
 
-	private static byte[] toEncryptKey(Player player) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(reverse(player.getName())).append(player.getStartDate().getTime());
+	private static byte[] toEncryptKey(PlayLog playlog) {
 		final int keySize = 16;
-		return Arrays.copyOf(sb.toString().getBytes(), keySize);
+		return Arrays.copyOf(reverse(playlog.getLog()).getBytes(), keySize);
 	}
 
 	private enum CipherMode {
@@ -74,8 +72,7 @@ class PersistManager {
 		return decryptedData;
 	}
 
-	private static Cipher getCipher(CipherMode cipherMode) throws InvalidKeyException, NoSuchAlgorithmException,
-			NoSuchPaddingException {
+	private static Cipher getCipher(CipherMode cipherMode) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		SecretKeySpec secretKeySpec = new SecretKeySpec(encryptionKey, "AES"); //$NON-NLS-1$
 		Cipher cipher;
 		cipher = Cipher.getInstance("AES/ECB/PKCS5Padding"); //$NON-NLS-1$
@@ -83,17 +80,22 @@ class PersistManager {
 		return cipher;
 	}
 
+	public static <T extends Savable> void save(PersistItem<T> saveItem, T saveObject) throws SaveFailureException {
+		save(saveItem, saveObject, encryptionKey);
+	}
+
 	/**
 	 * @param saveItem
 	 * @param saveObject
+	 * @param key
 	 * @throws SaveFailureException
 	 */
-	public static <T extends Savable> void save(PersistItem<T> saveItem, T saveObject) throws SaveFailureException {
-		if (saveItem.equals(PersistItem.PLAYER)) {
-			savePlayer((Player) saveObject);
+	static <T extends Savable> void save(PersistItem<T> saveItem, T saveObject, byte[] key) throws SaveFailureException {
+		if (saveItem.equals(PersistItem.PLAY_LOG)) {
+			savePlayLog((PlayLog) saveObject);
 			return;
 		}
-		if (encryptionKey == null) {
+		if (key == null) {
 			throw new SaveFailureException();
 		}
 		String saveJson = json.toJson(saveObject);
@@ -109,18 +111,37 @@ class PersistManager {
 
 	}
 
-	private static synchronized void savePlayer(Player saveObject) throws SaveFailureException {
-		if (encryptionKey != null) {
-			throw new SaveFailureException();
-		}
-		String playerJson = json.toJson(saveObject);
-		String base64PlayerJson = Base64Coder.encodeString(playerJson);
-		synchronized (PersistItem.PLAYER) {
-			FileHandle saveFile = Gdx.files.local(PersistItem.PLAYER.getFileName());
-			saveFile.writeString(base64PlayerJson, false);
+	private static synchronized void savePlayLog(PlayLog saveObject) {
+		String playlogJson = json.toJson(saveObject);
+		String base64PlaylogJson = Base64Coder.encodeString(playlogJson);
+		byte[] newEncryptionKey = toEncryptKey(saveObject);
+		synchronized (PersistItem.PLAY_LOG) {
+			FileHandle saveFile = Gdx.files.local(PersistItem.PLAY_LOG.getFileName());
+			saveFile.writeString(base64PlaylogJson, false);
+			if (encryptionKey != null) {
+				resavePersistItems(encryptionKey, newEncryptionKey);
+			}
 			encryptionKey = toEncryptKey(saveObject);
 		}
 
+	}
+
+	private static void resavePersistItems(byte[] oldEncryptionKey, byte[] newEncryptionKey) {
+		for (PersistItem<?> item : PersistItem.values()) {
+			if (item == PersistItem.PLAY_LOG) {
+				continue;
+			}
+			try {
+				item.changeSaveEncryptionKey(oldEncryptionKey, newEncryptionKey);
+			} catch (SaveFailureException | LoadFailureException e) {
+				// skip
+			}
+
+		}
+	}
+
+	public static <T extends Savable> T load(PersistItem<T> loadItem) throws LoadFailureException {
+		return load(loadItem, encryptionKey);
 	}
 
 	/**
@@ -129,12 +150,12 @@ class PersistManager {
 	 * @throws LoadFailureException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Savable> T load(PersistItem<T> loadItem) throws LoadFailureException {
-		if (encryptionKey == null) {
+	static <T extends Savable> T load(PersistItem<T> loadItem, byte[] key) throws LoadFailureException {
+		if (key == null) {
 			throw new LoadFailureException();
 		}
-		if (loadItem == PersistItem.PLAYER) {
-			return (T) loadPlayer();
+		if (loadItem == PersistItem.PLAY_LOG) {
+			return (T) loadPlayLog();
 		}
 
 		try {
@@ -155,14 +176,14 @@ class PersistManager {
 
 	}
 
-	private static synchronized Player loadPlayer() throws LoadFailureException {
+	private static synchronized PlayLog loadPlayLog() throws LoadFailureException {
 		try {
-			String base64PlayerJson = null;
-			synchronized (PersistItem.PLAYER) {
-				base64PlayerJson = Gdx.files.local(PersistItem.PLAYER.getFileName()).readString();
+			String base64PlaylogJson = null;
+			synchronized (PersistItem.PLAY_LOG) {
+				base64PlaylogJson = Gdx.files.local(PersistItem.PLAY_LOG.getFileName()).readString();
 			}
-			String playerJson = Base64Coder.decodeString(base64PlayerJson);
-			Player player = json.fromJson(Player.class, playerJson);
+			String playlogJson = Base64Coder.decodeString(base64PlaylogJson);
+			PlayLog player = json.fromJson(PlayLog.class, playlogJson);
 
 			if (!player.isValid()) {
 				throw new InvalidLoadDataException();

@@ -17,7 +17,7 @@ public class Riki extends FreeRunningLandObject {
 	 * create Riki
 	 */
 	public Riki() {
-		super(Square2dObjectKind.RIKI, moveSpeed);
+		super(Square2dObjectType.RIKI, moveSpeed);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {

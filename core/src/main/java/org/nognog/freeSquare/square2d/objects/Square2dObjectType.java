@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.Color;
  * @author goshi 2015/01/14
  */
 @SuppressWarnings("javadoc")
-public enum Square2dObjectKind {
+public enum Square2dObjectType {
 
 	RIKI(Messages.getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
 	TOFU(Messages.getString("tofu"), Resources.tofuPath, 75), //$NON-NLS-1$
@@ -26,19 +26,19 @@ public enum Square2dObjectKind {
 	BLACK_SESAME_TOFU(Messages.getString("black-sesame-tofu"), Resources.tofuPath, 75, Colors.LIGHT_GRAY), //$NON-NLS-1$
 	;
 
-	private Square2dObjectKind(String name, String texturePath, float logicalWidth) {
+	private Square2dObjectType(String name, String texturePath, float logicalWidth) {
 		this(name, texturePath, logicalWidth, Square2dObject.class);
 	}
 
-	private Square2dObjectKind(String name, String texturePath, float logicalWidth, Color color) {
+	private Square2dObjectType(String name, String texturePath, float logicalWidth, Color color) {
 		this(name, texturePath, logicalWidth, color, Square2dObject.class);
 	}
 
-	private <T extends Square2dObject> Square2dObjectKind(String name, String texturePath, float logicalWidth, Class<T> klass) {
+	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
 		this(name, texturePath, logicalWidth, Colors.WHITE, klass);
 	}
 
-	private <T extends Square2dObject> Square2dObjectKind(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
+	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
 		this.name = name;
 		this.texturePath = texturePath;
 		this.logicalWidth = logicalWidth;
@@ -70,7 +70,7 @@ public enum Square2dObjectKind {
 
 	public Square2dObject create() {
 		try {
-			Constructor<?> c = this.klass.getConstructor(Square2dObjectKind.class);
+			Constructor<?> c = this.klass.getConstructor(Square2dObjectType.class);
 			return (Square2dObject) c.newInstance(this);
 		} catch (Exception e) {
 			// nothing

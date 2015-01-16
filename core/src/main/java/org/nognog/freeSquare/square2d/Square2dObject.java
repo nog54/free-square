@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.square.SquareObject;
-import org.nognog.freeSquare.square2d.objects.Square2dObjectKind;
+import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  */
 public class Square2dObject extends Group implements SquareObject<Square2d> {
 
-	private Square2dObjectKind kind;
+	private Square2dObjectType type;
 	private final float logicalWidth;
 	private final float logicalHeight;
 
@@ -30,15 +30,15 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	private boolean isDisposed = false;
 
 	/**
-	 * @param kind
+	 * @param type
 	 */
-	public Square2dObject(Square2dObjectKind kind) {
-		this.kind = kind;
-		final Texture texture = new Texture(kind.getTexturePath());
+	public Square2dObject(Square2dObjectType type) {
+		this.type = type;
+		final Texture texture = new Texture(type.getTexturePath());
 		this.image = new Image(texture);
-		this.logicalWidth = kind.getLogicalWidth();
+		this.logicalWidth = type.getLogicalWidth();
 		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		this.setColor(kind.getColor());
+		this.setColor(type.getColor());
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.getLogicalHeight());
 		this.setOriginX(this.logicalWidth / 2);
@@ -114,8 +114,8 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	/**
 	 * @return kind of this object
 	 */
-	public Square2dObjectKind getKind() {
-		return this.kind;
+	public Square2dObjectType getKind() {
+		return this.type;
 	}
 
 	@Override
@@ -211,6 +211,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 
 	@Override
 	public String toString() {
-		return this.kind.name();
+		return this.type.name();
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 import org.nognog.freeSquare.model.Savable;
 import org.nognog.freeSquare.model.persist.LoadFailureException;
 import org.nognog.freeSquare.model.persist.PersistItem;
-import org.nognog.freeSquare.model.persist.SaveFailureException;
 
 /**
  * @author goshi 2014/11/18
@@ -39,7 +38,6 @@ public class LastPlay implements Savable {
 	 * persist new LastPlay and return persisted Date
 	 * 
 	 * @return persisted instance
-	 * @throws SaveFailureException
 	 */
 	public static Date update() {
 		LastPlay saveObject = new LastPlay(new Date());
