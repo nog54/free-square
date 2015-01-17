@@ -1,4 +1,4 @@
-package org.nognog.freeSquare;
+package org.nognog.freeSquare.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -213,15 +213,33 @@ public class FlickButtonController extends Group {
 		this.listener.left();
 	}
 
-	interface FlickInputListener {
+	/**
+	 * @author goshi 2015/01/08
+	 */
+	public interface FlickInputListener {
+		/**
+		 *  Called when center is selected
+		 */
 		void center();
 
+		/**
+		 * Called when up is selected
+		 */
 		void up();
 
+		/**
+		 * Called when down is selected
+		 */
 		void down();
 
+		/**
+		 * Called when right is selected
+		 */
 		void right();
 
+		/**
+		 * Called when left is selected
+		 */
 		void left();
 	}
 }

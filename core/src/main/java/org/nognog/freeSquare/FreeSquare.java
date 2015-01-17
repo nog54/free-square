@@ -2,19 +2,18 @@ package org.nognog.freeSquare;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
-import org.nognog.freeSquare.model.player.item.Square2dObjectItem;
-import org.nognog.freeSquare.square.SquareObserver;
-import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dSize;
-import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
-import org.nognog.freeSquare.square2d.squares.GrassySquare1;
+import org.nognog.freeSquare.ui.FlickButtonController;
+import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
+import org.nognog.freeSquare.ui.square.SquareObserver;
+import org.nognog.freeSquare.ui.square2d.Square2d;
+import org.nognog.freeSquare.ui.square2d.Square2dSize;
+import org.nognog.freeSquare.ui.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -69,14 +68,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 
-		for (Square2dObjectType object : Square2dObjectType.values()) {
-			this.square.addSquareObject(object.create());
-		}
+		// for (Square2dObjectType object : Square2dObjectType.values()) {
+		// this.square.addSquareObject(object.create());
+		// }
+		//
+		// for (Square2dObjectType type : Square2dObjectType.values()) {
+		// this.player.getItemBox().increaseItem(Square2dObjectItem.getInstance(type),
+		// 1);
+		// }
 
-		this.player.getItemBox().increaseItem(new Square2dObjectItem(Square2dObjectType.ICE_TOFU), 1);
-		this.player.getItemBox().increaseItem(new Square2dObjectItem(Square2dObjectType.MINT_TOFU), 2);
-		
-		
 		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.mainStage.addActor(this.square);
 		this.mainStage.getCamera().position.x -= this.mainStage.getCamera().viewportWidth / 2;

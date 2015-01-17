@@ -1,7 +1,7 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.ui.square2d;
 
-import org.nognog.freeSquare.square2d.Square2d.Vertex;
-import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;

@@ -1,6 +1,6 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.ui.square2d;
 
-import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.sence2d.action.KeepMovingToTargetPositionAction;
 
 import com.badlogic.gdx.math.MathUtils;

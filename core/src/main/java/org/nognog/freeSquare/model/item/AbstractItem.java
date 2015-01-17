@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.model.player.item;
+package org.nognog.freeSquare.model.item;
 
 /**
  * @author goshi 2015/01/15

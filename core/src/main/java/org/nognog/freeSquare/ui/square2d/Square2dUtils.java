@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.ui.square2d;
 
 import org.nognog.freeSquare.UnsupportedYetException;
 

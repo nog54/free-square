@@ -1,11 +1,11 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.ui.square2d;
 
-import static org.nognog.freeSquare.square2d.Square2d.Vertex.vertex;
+import static org.nognog.freeSquare.ui.square2d.Square2d.Vertex.vertex;
 
 import java.util.Comparator;
 
-import org.nognog.freeSquare.square.Square;
-import org.nognog.freeSquare.square.SquareObserver;
+import org.nognog.freeSquare.ui.square.Square;
+import org.nognog.freeSquare.ui.square.SquareObserver;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;

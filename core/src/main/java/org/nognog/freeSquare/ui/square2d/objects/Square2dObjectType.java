@@ -1,10 +1,10 @@
-package org.nognog.freeSquare.square2d.objects;
+package org.nognog.freeSquare.ui.square2d.objects;
 
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Messages;
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
 

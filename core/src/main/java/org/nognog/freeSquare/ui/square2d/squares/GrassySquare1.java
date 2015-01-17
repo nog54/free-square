@@ -1,10 +1,10 @@
-package org.nognog.freeSquare.square2d.squares;
+package org.nognog.freeSquare.ui.square2d.squares;
 
-import static org.nognog.freeSquare.square2d.Square2d.Vertex.vertex;
+import static org.nognog.freeSquare.ui.square2d.Square2d.Vertex.vertex;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dSize;
+import org.nognog.freeSquare.ui.square2d.Square2d;
+import org.nognog.freeSquare.ui.square2d.Square2dSize;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;

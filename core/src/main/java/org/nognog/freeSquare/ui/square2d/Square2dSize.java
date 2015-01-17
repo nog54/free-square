@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.ui.square2d;
 
 /**
  * @author goshi 2014/12/26

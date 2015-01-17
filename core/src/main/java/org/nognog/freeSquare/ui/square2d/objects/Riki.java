@@ -1,6 +1,6 @@
-package org.nognog.freeSquare.square2d.objects;
+package org.nognog.freeSquare.ui.square2d.objects;
 
-import org.nognog.freeSquare.square2d.FreeRunningLandObject;
+import org.nognog.freeSquare.ui.square2d.FreeRunningLandObject;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

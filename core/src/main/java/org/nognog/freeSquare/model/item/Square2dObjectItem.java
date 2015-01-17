@@ -1,11 +1,15 @@
-package org.nognog.freeSquare.model.player.item;
+package org.nognog.freeSquare.model.item;
 
-import org.nognog.freeSquare.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+
+import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * @author goshi 2015/01/15
  */
 public class Square2dObjectItem extends AbstractItem<Square2dObjectItem> {
+
+	private static final ObjectMap<Square2dObjectType, Square2dObjectItem> items = new ObjectMap<>();
 
 	private Square2dObjectItem() {
 		super(null);
@@ -14,8 +18,21 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem> {
 	/**
 	 * @param type
 	 */
-	public Square2dObjectItem(Square2dObjectType type) {
+	private Square2dObjectItem(Square2dObjectType type) {
 		super(new Square2dObjectItemType(type));
+	}
+
+	/**
+	 * @param type
+	 * @return type instance
+	 */
+	public static synchronized Square2dObjectItem getInstance(Square2dObjectType type) {
+		if (items.containsKey(type)) {
+			return items.get(type);
+		}
+		Square2dObjectItem typeInstance = new Square2dObjectItem(type);
+		items.put(type, typeInstance);
+		return typeInstance;
 	}
 
 	@Override
