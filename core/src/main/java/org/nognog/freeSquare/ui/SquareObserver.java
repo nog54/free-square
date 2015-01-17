@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.ui.square;
+package org.nognog.freeSquare.ui;
 
 /**
  * @author goshi

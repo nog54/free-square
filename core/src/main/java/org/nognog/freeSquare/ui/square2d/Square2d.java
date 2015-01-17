@@ -4,8 +4,8 @@ import static org.nognog.freeSquare.ui.square2d.Square2d.Vertex.vertex;
 
 import java.util.Comparator;
 
-import org.nognog.freeSquare.ui.square.Square;
-import org.nognog.freeSquare.ui.square.SquareObserver;
+import org.nognog.freeSquare.ui.Square;
+import org.nognog.freeSquare.ui.SquareObserver;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -291,5 +291,17 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		for (int i = 0; i < this.observers.size; i++) {
 			this.observers.get(i).update();
 		}
+	}
+
+	@Override
+	public void act(float delta) {
+		if (this.getActions().size != 0) {
+			super.act(delta);
+			this.notifyObservers();
+			return;
+		}
+
+		super.act(delta);
+
 	}
 }

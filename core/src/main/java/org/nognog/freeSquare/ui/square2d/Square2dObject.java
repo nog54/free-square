@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.ui.square2d;
 
-import org.nognog.freeSquare.ui.square.SquareObject;
+import org.nognog.freeSquare.ui.SquareObject;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;

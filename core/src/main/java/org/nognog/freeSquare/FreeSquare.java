@@ -1,6 +1,9 @@
 package org.nognog.freeSquare;
 
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
@@ -10,9 +13,11 @@ import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.ui.FlickButtonController;
 import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
-import org.nognog.freeSquare.ui.square.SquareObserver;
+import org.nognog.freeSquare.ui.PlayerItemList;
+import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.Square2dSize;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.GrassySquare1;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -23,41 +28,41 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
  * @author goshi 2014/10/23
  */
 public class FreeSquare extends ApplicationAdapter implements SquareObserver {
+	private Stage stage;
+	private Square2d square;
 
-	private static final float MAX_ZOOM = 1f;
-	private static final float MIN_ZOOM = 0.5f;
-	private boolean isShowingMenu;
+	private Vector2 cameraRangeLowerLeft;
+	private Vector2 cameraRangeUpperRight;
+	private boolean isLockingCameraZoom;
+	private boolean isLockingCameraMove;
 
-	private boolean isRequestedToRedraw;
-	Vector2 cameraRangeLowerLeft;
-	Vector2 cameraRangeUpperRight;
-	Stage mainStage;
-	Square2d square;
-	BitmapFont font;
-	PlayLog playlog;
-	Player player;
-	Life life;
-	Date start;
-	Date lastRun;
-	String now;
-	ShapeRenderer shapeRenderer;
-	FlickButtonController menu;
+	private BitmapFont font;
+	private PlayLog playlog;
+	private Player player;
+	private Life life;
+	// private Date start;
+	private Date lastRun;
+	private ShapeRenderer shapeRenderer;
+	private FlickButtonController menu;
+	private PlayerItemList itemList;
+
+	private ExecutorService pool;
+	private Future<?> future;
 
 	@Override
 	public void create() {
+		Gdx.graphics.setContinuousRendering(false);
 		setupPersistItems();
 		System.out.println(this.player.getItemBox());
 		this.shapeRenderer = new ShapeRenderer();
@@ -68,203 +73,186 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 
-		// for (Square2dObjectType object : Square2dObjectType.values()) {
-		// this.square.addSquareObject(object.create());
-		// }
-		//
-		// for (Square2dObjectType type : Square2dObjectType.values()) {
-		// this.player.getItemBox().increaseItem(Square2dObjectItem.getInstance(type),
-		// 1);
-		// }
+		for (Square2dObjectType object : Square2dObjectType.values()) {
+			this.square.addSquareObject(object.create());
+		}
 
-		this.mainStage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
-		this.mainStage.addActor(this.square);
-		this.mainStage.getCamera().position.x -= this.mainStage.getCamera().viewportWidth / 2;
+		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
+		this.stage.addActor(this.square);
+		this.stage.getCamera().position.x -= this.stage.getCamera().viewportWidth / 2;
 
 		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
 		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY() + Math.max(this.square.getHeight(), logicalCameraHeight));
 
-		GestureListener gestureListener = new GestureDetector.GestureAdapter() {
-
-			private float initialScale = 1;
-
-			private Actor lastTouchDownActor;
-
-			@Override
-			public boolean touchDown(float x, float y, int pointer, int button) {
-				Vector2 worldPosition = FreeSquare.this.mainStage.getViewport().unproject(new Vector2(x, y));
-				this.lastTouchDownActor = FreeSquare.this.mainStage.hit(worldPosition.x, worldPosition.y, true);
-				OrthographicCamera camera = (OrthographicCamera) FreeSquare.this.mainStage.getCamera();
-				this.initialScale = camera.zoom;
-				return false;
-			}
-
-			private boolean isLastTouchSquareObjectOrMenu() {
-				return !(this.lastTouchDownActor == FreeSquare.this.square.getSquareImage() || this.lastTouchDownActor == null);
-			}
-
-			@Override
-			public boolean pan(float x, float y, float deltaX, float deltaY) {
-				if (this.isLastTouchSquareObjectOrMenu()) {
-					return false;
-				}
-				OrthographicCamera camera = (OrthographicCamera) FreeSquare.this.mainStage.getCamera();
-				float currentZoom = camera.zoom;
-				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
-				this.adjustCameraPositionIfRangeOver();
-				return true;
-			}
-
-			@Override
-			public boolean zoom(float initialDistance, float distance) {
-				if (FreeSquare.this.square.getTouchable() == Touchable.disabled) {
-					return false;
-				}
-				if (this.isLastTouchSquareObjectOrMenu()) {
-					return false;
-				}
-				if (FreeSquare.this.isShowingMenu()) {
-					return false;
-				}
-				float ratio = initialDistance / distance;
-				float nextZoom = MathUtils.clamp(this.initialScale * ratio, MIN_ZOOM, MAX_ZOOM);
-				OrthographicCamera camera = (OrthographicCamera) FreeSquare.this.mainStage.getCamera();
-				camera.zoom = nextZoom;
-				this.adjustCameraPositionIfRangeOver();
-				return true;
-			}
-
-			@Override
-			public boolean tap(float x, float y, int count, int button) {
-				if (this.isLastTouchSquareObjectOrMenu()) {
-					return false;
-				}
-				if (this.tapsSquare(x, y)) {
-					return false;
-				}
-
-				if (FreeSquare.this.isShowingMenu()) {
-					FreeSquare.this.hideMenu();
-					return true;
-				}
-				Vector2 menuPosition = FreeSquare.this.mainStage.screenToStageCoordinates(new Vector2(x, y));
-				FreeSquare.this.showMenu(menuPosition.x, menuPosition.y);
-				return true;
-			}
-
-			private boolean tapsSquare(float x, float y) {
-				if (FreeSquare.this.square.getTouchable() == Touchable.disabled) {
-					return false;
-				}
-				Vector2 squareCoordinateTapPosition = FreeSquare.this.square.screenToLocalCoordinates(new Vector2(x, y));
-				return FreeSquare.this.square.containsInSquareArea(squareCoordinateTapPosition.x, squareCoordinateTapPosition.y);
-			}
-
-			private void adjustCameraPositionIfRangeOver() {
-				OrthographicCamera camera = (OrthographicCamera) FreeSquare.this.mainStage.getCamera();
-				float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-				float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-
-				float minCameraPositionX = FreeSquare.this.cameraRangeLowerLeft.x + effectiveViewportWidth / 2f;
-				float maxCameraPositionX = FreeSquare.this.cameraRangeUpperRight.x - effectiveViewportWidth / 2f;
-				float minCameraPositionY = FreeSquare.this.cameraRangeLowerLeft.y + effectiveViewportHeight / 2f;
-				float maxCameraPositionY = FreeSquare.this.cameraRangeUpperRight.y - effectiveViewportHeight / 2f;
-
-				camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
-				camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
-			}
-
-		};
 		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(new GestureDetector(gestureListener));
-		multiplexer.addProcessor(this.mainStage);
+		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
+		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
 		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 32);
 		this.menu = new FlickButtonController(this.font, logicalCameraWidth / 6, new FlickInputListener() {
-
 			@Override
 			public void up() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.mainStage.getCamera().translate(0, 10, 0);
+				FreeSquare.this.showSquare();
 			}
 
 			@Override
 			public void right() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.mainStage.getCamera().translate(10, 0, 0);
+				FreeSquare.this.showSquare();
 			}
 
 			@Override
 			public void left() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.mainStage.getCamera().translate(-10, 0, 0);
+				FreeSquare.this.showSquare();
 			}
 
 			@Override
 			public void down() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.mainStage.getCamera().translate(0, -10, 0);
+				FreeSquare.this.showSquare();
 			}
 
 			@Override
 			public void center() {
-				FreeSquare.this.hideMenu();
-				((OrthographicCamera) FreeSquare.this.mainStage.getCamera()).zoom -= 0.2;
+				FreeSquare.this.showItemList();
 			}
 		});
+
+		this.itemList = new PlayerItemList(this.player, this.font);
+		this.itemList.setWidth(logicalCameraWidth / 2);
+		this.itemList.setHeight(logicalCameraHeight / 2);
+
+		this.pool = Executors.newCachedThreadPool();
+		this.future = this.pool.submit(new Runnable() {
+			FreeSquare target = FreeSquare.this;
+			private long lastActTime = TimeUtils.millis();
+
+			@Override
+			public void run() {
+				while (true) {
+					final long currentTime = TimeUtils.millis();
+					final float delta = (currentTime - this.lastActTime) / 1000f;
+					this.target.actStage(delta);
+					this.lastActTime = currentTime;
+					if (Thread.currentThread().isInterrupted()) {
+						break;
+					}
+				}
+			}
+
+		});
+		this.update();
+
 	}
 
 	/**
-	 * @return true if menu is showing
+	 * @return stage
 	 */
-	public boolean isShowingMenu() {
-		return this.isShowingMenu;
+	public Stage getStage() {
+		return this.stage;
+	}
+
+	/**
+	 * @return square
+	 */
+	public Square2d getSquare() {
+		return this.square;
+	}
+
+	/**
+	 * @return true if locking camera zoom
+	 */
+	public boolean isLockingCameraZoom() {
+		return this.isLockingCameraZoom;
+	}
+
+	/**
+	 * @return true if locking camera move
+	 */
+	public boolean isLockingCameraMove() {
+		return this.isLockingCameraMove;
+	}
+
+	/**
+	 * @return lower-left point of camera range
+	 */
+	public Vector2 getCameraRangeLowerLeft() {
+		return this.cameraRangeLowerLeft;
+	}
+
+	/**
+	 * @return upper-right point of camera range
+	 */
+	public Vector2 getCameraRangeUpperRight() {
+		return this.cameraRangeUpperRight;
+	}
+
+	/**
+	 * @return true if showing square
+	 */
+	public boolean isShowingSquare() {
+		return this.square.getTouchable() == Touchable.enabled;
+	}
+
+	void showSquare() {
+		for (Actor child : this.stage.getRoot().getChildren()) {
+			if (child != this.square) {
+				this.stage.getRoot().removeActor(child);
+			}
+		}
+		this.square.getColor().a = 1;
+		this.square.setTouchable(Touchable.enabled);
+		this.isLockingCameraMove = false;
+		this.isLockingCameraZoom = false;
 	}
 
 	void showMenu(float x, float y) {
-		this.mainStage.getRoot().removeActor(this.menu);
+		this.showSquare();
 		this.menu.setPosition(x, y);
-		final float currentCameraZoom = ((OrthographicCamera) this.mainStage.getCamera()).zoom;
+		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
 		this.menu.setScale(currentCameraZoom);
-		this.mainStage.getRoot().addActor(FreeSquare.this.menu);
+		this.stage.getRoot().addActor(this.menu);
 		this.square.getColor().a = 0.75f;
 		this.square.setTouchable(Touchable.disabled);
-		this.isShowingMenu = true;
+		this.isLockingCameraZoom = true;
 	}
 
-	void hideMenu() {
-		this.mainStage.getRoot().removeActor(this.menu);
-		this.square.getColor().a = 1;
-		this.square.setTouchable(Touchable.enabled);
-		this.isShowingMenu = false;
+	void showItemList() {
+		this.showSquare();
+		this.itemList.setPosition(this.stage.getCamera().position.x, this.stage.getCamera().position.y);
+		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
+		this.itemList.setScale(currentCameraZoom);
+		this.stage.getRoot().addActor(this.itemList);
+		this.square.getColor().a = 0.75f;
+		this.square.setTouchable(Touchable.disabled);
+		this.isLockingCameraMove = true;
+		this.isLockingCameraZoom = true;
 	}
 
 	@Override
 	public void render() {
+		this.drawStage();
+	}
+
+	synchronized void drawStage() {
 		Gdx.gl.glClearColor(0.4f, 0.4f, 1.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		writeWorldCoordinate();
-		try {
-			this.mainStage.act();
-			if (this.isRequestedToRedraw) {
-				this.mainStage.draw();
-				this.isRequestedToRedraw = false;
-			}
-		} catch (Throwable t) {
-			Gdx.app.error(this.getClass().getName(), "error occured in draw", t); //$NON-NLS-1$
-			throw t;
+		this.stage.draw();
+	}
+
+	synchronized void actStage(float delta) {
+		synchronized (Gdx.input) {
+			this.stage.act(delta);
 		}
 	}
 
 	private void writeWorldCoordinate() {
 		this.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		this.shapeRenderer.setProjectionMatrix(this.mainStage.getCamera().combined);
+		this.shapeRenderer.setProjectionMatrix(this.stage.getCamera().combined);
 		this.shapeRenderer.setColor(1, 0, 0, 1);
 		this.shapeRenderer.line(-2048, 0, 2048, 0);
 		this.shapeRenderer.setColor(1, 0, 0, 1);
 		this.shapeRenderer.line(0, -2048, 0, 2048);
 		this.shapeRenderer.end();
-
 	}
 
 	@Override
@@ -280,12 +268,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void dispose() {
 		try {
+			this.future.cancel(true);
 			LastPlay.update();
 			PersistItem.PLAYER.save(this.player);
 			if (this.font != null) {
 				this.font.dispose();
 			}
-			this.mainStage.dispose();
+			this.stage.dispose();
 			this.square.dispose();
 			this.shapeRenderer.dispose();
 		} catch (Throwable t) {
@@ -318,14 +307,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			System.out.println("new last Run"); //$NON-NLS-1$
 			this.lastRun = new Date();
 		}
-		this.start = LastPlay.update();
+		// this.start = LastPlay.update();
 
 		PersistItem.LIFE1.save(this.life);
 	}
 
 	@Override
 	public void update() {
-		this.isRequestedToRedraw = true;
+		Gdx.graphics.requestRendering();
 	}
 
 }

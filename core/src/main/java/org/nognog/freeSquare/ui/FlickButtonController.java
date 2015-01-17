@@ -1,10 +1,7 @@
 package org.nognog.freeSquare.ui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -60,21 +57,16 @@ public class FlickButtonController extends Group {
 	}
 
 	private TextButton createMenuTextButton(String text, float x, float y, Color up, Color down) {
-		TextureRegionDrawable upTexture = createPlaneTextureRegionDrawable(up);
-		TextureRegionDrawable downTexture = (down == null) ? upTexture : createPlaneTextureRegionDrawable(down);
+		final int textureRegionWidth = 256;
+		final int textureRegionHeight = 128;
+		TextureRegionDrawable upTexture = UiUtils.createPlaneTextureRegionDrawable(textureRegionWidth, textureRegionHeight, up);
+		TextureRegionDrawable downTexture = (down == null) ? upTexture : UiUtils.createPlaneTextureRegionDrawable(textureRegionWidth, textureRegionHeight, down);
 
 		TextButtonStyle buttonStyle = new TextButtonStyle(upTexture, downTexture, downTexture, this.font);
 		TextButton textButton = new TextButton(text, buttonStyle);
 		textButton.setSize(this.buttonWidthHeight, this.buttonWidthHeight);
 		textButton.setPosition(x, y);
 		return textButton;
-	}
-
-	private static TextureRegionDrawable createPlaneTextureRegionDrawable(Color color) {
-		Pixmap pixmap = new Pixmap(256, 128, Pixmap.Format.RGBA8888);
-		pixmap.setColor(color);
-		pixmap.fill();
-		return new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
 	}
 
 	private void addListenerToButton() {
@@ -218,7 +210,7 @@ public class FlickButtonController extends Group {
 	 */
 	public interface FlickInputListener {
 		/**
-		 *  Called when center is selected
+		 * Called when center is selected
 		 */
 		void center();
 

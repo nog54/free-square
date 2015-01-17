@@ -9,13 +9,20 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2015/01/15
  */
 public class ItemBox implements Savable {
-	private Array<PossessedItem<?>> possessedItems;
+	private final Array<PossessedItem<?>> possessedItems;
 
 	/**
 	 * 
 	 */
 	public ItemBox() {
 		this.possessedItems = new Array<>();
+	}
+
+	/**
+	 * @return possessedItem array
+	 */
+	public Array<PossessedItem<?>> getItemArray() {
+		return this.possessedItems;
 	}
 
 	/**
