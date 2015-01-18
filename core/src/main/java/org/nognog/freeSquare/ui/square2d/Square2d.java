@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -45,9 +46,11 @@ public class Square2d extends Group implements Square<Square2dObject> {
 
 		@Override
 		public int compare(Actor actor1, Actor actor2) {
-			if (actor1.getY() < actor2.getY()) {
+			float actor1Y = actor1.getY() - actor1.getOriginY();
+			float actor2Y = actor2.getY() - actor2.getOriginY();
+			if (actor1Y < actor2Y) {
 				return 1;
-			} else if (actor1.getY() > actor2.getY()) {
+			} else if (actor1Y > actor2Y) {
 				return -1;
 			}
 			return 0;
@@ -87,7 +90,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		this.squareImage.setHeight(this.squareImage.getHeight() * scale);
 		this.squareImage.setY(squareImagePositionOffsetY);
 		this.squareImage.setName("squareImage"); //$NON-NLS-1$
-		this.addActor(this.squareImage);
+		super.addActor(this.squareImage);
 		this.observers = new Array<>();
 		this.objects = new Array<>();
 
@@ -144,14 +147,30 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		}
 	}
 
-	/**
-	 * @param object
-	 */
 	@Override
 	public void addSquareObject(Square2dObject object) {
+		Vector2 randomPoint = Square2dUtils.getRandomPointOn(this);
+		this.addSquareObject(object, randomPoint.x, randomPoint.y);
+	}
+
+	/**
+	 * @param object
+	 * @param x
+	 * @param y
+	 */
+	public void addSquareObject(Square2dObject object, float x, float y) {
 		this.objects.add(object);
-		this.addActor(object);
+		super.addActor(object);
 		object.setSquare(this);
+		object.setPosition(x, y);
+	}
+
+	@Override
+	public void addActor(Actor actor) {
+		if (actor instanceof Square2dObject) {
+			this.addSquareObject((Square2dObject) actor);
+		}
+		throw new RuntimeException("Non-sqaure2d-object is added to square2d."); //$NON-NLS-1$
 	}
 
 	@Override

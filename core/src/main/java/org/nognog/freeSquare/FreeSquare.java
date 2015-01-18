@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.nognog.freeSquare.model.item.Square2dObjectItem;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
@@ -51,7 +52,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private PlayLog playlog;
 	private Player player;
 	private Life life;
-	// private Date start;
 	private Date lastRun;
 	private ShapeRenderer shapeRenderer;
 	private FlickButtonController menu;
@@ -72,9 +72,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square = new GrassySquare1(Square2dSize.MEDIUM);
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
-
 		for (Square2dObjectType object : Square2dObjectType.values()) {
-			this.square.addSquareObject(object.create());
+			for (int i = 0; i < 2; i++) {
+				this.square.addSquareObject(object.create());
+			}
+			this.player.getItemBox().increaseItem(Square2dObjectItem.getInstance(object), 1);
 		}
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
@@ -88,7 +90,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 32);
+		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 24);
 		this.menu = new FlickButtonController(this.font, logicalCameraWidth / 6, new FlickInputListener() {
 			@Override
 			public void up() {
@@ -127,15 +129,21 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void run() {
+
 				while (true) {
 					final long currentTime = TimeUtils.millis();
 					final float delta = (currentTime - this.lastActTime) / 1000f;
-					this.target.actStage(delta);
+					try {
+						this.target.actStage(delta);
+					} catch (NullPointerException e) {
+						// NullPointerException may occur when remove actor.
+					}
 					this.lastActTime = currentTime;
 					if (Thread.currentThread().isInterrupted()) {
 						break;
 					}
 				}
+
 			}
 
 		});
@@ -210,21 +218,29 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
 		this.menu.setScale(currentCameraZoom);
 		this.stage.getRoot().addActor(this.menu);
-		this.square.getColor().a = 0.75f;
-		this.square.setTouchable(Touchable.disabled);
+		this.disableSquare();
 		this.isLockingCameraZoom = true;
 	}
 
 	void showItemList() {
 		this.showSquare();
-		this.itemList.setPosition(this.stage.getCamera().position.x, this.stage.getCamera().position.y);
-		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
-		this.itemList.setScale(currentCameraZoom);
+		resetItemListPositionAndScale();
 		this.stage.getRoot().addActor(this.itemList);
+		this.disableSquare();
+	}
+
+	private void disableSquare() {
+		this.stage.cancelTouchFocus(this.square);
 		this.square.getColor().a = 0.75f;
 		this.square.setTouchable(Touchable.disabled);
-		this.isLockingCameraMove = true;
-		this.isLockingCameraZoom = true;
+	}
+
+	void resetItemListPositionAndScale() {
+		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
+		final float newX = this.stage.getCamera().position.x;
+		final float newY = this.stage.getCamera().position.y - currentCameraZoom * this.itemList.getHeight();
+		this.itemList.setPosition(newX, newY);
+		this.itemList.setScale(currentCameraZoom);
 	}
 
 	@Override
@@ -233,9 +249,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	synchronized void drawStage() {
-		Gdx.gl.glClearColor(0.4f, 0.4f, 1.0f, 1);
+		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		writeWorldCoordinate();
+		// writeWorldCoordinate();
 		this.stage.draw();
 	}
 
@@ -307,8 +323,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			System.out.println("new last Run"); //$NON-NLS-1$
 			this.lastRun = new Date();
 		}
-		// this.start = LastPlay.update();
-
 		PersistItem.LIFE1.save(this.life);
 	}
 

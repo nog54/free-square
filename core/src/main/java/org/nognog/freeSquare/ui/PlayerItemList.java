@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 public class PlayerItemList extends ScrollPane {
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
+	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	private Player player;
 
@@ -25,6 +26,7 @@ public class PlayerItemList extends ScrollPane {
 	public PlayerItemList(Player player, BitmapFont font) {
 		super(createList(player, font));
 		this.player = player;
+		this.setupOverscroll(0, 0, 0);
 	}
 
 	private static List<PossessedItem<?>> createList(Player player, BitmapFont font) {
@@ -35,7 +37,7 @@ public class PlayerItemList extends ScrollPane {
 
 	private static ListStyle createListStyle(BitmapFont font) {
 		final ListStyle style = new ListStyle(font, emerald, nephritis, UiUtils.createPlaneTextureRegionDrawable(256, 128, Color.WHITE));
-		style.background = UiUtils.createPlaneTextureRegionDrawable(256, 128, Color.BLACK);
+		style.background = UiUtils.createPlaneTextureRegionDrawable(256, 128, clearBlack);
 		return style;
 	}
 

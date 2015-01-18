@@ -42,6 +42,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.getLogicalHeight());
 		this.setOriginX(this.logicalWidth / 2);
+		this.setOriginY(this.logicalHeight / 4);
 		this.image.setWidth(this.logicalWidth);
 		this.image.setHeight(this.getLogicalHeight());
 		this.addActor(this.image);
@@ -91,24 +92,27 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 			throw new RuntimeException("square already setted."); //$NON-NLS-1$
 		}
 		this.square = square;
-		Vector2 randomPoint = Square2dUtils.getRandomPointOn(this.square);
-		this.setX(randomPoint.x);
-		this.setY(randomPoint.y);
 	}
+
 
 	@Override
 	public void setX(float x) {
-		super.setX(x - this.getOriginX());
+		this.setPosition(x, this.getY());
+	}
+
+	@Override
+	public void setY(float y) {
+		this.setPosition(this.getX(), y);
 	}
 
 	@Override
 	public void setPosition(float x, float y) {
-		super.setPosition(x - this.getOriginX(), y);
+		super.setPosition(x - this.getOriginX(), y - this.getOriginY());
 	}
 
 	@Override
 	public void setPosition(float x, float y, int align) {
-		super.setPosition(x - this.getOriginX(), y, align);
+		super.setPosition(x - this.getOriginX(), y - this.getOriginY(), align);
 	}
 
 	/**
@@ -126,6 +130,16 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	@Override
 	public float getX(int align) {
 		return super.getX(align) + this.getOriginX();
+	}
+
+	@Override
+	public float getY() {
+		return super.getY() + this.getOriginY();
+	}
+
+	@Override
+	public float getY(int align) {
+		return super.getY(align) + this.getOriginY();
 	}
 
 	@Override

@@ -1,7 +1,10 @@
 package org.nognog.freeSquare;
 
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -10,24 +13,36 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 /**
  * @author goshi 2015/01/17
  */
-public class FreeSquareGestureDetector extends GestureDetector {
+public class FreeSquareGestureDetector extends InputMultiplexer {
 
 	private static final float MAX_CAMERA_ZOOM = 1;
 	private static final float MIN_CAMERA_ZOOM = 0.5f;
+
+	boolean isLastLongPressed;
 
 	/**
 	 * @param freeSquare
 	 */
 	FreeSquareGestureDetector(FreeSquare freeSquare) {
-		super(createFreeSquareGestureListener(freeSquare));
+		GestureDetector gestureDetector = new GestureDetector(createFreeSquareGestureListener(freeSquare));
+		gestureDetector.setLongPressSeconds(0.5f);
+		InputAdapter longTouchTapCanceller = new InputAdapter() {
+
+			@Override
+			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+				if (FreeSquareGestureDetector.this.isLastLongPressed) {
+					return true;
+				}
+				return false;
+			}
+		};
+		this.addProcessor(gestureDetector);
+		this.addProcessor(longTouchTapCanceller);
 	}
 
-	private static GestureListener createFreeSquareGestureListener(final FreeSquare freeSquare) {
-
+	private GestureListener createFreeSquareGestureListener(final FreeSquare freeSquare) {
 		GestureListener listener = new GestureDetector.GestureAdapter() {
-
 			private float initialScale = 1;
-
 			private Actor lastTouchDownActor;
 
 			@Override
@@ -36,6 +51,7 @@ public class FreeSquareGestureDetector extends GestureDetector {
 				this.lastTouchDownActor = freeSquare.getStage().hit(worldPosition.x, worldPosition.y, true);
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				this.initialScale = camera.zoom;
+				FreeSquareGestureDetector.this.isLastLongPressed = false;
 				return false;
 			}
 
@@ -55,6 +71,7 @@ public class FreeSquareGestureDetector extends GestureDetector {
 				float currentZoom = camera.zoom;
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
 				this.adjustCameraPositionIfRangeOver();
+				freeSquare.resetItemListPositionAndScale();
 				return true;
 			}
 
@@ -74,6 +91,7 @@ public class FreeSquareGestureDetector extends GestureDetector {
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
 				this.adjustCameraPositionIfRangeOver();
+				freeSquare.resetItemListPositionAndScale();
 				return true;
 			}
 
@@ -93,6 +111,17 @@ public class FreeSquareGestureDetector extends GestureDetector {
 				Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
 				freeSquare.showMenu(menuPosition.x, menuPosition.y);
 				return true;
+			}
+
+			@Override
+			public boolean longPress(float x, float y) {
+				if (this.isLastTouchBackGround()) {
+					Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
+					freeSquare.showMenu(menuPosition.x, menuPosition.y);
+					FreeSquareGestureDetector.this.isLastLongPressed = true;
+					return true;
+				}
+				return false;
 			}
 
 			private boolean tapsSquare(float x, float y) {
@@ -117,7 +146,6 @@ public class FreeSquareGestureDetector extends GestureDetector {
 				camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
 			}
 		};
-
 		return listener;
 
 	}

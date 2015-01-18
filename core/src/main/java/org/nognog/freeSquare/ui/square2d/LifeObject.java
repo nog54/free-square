@@ -27,6 +27,7 @@ public class LifeObject extends Square2dObject {
 	 */
 	public LifeObject(Square2dObjectType type) {
 		super(type);
+		this.setOriginY(0);
 		final float degree = 5;
 		final float cycleTime = 4;
 		Action foreverRotate = Square2dActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
