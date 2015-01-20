@@ -291,7 +291,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				this.font.dispose();
 			}
 			this.stage.dispose();
-			this.square.dispose();
+			Square2dType.dispose();
+			Square2dObjectType.dispose();
 			this.shapeRenderer.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$

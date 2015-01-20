@@ -8,7 +8,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nognog.freeSquare.GdxUseTest;
+import org.junit.runner.RunWith;
+import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -19,8 +20,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
  */
 
 @SuppressWarnings({ "boxing", "javadoc" })
-public class FlickButtonControllerTest extends GdxUseTest {
-
+@RunWith(GdxTestRunner.class)
+public class FlickButtonControllerTest {
+	
 	private BitmapFont font;
 	private float buttonWidthHeight;
 	private FlickInputListener listener;

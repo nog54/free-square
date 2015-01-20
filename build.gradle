@@ -81,14 +81,18 @@ project(":core") {
 
 	dependencies {
 		compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+		compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
 		compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 		compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 		testCompile "junit:junit:+"
 		testCompile "org.exparity:hamcrest-date:1.0.1"
 		testCompile "org.mockito:mockito-core:1.+"
+		testCompile "com.badlogicgames.gdx:gdx:$gdxVersion"
 		testCompile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
 		testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 		testCompile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+		testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+
 	}
 }
 

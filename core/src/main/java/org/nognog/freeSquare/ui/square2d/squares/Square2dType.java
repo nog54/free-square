@@ -138,9 +138,13 @@ public enum Square2dType {
 		squareImage.setHeight(squareImage.getHeight() * (this.size.getWidth() / this.texture.getWidth()));
 		squareImage.setY(this.squarePositionOffsetY);
 		squareImage.setName(this.name);
-		System.out.println(squareImage.getWidth());
-		System.out.println(squareImage.getHeight());
 		return squareImage;
+	}
+	
+	public static void dispose(){
+		for(Square2dType type : Square2dType.values()){
+			type.getTexture().dispose();
+		}
 	}
 
 	private boolean isInvalidVertex() {

@@ -6,6 +6,7 @@ import org.nognog.freeSquare.ui.Square;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -13,23 +14,22 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2014/12/10
  */
 public class Square2d extends Group implements Square<Square2dObject> {
-	
+
 	private final Square2dType type;
-	
-	/** vertex 1*/
+
+	/** vertex 1 */
 	public final Vertex vertex1;
-	/** vertex 2*/
+	/** vertex 2 */
 	public final Vertex vertex2;
-	/** vertex 3*/
+	/** vertex 3 */
 	public final Vertex vertex3;
-	/** vertex 4*/
+	/** vertex 4 */
 	public final Vertex vertex4;
 
 	private final Image squareImage;
@@ -38,7 +38,6 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	private final Array<Square2dObject> objects;
 
 	private boolean isRequestedDrawOrderUpdate = false;
-	private boolean isDisposed = false;
 
 	private static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
 
@@ -98,7 +97,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	}
 
 	@Override
-	public void draw(com.badlogic.gdx.graphics.g2d.Batch batch, float parentAlpha) {
+	public void draw(Batch batch, float parentAlpha) {
 		if (this.isRequestedDrawOrderUpdate) {
 			this.getChildren().sort(actorComparator);
 			moveSquareImageToBack();
@@ -135,6 +134,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	public void addActor(Actor actor) {
 		if (actor instanceof Square2dObject) {
 			this.addSquareObject((Square2dObject) actor);
+			return;
 		}
 		throw new RuntimeException("Non-sqaure2d-object is added to square2d."); //$NON-NLS-1$
 	}
@@ -182,26 +182,6 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y };
 		Polygon p = new Polygon(vertices);
 		return p.contains(x, y);
-	}
-
-	/**
-	 * dispose
-	 */
-	public void dispose() {
-		((TextureRegionDrawable) (this.squareImage.getDrawable())).getRegion().getTexture().dispose();
-		for (Square2dObject object : this.objects) {
-			if (!object.isDisposed()) {
-				object.dispose();
-			}
-		}
-		this.isDisposed = true;
-	}
-
-	/**
-	 * @return whether this is disposed
-	 */
-	public boolean isDisposed() {
-		return this.isDisposed;
 	}
 
 	@Override

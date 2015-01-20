@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * @author goshi 2014/12/03
@@ -26,8 +25,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 
 	private float minIntevalToNextIndependentAction;
 	private float actionStoppingTime;
-
-	private boolean isDisposed = false;
 
 	/**
 	 * @param type
@@ -161,17 +158,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	}
 
 	/**
-	 * dispose
-	 */
-	public void dispose() {
-		if (this.isDisposed) {
-			return;
-		}
-		((TextureRegionDrawable) (this.image.getDrawable())).getRegion().getTexture().dispose();
-		this.isDisposed = true;
-	}
-
-	/**
 	 * @return true if this is landing on square
 	 */
 	public boolean isLandingOnSquare() {
@@ -179,13 +165,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 			return false;
 		}
 		return this.square.containsInSquareArea(this.getX(), this.getY());
-	}
-
-	/**
-	 * @return true if this is disposed.
-	 */
-	public boolean isDisposed() {
-		return this.isDisposed;
 	}
 
 	/**

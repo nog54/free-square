@@ -1,8 +1,9 @@
 package org.nognog.freeSquare.ui.square2d.objects;
 
+import static org.nognog.freeSquare.Messages.getString;
+
 import java.lang.reflect.Constructor;
 
-import static org.nognog.freeSquare.Messages.getString;
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
@@ -100,6 +101,12 @@ public enum Square2dObjectType {
 			return (Square2dObject) this.klass.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static void dispose() {
+		for (Square2dObjectType type : Square2dObjectType.values()) {
+			type.getTexture().dispose();
 		}
 	}
 
