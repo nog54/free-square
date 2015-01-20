@@ -8,16 +8,16 @@ public enum Square2dSize {
 
 	SMALL(1024), MEDIUM(1536), LARGE(2048);
 
-	private int width;
+	private final float width;
 
-	private Square2dSize(int width) {
+	private Square2dSize(float width) {
 		this.width = width;
 	}
 
 	/**
 	 * @return width
 	 */
-	public int getWidth() {
+	public float getWidth() {
 		return this.width;
 	}
 }

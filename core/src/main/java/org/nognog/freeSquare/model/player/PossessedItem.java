@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
  * @author goshi 2015/01/15
  * @param <T>
  */
-public class PossessedItem<T extends Item<T>> implements Savable {
-	private static final int maxQuantity = 65535; // 現在は適当に決めてる
+public class PossessedItem<T extends Item<T, ?>> implements Savable {
+	private static final int maxQuantity = 999; // 現在は適当に決めてる
 
 	private T item;
 	private int quantity;
@@ -62,7 +62,7 @@ public class PossessedItem<T extends Item<T>> implements Savable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.item).append(" ").append(this.quantity); //$NON-NLS-1$
+		sb.append(this.item).append(" ×").append(this.quantity); //$NON-NLS-1$
 		return sb.toString();
 	}
 

@@ -3,6 +3,7 @@ package org.nognog.freeSquare.model.player;
 import java.util.Date;
 
 import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.item.Item;
 
 /**
  * @author goshi 2014/10/28
@@ -61,6 +62,22 @@ public class Player implements Savable {
 	 */
 	public ItemBox getItemBox() {
 		return this.itemBox;
+	}
+
+	/**
+	 * @param item
+	 * @return quantity after the put
+	 */
+	public <T extends Item<T, ?>> int putItem(T item) {
+		return this.itemBox.putItem(item);
+	}
+
+	/**
+	 * @param item
+	 * @return quantity after the take out
+	 */
+	public <T extends Item<T, ?>> int takeOutItem(T item) {
+		return this.itemBox.takeOutItem(item);
 	}
 
 }

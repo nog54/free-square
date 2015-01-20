@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.nognog.freeSquare.model.item.Square2dObjectItem;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
@@ -17,9 +16,8 @@ import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.PlayerItemList;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2d;
-import org.nognog.freeSquare.ui.square2d.Square2dSize;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
-import org.nognog.freeSquare.ui.square2d.squares.GrassySquare1;
+import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -69,15 +67,16 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = new GrassySquare1(Square2dSize.MEDIUM);
+		this.square = Square2dType.GRASSY_SQUARE1.create();
 		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 		for (Square2dObjectType object : Square2dObjectType.values()) {
 			for (int i = 0; i < 2; i++) {
 				this.square.addSquareObject(object.create());
 			}
-			this.player.getItemBox().increaseItem(Square2dObjectItem.getInstance(object), 1);
 		}
+
+		//this.player.takeOutItem(Square2dObjectItem.getInstance(Square2dObjectType.GOLD_SESAME_TOFU));
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.stage.addActor(this.square);
@@ -136,7 +135,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					try {
 						this.target.actStage(delta);
 					} catch (NullPointerException e) {
-						// NullPointerException may occur when remove actor.
+						// NullPointerException may occurs when remove actor.
 					}
 					this.lastActTime = currentTime;
 					if (Thread.currentThread().isInterrupted()) {
@@ -261,6 +260,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void writeWorldCoordinate() {
 		this.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 		this.shapeRenderer.setProjectionMatrix(this.stage.getCamera().combined);

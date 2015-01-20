@@ -34,7 +34,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	 */
 	public Square2dObject(Square2dObjectType type) {
 		this.type = type;
-		final Texture texture = new Texture(type.getTexturePath());
+		final Texture texture = type.getTexture();
 		this.image = new Image(texture);
 		this.logicalWidth = type.getLogicalWidth();
 		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
@@ -94,7 +94,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 		this.square = square;
 	}
 
-
 	@Override
 	public void setX(float x) {
 		this.setPosition(x, this.getY());
@@ -116,9 +115,9 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	}
 
 	/**
-	 * @return kind of this object
+	 * @return type of this object
 	 */
-	public Square2dObjectType getKind() {
+	public Square2dObjectType getType() {
 		return this.type;
 	}
 

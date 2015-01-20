@@ -26,17 +26,37 @@ public class ItemBox implements Savable {
 	}
 
 	/**
+	 * add item to itembox
+	 * 
+	 * @param item
+	 * @return quantity after the put
+	 */
+	public <T extends Item<T, ?>> int putItem(T item) {
+		return this.increaseItem(item, 1);
+	}
+
+	/**
+	 * add item to itembox
+	 * 
+	 * @param item
+	 * @return quantity after the take out
+	 */
+	public <T extends Item<T, ?>> int takeOutItem(T item) {
+		return this.decreaseItem(item, 1);
+	}
+
+	/**
 	 * @param increaseItemClass
 	 * @param item
 	 * @param amount
 	 * @return quantity after the increase
 	 */
-	public <T extends Item<T>> int increaseItem(T item, int amount) {
+	public <T extends Item<T, ?>> int increaseItem(T item, int amount) {
 		if (amount < 0) {
 			return this.decreaseItem(item, -amount);
 		}
 
-		PossessedItem<T> increasePossessedItem = this.findPossessedItem(item);
+		PossessedItem<?> increasePossessedItem = this.findPossessedItem(item);
 		if (increasePossessedItem != null) {
 			return increasePossessedItem.increaseQuantity(amount);
 		}
@@ -53,12 +73,12 @@ public class ItemBox implements Savable {
 	 * @param amount
 	 * @return quantity after the decrease
 	 */
-	public <T extends Item<T>> int decreaseItem(T item, int amount) {
+	public <T extends Item<T, ?>> int decreaseItem(T item, int amount) {
 		if (amount < 0) {
 			return this.increaseItem(item, -amount);
 		}
 
-		PossessedItem<T> decreasePossessedItem = this.findPossessedItem(item);
+		PossessedItem<?> decreasePossessedItem = this.findPossessedItem(item);
 		if (decreasePossessedItem != null) {
 			final int afterQuantity = decreasePossessedItem.decreaseQuantity(amount);
 			if (afterQuantity == 0) {
@@ -69,11 +89,10 @@ public class ItemBox implements Savable {
 		return 0;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T extends Item<T>> PossessedItem<T> findPossessedItem(T item) {
+	private PossessedItem<?> findPossessedItem(Item<?, ?> item) {
 		for (PossessedItem<?> possessedItem : this.possessedItems) {
 			if (item.isSameItem((possessedItem.getItem()))) {
-				return (PossessedItem<T>) possessedItem;
+				return possessedItem;
 			}
 		}
 		return null;
@@ -83,7 +102,7 @@ public class ItemBox implements Savable {
 	 * @param item
 	 * @return true if this has itemClass
 	 */
-	public <T extends Item<T>> boolean has(T item) {
+	public boolean has(Item<?, ?> item) {
 		return this.findPossessedItem(item) != null;
 	}
 
@@ -91,8 +110,8 @@ public class ItemBox implements Savable {
 	 * @param item
 	 * @return true if this has itemClass
 	 */
-	public <T extends Item<T>> int getItemQuantity(T item) {
-		PossessedItem<T> possessedItem = this.findPossessedItem(item);
+	public int getItemQuantity(Item<?, ?> item) {
+		PossessedItem<?> possessedItem = this.findPossessedItem(item);
 		if (possessedItem == null) {
 			return 0;
 		}

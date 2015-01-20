@@ -2,12 +2,14 @@ package org.nognog.freeSquare.model.item;
 
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * @author goshi 2015/01/15
  */
-public class Square2dObjectItem extends AbstractItem<Square2dObjectItem> {
+public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2dObjectItemType> implements DrawableItem {
 
 	private static final ObjectMap<Square2dObjectType, Square2dObjectItem> items = new ObjectMap<>();
 
@@ -52,6 +54,16 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem> {
 	}
 
 	@Override
+	public Texture getTexture() {
+		return this.getTypeInItem().getSquare2dObjectType().getTexture();
+	}
+
+	@Override
+	public Color getColor() {
+		return this.getTypeInItem().getSquare2dObjectType().getColor();
+	}
+
+	@Override
 	public boolean isValid() {
 		return this.getTypeInItem() != null;
 	}
@@ -60,4 +72,5 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem> {
 	public String toString() {
 		return this.getTypeInItem().toString();
 	}
+
 }

@@ -17,14 +17,14 @@ public class FlickButtonController extends Group {
 
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
-	FlickInputListener listener;
-	BitmapFont font;
-	float buttonWidthHeight;
-	TextButton centerButton;
-	TextButton upButton;
-	TextButton downButton;
-	TextButton rightButton;
-	TextButton leftButton;
+	protected FlickInputListener listener;
+	protected BitmapFont font;
+	protected float buttonWidthHeight;
+	protected TextButton centerButton;
+	protected TextButton upButton;
+	protected TextButton downButton;
+	protected TextButton rightButton;
+	protected TextButton leftButton;
 
 	/**
 	 * @param font

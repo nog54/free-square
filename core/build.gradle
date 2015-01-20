@@ -3,9 +3,10 @@ apply plugin: "java"
 sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/main/java/" ]
-sourceSets.test.java.srcDirs = [ "src/test/java/" ]
+sourceSets.main.java.srcDirs = ["src/main/java/"]
+sourceSets.test.java.srcDirs = ["src/test/java/"]
+sourceSets.test.resources.srcDirs = ["../android/assets"]
 
-eclipse.project {
-    name = appName + "-core"
-}
+project.ext.assetsDir = new File("../android/assets");
+
+eclipse.project { name = appName + "-core" }

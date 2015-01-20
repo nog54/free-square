@@ -26,4 +26,16 @@ public class Messages {
 	public static String getString(String key) {
 		return messages.get(key);
 	}
+
+	/**
+	 * @param key
+	 * @return string
+	 */
+	public static String getString(String... key) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < key.length; i++) {
+			sb.append(messages.get(key[i]));
+		}
+		return sb.toString();
+	}
 }

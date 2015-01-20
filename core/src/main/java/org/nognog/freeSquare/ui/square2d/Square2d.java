@@ -1,15 +1,11 @@
 package org.nognog.freeSquare.ui.square2d;
 
-import static org.nognog.freeSquare.ui.square2d.Square2d.Vertex.vertex;
-
 import java.util.Comparator;
 
 import org.nognog.freeSquare.ui.Square;
 import org.nognog.freeSquare.ui.SquareObserver;
+import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,20 +20,22 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2014/12/10
  */
 public class Square2d extends Group implements Square<Square2dObject> {
-	/** vertex1 of Square */
+	
+	private final Square2dType type;
+	
+	/** vertex 1*/
 	public final Vertex vertex1;
-	/** vertex2 of Square */
+	/** vertex 2*/
 	public final Vertex vertex2;
-	/** vertex3 of Square */
+	/** vertex 3*/
 	public final Vertex vertex3;
-	/** vertex4 of Square */
+	/** vertex 4*/
 	public final Vertex vertex4;
-	private final boolean isConcave;
-	private final Square2dSize size;
-	private Image squareImage;
 
-	private Array<SquareObserver> observers;
-	private Array<Square2dObject> objects;
+	private final Image squareImage;
+
+	private final Array<SquareObserver> observers;
+	private final Array<Square2dObject> objects;
 
 	private boolean isRequestedDrawOrderUpdate = false;
 	private boolean isDisposed = false;
@@ -59,37 +57,15 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	};
 
 	/**
-	 * @param size
-	 * @param baseVertex1
-	 * @param baseVertex2
-	 * @param baseVertex3
-	 * @param baseVertex4
-	 * @param texture
+	 * @param type
 	 */
-	public Square2d(Square2dSize size, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Texture texture) {
-		this.size = size;
-		final float width = size.getWidth();
-		final float scale = width / texture.getWidth();
-		final float squareImagePositionOffsetY = width / 12;
-		this.vertex1 = vertex(baseVertex1.x * scale, baseVertex1.y * scale + squareImagePositionOffsetY);
-		this.vertex2 = vertex(baseVertex2.x * scale, baseVertex2.y * scale + squareImagePositionOffsetY);
-		this.vertex3 = vertex(baseVertex3.x * scale, baseVertex3.y * scale + squareImagePositionOffsetY);
-		this.vertex4 = vertex(baseVertex4.x * scale, baseVertex4.y * scale + squareImagePositionOffsetY);
-		if (this.isInvalidVertex()) {
-			throw new RuntimeException("Square corners are invalid."); //$NON-NLS-1$
-		}
-		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex3.x, this.vertex3.y, this.vertex2.x, this.vertex2.y, this.vertex4.x, this.vertex4.y, null)) {
-			this.isConcave = false;
-		} else {
-			this.isConcave = true;
-		}
-
-		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		this.squareImage = new Image(texture);
-		this.squareImage.setWidth(width);
-		this.squareImage.setHeight(this.squareImage.getHeight() * scale);
-		this.squareImage.setY(squareImagePositionOffsetY);
-		this.squareImage.setName("squareImage"); //$NON-NLS-1$
+	public Square2d(Square2dType type) {
+		this.type = type;
+		this.vertex1 = type.vertex1;
+		this.vertex2 = type.vertex2;
+		this.vertex3 = type.vertex3;
+		this.vertex4 = type.vertex4;
+		this.squareImage = type.createSquareImage();
 		super.addActor(this.squareImage);
 		this.observers = new Array<>();
 		this.objects = new Array<>();
@@ -119,16 +95,6 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	@Override
 	public float getHeight() {
 		return this.squareImage.getHeight();
-	}
-
-	private boolean isInvalidVertex() {
-		if (Intersector.intersectSegments(this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y, null)) {
-			return true;
-		}
-		if (Intersector.intersectSegments(this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y, this.vertex1.x, this.vertex1.y, null)) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -189,7 +155,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 * @return size
 	 */
 	public Square2dSize getSquareSize() {
-		return this.size;
+		return this.type.getSize();
 	}
 
 	/**
@@ -203,7 +169,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 * @return true if square is concave
 	 */
 	public boolean isConcave() {
-		return this.isConcave;
+		return this.type.isConcave();
 	}
 
 	/**
@@ -240,7 +206,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(this.type.getName());
 		sb.append(this.vertex1).append("-").append(this.vertex2).append("-").append(this.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				.append(this.vertex4);
 		return sb.toString();
