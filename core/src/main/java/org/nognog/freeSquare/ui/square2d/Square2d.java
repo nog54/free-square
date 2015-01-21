@@ -136,7 +136,24 @@ public class Square2d extends Group implements Square<Square2dObject> {
 			this.addSquareObject((Square2dObject) actor);
 			return;
 		}
-		throw new RuntimeException("Non-sqaure2d-object is added to square2d."); //$NON-NLS-1$
+		throw new RuntimeException("Non-sqaure2d-object is passed to square2d$addActor."); //$NON-NLS-1$
+	}
+
+	@Override
+	public boolean removeSquareObject(Square2dObject object) {
+		this.objects.removeValue(object, true);
+		boolean isRemoved = super.removeActor(object);
+		object.setSquare(null);
+		object.setPosition(0, 0);
+		return isRemoved;
+	}
+
+	@Override
+	public boolean removeActor(Actor actor) {
+		if (actor instanceof Square2dObject) {
+			return this.removeSquareObject((Square2dObject) actor);
+		}
+		throw new RuntimeException("Non-sqaure2d-object is passed to square2d$removeActor."); //$NON-NLS-1$
 	}
 
 	@Override
@@ -269,4 +286,5 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		super.act(delta);
 
 	}
+
 }

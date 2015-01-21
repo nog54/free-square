@@ -12,6 +12,12 @@ public interface Square<T extends SquareObject<?>> {
 	void addSquareObject(T object);
 
 	/**
+	 * @param object
+	 * @return true if object is removed
+	 */
+	boolean removeSquareObject(T object);
+
+	/**
 	 * @return square objects
 	 */
 	Iterable<T> getObjects();
@@ -26,7 +32,7 @@ public interface Square<T extends SquareObject<?>> {
 	 * @param observer
 	 */
 	void removeSquareObserver(SquareObserver observer);
-	
+
 	/**
 	 * 
 	 */

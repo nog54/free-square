@@ -15,9 +15,6 @@ import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
-/**
- * @author goshi 2015/01/08
- */
 
 @SuppressWarnings({ "boxing", "javadoc" })
 @RunWith(GdxTestRunner.class)
