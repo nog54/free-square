@@ -23,5 +23,14 @@ public abstract class AbstractItem<T1 extends AbstractItem<T1, T2>, T2 extends T
 	public T2 getTypeInItem() {
 		return this.type;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean isSameItem(Object obj) {
+		if (obj.getClass() == this.getClass()) {
+			return this.isSameItem((T1) obj);
+		}
+		return false;
+	}
 
 }

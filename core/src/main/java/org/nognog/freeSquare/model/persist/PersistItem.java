@@ -26,6 +26,8 @@ public class PersistItem<T extends Savable> {
 
 	/** プレイ記録 */
 	public static final PersistItem<PlayLog> PLAY_LOG = new PersistItem<>(PlayLog.class, "playlog"); //$NON-NLS-1$
+	
+	static final PersistItem<Life> TEST_ITEM = new PersistItem<>(Life.class, "PersistManagerTestItem"); //$NON-NLS-1$
 
 	private static final PersistItem<?>[] items = new PersistItem[] { PLAYER, LIFE1, LAST_PLAY, PLAY_LOG };
 

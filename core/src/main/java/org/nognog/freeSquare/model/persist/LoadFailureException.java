@@ -14,5 +14,8 @@ public class LoadFailureException extends Exception {
 	LoadFailureException(Throwable t) {
 		super(t);
 	}
+	LoadFailureException(String string) {
+		super(string);
+	}
 
 }

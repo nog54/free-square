@@ -37,19 +37,12 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		return typeInstance;
 	}
 
-	@Override
-	public boolean isSameItem(Object obj) {
-		if (obj instanceof Square2dObjectItem) {
-			return this.isSameType((Square2dObjectItem) obj);
-		}
-		return false;
-	}
-
 	/**
 	 * @param item
 	 * @return true if same type
 	 */
-	public boolean isSameType(Square2dObjectItem item) {
+	@Override
+	public boolean isSameItem(Square2dObjectItem item) {
 		return this.getTypeInItem().equals(item.getTypeInItem());
 	}
 

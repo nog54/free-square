@@ -14,6 +14,9 @@ public class SaveFailureException extends Exception {
 	SaveFailureException(Throwable t) {
 		super(t);
 	}
+	SaveFailureException(String string) {
+		super(string);
+	}
 	
 	
 }

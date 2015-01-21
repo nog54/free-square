@@ -12,8 +12,14 @@ public interface Item<T1 extends Item<T1, T2>, T2 extends TypeInItem<T1, T2>> ex
 	/**
 	 * @param obj
 	 * @return true if same item-type
-	 */
+	 */	
 	public boolean isSameItem(Object obj);
+	
+	/**
+	 * @param obj
+	 * @return true if same item-type
+	 */
+	public boolean isSameItem(T1 obj);
 
 	/**
 	 * @return type in the item

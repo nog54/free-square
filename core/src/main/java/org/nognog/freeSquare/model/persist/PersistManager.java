@@ -96,13 +96,17 @@ class PersistManager {
 			return;
 		}
 		if (key == null) {
-			throw new SaveFailureException();
+			throw new SaveFailureException("key is null."); //$NON-NLS-1$
 		}
-		String saveJson = json.toJson(saveObject);
+		if(!saveObject.isValid()){
+			throw new SaveFailureException("save object is invalid."); //$NON-NLS-1$
+		}
+		
+		final String saveJson = json.toJson(saveObject);
 		try {
-			byte[] encryptedSaveJson = encrypt(saveJson.getBytes(charSet));
+			final byte[] encryptedSaveJson = encrypt(saveJson.getBytes(charSet));
 			synchronized (saveItem) {
-				FileHandle file = Gdx.files.local((saveItem.getFileName()));
+				final FileHandle file = Gdx.files.local((saveItem.getFileName()));
 				file.writeBytes(encryptedSaveJson, false);
 			}
 		} catch (Exception e) {
@@ -157,6 +161,10 @@ class PersistManager {
 		if (loadItem == PersistItem.PLAY_LOG) {
 			return (T) loadPlayLog();
 		}
+		
+		if(!isAlreadyPersisted(loadItem)){
+			throw new LoadFailureException("load item is not persisted."); //$NON-NLS-1$
+		}
 
 		try {
 			byte[] enctyptedLoadJson = null;
@@ -195,16 +203,17 @@ class PersistManager {
 		}
 	}
 
+	public static <T extends Savable> boolean delete(PersistItem<T> removeItem) {
+		FileHandle file = Gdx.files.local(removeItem.getFileName());
+		return file.delete();
+	}
+
 	/**
-	 * @param saveItem
+	 * @param item
 	 * @return file of saveItem exists
 	 */
-	public static boolean saveItemExists(PersistItem<?> saveItem) {
-		try {
-			FileHandle file = Gdx.files.local(saveItem.getFileName());
-			return file.exists();
-		} catch (Exception e) {
-			return false;
-		}
+	public static <T extends Savable> boolean isAlreadyPersisted(PersistItem<T> item) {
+		FileHandle file = Gdx.files.local(item.getFileName());
+		return file.exists();
 	}
 }

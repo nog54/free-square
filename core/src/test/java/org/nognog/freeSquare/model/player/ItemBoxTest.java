@@ -30,8 +30,8 @@ public class ItemBoxTest {
 		ItemBox box = new ItemBox();
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem(item1)).thenReturn(true);
-		when(item2.isSameItem(item2)).thenReturn(true);
+		when(item1.isSameItem((Object)item1)).thenReturn(true);
+		when(item2.isSameItem((Object)item2)).thenReturn(true);
 
 		box.putItem(item1);
 
@@ -78,8 +78,8 @@ public class ItemBoxTest {
 		ItemBox box = new ItemBox();
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem(item1)).thenReturn(true);
-		when(item2.isSameItem(item2)).thenReturn(true);
+		when(item1.isSameItem((Object)item1)).thenReturn(true);
+		when(item2.isSameItem((Object)item2)).thenReturn(true);
 
 		box.increaseItem(item1, 3);
 		box.increaseItem(item1, 2);
@@ -121,8 +121,8 @@ public class ItemBoxTest {
 		ItemBox box = new ItemBox();
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem(item1)).thenReturn(true);
-		when(item2.isSameItem(item2)).thenReturn(true);
+		when(item1.isSameItem((Object)item1)).thenReturn(true);
+		when(item2.isSameItem((Object)item2)).thenReturn(true);
 
 		box.decreaseItem(item1, 3);
 		box.decreaseItem(item1, 2);
