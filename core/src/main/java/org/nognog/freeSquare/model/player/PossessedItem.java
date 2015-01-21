@@ -10,7 +10,8 @@ import com.badlogic.gdx.math.MathUtils;
  * @param <T>
  */
 public class PossessedItem<T extends Item<T, ?>> implements Savable {
-	private static final int maxQuantity = 999; // 現在は適当に決めてる
+	/** アイテムの最大保持数 */
+	public static final int maxQuantity = 999; // 現在は適当に決めてる
 
 	private T item;
 	private int quantity;

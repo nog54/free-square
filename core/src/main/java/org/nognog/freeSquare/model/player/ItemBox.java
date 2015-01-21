@@ -10,7 +10,8 @@ import com.badlogic.gdx.utils.Array;
  */
 public class ItemBox implements Savable {
 	private final Array<PossessedItem<?>> possessedItems;
-
+	/** アイテムの最大保持数 */
+	public static final int maxQuantity = PossessedItem.maxQuantity;
 	/**
 	 * 
 	 */
