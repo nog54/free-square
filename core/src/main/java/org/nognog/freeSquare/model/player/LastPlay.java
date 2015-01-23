@@ -57,4 +57,9 @@ public class LastPlay implements Savable {
 		return true;
 	}
 
+	@Override
+	public void reconstruction() {
+		//
+	}
+
 }

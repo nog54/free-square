@@ -5,14 +5,18 @@ import java.util.Date;
 import org.nognog.freeSquare.model.Savable;
 import org.nognog.freeSquare.model.item.Item;
 
+import com.badlogic.gdx.utils.Array;
+
 /**
  * @author goshi 2014/10/28
  */
-public class Player implements Savable {
+public class Player implements Savable, ItemBoxObserver {
 	private static final String defaultName = "noname"; //$NON-NLS-1$
 
 	private String name;
 	private long startDate;
+
+	private transient Array<PlayerObserver> observers;
 
 	private ItemBox itemBox;
 
@@ -32,6 +36,8 @@ public class Player implements Savable {
 		}
 		this.startDate = new Date().getTime();
 		this.itemBox = new ItemBox();
+		this.itemBox.addObserver(this);
+		this.observers = new Array<>();
 	}
 
 	/**
@@ -69,7 +75,8 @@ public class Player implements Savable {
 	 * @return quantity after the put
 	 */
 	public <T extends Item<T, ?>> int putItem(T item) {
-		return this.itemBox.putItem(item);
+		final int quantity = this.itemBox.putItem(item);
+		return quantity;
 	}
 
 	/**
@@ -77,7 +84,43 @@ public class Player implements Savable {
 	 * @return quantity after the take out
 	 */
 	public <T extends Item<T, ?>> int takeOutItem(T item) {
-		return this.itemBox.takeOutItem(item);
+		final int quantity = this.itemBox.takeOutItem(item);
+		return quantity;
+	}
+
+	/**
+	 * @param observer
+	 */
+	public void addObserver(PlayerObserver observer) {
+		if (!this.observers.contains(observer, true)) {
+			this.observers.add(observer);
+		}
+	}
+
+	/**
+	 * @param observer
+	 */
+	public void removeObserver(PlayerObserver observer) {
+		this.observers.removeValue(observer, true);
+	}
+
+	/**
+	 * 
+	 */
+	public void notifyObservers() {
+		for (int i = 0; i < this.observers.size; i++) {
+			this.observers.get(i).update();
+		}
+	}
+
+	@Override
+	public void update() {
+		this.notifyObservers();
+	}
+
+	@Override
+	public void reconstruction() {
+		this.itemBox.addObserver(this);
 	}
 
 }

@@ -8,6 +8,7 @@ import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
  * @author goshi 2015/01/16
  */
 public class Square2dObjectItemType implements TypeInItem<Square2dObjectItem, Square2dObjectItemType> {
+
 	private Square2dObjectType type;
 
 	@SuppressWarnings("unused")

@@ -640,4 +640,9 @@ public class Status implements Savable {
 	private static boolean isRange(int value, int min, int max) {
 		return (value >= min) && (value <= max);
 	}
+
+	@Override
+	public void reconstruction() {
+		// 
+	}
 }

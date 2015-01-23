@@ -12,4 +12,9 @@ public class ShibaInu implements Family {
 		return true;
 	}
 
+	@Override
+	public void reconstruction() {
+		// 
+	}
+
 }

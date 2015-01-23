@@ -56,6 +56,16 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		return this.getTypeInItem().getSquare2dObjectType().getColor();
 	}
 
+	public static Square2dObjectItem[] getAllItems() {
+		final Square2dObjectItem[] allItems = new Square2dObjectItem[Square2dObjectType.values().length];
+		int i = 0;
+		for (Square2dObjectType type : Square2dObjectType.values()) {
+			allItems[i] = Square2dObjectItem.getInstance(type);
+			i++;
+		}
+		return allItems;
+	}
+
 	@Override
 	public boolean isValid() {
 		return this.getTypeInItem() != null;
@@ -64,6 +74,11 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	@Override
 	public String toString() {
 		return this.getTypeInItem().toString();
+	}
+
+	@Override
+	public void reconstruction() {
+		//
 	}
 
 }

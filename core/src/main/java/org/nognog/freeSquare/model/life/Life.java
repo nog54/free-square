@@ -64,4 +64,9 @@ public class Life implements Savable {
 		}
 		return true;
 	}
+
+	@Override
+	public void reconstruction() {
+		// 
+	}
 }

@@ -3,6 +3,7 @@ package org.nognog.freeSquare.ui;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.model.player.PlayerObserver;
 import org.nognog.freeSquare.model.player.PossessedItem;
 
 import com.badlogic.gdx.graphics.Color;
@@ -17,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 /**
  * @author goshi 2015/01/17
  */
-public class PlayerItemList extends ScrollPane {
+public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserver {
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
@@ -28,15 +29,16 @@ public class PlayerItemList extends ScrollPane {
 	 * @param player
 	 * @param font
 	 */
-	public PlayerItemList(Player player, BitmapFont font) {
+	public PlayerItemListScrollPane(Player player, BitmapFont font) {
 		super(createList(player, font));
 		this.player = player;
+		this.player.addObserver(this);
 		this.setupOverscroll(0, 0, 0);
 	}
 
 	private static List<PossessedItem<?>> createList(Player player, BitmapFont font) {
 		ImageIncludedItemList list = new ImageIncludedItemList(createListStyle(font));
-		list.setItems(player.getItemBox().getItemArray());
+		list.setItems(player.getItemBox().toItemArray());
 		list.setSelectedIndex(-1);
 		return list;
 	}
@@ -45,6 +47,14 @@ public class PlayerItemList extends ScrollPane {
 		final ListStyle style = new ListStyle(font, emerald, nephritis, UiUtils.createPlaneTextureRegionDrawable(256, 128, Color.WHITE));
 		style.background = UiUtils.createPlaneTextureRegionDrawable(256, 128, clearBlack);
 		return style;
+	}
+
+	/**
+	 * @return list
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PossessedItem<?>> getList() {
+		return (List<PossessedItem<?>>) this.getWidget();
 	}
 
 	/**
@@ -131,6 +141,22 @@ public class PlayerItemList extends ScrollPane {
 			}
 		}
 
+	}
+
+	@Override
+	public void update() {
+		List<PossessedItem<?>> list = this.getList();
+		list.setItems(this.player.getItemBox().toItemArray());
+	}
+	
+	/**
+	 * dispose
+	 */
+	public void dispose(){
+		if(this.player != null){
+			this.player.removeObserver(this);
+		}
+		this.setWidget(null);
 	}
 
 }

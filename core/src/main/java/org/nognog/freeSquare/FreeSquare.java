@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.nognog.freeSquare.model.item.Item;
+import org.nognog.freeSquare.model.item.Square2dObjectItem;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
@@ -13,7 +15,8 @@ import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.ui.FlickButtonController;
 import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
-import org.nognog.freeSquare.ui.PlayerItemList;
+import org.nognog.freeSquare.ui.ItemList;
+import org.nognog.freeSquare.ui.PlayerItemListScrollPane;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
@@ -31,6 +34,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -53,7 +58,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Date lastRun;
 	private ShapeRenderer shapeRenderer;
 	private FlickButtonController menu;
-	private PlayerItemList itemList;
+	private PlayerItemListScrollPane playerItemList;
+	private ItemList itemList;
 
 	private ExecutorService pool;
 	private Future<?> future;
@@ -76,7 +82,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		}
 
-		//this.player.takeOutItem(Square2dObjectItem.getInstance(Square2dObjectType.GOLD_SESAME_TOFU));
+		// this.player.takeOutItem(Square2dObjectItem.getInstance(Square2dObjectType.GOLD_SESAME_TOFU));
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.stage.addActor(this.square);
@@ -108,18 +114,31 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void down() {
-				FreeSquare.this.showSquare();
+				FreeSquare.this.showAddItemList();
 			}
 
 			@Override
 			public void center() {
-				FreeSquare.this.showItemList();
+				FreeSquare.this.showUseItemList();
 			}
 		});
 
-		this.itemList = new PlayerItemList(this.player, this.font);
+		this.playerItemList = new PlayerItemListScrollPane(this.player, this.font);
+		this.playerItemList.setWidth(logicalCameraWidth / 2);
+		this.playerItemList.setHeight(logicalCameraHeight / 2);
+
+		this.itemList = new ItemList(Square2dObjectItem.getAllItems(), this.font);
 		this.itemList.setWidth(logicalCameraWidth / 2);
 		this.itemList.setHeight(logicalCameraHeight / 2);
+		this.itemList.addListenerToList(new ChangeListener() {
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				List<Item> list = (List<Item>) actor;
+				FreeSquare.this.player.putItem(list.getSelected());
+			}
+
+		});
 
 		this.pool = Executors.newCachedThreadPool();
 		this.future = this.pool.submit(new Runnable() {
@@ -221,7 +240,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.isLockingCameraZoom = true;
 	}
 
-	void showItemList() {
+	void showUseItemList() {
+		this.showSquare();
+		resetItemListPositionAndScale();
+		this.stage.getRoot().addActor(this.playerItemList);
+		this.disableSquare();
+	}
+
+	void showAddItemList() {
 		this.showSquare();
 		resetItemListPositionAndScale();
 		this.stage.getRoot().addActor(this.itemList);
@@ -237,9 +263,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	void resetItemListPositionAndScale() {
 		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
 		final float newX = this.stage.getCamera().position.x;
-		final float newY = this.stage.getCamera().position.y - currentCameraZoom * this.itemList.getHeight();
-		this.itemList.setPosition(newX, newY);
+		final float newUseItemListY = this.stage.getCamera().position.y - currentCameraZoom * this.playerItemList.getHeight();
+		this.playerItemList.setPosition(newX, newUseItemListY);
+		this.playerItemList.setScale(currentCameraZoom);
+		final float newAddItemListY = this.stage.getCamera().position.y - currentCameraZoom * this.itemList.getHeight();
+		this.itemList.setPosition(newX, newAddItemListY);
 		this.itemList.setScale(currentCameraZoom);
+
 	}
 
 	@Override

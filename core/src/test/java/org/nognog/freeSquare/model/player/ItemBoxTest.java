@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -19,19 +21,24 @@ import com.badlogic.gdx.utils.Array;
 public class ItemBoxTest {
 
 	@Test
-	public final void testGetItemArray() {
+	public final void testToItemArray() {
 		ItemBox box = new ItemBox();
-		Array<?> array = box.getItemArray();
-		assertThat(array, is(not(nullValue())));
+		Array<?> array1 = box.toItemArray();
+		assertThat(array1, is(not(nullValue())));
+
+		Array<?> array2 = box.toItemArray();
+		assertThat(array1 == array2, is(false));
 	}
 
 	@Test
 	public final void testPutItemTakeOutItem() {
 		ItemBox box = new ItemBox();
+		ItemBoxObserver mock = mock(ItemBoxObserver.class);
+		box.addObserver(mock);
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem((Object)item1)).thenReturn(true);
-		when(item2.isSameItem((Object)item2)).thenReturn(true);
+		when(item1.isSameItem((Object) item1)).thenReturn(true);
+		when(item2.isSameItem((Object) item2)).thenReturn(true);
 
 		box.putItem(item1);
 
@@ -41,6 +48,7 @@ public class ItemBoxTest {
 		final int expected2 = 0;
 		final int actual2 = box.getItemQuantity(item2);
 		assertThat(actual2, is(expected2));
+		verify(mock, times(1)).update();
 
 		box.putItem(item2);
 		box.putItem(item1);
@@ -51,6 +59,7 @@ public class ItemBoxTest {
 		final int expected4 = 1;
 		final int actual4 = box.getItemQuantity(item2);
 		assertThat(actual4, is(expected4));
+		verify(mock, times(3)).update();
 
 		box.takeOutItem(item2);
 
@@ -60,6 +69,7 @@ public class ItemBoxTest {
 		final int expected6 = 0;
 		final int actual6 = box.getItemQuantity(item2);
 		assertThat(actual6, is(expected6));
+		verify(mock, times(4)).update();
 
 		Item item3 = mock(Item.class);
 		when(item3.isSameItem(item3)).thenReturn(true);
@@ -71,15 +81,18 @@ public class ItemBoxTest {
 		final int expected8 = 0;
 		final int actual8 = box.getItemQuantity(item2);
 		assertThat(actual8, is(expected8));
+		verify(mock, times(4)).update();
 	}
 
 	@Test
 	public final void testIncreaseItem() {
 		ItemBox box = new ItemBox();
+		ItemBoxObserver mock = mock(ItemBoxObserver.class);
+		box.addObserver(mock);
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem((Object)item1)).thenReturn(true);
-		when(item2.isSameItem((Object)item2)).thenReturn(true);
+		when(item1.isSameItem((Object) item1)).thenReturn(true);
+		when(item2.isSameItem((Object) item2)).thenReturn(true);
 
 		box.increaseItem(item1, 3);
 		box.increaseItem(item1, 2);
@@ -114,15 +127,18 @@ public class ItemBoxTest {
 
 		assertThat(box.has(item1), is(true));
 		assertThat(box.has(item2), is(false));
+		verify(mock, times(5)).update();
 	}
 
 	@Test
 	public final void testDecreaseItem() {
 		ItemBox box = new ItemBox();
+		ItemBoxObserver mock = mock(ItemBoxObserver.class);
+		box.addObserver(mock);
 		Item item1 = mock(Item.class);
 		Item item2 = mock(Item.class);
-		when(item1.isSameItem((Object)item1)).thenReturn(true);
-		when(item2.isSameItem((Object)item2)).thenReturn(true);
+		when(item1.isSameItem((Object) item1)).thenReturn(true);
+		when(item2.isSameItem((Object) item2)).thenReturn(true);
 
 		box.decreaseItem(item1, 3);
 		box.decreaseItem(item1, 2);
@@ -157,5 +173,6 @@ public class ItemBoxTest {
 
 		assertThat(box.has(item1), is(true));
 		assertThat(box.has(item2), is(true));
+		verify(mock, times(4)).update();
 	}
 }

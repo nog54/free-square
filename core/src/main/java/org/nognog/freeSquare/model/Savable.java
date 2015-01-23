@@ -9,5 +9,10 @@ package org.nognog.freeSquare.model;
  * 2014/11/18
  */
 public interface Savable extends SelfValidatable{
+	
+	/**
+	 * This method will be called when load.
+	 */
+	void reconstruction();
 	// no method
 }

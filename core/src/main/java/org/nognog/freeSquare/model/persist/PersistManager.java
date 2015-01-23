@@ -173,11 +173,11 @@ class PersistManager {
 			}
 			String loadJson = new String(decrypt(enctyptedLoadJson), charSet);
 			T loadData = json.fromJson(loadItem.getSaveClass(), loadJson);
+			loadData.reconstruction();
 			if (!(loadData.isValid())) {
 				throw new InvalidLoadDataException();
 			}
 			return loadData;
-
 		} catch (Throwable t) {
 			throw new LoadFailureException(t);
 		}

@@ -56,4 +56,9 @@ public class PlayLog implements Savable {
 		return this.log != null;
 	}
 
+	@Override
+	public void reconstruction() {
+		//
+	}
+
 }
