@@ -34,8 +34,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -50,6 +49,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Vector2 cameraRangeUpperRight;
 	private boolean isLockingCameraZoom;
 	private boolean isLockingCameraMove;
+
+	private Array<CameraObserver> cameraObservers;
 
 	private BitmapFont font;
 	private PlayLog playlog;
@@ -68,8 +69,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void create() {
 		Gdx.graphics.setContinuousRendering(false);
 		setupPersistItems();
-		System.out.println(this.player.getItemBox());
 		this.shapeRenderer = new ShapeRenderer();
+		this.cameraObservers = new Array<>();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
@@ -126,19 +127,17 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.playerItemList = new PlayerItemListScrollPane(this.player, this.font);
 		this.playerItemList.setWidth(logicalCameraWidth / 2);
 		this.playerItemList.setHeight(logicalCameraHeight / 2);
+		this.cameraObservers.add(this.playerItemList);
 
-		this.itemList = new ItemList(Square2dObjectItem.getAllItems(), this.font);
+		this.itemList = new ItemList(Square2dObjectItem.getAllItems(), this.font) {
+			@Override
+			protected void selectedItemTapped(Item<?, ?> tappedItem) {
+				FreeSquare.this.getPlayer().putItem(tappedItem);
+			}
+		};
 		this.itemList.setWidth(logicalCameraWidth / 2);
 		this.itemList.setHeight(logicalCameraHeight / 2);
-		this.itemList.addListenerToList(new ChangeListener() {
-
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				List<Item> list = (List<Item>) actor;
-				FreeSquare.this.player.putItem(list.getSelected());
-			}
-
-		});
+		this.cameraObservers.add(this.itemList);
 
 		this.pool = Executors.newCachedThreadPool();
 		this.future = this.pool.submit(new Runnable() {
@@ -165,7 +164,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 
 		});
-		this.update();
+		this.updateSquare();
 
 	}
 
@@ -242,14 +241,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void showUseItemList() {
 		this.showSquare();
-		resetItemListPositionAndScale();
 		this.stage.getRoot().addActor(this.playerItemList);
 		this.disableSquare();
 	}
 
 	void showAddItemList() {
 		this.showSquare();
-		resetItemListPositionAndScale();
 		this.stage.getRoot().addActor(this.itemList);
 		this.disableSquare();
 	}
@@ -258,18 +255,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage.cancelTouchFocus(this.square);
 		this.square.getColor().a = 0.75f;
 		this.square.setTouchable(Touchable.disabled);
-	}
-
-	void resetItemListPositionAndScale() {
-		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
-		final float newX = this.stage.getCamera().position.x;
-		final float newUseItemListY = this.stage.getCamera().position.y - currentCameraZoom * this.playerItemList.getHeight();
-		this.playerItemList.setPosition(newX, newUseItemListY);
-		this.playerItemList.setScale(currentCameraZoom);
-		final float newAddItemListY = this.stage.getCamera().position.y - currentCameraZoom * this.itemList.getHeight();
-		this.itemList.setPosition(newX, newAddItemListY);
-		this.itemList.setScale(currentCameraZoom);
-
 	}
 
 	@Override
@@ -357,9 +342,25 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		PersistItem.LIFE1.save(this.life);
 	}
 
+	/**
+	 * @return player
+	 */
+	public Player getPlayer() {
+		return this.player;
+	}
+
 	@Override
-	public void update() {
+	public void updateSquare() {
 		Gdx.graphics.requestRendering();
+	}
+
+	/**
+	 * notify all camera observers
+	 */
+	public void notifyCameraObservers() {
+		for (int i = 0; i < this.cameraObservers.size; i++) {
+			this.cameraObservers.get(i).updateCamera(this.stage.getCamera());
+		}
 	}
 
 }

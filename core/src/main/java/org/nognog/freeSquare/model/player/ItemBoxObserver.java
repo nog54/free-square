@@ -6,7 +6,7 @@ package org.nognog.freeSquare.model.player;
  */
 public interface ItemBoxObserver {
 	/**
-	 * update
+	 * update itembox
 	 */
-	void update();
+	void updateItemBox();
 }

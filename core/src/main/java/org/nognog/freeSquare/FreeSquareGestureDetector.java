@@ -71,7 +71,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				float currentZoom = camera.zoom;
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
 				this.adjustCameraPositionIfRangeOver();
-				freeSquare.resetItemListPositionAndScale();
+				freeSquare.notifyCameraObservers();
 				return true;
 			}
 
@@ -91,7 +91,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
 				this.adjustCameraPositionIfRangeOver();
-				freeSquare.resetItemListPositionAndScale();
+				freeSquare.notifyCameraObservers();
 				return true;
 			}
 

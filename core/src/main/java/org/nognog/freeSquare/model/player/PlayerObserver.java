@@ -6,7 +6,7 @@ package org.nognog.freeSquare.model.player;
  */
 public interface PlayerObserver {
 	/**
-	 * 
+	 * update player
 	 */
-	void update();
+	void updatePlayer();
 }

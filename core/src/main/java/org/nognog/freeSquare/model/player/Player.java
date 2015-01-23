@@ -16,7 +16,7 @@ public class Player implements Savable, ItemBoxObserver {
 	private String name;
 	private long startDate;
 
-	private transient Array<PlayerObserver> observers;
+	private transient Array<PlayerObserver> playerObservers;
 
 	private ItemBox itemBox;
 
@@ -37,7 +37,7 @@ public class Player implements Savable, ItemBoxObserver {
 		this.startDate = new Date().getTime();
 		this.itemBox = new ItemBox();
 		this.itemBox.addObserver(this);
-		this.observers = new Array<>();
+		this.playerObservers = new Array<>();
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Player implements Savable, ItemBoxObserver {
 	 * @param item
 	 * @return quantity after the put
 	 */
-	public <T extends Item<T, ?>> int putItem(T item) {
+	public <T extends Item<?, ?>> int putItem(T item) {
 		final int quantity = this.itemBox.putItem(item);
 		return quantity;
 	}
@@ -92,8 +92,8 @@ public class Player implements Savable, ItemBoxObserver {
 	 * @param observer
 	 */
 	public void addObserver(PlayerObserver observer) {
-		if (!this.observers.contains(observer, true)) {
-			this.observers.add(observer);
+		if (!this.playerObservers.contains(observer, true)) {
+			this.playerObservers.add(observer);
 		}
 	}
 
@@ -101,21 +101,21 @@ public class Player implements Savable, ItemBoxObserver {
 	 * @param observer
 	 */
 	public void removeObserver(PlayerObserver observer) {
-		this.observers.removeValue(observer, true);
+		this.playerObservers.removeValue(observer, true);
 	}
 
 	/**
 	 * 
 	 */
-	public void notifyObservers() {
-		for (int i = 0; i < this.observers.size; i++) {
-			this.observers.get(i).update();
+	public void notifyPlayerObservers() {
+		for (int i = 0; i < this.playerObservers.size; i++) {
+			this.playerObservers.get(i).updatePlayer();
 		}
 	}
 
 	@Override
-	public void update() {
-		this.notifyObservers();
+	public void updateItemBox() {
+		this.notifyPlayerObservers();
 	}
 
 	@Override

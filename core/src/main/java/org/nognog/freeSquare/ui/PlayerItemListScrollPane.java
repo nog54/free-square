@@ -1,12 +1,15 @@
 package org.nognog.freeSquare.ui;
 
+import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PlayerObserver;
 import org.nognog.freeSquare.model.player.PossessedItem;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -18,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 /**
  * @author goshi 2015/01/17
  */
-public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserver {
+public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserver, CameraObserver {
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
@@ -144,7 +147,7 @@ public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserv
 	}
 
 	@Override
-	public void update() {
+	public void updatePlayer() {
 		List<PossessedItem<?>> list = this.getList();
 		list.setItems(this.player.getItemBox().toItemArray());
 	}
@@ -157,6 +160,15 @@ public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserv
 			this.player.removeObserver(this);
 		}
 		this.setWidget(null);
+	}
+
+	@Override
+	public void updateCamera(Camera camera) {
+		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
+		final float newX = camera.position.x;
+		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
+		this.setPosition(newX, newY);
+		this.setScale(currentCameraZoom);
 	}
 
 }

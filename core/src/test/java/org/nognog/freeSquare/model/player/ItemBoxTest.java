@@ -48,7 +48,7 @@ public class ItemBoxTest {
 		final int expected2 = 0;
 		final int actual2 = box.getItemQuantity(item2);
 		assertThat(actual2, is(expected2));
-		verify(mock, times(1)).update();
+		verify(mock, times(1)).updateItemBox();
 
 		box.putItem(item2);
 		box.putItem(item1);
@@ -59,7 +59,7 @@ public class ItemBoxTest {
 		final int expected4 = 1;
 		final int actual4 = box.getItemQuantity(item2);
 		assertThat(actual4, is(expected4));
-		verify(mock, times(3)).update();
+		verify(mock, times(3)).updateItemBox();
 
 		box.takeOutItem(item2);
 
@@ -69,7 +69,7 @@ public class ItemBoxTest {
 		final int expected6 = 0;
 		final int actual6 = box.getItemQuantity(item2);
 		assertThat(actual6, is(expected6));
-		verify(mock, times(4)).update();
+		verify(mock, times(4)).updateItemBox();
 
 		Item item3 = mock(Item.class);
 		when(item3.isSameItem(item3)).thenReturn(true);
@@ -81,7 +81,7 @@ public class ItemBoxTest {
 		final int expected8 = 0;
 		final int actual8 = box.getItemQuantity(item2);
 		assertThat(actual8, is(expected8));
-		verify(mock, times(4)).update();
+		verify(mock, times(4)).updateItemBox();
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class ItemBoxTest {
 
 		assertThat(box.has(item1), is(true));
 		assertThat(box.has(item2), is(false));
-		verify(mock, times(5)).update();
+		verify(mock, times(5)).updateItemBox();
 	}
 
 	@Test
@@ -173,6 +173,6 @@ public class ItemBoxTest {
 
 		assertThat(box.has(item1), is(true));
 		assertThat(box.has(item2), is(true));
-		verify(mock, times(4)).update();
+		verify(mock, times(4)).updateItemBox();
 	}
 }

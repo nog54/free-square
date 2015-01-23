@@ -142,10 +142,10 @@ public class Square2dObjectTest {
 		
 		object.notifyObservers();
 		
-		verify(observer, never()).update();
+		verify(observer, never()).updateSquare();
 		square.addSquareObject(object);
 		object.notifyObservers();
-		verify(observer, times(1)).update();
+		verify(observer, times(1)).updateSquare();
 	}
 
 }

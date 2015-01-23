@@ -1,23 +1,26 @@
 package org.nognog.freeSquare.ui;
 
+import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.model.item.Item;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/17
  */
-public class ItemList extends ScrollPane {
+public class ItemList extends ScrollPane implements CameraObserver {
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
@@ -29,6 +32,37 @@ public class ItemList extends ScrollPane {
 	public ItemList(Item<?, ?>[] items, BitmapFont font) {
 		super(createList(items, font));
 		this.setupOverscroll(0, 0, 0);
+		this.getWidget().addListener(new ActorGestureListener() {
+
+			private List<Item<?, ?>> list = ItemList.this.getList();
+			private Item<?, ?> lastTouchDownedItem;
+			private Item<?, ?> lastSelectedItem;
+			private boolean isSameItemTouch;
+
+			@Override
+			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				this.isSameItemTouch = this.lastTouchDownedItem == this.list.getSelected();
+				this.lastTouchDownedItem = this.list.getSelected();
+				if(this.isSameItemTouch){
+					return;
+				}
+				if (this.lastSelectedItem == null) {
+					this.list.setSelectedIndex(-1);
+				} else {
+					this.list.setSelected(this.lastSelectedItem);
+				}
+			}
+
+			@Override
+			public void tap(InputEvent event, float x, float y, int count, int button) {
+				if (this.isSameItemTouch) {
+					ItemList.this.selectedItemTapped(this.lastTouchDownedItem);
+					return;
+				}
+				this.list.setSelected(this.lastTouchDownedItem);
+				this.lastSelectedItem = this.lastTouchDownedItem;
+			}
+		});
 	}
 
 	private static List<Item<?, ?>> createList(Item<?, ?>[] items, BitmapFont font) {
@@ -44,34 +78,9 @@ public class ItemList extends ScrollPane {
 		return style;
 	}
 
-	/**
-	 * @param listener
-	 * @return success
-	 */
-	public boolean addListenerToList(EventListener listener) {
-		return this.getWidget().addListener(listener);
-	}
-
-	/**
-	 * @param listener
-	 * @return success
-	 */
-	public boolean addCaptureListenerToList(EventListener listener) {
-		return this.getWidget().addCaptureListener(listener);
-	}
-
-	/**
-	 * @return list listeners
-	 */
-	public Array<EventListener> getListListeners() {
-		return this.getWidget().getListeners();
-	}
-
-	/**
-	 * @return list capture listeners
-	 */
-	public Array<EventListener> getListCaptureListeners() {
-		return this.getWidget().getCaptureListeners();
+	@SuppressWarnings("unchecked")
+	protected List<Item<?, ?>> getList() {
+		return (List<Item<?, ?>>) this.getWidget();
 	}
 
 	/**
@@ -152,4 +161,16 @@ public class ItemList extends ScrollPane {
 
 	}
 
+	@Override
+	public void updateCamera(Camera camera) {
+		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
+		final float newX = camera.position.x - camera.viewportWidth / 2;
+		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
+		this.setPosition(newX, newY);
+		this.setScale(currentCameraZoom);
+	}
+	
+	protected void selectedItemTapped(Item<?,?> tappedItem){
+		// default is empty.
+	}
 }

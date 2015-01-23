@@ -38,7 +38,7 @@ public class ItemBox implements Savable {
 	 * @param item
 	 * @return quantity after the put
 	 */
-	public <T extends Item<T, ?>> int putItem(T item) {
+	public <T extends Item<?, ?>> int putItem(T item) {
 		final int quantity = this.increaseItem(item, 1);
 		return quantity;
 	}
@@ -49,7 +49,7 @@ public class ItemBox implements Savable {
 	 * @param item
 	 * @return quantity after the take out
 	 */
-	public <T extends Item<T, ?>> int takeOutItem(T item) {
+	public <T extends Item<?, ?>> int takeOutItem(T item) {
 		final int quantity = this.decreaseItem(item, 1);
 		return quantity;
 	}
@@ -60,7 +60,7 @@ public class ItemBox implements Savable {
 	 * @param amount
 	 * @return quantity after the increase
 	 */
-	public <T extends Item<T, ?>> int increaseItem(T item, int amount) {
+	public <T extends Item<?, ?>> int increaseItem(T item, int amount) {
 		if (amount == 0) {
 			return this.getItemQuantity(item);
 		}
@@ -88,7 +88,7 @@ public class ItemBox implements Savable {
 	 * @param amount
 	 * @return quantity after the decrease
 	 */
-	public <T extends Item<T, ?>> int decreaseItem(T item, int amount) {
+	public <T extends Item<?, ?>> int decreaseItem(T item, int amount) {
 		if (amount == 0) {
 			return this.getItemQuantity(item);
 		}
@@ -173,7 +173,7 @@ public class ItemBox implements Savable {
 	 */
 	public void notifyObservers(){
 		for (int i = 0; i < this.observers.size; i++) {
-			this.observers.get(i).update();
+			this.observers.get(i).updateItemBox();
 		}
 	}
 

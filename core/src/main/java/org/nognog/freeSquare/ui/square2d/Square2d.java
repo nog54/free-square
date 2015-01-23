@@ -271,7 +271,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	@Override
 	public void notifyObservers() {
 		for (int i = 0; i < this.observers.size; i++) {
-			this.observers.get(i).update();
+			this.observers.get(i).updateSquare();
 		}
 	}
 

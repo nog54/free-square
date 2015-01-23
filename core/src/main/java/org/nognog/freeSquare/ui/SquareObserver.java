@@ -6,7 +6,7 @@ package org.nognog.freeSquare.ui;
  */
 public interface SquareObserver {
 	/**
-	 * update square drawing
+	 * update square
 	 */
-	void update();
+	void updateSquare();
 }

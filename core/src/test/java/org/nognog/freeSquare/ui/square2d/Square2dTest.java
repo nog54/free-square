@@ -31,10 +31,10 @@ public class Square2dTest {
 		Square2d square = Square2dType.GRASSY_SQUARE1.create();
 		square.addSquareObserver(observer);
 		square.act(0.1f);
-		verify(observer, never()).update();
+		verify(observer, never()).updateSquare();
 		square.addAction(mock(Action.class));
 		square.act(0.1f);
-		verify(observer, times(1)).update();
+		verify(observer, times(1)).updateSquare();
 	}
 
 	@Test
@@ -179,11 +179,11 @@ public class Square2dTest {
 		square.addSquareObserver(observer);
 
 		square.act(0.1f);
-		verify(observer, times(1)).update();
+		verify(observer, times(1)).updateSquare();
 
 		square.removeSquareObserver(observer);
 		square.act(0.1f);
-		verify(observer, times(1)).update();
+		verify(observer, times(1)).updateSquare();
 	}
 
 	@Test
@@ -200,9 +200,9 @@ public class Square2dTest {
 		square.addSquareObserver(observer2);
 		square.notifyObservers();
 		
-		verify(observer1, times(2)).update();
-		verify(observer2, times(1)).update();
-		verify(observer3, times(2)).update();
+		verify(observer1, times(2)).updateSquare();
+		verify(observer2, times(1)).updateSquare();
+		verify(observer3, times(2)).updateSquare();
 	}
 
 }

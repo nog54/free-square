@@ -56,6 +56,9 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		return this.getTypeInItem().getSquare2dObjectType().getColor();
 	}
 
+	/**
+	 * @return all items
+	 */
 	public static Square2dObjectItem[] getAllItems() {
 		final Square2dObjectItem[] allItems = new Square2dObjectItem[Square2dObjectType.values().length];
 		int i = 0;
