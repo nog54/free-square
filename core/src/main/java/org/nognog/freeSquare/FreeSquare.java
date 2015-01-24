@@ -1,9 +1,6 @@
 package org.nognog.freeSquare;
 
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.item.Square2dObjectItem;
@@ -35,7 +32,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
@@ -61,12 +57,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private PlayerItemList playerItemList;
 	private ItemList itemList;
 
-	private ExecutorService pool;
-	private Future<?> future;
-
 	@Override
 	public void create() {
-		Gdx.graphics.setContinuousRendering(false);
 		setupPersistItems();
 		this.cameraObservers = new Array<>();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
@@ -166,37 +158,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		};
 
-		this.pool = Executors.newCachedThreadPool();
-		this.future = this.pool.submit(new Runnable() {
-			FreeSquare target = FreeSquare.this;
-			private long lastActTime = TimeUtils.millis();
-
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						final long currentTime = TimeUtils.millis();
-						final float delta = (currentTime - this.lastActTime) / 1000f;
-						try {
-							this.target.actStage(delta);
-						} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-							// exception may occurs when remove
-							// actor.
-						}
-						this.lastActTime = currentTime;
-						if (Thread.currentThread().isInterrupted()) {
-							break;
-						}
-					}
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-
-			}
-
-		});
-		this.updateSquare();
-
 	}
 
 	/**
@@ -269,7 +230,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showMenu(float x, float y) {
-		// this.showSquareOnly();
 		this.menu.setPosition(x, y);
 		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
 		this.menu.setScale(currentCameraZoom);
@@ -285,7 +245,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showPlayerItemList() {
-		// this.showSquareOnly();
 		this.stage.getRoot().addActor(this.playerItemList);
 		this.addCameraObserver(this.playerItemList);
 		this.playerItemList.updateCamera(this.stage.getCamera());
@@ -298,7 +257,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showItemList() {
-		// this.showSquareOnly();
 		this.stage.getRoot().addActor(this.itemList);
 		this.addCameraObserver(this.itemList);
 		this.itemList.updateCamera(this.stage.getCamera());
@@ -312,25 +270,20 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void render() {
+		this.stage.act();
 		this.drawStage();
 	}
 
-	synchronized void drawStage() {
+	private void drawStage() {
 		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		this.stage.draw();
 	}
 
-	synchronized void actStage(float delta) {
-		synchronized (Gdx.input) {
-			this.stage.act(delta);
-		}
-	}
-
-
 	@Override
 	public void pause() {
 		Gdx.graphics.setContinuousRendering(false);
+		PersistItem.PLAYER.save(this.player);
 	}
 
 	@Override
@@ -341,7 +294,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void dispose() {
 		try {
-			this.future.cancel(true);
 			LastPlay.update();
 			PersistItem.PLAYER.save(this.player);
 			if (this.font != null) {
@@ -392,7 +344,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void updateSquare() {
-		Gdx.graphics.requestRendering();
+		// nothing yet
 	}
 
 	/**
