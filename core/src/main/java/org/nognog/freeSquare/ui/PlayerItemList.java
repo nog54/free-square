@@ -32,14 +32,17 @@ public class PlayerItemList extends ScrollPane implements PlayerObserver, Camera
 	private Player player;
 
 	/**
+	 * @param camera
 	 * @param player
 	 * @param font
 	 */
-	public PlayerItemList(Player player, BitmapFont font) {
+	public PlayerItemList(Camera camera, Player player, BitmapFont font) {
 		super(createList(player, font));
 		this.player = player;
 		this.player.addObserver(this);
 		this.setupOverscroll(0, 0, 0);
+		this.setWidth(camera.viewportWidth / 2);
+		this.setHeight(camera.viewportHeight / 2);
 
 		this.getWidget().addListener(new ActorGestureListener() {
 

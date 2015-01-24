@@ -14,9 +14,9 @@ import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
-import org.nognog.freeSquare.ui.FlickButtonController;
 import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.ItemList;
+import org.nognog.freeSquare.ui.Menu;
 import org.nognog.freeSquare.ui.PlayerItemList;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2d;
@@ -31,9 +31,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
@@ -59,8 +57,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Player player;
 	private Life life;
 	private Date lastRun;
-	private ShapeRenderer shapeRenderer;
-	private FlickButtonController menu;
+	private Menu menu;
 	private PlayerItemList playerItemList;
 	private ItemList itemList;
 
@@ -71,7 +68,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void create() {
 		Gdx.graphics.setContinuousRendering(false);
 		setupPersistItems();
-		this.shapeRenderer = new ShapeRenderer();
 		this.cameraObservers = new Array<>();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
@@ -85,8 +81,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		}
 
-		// this.player.takeOutItem(Square2dObjectItem.getInstance(Square2dObjectType.GOLD_SESAME_TOFU));
-
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.stage.addActor(this.square);
 		this.stage.getCamera().position.x -= this.stage.getCamera().viewportWidth / 2;
@@ -99,39 +93,41 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
 		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 24);
-		this.menu = new FlickButtonController(this.font, logicalCameraWidth / 6, new FlickInputListener() {
+		this.menu = new Menu(this.font, logicalCameraWidth / 6, new FlickInputListener() {
 			@Override
 			public void up() {
-				FreeSquare.this.showSquare();
+				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void right() {
-				FreeSquare.this.showSquare();
+				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void left() {
-				FreeSquare.this.showSquare();
+				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void down() {
-				FreeSquare.this.showAddItemList();
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.showItemList();
 			}
 
 			@Override
 			public void center() {
-				FreeSquare.this.showUseItemList();
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.showPlayerItemList();
 			}
 		});
 
-		this.playerItemList = new PlayerItemList(this.player, this.font) {
+		this.playerItemList = new PlayerItemList(this.stage.getCamera(), this.player, this.font) {
 			private Square2dObject addedActor;
 
 			@Override
 			protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
-				if(pannedItem == null){
+				if (pannedItem == null) {
 					return;
 				}
 				if (this.addedActor == null) {
@@ -162,19 +158,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				}
 			}
 		};
-		this.playerItemList.setWidth(logicalCameraWidth / 2);
-		this.playerItemList.setHeight(logicalCameraHeight / 2);
-		this.cameraObservers.add(this.playerItemList);
 
-		this.itemList = new ItemList(Square2dObjectItem.getAllItems(), this.font) {
+		this.itemList = new ItemList(this.stage.getCamera(), Square2dObjectItem.getAllItems(), this.font) {
 			@Override
 			protected void selectedItemTapped(Item<?, ?> tappedItem) {
 				FreeSquare.this.getPlayer().putItem(tappedItem);
 			}
 		};
-		this.itemList.setWidth(logicalCameraWidth / 2);
-		this.itemList.setHeight(logicalCameraHeight / 2);
-		this.cameraObservers.add(this.itemList);
 
 		this.pool = Executors.newCachedThreadPool();
 		this.future = this.pool.submit(new Runnable() {
@@ -183,19 +173,23 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void run() {
-
-				while (true) {
-					final long currentTime = TimeUtils.millis();
-					final float delta = (currentTime - this.lastActTime) / 1000f;
-					try {
-						this.target.actStage(delta);
-					} catch (NullPointerException e) {
-						// NullPointerException may occurs when remove actor.
+				try {
+					while (true) {
+						final long currentTime = TimeUtils.millis();
+						final float delta = (currentTime - this.lastActTime) / 1000f;
+						try {
+							this.target.actStage(delta);
+						} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+							// exception may occurs when remove
+							// actor.
+						}
+						this.lastActTime = currentTime;
+						if (Thread.currentThread().isInterrupted()) {
+							break;
+						}
 					}
-					this.lastActTime = currentTime;
-					if (Thread.currentThread().isInterrupted()) {
-						break;
-					}
+				} catch (Throwable t) {
+					t.printStackTrace();
 				}
 
 			}
@@ -254,44 +248,66 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		return this.square.getTouchable() == Touchable.enabled;
 	}
 
-	void showSquare() {
-		for (Actor child : this.stage.getRoot().getChildren()) {
-			if (child != this.square) {
-				this.stage.getRoot().removeActor(child);
-			}
-		}
+	void showSquareOnly() {
+		this.hideMenu();
+		this.hidePlayerItemList();
+		this.hideItemList();
+		this.enableSquare();
+	}
+
+	private void enableSquare() {
 		this.square.getColor().a = 1;
 		this.square.setTouchable(Touchable.enabled);
 		this.isLockingCameraMove = false;
 		this.isLockingCameraZoom = false;
 	}
 
-	void showMenu(float x, float y) {
-		this.showSquare();
-		this.menu.setPosition(x, y);
-		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
-		this.menu.setScale(currentCameraZoom);
-		this.stage.getRoot().addActor(this.menu);
-		this.disableSquare();
-		this.isLockingCameraZoom = true;
-	}
-
-	void showUseItemList() {
-		this.showSquare();
-		this.stage.getRoot().addActor(this.playerItemList);
-		this.disableSquare();
-	}
-
-	void showAddItemList() {
-		this.showSquare();
-		this.stage.getRoot().addActor(this.itemList);
-		this.disableSquare();
-	}
-
 	private void disableSquare() {
 		this.stage.cancelTouchFocus(this.square);
 		this.square.getColor().a = 0.75f;
 		this.square.setTouchable(Touchable.disabled);
+	}
+
+	void showMenu(float x, float y) {
+		// this.showSquareOnly();
+		this.menu.setPosition(x, y);
+		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
+		this.menu.setScale(currentCameraZoom);
+		this.stage.getRoot().addActor(this.menu);
+		this.addCameraObserver(this.menu);
+		this.menu.updateCamera(this.stage.getCamera());
+		this.disableSquare();
+	}
+
+	void hideMenu() {
+		this.stage.getRoot().removeActor(this.menu);
+		this.removeCameraObserver(this.menu);
+	}
+
+	void showPlayerItemList() {
+		// this.showSquareOnly();
+		this.stage.getRoot().addActor(this.playerItemList);
+		this.addCameraObserver(this.playerItemList);
+		this.playerItemList.updateCamera(this.stage.getCamera());
+		this.disableSquare();
+	}
+
+	void hidePlayerItemList() {
+		this.stage.getRoot().removeActor(this.playerItemList);
+		this.removeCameraObserver(this.playerItemList);
+	}
+
+	void showItemList() {
+		// this.showSquareOnly();
+		this.stage.getRoot().addActor(this.itemList);
+		this.addCameraObserver(this.itemList);
+		this.itemList.updateCamera(this.stage.getCamera());
+		this.disableSquare();
+	}
+
+	void hideItemList() {
+		this.stage.getRoot().removeActor(this.itemList);
+		this.removeCameraObserver(this.itemList);
 	}
 
 	@Override
@@ -302,7 +318,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	synchronized void drawStage() {
 		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		// writeWorldCoordinate();
 		this.stage.draw();
 	}
 
@@ -312,16 +327,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private void writeWorldCoordinate() {
-		this.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		this.shapeRenderer.setProjectionMatrix(this.stage.getCamera().combined);
-		this.shapeRenderer.setColor(1, 0, 0, 1);
-		this.shapeRenderer.line(-2048, 0, 2048, 0);
-		this.shapeRenderer.setColor(1, 0, 0, 1);
-		this.shapeRenderer.line(0, -2048, 0, 2048);
-		this.shapeRenderer.end();
-	}
 
 	@Override
 	public void pause() {
@@ -345,7 +350,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.stage.dispose();
 			Square2dType.dispose();
 			Square2dObjectType.dispose();
-			this.shapeRenderer.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;
@@ -389,6 +393,22 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void updateSquare() {
 		Gdx.graphics.requestRendering();
+	}
+
+	/**
+	 * @param observer
+	 */
+	public void addCameraObserver(CameraObserver observer) {
+		if (!this.cameraObservers.contains(observer, true)) {
+			this.cameraObservers.add(observer);
+		}
+	}
+
+	/**
+	 * @param observer
+	 */
+	public void removeCameraObserver(CameraObserver observer) {
+		this.cameraObservers.removeValue(observer, true);
 	}
 
 	/**

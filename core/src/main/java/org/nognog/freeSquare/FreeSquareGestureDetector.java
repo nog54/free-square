@@ -25,7 +25,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 	 */
 	FreeSquareGestureDetector(FreeSquare freeSquare) {
 		GestureDetector gestureDetector = new GestureDetector(createFreeSquareGestureListener(freeSquare));
-		gestureDetector.setLongPressSeconds(0.5f);
+		gestureDetector.setLongPressSeconds(0.2f);
 		InputAdapter longTouchTapCanceller = new InputAdapter() {
 
 			@Override
@@ -69,17 +69,16 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				}
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				float currentZoom = camera.zoom;
+				
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
 				this.adjustCameraPositionIfRangeOver();
+				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
 			}
 
 			@Override
 			public boolean zoom(float initialDistance, float distance) {
-				if (freeSquare.getSquare().getTouchable() == Touchable.disabled) {
-					return false;
-				}
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
@@ -91,6 +90,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
 				this.adjustCameraPositionIfRangeOver();
+				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
 			}
@@ -105,10 +105,11 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				}
 
 				if (!freeSquare.isShowingSquare()) {
-					freeSquare.showSquare();
+					freeSquare.showSquareOnly();
 					return true;
 				}
 				Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
+				freeSquare.showSquareOnly();
 				freeSquare.showMenu(menuPosition.x, menuPosition.y);
 				return true;
 			}

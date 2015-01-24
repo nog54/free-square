@@ -26,12 +26,15 @@ public class ItemList extends ScrollPane implements CameraObserver {
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	/**
+	 * @param camera
 	 * @param items
 	 * @param font
 	 */
-	public ItemList(Item<?, ?>[] items, BitmapFont font) {
+	public ItemList(Camera camera, Item<?, ?>[] items, BitmapFont font) {
 		super(createList(items, font));
 		this.setupOverscroll(0, 0, 0);
+		this.setWidth(camera.viewportWidth / 2);
+		this.setHeight(camera.viewportHeight / 2);
 		this.getWidget().addListener(new ActorGestureListener() {
 
 			private List<Item<?, ?>> list = ItemList.this.getList();
@@ -43,7 +46,7 @@ public class ItemList extends ScrollPane implements CameraObserver {
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				this.isSameItemTouch = this.lastTouchDownedItem == this.list.getSelected();
 				this.lastTouchDownedItem = this.list.getSelected();
-				if(this.isSameItemTouch){
+				if (this.isSameItemTouch) {
 					return;
 				}
 				if (this.lastSelectedItem == null) {
@@ -164,13 +167,13 @@ public class ItemList extends ScrollPane implements CameraObserver {
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - camera.viewportWidth / 2;
+		final float newX = camera.position.x - currentCameraZoom * camera.viewportWidth / 2;
 		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}
-	
-	protected void selectedItemTapped(Item<?,?> tappedItem){
+
+	protected void selectedItemTapped(Item<?, ?> tappedItem) {
 		// default is empty.
 	}
 }
