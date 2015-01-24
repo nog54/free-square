@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.model.player;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.item.Item;
 
 import com.badlogic.gdx.utils.Array;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/01/15
  */
-public class ItemBox implements Savable {
+public class ItemBox implements PersistItemClass {
 	
 	private final Array<PossessedItem<?>> possessedItems;
 	private transient final Array<ItemBoxObserver> observers;

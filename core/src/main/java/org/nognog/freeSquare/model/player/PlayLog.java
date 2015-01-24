@@ -3,13 +3,13 @@ package org.nognog.freeSquare.model.player;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.persist.PersistItem;
 
 /**
  * @author goshi 2015/01/15
  */
-public class PlayLog implements Savable {
+public class PlayLog implements PersistItemClass {
 
 	private String log;
 

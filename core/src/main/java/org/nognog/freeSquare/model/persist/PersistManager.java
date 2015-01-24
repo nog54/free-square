@@ -8,7 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.player.PlayLog;
 
 import com.badlogic.gdx.Gdx;
@@ -80,7 +80,7 @@ class PersistManager {
 		return cipher;
 	}
 
-	public static <T extends Savable> void save(PersistItem<T> saveItem, T saveObject) throws SaveFailureException {
+	public static <T extends PersistItemClass> void save(PersistItem<T> saveItem, T saveObject) throws SaveFailureException {
 		save(saveItem, saveObject, encryptionKey);
 	}
 
@@ -90,7 +90,7 @@ class PersistManager {
 	 * @param key
 	 * @throws SaveFailureException
 	 */
-	static <T extends Savable> void save(PersistItem<T> saveItem, T saveObject, byte[] key) throws SaveFailureException {
+	static <T extends PersistItemClass> void save(PersistItem<T> saveItem, T saveObject, byte[] key) throws SaveFailureException {
 		if (saveItem.equals(PersistItem.PLAY_LOG)) {
 			savePlayLog((PlayLog) saveObject);
 			return;
@@ -144,7 +144,7 @@ class PersistManager {
 		}
 	}
 
-	public static <T extends Savable> T load(PersistItem<T> loadItem) throws LoadFailureException {
+	public static <T extends PersistItemClass> T load(PersistItem<T> loadItem) throws LoadFailureException {
 		return load(loadItem, encryptionKey);
 	}
 
@@ -154,7 +154,7 @@ class PersistManager {
 	 * @throws LoadFailureException
 	 */
 	@SuppressWarnings("unchecked")
-	static <T extends Savable> T load(PersistItem<T> loadItem, byte[] key) throws LoadFailureException {
+	static <T extends PersistItemClass> T load(PersistItem<T> loadItem, byte[] key) throws LoadFailureException {
 		if (key == null) {
 			throw new LoadFailureException();
 		}
@@ -203,7 +203,7 @@ class PersistManager {
 		}
 	}
 
-	public static <T extends Savable> boolean delete(PersistItem<T> removeItem) {
+	public static <T extends PersistItemClass> boolean delete(PersistItem<T> removeItem) {
 		FileHandle file = Gdx.files.local(removeItem.getFileName());
 		return file.delete();
 	}
@@ -212,7 +212,7 @@ class PersistManager {
 	 * @param item
 	 * @return file of saveItem exists
 	 */
-	public static <T extends Savable> boolean isAlreadyPersisted(PersistItem<T> item) {
+	public static <T extends PersistItemClass> boolean isAlreadyPersisted(PersistItem<T> item) {
 		FileHandle file = Gdx.files.local(item.getFileName());
 		return file.exists();
 	}

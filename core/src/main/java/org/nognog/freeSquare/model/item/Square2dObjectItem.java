@@ -1,5 +1,6 @@
 package org.nognog.freeSquare.model.item;
 
+import org.nognog.freeSquare.ui.square2d.Square2dObject;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
@@ -55,6 +56,13 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	public Color getColor() {
 		return this.getTypeInItem().getSquare2dObjectType().getColor();
 	}
+	
+	/**
+	 * @return square2d object
+	 */
+	public Square2dObject createSquare2dObject(){
+		return this.getTypeInItem().getSquare2dObjectType().create();
+	}
 
 	/**
 	 * @return all items
@@ -68,7 +76,7 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		}
 		return allItems;
 	}
-
+	
 	@Override
 	public boolean isValid() {
 		return this.getTypeInItem() != null;
@@ -79,9 +87,5 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		return this.getTypeInItem().toString();
 	}
 
-	@Override
-	public void reconstruction() {
-		//
-	}
 
 }

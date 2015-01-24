@@ -13,12 +13,14 @@ import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.model.player.PossessedItem;
 import org.nognog.freeSquare.ui.FlickButtonController;
 import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.ItemList;
-import org.nognog.freeSquare.ui.PlayerItemListScrollPane;
+import org.nognog.freeSquare.ui.PlayerItemList;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2d;
+import org.nognog.freeSquare.ui.square2d.Square2dObject;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 import org.nognog.freeSquare.util.font.FontUtil;
@@ -59,7 +61,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Date lastRun;
 	private ShapeRenderer shapeRenderer;
 	private FlickButtonController menu;
-	private PlayerItemListScrollPane playerItemList;
+	private PlayerItemList playerItemList;
 	private ItemList itemList;
 
 	private ExecutorService pool;
@@ -124,7 +126,42 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		});
 
-		this.playerItemList = new PlayerItemListScrollPane(this.player, this.font);
+		this.playerItemList = new PlayerItemList(this.player, this.font) {
+			private Square2dObject addedActor;
+
+			@Override
+			protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
+				if(pannedItem == null){
+					return;
+				}
+				if (this.addedActor == null) {
+					Item<?, ?> item = pannedItem.getItem();
+					if (item instanceof Square2dObjectItem) {
+						this.addedActor = ((Square2dObjectItem) item).createSquare2dObject();
+						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
+							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
+							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y);
+							this.getColor().a = 0.25f;
+						}
+					}
+				} else {
+					this.addedActor.moveBy(deltaX, deltaY);
+				}
+			}
+
+			@Override
+			protected void touchUp(float x, float y) {
+				if (this.addedActor != null) {
+					if (this.addedActor.isLandingOnSquare()) {
+						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
+					} else {
+						FreeSquare.this.getSquare().removeSquareObject(this.addedActor);
+					}
+					this.addedActor = null;
+					this.getColor().a = 1f;
+				}
+			}
+		};
 		this.playerItemList.setWidth(logicalCameraWidth / 2);
 		this.playerItemList.setHeight(logicalCameraHeight / 2);
 		this.cameraObservers.add(this.playerItemList);

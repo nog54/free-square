@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.model.player;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.item.Item;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
  * @author goshi 2015/01/15
  * @param <T>
  */
-public class PossessedItem<T extends Item<?, ?>> implements Savable {
+public class PossessedItem<T extends Item<?, ?>> implements PersistItemClass {
 	/** アイテムの最大保持数 */
 	public static final int maxQuantity = 999; // 現在は適当に決めてる
 

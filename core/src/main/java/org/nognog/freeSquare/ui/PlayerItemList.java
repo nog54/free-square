@@ -13,15 +13,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 /**
  * @author goshi 2015/01/17
  */
-public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserver, CameraObserver {
+public class PlayerItemList extends ScrollPane implements PlayerObserver, CameraObserver {
 	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
@@ -32,11 +35,66 @@ public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserv
 	 * @param player
 	 * @param font
 	 */
-	public PlayerItemListScrollPane(Player player, BitmapFont font) {
+	public PlayerItemList(Player player, BitmapFont font) {
 		super(createList(player, font));
 		this.player = player;
 		this.player.addObserver(this);
 		this.setupOverscroll(0, 0, 0);
+
+		this.getWidget().addListener(new ActorGestureListener() {
+
+			private List<PossessedItem<?>> list = PlayerItemList.this.getList();
+			private PossessedItem<?> lastTouchDownedItem;
+			private PossessedItem<?> lastSelectedItem;
+			private boolean isSameItemTouch;
+
+			@Override
+			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				this.isSameItemTouch = this.lastTouchDownedItem == this.list.getSelected();
+				this.lastTouchDownedItem = this.list.getSelected();
+				if (this.isSameItemTouch) {
+					PlayerItemList.this.setFlickScroll(false);
+					return;
+				}
+				PlayerItemList.this.setFlickScroll(true);
+				if (this.lastSelectedItem == null) {
+					this.list.setSelectedIndex(-1);
+				} else {
+					this.list.setSelected(this.lastSelectedItem);
+				}
+			}
+
+			@Override
+			public boolean longPress(Actor actor, float x, float y) {
+				if (this.isSameItemTouch) {
+					PlayerItemList.this.selectedItemLongPressed(this.lastTouchDownedItem, x, y);
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
+				if (this.isSameItemTouch) {
+					PlayerItemList.this.selectedItemPanned(this.lastTouchDownedItem, x, y, deltaX, deltaY);
+				}
+			}
+
+			@Override
+			public void tap(InputEvent event, float x, float y, int count, int button) {
+				if (this.isSameItemTouch) {
+					PlayerItemList.this.selectedItemTapped(this.lastTouchDownedItem);
+					return;
+				}
+				this.list.setSelected(this.lastTouchDownedItem);
+				this.lastSelectedItem = this.lastTouchDownedItem;
+			}
+
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				PlayerItemList.this.touchUp(x, y);
+			}
+		});
 	}
 
 	private static List<PossessedItem<?>> createList(Player player, BitmapFont font) {
@@ -135,7 +193,8 @@ public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserv
 
 					final float rightSpace = itemHeight / 8;
 					Color oldColor = batch.getColor();
-					batch.setColor(((DrawableItem) item).getColor());
+					Color itemColor = ((DrawableItem) item).getColor();
+					batch.setColor(itemColor.r, itemColor.g, itemColor.b, oldColor.a);
 					batch.draw(drawTexture, x + textOffsetX + this.getWidth() - itemHeight - rightSpace, y + itemY - itemHeight + drawImageInterval / 2, drawImageWidth, drawImageHeight);
 					batch.setColor(oldColor);
 				}
@@ -146,17 +205,33 @@ public class PlayerItemListScrollPane extends ScrollPane implements PlayerObserv
 
 	}
 
+	protected void selectedItemTapped(PossessedItem<?> tappedItem) {
+		// default is empty.
+	}
+
+	protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
+		// default is empty.
+	}
+
+	protected void selectedItemLongPressed(PossessedItem<?> pannedItem, float x, float y) {
+		// default is empty.
+	}
+
+	protected void touchUp(float x, float y) {
+		// default is empty.
+	}
+
 	@Override
 	public void updatePlayer() {
 		List<PossessedItem<?>> list = this.getList();
 		list.setItems(this.player.getItemBox().toItemArray());
 	}
-	
+
 	/**
 	 * dispose
 	 */
-	public void dispose(){
-		if(this.player != null){
+	public void dispose() {
+		if (this.player != null) {
 			this.player.removeObserver(this);
 		}
 		this.setWidget(null);

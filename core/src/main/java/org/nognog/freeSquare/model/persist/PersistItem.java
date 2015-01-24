@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.model.persist;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
@@ -13,7 +13,7 @@ import org.nognog.freeSquare.model.player.Player;
  * @param <T>
  *            save object class
  */
-public class PersistItem<T extends Savable> {
+public class PersistItem<T extends PersistItemClass> {
 
 	/** プレイヤー情報 */
 	public static final PersistItem<Player> PLAYER = new PersistItem<>(Player.class, "player"); //$NON-NLS-1$

@@ -1,11 +1,11 @@
 package org.nognog.freeSquare.model.life;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.SelfValidatable;
 
 /**
  * @author goshi 2014/08/24
  */
-public class Status implements Savable {
+public class Status implements SelfValidatable {
 
 	private int age; // 年
 	private int condition; // コンディション
@@ -639,10 +639,5 @@ public class Status implements Savable {
 
 	private static boolean isRange(int value, int min, int max) {
 		return (value >= min) && (value <= max);
-	}
-
-	@Override
-	public void reconstruction() {
-		// 
 	}
 }

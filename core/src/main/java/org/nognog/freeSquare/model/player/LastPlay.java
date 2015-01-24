@@ -2,14 +2,14 @@ package org.nognog.freeSquare.model.player;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.persist.LoadFailureException;
 import org.nognog.freeSquare.model.persist.PersistItem;
 
 /**
  * @author goshi 2014/11/18
  */
-public class LastPlay implements Savable {
+public class LastPlay implements PersistItemClass {
 	private long lastPlayDateTime;
 
 	private LastPlay() {

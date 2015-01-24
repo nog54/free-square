@@ -2,7 +2,7 @@ package org.nognog.freeSquare.model.player;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.item.Item;
 
 import com.badlogic.gdx.utils.Array;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2014/10/28
  */
-public class Player implements Savable, ItemBoxObserver {
+public class Player implements PersistItemClass, ItemBoxObserver {
 	private static final String defaultName = "noname"; //$NON-NLS-1$
 
 	private String name;
@@ -74,7 +74,7 @@ public class Player implements Savable, ItemBoxObserver {
 	 * @param item
 	 * @return quantity after the put
 	 */
-	public <T extends Item<?, ?>> int putItem(T item) {
+	public int putItem(Item<?, ?> item) {
 		final int quantity = this.itemBox.putItem(item);
 		return quantity;
 	}
@@ -83,7 +83,7 @@ public class Player implements Savable, ItemBoxObserver {
 	 * @param item
 	 * @return quantity after the take out
 	 */
-	public <T extends Item<T, ?>> int takeOutItem(T item) {
+	public int takeOutItem(Item<?, ?> item) {
 		final int quantity = this.itemBox.takeOutItem(item);
 		return quantity;
 	}

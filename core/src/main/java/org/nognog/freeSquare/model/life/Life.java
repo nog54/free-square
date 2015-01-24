@@ -1,11 +1,11 @@
 package org.nognog.freeSquare.model.life;
 
-import org.nognog.freeSquare.model.Savable;
+import org.nognog.freeSquare.model.PersistItemClass;
 
 /**
  * @author goshi 2014/08/25
  */
-public class Life implements Savable {
+public class Life implements PersistItemClass {
 	private Family family;
 	private Status status;
 
