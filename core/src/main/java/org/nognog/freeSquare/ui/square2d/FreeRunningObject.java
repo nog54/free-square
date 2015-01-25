@@ -87,12 +87,11 @@ public class FreeRunningObject extends LifeObject {
 	}
 
 	@Override
-	protected float independentAction(float delta, float defaultIntervalToNext) {
-		super.independentAction(delta, defaultIntervalToNext);
+	protected void independentAction(float delta) {
+		super.independentAction(delta);
 		if (!this.isEnableFreeRun) {
-			return defaultIntervalToNext;
+			return;
 		}
-
 		if (this.freeRunActionIsAlreadyEnded() || this.freeRunAction == null) {
 			this.stoppingTime += delta;
 			if (this.stoppingTime > this.stopTime) {
@@ -102,12 +101,10 @@ public class FreeRunningObject extends LifeObject {
 				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x, dest.y, this.moveSpeed);
 				this.addAction(this.freeRunAction);
 			}
-			return defaultIntervalToNext;
+			return;
 		}
-
 		this.square.notifyObservers();
 		this.getSquare().requestDrawOrderUpdate();
-		return defaultIntervalToNext;
 	}
 
 	private boolean freeRunActionIsAlreadyEnded() {

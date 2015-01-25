@@ -23,8 +23,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	protected Square2d square;
 	private final Image image;
 
-	private float intevalToNextIndependentAction;
-	private float actionStoppingTime;
+	private boolean enableIndependentAction = true;
 
 	/**
 	 * @param type
@@ -163,12 +162,24 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 
 	@Override
 	public void act(float delta) {
-		this.actionStoppingTime += delta;
-		if (this.actionStoppingTime >= this.intevalToNextIndependentAction) {
-			this.intevalToNextIndependentAction = this.independentAction(this.actionStoppingTime, 0);
-			this.actionStoppingTime = 0;
+		if (this.enableIndependentAction) {
+			this.independentAction(delta);
+			super.act(delta);
 		}
-		super.act(delta);
+	}
+	
+	/**
+	 * @param enableIndependentAction
+	 */
+	public void setEnableIndependentAction(boolean enableIndependentAction){
+		this.enableIndependentAction = enableIndependentAction;
+	}
+	
+	/**
+	 * @return true if independent-action is enabled.
+	 */
+	public boolean isEnableIndependentAction(){
+		return this.enableIndependentAction;
 	}
 
 	@Override
@@ -179,13 +190,10 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 
 	/**
 	 * This method will be called by {@link #act(float)}.
-	 * 
-	 * @return min interval to next act [ms]
-	 * 
+	 *
 	 */
-	@SuppressWarnings("static-method")
-	protected float independentAction(float delta, float defaultIndependentActionInterval) {
-		return defaultIndependentActionInterval;
+	protected void independentAction(float delta) {
+		// overriden by sub class
 	}
 
 	@Override

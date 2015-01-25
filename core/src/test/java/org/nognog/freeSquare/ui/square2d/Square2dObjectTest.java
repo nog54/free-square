@@ -26,20 +26,23 @@ public class Square2dObjectTest {
 	@Test
 	public final void testAct() {
 		final Square2dObject mock = Mockito.mock(Square2dObject.class);
-		final float independentActionInterval = 2;
 		Square2dObject object = new Square2dObject(Square2dObjectType.TOFU) {
 			@Override
-			protected float independentAction(float delta, float defaultIndependentActionInterval) {
+			protected void independentAction(float delta) {
 				mock.getX();
-				return independentActionInterval;
 			}
 		};
-		final float delta = independentActionInterval / 4;
+		final float delta = 0.1f;
 		final int actCount = 10;
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
-		verify(mock, times((int) Math.ceil(delta * actCount / independentActionInterval))).getX();
+		verify(mock, times(0)).getX();
+		object.setEnableIndependentAction(true);
+		for (int i = 0; i < actCount; i++) {
+			object.act(delta);
+		}
+		verify(mock, times(actCount)).getX();
 	}
 
 	@Test
@@ -125,7 +128,7 @@ public class Square2dObjectTest {
 			boolean expected1 = square.containsInSquareArea(object.getX(), object.getY());
 			boolean actual1 = object.isLandingOnSquare();
 			assertThat(actual1, is(expected1));
-			
+
 			square.removeSquareObject(object);
 			boolean expected2 = false;
 			boolean actual2 = object.isLandingOnSquare();
@@ -139,9 +142,9 @@ public class Square2dObjectTest {
 		SquareObserver observer = mock(SquareObserver.class);
 		square.addSquareObserver(observer);
 		Square2dObject object = Square2dObjectType.TOFU.create();
-		
+
 		object.notifyObservers();
-		
+
 		verify(observer, never()).updateSquare();
 		square.addSquareObject(object);
 		object.notifyObservers();

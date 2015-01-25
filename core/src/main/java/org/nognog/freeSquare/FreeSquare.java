@@ -126,10 +126,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					Item<?, ?> item = pannedItem.getItem();
 					if (item instanceof Square2dObjectItem) {
 						this.addedActor = ((Square2dObjectItem) item).createSquare2dObject();
+						this.addedActor.setEnableIndependentAction(false);
 						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
 							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
 							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y);
-							this.getColor().a = 0.25f;
+							FreeSquare.this.showSquareOnly();
 						}
 					}
 				} else {
@@ -142,9 +143,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				if (this.addedActor != null) {
 					if (this.addedActor.isLandingOnSquare()) {
 						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
+						this.addedActor.setEnableIndependentAction(true);
 					} else {
 						FreeSquare.this.getSquare().removeSquareObject(this.addedActor);
 					}
+					FreeSquare.this.showPlayerItemList();
 					this.addedActor = null;
 					this.getColor().a = 1f;
 				}
@@ -279,23 +282,16 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		this.stage.draw();
 	}
-
+	
 	@Override
 	public void pause() {
-		Gdx.graphics.setContinuousRendering(false);
 		PersistItem.PLAYER.save(this.player);
-	}
-
-	@Override
-	public void resume() {
-		Gdx.graphics.setContinuousRendering(true);
+		LastPlay.update();
 	}
 
 	@Override
 	public void dispose() {
 		try {
-			LastPlay.update();
-			PersistItem.PLAYER.save(this.player);
 			if (this.font != null) {
 				this.font.dispose();
 			}
