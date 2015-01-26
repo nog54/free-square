@@ -88,7 +88,6 @@ public class FreeRunningObject extends LifeObject {
 
 	@Override
 	protected void independentAction(float delta) {
-		super.independentAction(delta);
 		if (!this.isEnableFreeRun) {
 			return;
 		}
@@ -103,7 +102,6 @@ public class FreeRunningObject extends LifeObject {
 			}
 			return;
 		}
-		this.square.notifyObservers();
 		this.getSquare().requestDrawOrderUpdate();
 	}
 
@@ -136,7 +134,7 @@ public class FreeRunningObject extends LifeObject {
 	 * @param enable
 	 * 
 	 */
-	public synchronized void setEnableFreeRun(boolean enable) {
+	public void setEnableFreeRun(boolean enable) {
 		if (this.freeRunAction != null) {
 			if (!enable && this.getActions().contains(this.freeRunAction, true)) {
 				this.getActions().removeValue(this.freeRunAction, true);

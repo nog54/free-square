@@ -15,7 +15,8 @@ import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.ItemList;
 import org.nognog.freeSquare.ui.Menu;
 import org.nognog.freeSquare.ui.PlayerItemList;
-import org.nognog.freeSquare.ui.SquareObserver;
+import org.nognog.freeSquare.ui.SquareEvent;
+import org.nognog.freeSquare.ui.SquareEvent.EventType;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
@@ -37,7 +38,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 /**
  * @author goshi 2014/10/23
  */
-public class FreeSquare extends ApplicationAdapter implements SquareObserver {
+public class FreeSquare extends ApplicationAdapter {
 	private Stage stage;
 	private Square2d square;
 
@@ -65,7 +66,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
 		this.square = Square2dType.GRASSY_SQUARE1.create();
-		this.square.addSquareObserver(this);
 		this.square.setX(-this.square.getWidth() / 2);
 		for (Square2dObjectType object : Square2dObjectType.values()) {
 			for (int i = 0; i < 2; i++) {
@@ -126,7 +126,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					Item<?, ?> item = pannedItem.getItem();
 					if (item instanceof Square2dObjectItem) {
 						this.addedActor = ((Square2dObjectItem) item).createSquare2dObject();
-						this.addedActor.setEnableIndependentAction(false);
+						this.addedActor.setEnabledAction(false);
 						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
 							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
 							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y);
@@ -143,7 +143,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				if (this.addedActor != null) {
 					if (this.addedActor.isLandingOnSquare()) {
 						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
-						this.addedActor.setEnableIndependentAction(true);
+						this.addedActor.setEnabledAction(true);
+						FreeSquare.this.getSquare().notifyObservers(new SquareEvent(EventType.ADD_OBJECT, this.addedActor));
 					} else {
 						FreeSquare.this.getSquare().removeSquareObject(this.addedActor);
 					}
@@ -336,11 +337,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 */
 	public Player getPlayer() {
 		return this.player;
-	}
-
-	@Override
-	public void updateSquare() {
-		// nothing yet
 	}
 
 	/**

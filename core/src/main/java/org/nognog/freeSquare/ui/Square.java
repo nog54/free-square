@@ -34,8 +34,8 @@ public interface Square<T extends SquareObject<?>> {
 	void removeSquareObserver(SquareObserver observer);
 
 	/**
-	 * 
+	 * @param event 
 	 */
-	void notifyObservers();
+	void notifyObservers(SquareEvent event);
 
 }

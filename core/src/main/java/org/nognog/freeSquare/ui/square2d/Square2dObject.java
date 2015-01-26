@@ -1,6 +1,9 @@
 package org.nognog.freeSquare.ui.square2d;
 
+import org.nognog.freeSquare.model.SelfValidatable;
+import org.nognog.freeSquare.ui.SquareEvent;
 import org.nognog.freeSquare.ui.SquareObject;
+import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
@@ -14,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/03
  */
-public class Square2dObject extends Group implements SquareObject<Square2d> {
+public class Square2dObject extends Group implements SquareObject<Square2d>, SquareObserver, SelfValidatable {
 
 	private Square2dObjectType type;
 	private final float logicalWidth;
@@ -23,7 +26,8 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	protected Square2d square;
 	private final Image image;
 
-	private boolean enableIndependentAction = true;
+	private boolean enableAction = true;
+	private boolean performAddedActionInstances = true;
 
 	/**
 	 * @param type
@@ -151,35 +155,45 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 		return this.square.containsInSquareArea(this.getX(), this.getY());
 	}
 
-	/**
-	 * notify all observers
-	 */
-	public void notifyObservers() {
-		if (this.square != null) {
-			this.square.notifyObservers();
+	@Override
+	public final void act(float delta) {
+		if (this.square == null) {
+			return;
+		}
+		if (this.isEnabledAction()) {
+			this.independentAction(delta);
+			if (this.isPerformAddedActionInstances()) {
+				super.act(delta);
+			}
 		}
 	}
 
-	@Override
-	public void act(float delta) {
-		if (this.enableIndependentAction) {
-			this.independentAction(delta);
-			super.act(delta);
-		}
-	}
-	
 	/**
 	 * @param enableIndependentAction
 	 */
-	public void setEnableIndependentAction(boolean enableIndependentAction){
-		this.enableIndependentAction = enableIndependentAction;
+	public void setEnabledAction(boolean enableIndependentAction) {
+		this.enableAction = enableIndependentAction;
 	}
-	
+
 	/**
 	 * @return true if independent-action is enabled.
 	 */
-	public boolean isEnableIndependentAction(){
-		return this.enableIndependentAction;
+	public boolean isEnabledAction() {
+		return this.enableAction;
+	}
+	
+	/**
+	 * @param perform
+	 */
+	public void setPerformAddedActionInstances(boolean perform) {
+		this.performAddedActionInstances = perform;
+	}
+	
+	/**
+	 * @return true if perform Added Action-class instance option is enable.
+	 */
+	public boolean isPerformAddedActionInstances() {
+		return this.performAddedActionInstances;
 	}
 
 	@Override
@@ -193,11 +207,21 @@ public class Square2dObject extends Group implements SquareObject<Square2d> {
 	 *
 	 */
 	protected void independentAction(float delta) {
-		// overriden by sub class
+		// overridden by sub class
 	}
 
 	@Override
 	public String toString() {
 		return this.type.name();
+	}
+
+	@Override
+	public void notify(SquareEvent event) {
+		// overridden by sub class
+	}
+	
+	@Override
+	public boolean isValid() {
+		return this.square != null;
 	}
 }

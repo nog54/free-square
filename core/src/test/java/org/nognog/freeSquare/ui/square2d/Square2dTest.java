@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.ui.SquareEvent;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
@@ -24,18 +25,6 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
 public class Square2dTest {
-	
-	@Test
-	public final void testAct() {
-		SquareObserver observer = mock(SquareObserver.class);
-		Square2d square = Square2dType.GRASSY_SQUARE1.create();
-		square.addSquareObserver(observer);
-		square.act(0.1f);
-		verify(observer, never()).updateSquare();
-		square.addAction(mock(Action.class));
-		square.act(0.1f);
-		verify(observer, times(1)).updateSquare();
-	}
 
 	@Test
 	public final void testGetWidth() {
@@ -172,21 +161,6 @@ public class Square2dTest {
 	}
 
 	@Test
-	public final void testRemoveSquareObserver() {
-		Square2d square = Square2dType.GRASSY_SQUARE1.create();
-		SquareObserver observer = mock(SquareObserver.class);
-		square.addAction(mock(Action.class));
-		square.addSquareObserver(observer);
-
-		square.act(0.1f);
-		verify(observer, times(1)).updateSquare();
-
-		square.removeSquareObserver(observer);
-		square.act(0.1f);
-		verify(observer, times(1)).updateSquare();
-	}
-
-	@Test
 	public final void testNotifyObservers() {
 		System.out.println(Gdx.gl);
 		Square2d square = Square2dType.GRASSY_SQUARE1.create();
@@ -194,15 +168,23 @@ public class Square2dTest {
 		SquareObserver observer2 = mock(SquareObserver.class);
 		SquareObserver observer3 = mock(SquareObserver.class);
 
+		SquareEvent event = SquareEvent.getSimpleSquareUpdateEvent();
 		square.addSquareObserver(observer1);
 		square.addSquareObserver(observer3);
-		square.notifyObservers();
+		square.notifyObservers(event);
 		square.addSquareObserver(observer2);
-		square.notifyObservers();
+		square.notifyObservers(event);
 		
-		verify(observer1, times(2)).updateSquare();
-		verify(observer2, times(1)).updateSquare();
-		verify(observer3, times(2)).updateSquare();
+		verify(observer1, times(2)).notify(event);
+		verify(observer2, times(1)).notify(event);
+		verify(observer3, times(2)).notify(event);
+		
+		square.removeSquareObserver(observer1);
+		square.notifyObservers(event);
+		
+		verify(observer1, times(2)).notify(event);
+		verify(observer2, times(2)).notify(event);
+		verify(observer3, times(3)).notify(event);
 	}
 
 }

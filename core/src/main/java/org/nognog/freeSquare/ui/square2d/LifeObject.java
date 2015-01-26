@@ -73,11 +73,6 @@ public class LifeObject extends Square2dObject {
 		});
 	}
 
-	@Override
-	protected void independentAction(float delta) {
-		this.square.notifyObservers();
-	}
-
 	/**
 	 * @return true if up-down routine is enable
 	 */
@@ -88,7 +83,7 @@ public class LifeObject extends Square2dObject {
 	/**
 	 * @param enable
 	 */
-	public synchronized void setEnableUpDownRoutine(boolean enable) {
+	public void setEnableUpDownRoutine(boolean enable) {
 		final boolean currentEnable = this.isEnableUpDownRoutine();
 		if (enable && !currentEnable) {
 			this.getActions().add(this.upDownRoutineAction);

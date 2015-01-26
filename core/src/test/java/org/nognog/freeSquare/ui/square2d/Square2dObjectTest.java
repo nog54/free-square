@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.ui.SquareEvent;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
@@ -26,19 +27,21 @@ public class Square2dObjectTest {
 	@Test
 	public final void testAct() {
 		final Square2dObject mock = Mockito.mock(Square2dObject.class);
-		Square2dObject object = new Square2dObject(Square2dObjectType.TOFU) {
+		final Square2d square = Square2dType.GRASSY_SQUARE1.create();
+		final Square2dObject object = new Square2dObject(Square2dObjectType.TOFU) {
 			@Override
 			protected void independentAction(float delta) {
 				mock.getX();
 			}
 		};
+		square.addSquareObject(object);
 		final float delta = 0.1f;
 		final int actCount = 10;
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
-		verify(mock, times(0)).getX();
-		object.setEnableIndependentAction(true);
+		verify(mock, times(actCount)).getX();
+		object.setEnabledAction(false);
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
@@ -134,21 +137,6 @@ public class Square2dObjectTest {
 			boolean actual2 = object.isLandingOnSquare();
 			assertThat(actual2, is(expected2));
 		}
-	}
-
-	@Test
-	public final void testNotifyObservers() {
-		Square2d square = Square2dType.GRASSY_SQUARE1.create();
-		SquareObserver observer = mock(SquareObserver.class);
-		square.addSquareObserver(observer);
-		Square2dObject object = Square2dObjectType.TOFU.create();
-
-		object.notifyObservers();
-
-		verify(observer, never()).updateSquare();
-		square.addSquareObject(object);
-		object.notifyObservers();
-		verify(observer, times(1)).updateSquare();
 	}
 
 }

@@ -7,6 +7,7 @@ package org.nognog.freeSquare.ui;
 public interface SquareObserver {
 	/**
 	 * update square
+	 * @param event 
 	 */
-	void updateSquare();
+	void notify(SquareEvent event);
 }

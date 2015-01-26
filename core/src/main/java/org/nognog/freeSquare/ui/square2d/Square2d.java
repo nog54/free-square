@@ -3,6 +3,8 @@ package org.nognog.freeSquare.ui.square2d;
 import java.util.Comparator;
 
 import org.nognog.freeSquare.ui.Square;
+import org.nognog.freeSquare.ui.SquareEvent;
+import org.nognog.freeSquare.ui.SquareEvent.EventType;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
@@ -112,22 +114,77 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		}
 	}
 
+	/**
+	 * not notify observer
+	 * 
+	 * @param object
+	 */
 	@Override
 	public void addSquareObject(Square2dObject object) {
+		this.addSquareObject(object, false);
+	}
+
+	/**
+	 * @param object
+	 * @param notifyObserver
+	 */
+	public void addSquareObject(Square2dObject object, boolean notifyObserver) {
 		Vector2 randomPoint = Square2dUtils.getRandomPointOn(this);
-		this.addSquareObject(object, randomPoint.x, randomPoint.y);
+		this.addSquareObject(object, randomPoint.x, randomPoint.y, notifyObserver);
+	}
+	
+	/**
+	 * @param object
+	 * @param x
+	 * @param y
+	 * @param notifyObserver
+	 */
+	public void addSquareObject(Square2dObject object, float x, float y) {
+		this.addSquareObject(object, x, y, false);
 	}
 
 	/**
 	 * @param object
 	 * @param x
 	 * @param y
+	 * @param notifyObserver
 	 */
-	public void addSquareObject(Square2dObject object, float x, float y) {
-		this.objects.add(object);
+	public void addSquareObject(Square2dObject object, float x, float y, boolean notifyObserver) {
 		super.addActor(object);
 		object.setSquare(this);
 		object.setPosition(x, y);
+		this.objects.add(object);
+		if (notifyObserver) {
+			this.notifyObservers(new SquareEvent(EventType.ADD_OBJECT, object));
+		}
+		this.addSquareObserver(object);
+	}
+
+	/**
+	 * not notify observer
+	 * 
+	 * @param object
+	 */
+	@Override
+	public boolean removeSquareObject(Square2dObject object) {
+		return this.removeSquareObject(object, false);
+	}
+
+	/**
+	 * @param object
+	 * @param notifyObserver
+	 * @return true if object is removed
+	 */
+	public boolean removeSquareObject(Square2dObject object, boolean notifyObserver) {
+		boolean isRemoved = super.removeActor(object);
+		object.setSquare(null);
+		object.setPosition(0, 0);
+		this.objects.removeValue(object, true);
+		if (notifyObserver) {
+			this.notifyObservers(new SquareEvent(EventType.REMOVE_OBJECT, object));
+		}
+		this.removeSquareObserver(object);
+		return isRemoved;
 	}
 
 	@Override
@@ -137,15 +194,6 @@ public class Square2d extends Group implements Square<Square2dObject> {
 			return;
 		}
 		throw new RuntimeException("Non-sqaure2d-object is passed to square2d$addActor."); //$NON-NLS-1$
-	}
-
-	@Override
-	public boolean removeSquareObject(Square2dObject object) {
-		this.objects.removeValue(object, true);
-		boolean isRemoved = super.removeActor(object);
-		object.setSquare(null);
-		object.setPosition(0, 0);
-		return isRemoved;
 	}
 
 	@Override
@@ -269,22 +317,14 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	}
 
 	@Override
-	public void notifyObservers() {
-		for (int i = 0; i < this.observers.size; i++) {
-			this.observers.get(i).updateSquare();
-		}
-	}
-
-	@Override
-	public void act(float delta) {
-		if (this.getActions().size != 0) {
-			super.act(delta);
-			this.notifyObservers();
+	public void notifyObservers(SquareEvent event) {
+		SquareObserver notifyTarget = event.getTargetObserver();
+		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
+			notifyTarget.notify(event);
 			return;
 		}
-
-		super.act(delta);
-
+		for (int i = 0; i < this.observers.size; i++) {
+			this.observers.get(i).notify(event);
+		}
 	}
-
 }

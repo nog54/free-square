@@ -74,4 +74,8 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 		return Square2dUtils.getRandomPointOn(this.square);
 	}
 
+	@Override
+	public boolean isValid() {
+		return this.isLandingOnSquare();
+	}
 }
