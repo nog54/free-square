@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.ui.square2d;
+package org.nognog.freeSquare.ui.square2d.action;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 /**
  * @author goshi 2014/12/23
  */
-public class Square2dActionUtils {
-	private Square2dActionUtils() {
+public class Square2dActions {
+	private Square2dActions() {
 	}
 
 	/**
@@ -38,4 +38,5 @@ public class Square2dActionUtils {
 
 		return Actions.forever(Actions.sequence(up, down));
 	}
+	
 }

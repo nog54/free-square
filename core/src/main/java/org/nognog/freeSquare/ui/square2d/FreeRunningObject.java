@@ -1,12 +1,16 @@
 package org.nognog.freeSquare.ui.square2d;
 
+import org.nognog.freeSquare.ui.square2d.action.ActionFactory;
+import org.nognog.freeSquare.ui.square2d.action.AddAction2;
+import org.nognog.freeSquare.ui.square2d.action.KeepMovingToTargetPositionAction;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
-import org.nognog.sence2d.action.KeepMovingToTargetPositionAction;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 
 /**
@@ -16,21 +20,19 @@ public class FreeRunningObject extends LifeObject {
 
 	protected static final float defaultMoveSpeed = 32;
 
-	protected static final StopTimeGenerator defaultGenerator = new StopTimeGenerator() {
+	protected static final StopTimeGenerator defaultStopTimeGenerator = new StopTimeGenerator() {
 		@Override
 		public float generateNextStopTime() {
 			return MathUtils.random(0, 1f);
 		}
 	};
 
-	private KeepMovingToTargetPositionAction freeRunAction = null;
+	protected Action foreverFreeRunAction = null;
+	private boolean isEnabledFreeRun;
 
-	private boolean isEnableFreeRun;
 	private float moveSpeed; // [logicalWidth / sec]
 
-	private float stopTime;
 	private StopTimeGenerator stopTimeGenerator;
-	private float stoppingTime;
 
 	/**
 	 * @param info
@@ -44,7 +46,7 @@ public class FreeRunningObject extends LifeObject {
 	 * @param moveSpeed
 	 */
 	public FreeRunningObject(Square2dObjectType info, float moveSpeed) {
-		this(info, moveSpeed, defaultGenerator);
+		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
 
 	/**
@@ -54,11 +56,9 @@ public class FreeRunningObject extends LifeObject {
 	 */
 	public FreeRunningObject(Square2dObjectType type, float moveSpeed, StopTimeGenerator generator) {
 		super(type);
-		this.isEnableFreeRun = true;
+		this.isEnabledFreeRun = true;
 		this.moveSpeed = moveSpeed;
 		this.stopTimeGenerator = generator;
-		this.stopTime = this.stopTimeGenerator.generateNextStopTime();
-		this.stoppingTime = 0;
 
 		this.addListener(new ActorGestureListener() {
 			FreeRunningObject target = FreeRunningObject.this;
@@ -87,26 +87,23 @@ public class FreeRunningObject extends LifeObject {
 	}
 
 	@Override
-	protected void independentAction(float delta) {
-		if (!this.isEnableFreeRun) {
-			return;
+	public void setSquare(Square2d square) {
+		super.setSquare(square);
+		if (this.foreverFreeRunAction == null) {
+			ActionFactory factory = new ActionFactory() {
+				@Override
+				public Action create() {
+					Vector2 dest = FreeRunningObject.this.generateNextTargetPosition();
+					Action moveAction = new KeepMovingToTargetPositionAction(dest.x, dest.y, FreeRunningObject.this.getMoveSpeed());
+					Action delay = Actions.delay(FreeRunningObject.this.getStopTimeGenerator().generateNextStopTime());
+					Action addAction = new AddAction2(this, FreeRunningObject.this);
+					FreeRunningObject.this.foreverFreeRunAction = Actions.sequence(moveAction, delay, addAction);
+					return FreeRunningObject.this.foreverFreeRunAction;
+				}
+			};
+			this.foreverFreeRunAction = factory.create();
+			this.addAction(this.foreverFreeRunAction);
 		}
-		if (this.freeRunActionIsAlreadyEnded() || this.freeRunAction == null) {
-			this.stoppingTime += delta;
-			if (this.stoppingTime > this.stopTime) {
-				this.stoppingTime = 0;
-				this.stopTime = this.stopTimeGenerator.generateNextStopTime();
-				final Vector2 dest = this.generateNextTargetPosition();
-				this.freeRunAction = new KeepMovingToTargetPositionAction(dest.x, dest.y, this.moveSpeed);
-				this.addAction(this.freeRunAction);
-			}
-			return;
-		}
-		this.getSquare().requestDrawOrderUpdate();
-	}
-
-	private boolean freeRunActionIsAlreadyEnded() {
-		return !this.getActions().contains(this.freeRunAction, true);
 	}
 
 	/**
@@ -127,7 +124,16 @@ public class FreeRunningObject extends LifeObject {
 	 * @param generator
 	 */
 	public void setStopTimeGenerator(StopTimeGenerator generator) {
-		this.stopTimeGenerator = generator;
+		if (generator != null) {
+			this.stopTimeGenerator = generator;
+		}
+	}
+
+	/**
+	 * @return using stopTimeGenerator
+	 */
+	public StopTimeGenerator getStopTimeGenerator() {
+		return this.stopTimeGenerator;
 	}
 
 	/**
@@ -135,22 +141,22 @@ public class FreeRunningObject extends LifeObject {
 	 * 
 	 */
 	public void setEnableFreeRun(boolean enable) {
-		if (this.freeRunAction != null) {
-			if (!enable && this.getActions().contains(this.freeRunAction, true)) {
-				this.getActions().removeValue(this.freeRunAction, true);
-			}
-			if (enable && !this.freeRunAction.isFinished()) {
-				this.getActions().add(this.freeRunAction);
-			}
+		if (this.isEnabledFreeRun == enable) {
+			return;
 		}
-		this.isEnableFreeRun = enable;
+		if (enable) {
+			this.getActions().add(this.foreverFreeRunAction);
+		} else {
+			this.getActions().removeValue(this.foreverFreeRunAction, true);
+		}
+		this.isEnabledFreeRun = enable;
 	}
 
 	/**
 	 * @return true if free run is enabled.
 	 */
-	public boolean isEnableFreeRun() {
-		return this.isEnableFreeRun;
+	public boolean isEnabledFreeRun() {
+		return this.isEnabledFreeRun;
 	}
 
 	protected Vector2 generateNextTargetPosition() {

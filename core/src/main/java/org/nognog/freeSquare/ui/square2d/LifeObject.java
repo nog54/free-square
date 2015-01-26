@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.ui.square2d;
 
 import org.nognog.freeSquare.Resources;
+import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.Gdx;
@@ -20,21 +21,23 @@ public class LifeObject extends Square2dObject {
 
 	private Image frame;
 
+	private boolean isEnabledUpDownRoutineAction;
 	private Action upDownRoutineAction;
 
 	/**
-	 * @param type 
+	 * @param type
 	 */
 	public LifeObject(Square2dObjectType type) {
 		super(type);
 		this.setOriginY(0);
 		final float degree = 5;
 		final float cycleTime = 4;
-		Action foreverRotate = Square2dActionUtils.foreverRotate(degree, cycleTime, Interpolation.sine);
+		Action foreverRotate = Square2dActions.foreverRotate(degree, cycleTime, Interpolation.sine);
 		final float upDownAmount = 5;
-		Action foreverUpDown = Square2dActionUtils.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
+		Action foreverUpDown = Square2dActions.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
 		this.upDownRoutineAction = Actions.parallel(foreverRotate, foreverUpDown);
 		this.addAction(this.upDownRoutineAction);
+		this.isEnabledUpDownRoutineAction = true;
 
 		this.frame = new Image(new Texture(Gdx.files.internal(Resources.frame1Path)));
 		this.frame.setWidth(this.getWidth());
@@ -76,19 +79,22 @@ public class LifeObject extends Square2dObject {
 	/**
 	 * @return true if up-down routine is enable
 	 */
-	public boolean isEnableUpDownRoutine() {
-		return this.getActions().contains(this.upDownRoutineAction, true);
+	public boolean isEnabledUpDownRoutine() {
+		return this.isEnabledUpDownRoutineAction;
 	}
 
 	/**
 	 * @param enable
 	 */
 	public void setEnableUpDownRoutine(boolean enable) {
-		final boolean currentEnable = this.isEnableUpDownRoutine();
-		if (enable && !currentEnable) {
+		if (this.isEnabledUpDownRoutineAction == enable) {
+			return;
+		}
+		if (enable) {
 			this.getActions().add(this.upDownRoutineAction);
-		} else if (!enable && currentEnable) {
+		} else {
 			this.getActions().removeValue(this.upDownRoutineAction, true);
 		}
+		this.isEnabledUpDownRoutineAction = enable;
 	}
 }

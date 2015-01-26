@@ -26,7 +26,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param moveSpeed
 	 */
 	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed) {
-		this(info, moveSpeed, defaultGenerator);
+		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
 
 	/**

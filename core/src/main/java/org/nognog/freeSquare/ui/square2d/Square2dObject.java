@@ -27,7 +27,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private final Image image;
 
 	private boolean enableAction = true;
-	private boolean performAddedActionInstances = true;
 
 	/**
 	 * @param type
@@ -156,15 +155,14 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	@Override
-	public final void act(float delta) {
-		if (this.square == null) {
-			return;
-		}
+	public void act(float delta) {
+		final float yBeforeAct = this.getY();
 		if (this.isEnabledAction()) {
-			this.independentAction(delta);
-			if (this.isPerformAddedActionInstances()) {
-				super.act(delta);
-			}
+			super.act(delta);
+		}
+		final float yAfterAct = this.getY();
+		if (yBeforeAct != yAfterAct) {
+			this.square.requestDrawOrderUpdate();
 		}
 	}
 
@@ -181,33 +179,11 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	public boolean isEnabledAction() {
 		return this.enableAction;
 	}
-	
-	/**
-	 * @param perform
-	 */
-	public void setPerformAddedActionInstances(boolean perform) {
-		this.performAddedActionInstances = perform;
-	}
-	
-	/**
-	 * @return true if perform Added Action-class instance option is enable.
-	 */
-	public boolean isPerformAddedActionInstances() {
-		return this.performAddedActionInstances;
-	}
 
 	@Override
 	public void setColor(Color color) {
 		super.setColor(color);
 		this.image.setColor(color);
-	}
-
-	/**
-	 * This method will be called by {@link #act(float)}.
-	 *
-	 */
-	protected void independentAction(float delta) {
-		// overridden by sub class
 	}
 
 	@Override
@@ -219,7 +195,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	public void notify(SquareEvent event) {
 		// overridden by sub class
 	}
-	
+
 	@Override
 	public boolean isValid() {
 		return this.square != null;

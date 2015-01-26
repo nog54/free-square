@@ -45,8 +45,8 @@ public class Riki extends FreeRunningLandObject {
 	}
 
 	@Override
-	protected void independentAction(float delta) {
-		super.independentAction(delta);
+	public void act(float delta) {
+		super.act(delta);
 		if (this.stopFreeRunTime > 0) {
 			this.stopFreeRunTime -= delta;
 			if (this.stopFreeRunTime <= 0) {

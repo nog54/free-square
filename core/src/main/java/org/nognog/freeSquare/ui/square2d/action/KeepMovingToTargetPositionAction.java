@@ -1,4 +1,4 @@
-package org.nognog.sence2d.action;
+package org.nognog.freeSquare.ui.square2d.action;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;

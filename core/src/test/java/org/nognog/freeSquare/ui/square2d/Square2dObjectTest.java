@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -12,12 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.ui.SquareEvent;
-import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 
 @SuppressWarnings("all")
@@ -26,26 +24,21 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testAct() {
-		final Square2dObject mock = Mockito.mock(Square2dObject.class);
-		final Square2d square = Square2dType.GRASSY_SQUARE1.create();
-		final Square2dObject object = new Square2dObject(Square2dObjectType.TOFU) {
-			@Override
-			protected void independentAction(float delta) {
-				mock.getX();
-			}
-		};
-		square.addSquareObject(object);
+		final Action mock = Mockito.mock(Action.class);
+		final Square2dObject object = new Square2dObject(Square2dObjectType.TOFU);
+		object.addAction(mock);
+		
 		final float delta = 0.1f;
 		final int actCount = 10;
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
-		verify(mock, times(actCount)).getX();
+		verify(mock, times(actCount)).act(delta);
 		object.setEnabledAction(false);
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
-		verify(mock, times(actCount)).getX();
+		verify(mock, times(actCount)).act(delta);
 	}
 
 	@Test
