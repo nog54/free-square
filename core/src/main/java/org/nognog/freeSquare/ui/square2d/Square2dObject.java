@@ -27,7 +27,8 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private final Image image;
 
 	private boolean enableAction = true;
-
+	protected boolean isBeingTouched = false;
+	
 	/**
 	 * @param type
 	 */
@@ -49,11 +50,13 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				Square2dObject.this.isBeingTouched = true;
 				event.stop();
 			}
 
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				Square2dObject.this.isBeingTouched = false;
 				event.stop();
 			}
 

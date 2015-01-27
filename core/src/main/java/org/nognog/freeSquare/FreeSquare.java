@@ -68,7 +68,7 @@ public class FreeSquare extends ApplicationAdapter {
 		this.square = Square2dType.GRASSY_SQUARE1.create();
 		this.square.setX(-this.square.getWidth() / 2);
 		for (Square2dObjectType object : Square2dObjectType.values()) {
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < 1; i++) {
 				this.square.addSquareObject(object.create());
 			}
 		}
@@ -129,7 +129,7 @@ public class FreeSquare extends ApplicationAdapter {
 						this.addedActor.setEnabledAction(false);
 						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
 							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y);
+							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y, false);
 							FreeSquare.this.showSquareOnly();
 						}
 					}

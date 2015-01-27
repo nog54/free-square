@@ -115,13 +115,11 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	}
 
 	/**
-	 * not notify observer
-	 * 
 	 * @param object
 	 */
 	@Override
 	public void addSquareObject(Square2dObject object) {
-		this.addSquareObject(object, false);
+		this.addSquareObject(object, true);
 	}
 
 	/**
@@ -132,7 +130,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		Vector2 randomPoint = Square2dUtils.getRandomPointOn(this);
 		this.addSquareObject(object, randomPoint.x, randomPoint.y, notifyObserver);
 	}
-	
+
 	/**
 	 * @param object
 	 * @param x
@@ -140,7 +138,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 * @param notifyObserver
 	 */
 	public void addSquareObject(Square2dObject object, float x, float y) {
-		this.addSquareObject(object, x, y, false);
+		this.addSquareObject(object, x, y, true);
 	}
 
 	/**
@@ -167,7 +165,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 */
 	@Override
 	public boolean removeSquareObject(Square2dObject object) {
-		return this.removeSquareObject(object, false);
+		return this.removeSquareObject(object, true);
 	}
 
 	/**
@@ -244,9 +242,16 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 *         vertex3 and vertex4
 	 */
 	public boolean containsInSquareArea(float x, float y) {
+		if(this.isVertexPoint(x, y)){
+			return true;
+		}
 		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y };
 		Polygon p = new Polygon(vertices);
 		return p.contains(x, y);
+	}
+
+	private boolean isVertexPoint(float x, float y) {
+		return this.vertex1.equals(x, y) || this.vertex2.equals(x, y) || this.vertex3.equals(x, y) || this.vertex4.equals(x, y);
 	}
 
 	@Override
@@ -286,6 +291,24 @@ public class Square2d extends Group implements Square<Square2dObject> {
 			final float diffX = this.x - x1;
 			final float diffY = this.y - y1;
 			return (float) Math.sqrt(diffX * diffX + diffY * diffY);
+		}
+
+		/**
+		 * @param x
+		 * @param y
+		 * @return true if same x,y
+		 */
+		@SuppressWarnings("hiding")
+		public boolean equals(float x, float y) {
+			return x == this.x && y == this.y;
+		}
+
+		/**
+		 * @param vertex
+		 * @return true if same value
+		 */
+		public boolean equals(Vertex vertex) {
+			return this.equals(vertex.x, vertex.y);
 		}
 
 		/**
