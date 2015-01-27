@@ -27,7 +27,7 @@ public class KeepMovingToTargetPositionAction extends Action {
 
 	@Override
 	public boolean act(float delta) {
-		if(this.isFinished){
+		if (this.isFinished) {
 			return true;
 		}
 		final float remainingDistanceX = this.targetPositionX - this.actor.getX();
@@ -80,12 +80,26 @@ public class KeepMovingToTargetPositionAction extends Action {
 	}
 
 	/**
+	 * @return speed
+	 */
+	public float getSpeed() {
+		return this.speed;
+	}
+
+	/**
+	 * @param speed
+	 */
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+
+	/**
 	 * @return true if this action have completed.
 	 */
 	public boolean isFinished() {
 		return this.isFinished;
 	}
-	
+
 	@Override
 	public void reset() {
 		this.isFinished = false;

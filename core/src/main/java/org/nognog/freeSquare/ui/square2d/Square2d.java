@@ -3,9 +3,8 @@ package org.nognog.freeSquare.ui.square2d;
 import java.util.Comparator;
 
 import org.nognog.freeSquare.ui.Square;
-import org.nognog.freeSquare.ui.SquareEvent;
-import org.nognog.freeSquare.ui.SquareEvent.EventType;
 import org.nognog.freeSquare.ui.SquareObserver;
+import org.nognog.freeSquare.ui.square2d.Square2dEvent.EventType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -153,7 +152,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		object.setPosition(x, y);
 		this.objects.add(object);
 		if (notifyObserver) {
-			this.notifyObservers(new SquareEvent(EventType.ADD_OBJECT, object));
+			this.notifyObservers(new Square2dEvent(EventType.ADD_OBJECT, object));
 		}
 		this.addSquareObserver(object);
 	}
@@ -179,7 +178,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		object.setPosition(0, 0);
 		this.objects.removeValue(object, true);
 		if (notifyObserver) {
-			this.notifyObservers(new SquareEvent(EventType.REMOVE_OBJECT, object));
+			this.notifyObservers(new Square2dEvent(EventType.REMOVE_OBJECT, object));
 		}
 		this.removeSquareObserver(object);
 		return isRemoved;
@@ -242,7 +241,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 *         vertex3 and vertex4
 	 */
 	public boolean containsInSquareArea(float x, float y) {
-		if(this.isVertexPoint(x, y)){
+		if (this.isVertexPoint(x, y)) {
 			return true;
 		}
 		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y };
@@ -340,13 +339,16 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	}
 
 	@Override
-	public void notifyObservers(SquareEvent event) {
+	public void notifyObservers(Square2dEvent event) {
 		SquareObserver notifyTarget = event.getTargetObserver();
 		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
 			notifyTarget.notify(event);
 			return;
 		}
 		for (int i = 0; i < this.observers.size; i++) {
+			if (event.getExceptObservers().contains(this.observers.get(i), true)) {
+				continue;
+			}
 			this.observers.get(i).notify(event);
 		}
 	}

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.ui.SquareEvent;
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
@@ -143,13 +142,17 @@ public class Square2dTest {
 	@Test
 	public final void testContainsInSquareArea() {
 		Square2d square = Square2dType.GRASSY_SQUARE1.create();
-		boolean expected1 = false;
+		boolean expected1 = true;
 		boolean actual1 = square.containsInSquareArea(square.vertex1.x, square.vertex1.y);
 		assertThat(actual1, is(expected1));
 
 		boolean expected2 = true;
 		boolean actual2 = square.containsInSquareArea(square.vertex1.x, (square.vertex1.y + square.vertex3.y) / 2);
 		assertThat(actual2, is(expected2));
+
+		boolean expected3 = false;
+		boolean actual3 = square.containsInSquareArea(square.vertex1.x, Math.nextAfter(square.vertex1.y, Float.NEGATIVE_INFINITY));
+		assertThat(actual3, is(expected3));
 	}
 
 	@Test
@@ -168,20 +171,20 @@ public class Square2dTest {
 		SquareObserver observer2 = mock(SquareObserver.class);
 		SquareObserver observer3 = mock(SquareObserver.class);
 
-		SquareEvent event = SquareEvent.getSimpleSquareUpdateEvent();
+		Square2dEvent event = Square2dEvent.getSimpleSquareUpdateEvent();
 		square.addSquareObserver(observer1);
 		square.addSquareObserver(observer3);
 		square.notifyObservers(event);
 		square.addSquareObserver(observer2);
 		square.notifyObservers(event);
-		
+
 		verify(observer1, times(2)).notify(event);
 		verify(observer2, times(1)).notify(event);
 		verify(observer3, times(2)).notify(event);
-		
+
 		square.removeSquareObserver(observer1);
 		square.notifyObservers(event);
-		
+
 		verify(observer1, times(2)).notify(event);
 		verify(observer2, times(2)).notify(event);
 		verify(observer3, times(3)).notify(event);

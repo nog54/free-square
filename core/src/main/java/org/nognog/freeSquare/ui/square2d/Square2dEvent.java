@@ -1,27 +1,32 @@
-package org.nognog.freeSquare.ui;
+package org.nognog.freeSquare.ui.square2d;
+
+import org.nognog.freeSquare.ui.SquareObserver;
+
+import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/25
  */
-public class SquareEvent {
+public class Square2dEvent {
 
 	private final EventType eventType;
-	private final SquareObject<?> relatedObject;
+	private final Square2dObject relatedObject;
 	private final SquareObserver targetObserver;
+	private Array<SquareObserver> exceptObservers;
 
-	private static final SquareEvent simpleSquareUpdateEvent = new SquareEvent();
-	
+	private static final Square2dEvent simpleSquareUpdateEvent = new Square2dEvent();
+
 	/**
 	 * 
 	 */
-	private SquareEvent() {
+	private Square2dEvent() {
 		this(EventType.UPDATE_SQUARE);
 	}
 
 	/**
 	 * @param eventType
 	 */
-	public SquareEvent(EventType eventType) {
+	public Square2dEvent(EventType eventType) {
 		this(eventType, null);
 	}
 
@@ -29,7 +34,7 @@ public class SquareEvent {
 	 * @param eventType
 	 * @param relatedObject
 	 */
-	public SquareEvent(EventType eventType, SquareObject<?> relatedObject) {
+	public Square2dEvent(EventType eventType, Square2dObject relatedObject) {
 		this(eventType, relatedObject, null);
 	}
 
@@ -38,10 +43,11 @@ public class SquareEvent {
 	 * @param relatedObject
 	 * @param targetObject
 	 */
-	public SquareEvent(EventType eventType, SquareObject<?> relatedObject, SquareObserver targetObject) {
+	public Square2dEvent(EventType eventType, Square2dObject relatedObject, SquareObserver targetObject) {
 		this.eventType = eventType;
 		this.relatedObject = relatedObject;
 		this.targetObserver = targetObject;
+		this.exceptObservers = new Array<>();
 	}
 
 	/**
@@ -54,7 +60,7 @@ public class SquareEvent {
 	/**
 	 * @return object that related this event
 	 */
-	public SquareObject<?> getRelatedObject() {
+	public Square2dObject getRelatedObject() {
 		return this.relatedObject;
 	}
 
@@ -66,20 +72,37 @@ public class SquareEvent {
 	}
 
 	/**
+	 * @param observer
+	 */
+	public void addExceptObserver(SquareObserver observer) {
+		if (this.targetObserver != null) {
+			throw new RuntimeException("target observer should be null when addExceptObserver is called."); //$NON-NLS-1$
+		}
+		this.exceptObservers.add(observer);
+	}
+	
+	/**
+	 * @return except observers.
+	 */
+	public Array<SquareObserver> getExceptObservers(){
+		return this.exceptObservers;
+	}
+
+	/**
 	 * @param event
 	 * @return true if all field is same.
 	 */
-	public boolean equals(SquareEvent event) {
+	public boolean equals(Square2dEvent event) {
 		return (this.eventType == event.eventType) && (this.relatedObject == event.relatedObject) && (this.targetObserver == event.targetObserver);
 	}
 
 	/**
 	 * @return simple event
 	 */
-	public static SquareEvent getSimpleSquareUpdateEvent(){
+	public static Square2dEvent getSimpleSquareUpdateEvent() {
 		return simpleSquareUpdateEvent;
 	}
-	
+
 	/**
 	 * @author goshi 2015/01/25
 	 */

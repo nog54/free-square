@@ -8,7 +8,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -46,33 +45,10 @@ public class LifeObject extends Square2dObject {
 		this.addActor(this.frame);
 
 		this.addListener(new ActorGestureListener() {
-			LifeObject target = LifeObject.this;
-			boolean isLongTapped;
-
-			@Override
-			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				this.isLongTapped = false;
-			}
-
-			@Override
-			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				if (!this.isLongTapped) {
-					this.target.setEnableUpDownRoutine(true);
-				}
-			}
-
-			@Override
-			public boolean longPress(Actor actor, float x, float y) {
-				this.isLongTapped = true;
-				this.target.setEnableUpDownRoutine(false);
-				return true;
-			}
-
 			@Override
 			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
-				this.target.moveBy(deltaX, deltaY);
+				LifeObject.this.moveBy(deltaX, deltaY);
 			}
-
 		});
 	}
 
@@ -87,14 +63,17 @@ public class LifeObject extends Square2dObject {
 	 * @param enable
 	 */
 	public void setEnableUpDownRoutine(boolean enable) {
-		if (this.isEnabledUpDownRoutineAction == enable) {
-			return;
-		}
-		if (enable) {
-			this.getActions().add(this.upDownRoutineAction);
-		} else {
-			this.getActions().removeValue(this.upDownRoutineAction, true);
-		}
 		this.isEnabledUpDownRoutineAction = enable;
+	}
+
+	@Override
+	public void act(float delta) {
+		if (this.isEnabledUpDownRoutine() && this.isPausingAction(this.upDownRoutineAction)) {
+			this.resumePausingAction(this.upDownRoutineAction);
+		}
+		if (!this.isEnabledUpDownRoutine() && this.isPerformingAction(this.upDownRoutineAction) || this.isBeingTouched() || this.isLongPressedInLastTouch()) {
+			this.pauseAction(this.upDownRoutineAction);
+		}
+		super.act(delta);
 	}
 }

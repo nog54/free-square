@@ -8,10 +8,7 @@ import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 
 /**
  * @author goshi 2015/01/03
@@ -59,31 +56,6 @@ public class FreeRunningObject extends LifeObject {
 		this.isEnabledFreeRun = true;
 		this.moveSpeed = moveSpeed;
 		this.stopTimeGenerator = generator;
-
-		this.addListener(new ActorGestureListener() {
-			FreeRunningObject target = FreeRunningObject.this;
-			boolean isLongTapped;
-
-			@Override
-			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				this.target.setEnableFreeRun(false);
-				this.isLongTapped = false;
-			}
-
-			@Override
-			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				if (!this.isLongTapped) {
-					this.target.setEnableFreeRun(true);
-				}
-			}
-
-			@Override
-			public boolean longPress(Actor actor, float x, float y) {
-				this.isLongTapped = true;
-				return true;
-			}
-
-		});
 	}
 
 	@Override
@@ -141,14 +113,6 @@ public class FreeRunningObject extends LifeObject {
 	 * 
 	 */
 	public void setEnableFreeRun(boolean enable) {
-		if (this.isEnabledFreeRun == enable) {
-			return;
-		}
-		if (enable) {
-			this.getActions().add(this.foreverFreeRunAction);
-		} else {
-			this.getActions().removeValue(this.foreverFreeRunAction, true);
-		}
 		this.isEnabledFreeRun = enable;
 	}
 
@@ -157,6 +121,17 @@ public class FreeRunningObject extends LifeObject {
 	 */
 	public boolean isEnabledFreeRun() {
 		return this.isEnabledFreeRun;
+	}
+
+	@Override
+	public void act(float delta) {
+		if (this.isEnabledFreeRun() && this.isPausingAction(this.foreverFreeRunAction)) {
+			this.resumePausingAction(this.foreverFreeRunAction);
+		}
+		if (!this.isEnabledFreeRun() && this.isPerformingAction(this.foreverFreeRunAction) || this.isBeingTouched() || this.isLongPressedInLastTouch()) {
+			this.pauseAction(this.foreverFreeRunAction);
+		}
+		super.act(delta);
 	}
 
 	protected Vector2 generateNextTargetPosition() {

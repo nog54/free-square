@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/11
@@ -29,26 +30,42 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed) {
 		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
+	
+	/**
+	 * @param info
+	 * @param moveSpeed
+	 * @param generator
+	 */
+	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed, StopTimeGenerator generator) {
+		super(info, moveSpeed, generator);
+	}
 
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if (!this.isBeingTouched && !this.isLandingOnSquare() && !this.isReturningToSquare()) {
+		if (!this.isBeingTouched() && !this.isLandingOnSquare()) {
 			this.addReturnToSquareAction();
 		}
 	}
 
-	private boolean isReturningToSquare() {
-		if (this.returnToSquareAction == null) {
-			return false;
-		}
-		return this.getActions().contains(this.returnToSquareAction, true);
-	}
-
 	private void addReturnToSquareAction() {
-		Vertex nearestSquareVertex = this.getNearestSquareVertex();
-		this.returnToSquareAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
+		if(this.isLockingAddAction()){
+			return;
+		}
+		final Array<Action> pausingActions = this.pauseAllPerformingActions();
+		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
+		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
+		Action resumeActionsAction = new Action() {
+			@Override
+			public boolean act(float delta) {
+				FreeRunningLandObject.this.unlockAddAction();
+				FreeRunningLandObject.this.resumePausingAction(pausingActions);
+				return true;
+			}
+		};
+		this.returnToSquareAction = Actions.sequence(moveToNearestSquareVertexAction, resumeActionsAction);
 		this.addAction(this.returnToSquareAction);
+		this.lockAddAction();
 	}
 
 	private Vertex getNearestSquareVertex() {
@@ -69,14 +86,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 		return this.square.vertex4;
 	}
 
-	/**
-	 * @param info
-	 * @param moveSpeed
-	 * @param generator
-	 */
-	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed, StopTimeGenerator generator) {
-		super(info, moveSpeed, generator);
-	}
+
 
 	@Override
 	protected Vector2 generateNextTargetPosition() {

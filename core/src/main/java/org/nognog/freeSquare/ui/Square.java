@@ -1,5 +1,7 @@
 package org.nognog.freeSquare.ui;
 
+import org.nognog.freeSquare.ui.square2d.Square2dEvent;
+
 /**
  * @author goshi 2014/12/17
  * @param <T>
@@ -36,6 +38,6 @@ public interface Square<T extends SquareObject<?>> {
 	/**
 	 * @param event 
 	 */
-	void notifyObservers(SquareEvent event);
+	void notifyObservers(Square2dEvent event);
 
 }

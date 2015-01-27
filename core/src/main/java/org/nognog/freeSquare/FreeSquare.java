@@ -15,10 +15,10 @@ import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.ItemList;
 import org.nognog.freeSquare.ui.Menu;
 import org.nognog.freeSquare.ui.PlayerItemList;
-import org.nognog.freeSquare.ui.SquareEvent;
-import org.nognog.freeSquare.ui.SquareEvent.EventType;
 import org.nognog.freeSquare.ui.square2d.Square2d;
+import org.nognog.freeSquare.ui.square2d.Square2dEvent;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.Square2dEvent.EventType;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 import org.nognog.freeSquare.util.font.FontUtil;
@@ -69,7 +69,7 @@ public class FreeSquare extends ApplicationAdapter {
 		this.square.setX(-this.square.getWidth() / 2);
 		for (Square2dObjectType object : Square2dObjectType.values()) {
 			for (int i = 0; i < 1; i++) {
-				this.square.addSquareObject(object.create());
+				this.square.addSquareObject(object.create(), false);
 			}
 		}
 
@@ -144,7 +144,9 @@ public class FreeSquare extends ApplicationAdapter {
 					if (this.addedActor.isLandingOnSquare()) {
 						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
 						this.addedActor.setEnabledAction(true);
-						FreeSquare.this.getSquare().notifyObservers(new SquareEvent(EventType.ADD_OBJECT, this.addedActor));
+						Square2dEvent event = new Square2dEvent(EventType.ADD_OBJECT, this.addedActor);
+						event.addExceptObserver(this.addedActor);
+						FreeSquare.this.getSquare().notifyObservers(event);
 					} else {
 						FreeSquare.this.getSquare().removeSquareObject(this.addedActor);
 					}
