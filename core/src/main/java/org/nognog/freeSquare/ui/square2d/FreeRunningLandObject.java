@@ -1,12 +1,15 @@
 package org.nognog.freeSquare.ui.square2d;
 
 import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.ui.square2d.action.StopTimeGenerator;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -30,7 +33,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed) {
 		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
-	
+
 	/**
 	 * @param info
 	 * @param moveSpeed
@@ -38,18 +41,18 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 */
 	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed, StopTimeGenerator generator) {
 		super(info, moveSpeed, generator);
+		this.addListener(new ActorGestureListener() {
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				if (!FreeRunningLandObject.this.isLandingOnSquare()) {
+					FreeRunningLandObject.this.goToSquareNearestVertex();
+				}
+			}
+		});
 	}
 
-	@Override
-	public void act(float delta) {
-		super.act(delta);
-		if (!this.isBeingTouched() && !this.isLandingOnSquare()) {
-			this.addReturnToSquareAction();
-		}
-	}
-
-	private void addReturnToSquareAction() {
-		if(this.isLockingAddAction()){
+	protected void goToSquareNearestVertex() {
+		if (this.isLockingAddAction()) {
 			return;
 		}
 		final Array<Action> pausingActions = this.pauseAllPerformingActions();
@@ -86,10 +89,8 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 		return this.square.vertex4;
 	}
 
-
-
 	@Override
-	protected Vector2 generateNextTargetPosition() {
+	public Vector2 nextTargetPosition() {
 		return Square2dUtils.getRandomPointOn(this.square);
 	}
 

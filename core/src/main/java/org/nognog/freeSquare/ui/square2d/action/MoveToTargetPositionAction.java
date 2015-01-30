@@ -1,12 +1,13 @@
 package org.nognog.freeSquare.ui.square2d.action;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 
 /**
  * @author goshi 2015/01/10
  */
-public class KeepMovingToTargetPositionAction extends Action {
+public class MoveToTargetPositionAction extends Action {
 
 	private float targetPositionX;
 	private float targetPositionY;
@@ -14,12 +15,20 @@ public class KeepMovingToTargetPositionAction extends Action {
 	private boolean isFinished = false;
 
 	/**
+	 * @param targetPosition
+	 * @param speed
+	 */
+	public MoveToTargetPositionAction(Vector2 targetPosition, float speed) {
+		this(targetPosition.x, targetPosition.y, speed);
+	}
+
+	/**
 	 * @param x
 	 * @param y
 	 * @param speed
 	 *            [logical distance / s]
 	 */
-	public KeepMovingToTargetPositionAction(float x, float y, float speed) {
+	public MoveToTargetPositionAction(float x, float y, float speed) {
 		this.targetPositionX = x;
 		this.targetPositionY = y;
 		this.speed = speed;
@@ -102,6 +111,13 @@ public class KeepMovingToTargetPositionAction extends Action {
 
 	@Override
 	public void reset() {
+		super.reset();
+		this.isFinished = false;
+	}
+	
+	@Override
+	public void restart() {
+		super.restart();
 		this.isFinished = false;
 	}
 
