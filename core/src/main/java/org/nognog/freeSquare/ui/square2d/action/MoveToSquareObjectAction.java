@@ -14,6 +14,13 @@ public class MoveToSquareObjectAction extends Action {
 	private boolean isFinished = false;
 
 	/**
+	 * 
+	 */
+	public MoveToSquareObjectAction() {
+		
+	}
+	
+	/**
 	 * @param targetObject
 	 * @param speed 
 	 */

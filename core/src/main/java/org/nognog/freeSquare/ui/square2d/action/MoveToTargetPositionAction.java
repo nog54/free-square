@@ -15,6 +15,13 @@ public class MoveToTargetPositionAction extends Action {
 	private boolean isFinished = false;
 
 	/**
+	 * 
+	 */
+	public MoveToTargetPositionAction() {
+		this(0, 0, 0);
+	}
+
+	/**
 	 * @param targetPosition
 	 * @param speed
 	 */
@@ -114,7 +121,7 @@ public class MoveToTargetPositionAction extends Action {
 		super.reset();
 		this.isFinished = false;
 	}
-	
+
 	@Override
 	public void restart() {
 		super.restart();

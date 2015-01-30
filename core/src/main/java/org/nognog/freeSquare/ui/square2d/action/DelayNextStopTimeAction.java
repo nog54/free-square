@@ -3,11 +3,18 @@ package org.nognog.freeSquare.ui.square2d.action;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 
 /**
- * @author goshi
- * 2015/01/29
+ * @author goshi 2015/01/29
  */
-public class DelayNextStopTimeAction extends DelayAction{
-	private final StopTimeGenerator stopTimeGenerator;
+public class DelayNextStopTimeAction extends DelayAction {
+	private StopTimeGenerator stopTimeGenerator;
+
+	/**
+	 * 
+	 */
+	public DelayNextStopTimeAction() {
+
+	}
+
 	/**
 	 * @param stopTimeGenerator
 	 */
@@ -15,7 +22,22 @@ public class DelayNextStopTimeAction extends DelayAction{
 		super(stopTimeGenerator.nextStopTime());
 		this.stopTimeGenerator = stopTimeGenerator;
 	}
-	
+
+	/**
+	 * @param stopTimeGenerator
+	 */
+	public void setStopTimeGenerator(StopTimeGenerator stopTimeGenerator) {
+		this.stopTimeGenerator = stopTimeGenerator;
+	}
+
+
+	/**
+	 * @return using StopTimeGenerator
+	 */
+	public StopTimeGenerator getStopTimeGenerator() {
+		return this.stopTimeGenerator;
+	}
+
 	@Override
 	public void restart() {
 		super.restart();

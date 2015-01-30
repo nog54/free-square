@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.ui.square2d;
 
-import org.nognog.freeSquare.ui.square2d.action.FreeRunningAction;
+import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
 import org.nognog.freeSquare.ui.square2d.action.StopTimeGenerator;
 import org.nognog.freeSquare.ui.square2d.action.TargetPositionGenerator;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
@@ -61,7 +61,7 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	public void setSquare(Square2d square) {
 		super.setSquare(square);
 		if (this.freeRunningAction == null) {
-			this.freeRunningAction = new FreeRunningAction(this.stopTimeGenerator, this, this.moveSpeed);
+			this.freeRunningAction = Square2dActions.freeRunning(this.stopTimeGenerator, this, this.moveSpeed);
 			this.addAction(this.freeRunningAction);
 		}
 	}
