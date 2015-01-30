@@ -149,7 +149,8 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	/**
-	 * Return NaN if this sauare is different to object's square. 
+	 * Return NaN if this sauare is different to object's square.
+	 * 
 	 * @param object
 	 * @return Distance to object.
 	 */
@@ -290,6 +291,26 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		Array<Action> bePausedActions = new Array<>();
 		bePausedActions.addAll(this.getActions());
 		for (Action performingAction : bePausedActions) {
+			this.pauseAction(performingAction);
+		}
+		return bePausedActions;
+	}
+
+	/**
+	 * @param actions
+	 * @return paused actions.
+	 */
+	public Array<Action> pausePerformingActionsExcept(Action... actions) {
+		if (actions == null) {
+			return this.pauseAllPerformingActions();
+		}
+		Array<Action> bePausedActions = new Array<>(this.getActions());
+		Array<Action> exceptActions = new Array<>(actions);
+		for (Action performingAction : bePausedActions) {
+			if (exceptActions.contains(performingAction, true)) {
+				bePausedActions.removeValue(performingAction, true);
+				continue;
+			}
 			this.pauseAction(performingAction);
 		}
 		return bePausedActions;

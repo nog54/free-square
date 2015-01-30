@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.ui.square2d;
 
 import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
 import org.nognog.freeSquare.ui.square2d.action.StopTimeGenerator;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
@@ -10,14 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/11
  */
 public class FreeRunningLandObject extends FreeRunningObject implements LandObject {
-
-	private Action returnToSquareAction;
 
 	/**
 	 * @param info
@@ -52,23 +50,9 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	}
 
 	protected void goToSquareNearestVertex() {
-		if (this.isLockingAddAction()) {
-			return;
-		}
-		final Array<Action> pausingActions = this.pauseAllPerformingActions();
 		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
 		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
-		Action resumeActionsAction = new Action() {
-			@Override
-			public boolean act(float delta) {
-				FreeRunningLandObject.this.unlockAddAction();
-				FreeRunningLandObject.this.resumePausingAction(pausingActions);
-				return true;
-			}
-		};
-		this.returnToSquareAction = Actions.sequence(moveToNearestSquareVertexAction, resumeActionsAction);
-		this.addAction(this.returnToSquareAction);
-		this.lockAddAction();
+		this.addAction(Square2dActions.excludeObjectOtherAction(moveToNearestSquareVertexAction));
 	}
 
 	private Vertex getNearestSquareVertex() {

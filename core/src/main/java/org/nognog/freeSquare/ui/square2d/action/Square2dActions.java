@@ -76,6 +76,16 @@ public class Square2dActions {
 		action.setMoveActionDelayActionSequence(Actions.sequence(moveAction, delayAction));
 		return action;
 	}
+	
+	/**
+	 * @param mainAction
+	 * @return action
+	 */
+	public static ExcludeObjectOtherActionAction excludeObjectOtherAction(Action mainAction){
+		ExcludeObjectOtherActionAction action = Actions.action(ExcludeObjectOtherActionAction.class);
+		action.setAction(mainAction);
+		return action;
+	}
 
 	/**
 	 * @param degree

@@ -13,7 +13,7 @@ public class FreeRunningAction extends RepeatAction {
 	 * 
 	 */
 	public FreeRunningAction() {
-
+		this.setCount(RepeatAction.FOREVER);
 	}
 
 	/**
@@ -22,39 +22,45 @@ public class FreeRunningAction extends RepeatAction {
 	 * @param speed
 	 */
 	public FreeRunningAction(StopTimeGenerator stopTimeGenerator, TargetPositionGenerator targetPositionGenerator, float speed) {
-		this.setCount(RepeatAction.FOREVER);
+		this();
 
 		Action moveAction = new MoveToNextTargetPositionAction(targetPositionGenerator, speed);
 		Action delayAction = new DelayNextStopTimeAction(stopTimeGenerator);
 		this.setAction(new SequenceAction(moveAction, delayAction));
 	}
-	
+
 	/**
 	 * unsafe if used improperly.
+	 * 
 	 * @param action
 	 */
-	void setMoveActionDelayActionSequence(SequenceAction action){
+	void setMoveActionDelayActionSequence(SequenceAction action) {
 		this.setAction(action);
-	}	
-	
+	}
+
 	/**
 	 * @param speed
 	 */
-	public void setSpeed(float speed){
+	public void setSpeed(float speed) {
 		this.getMoveToNextTargetPositionAciton().setSpeed(speed);
 	}
-	
+
 	/**
 	 * @return speed
 	 */
-	public float getSpeed(){
+	public float getSpeed() {
 		return this.getMoveToNextTargetPositionAciton().getSpeed();
 	}
 
-	private MoveToNextTargetPositionAction getMoveToNextTargetPositionAciton(){
-		return (MoveToNextTargetPositionAction) ((SequenceAction)this.getAction()).getActions().get(0);
+	private MoveToNextTargetPositionAction getMoveToNextTargetPositionAciton() {
+		return (MoveToNextTargetPositionAction) ((SequenceAction) this.getAction()).getActions().get(0);
 	}
-	
+
+	@Override
+	protected boolean delegate(float delta) {
+		return super.delegate(delta);
+	}
+
 	@Override
 	public String toString() {
 		String name = getClass().getName();
