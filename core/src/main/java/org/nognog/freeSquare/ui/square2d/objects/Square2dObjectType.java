@@ -5,6 +5,7 @@ import static org.nognog.freeSquare.Messages.getString;
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
+import org.nognog.freeSquare.ui.square2d.EatableObject;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
@@ -15,9 +16,10 @@ import com.badlogic.gdx.graphics.Texture;
  */
 @SuppressWarnings("javadoc")
 public enum Square2dObjectType {
+	// EatableObject : otherValues[0] = quantity
 
 	RIKI(getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
-	TOFU(getString("tofu"), Resources.tofuPath, 75), //$NON-NLS-1$
+	TOFU(getString("tofu"), Resources.tofuPath, 75, EatableObject.class, 100), //$NON-NLS-1$
 	RED_PEPPER_TOFU(TOFU, getString("red-pepper-tofu"), Colors.RED), //$NON-NLS-1$
 	MINT_TOFU(TOFU, getString("mint-tofu"), Colors.CYAN), //$NON-NLS-1$
 	WORMWOOD_TOFU(TOFU, getString("wormwood-tofu"), Colors.OLIVE), //$NON-NLS-1$
@@ -36,35 +38,36 @@ public enum Square2dObjectType {
 		this(name, texturePath, logicalWidth, color, Square2dObject.class);
 	}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
-		this(name, texturePath, logicalWidth, Colors.WHITE, klass);
+	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Class<T> klass, float... otherValues) {
+		this(name, texturePath, logicalWidth, Colors.WHITE, klass, otherValues);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, Color color) {
-		this(name, type.texture, type.logicalWidth, color, (Class<T>) type.klass);
+		this(name, type.texture, type.logicalWidth, color, (Class<T>) type.klass, type.otherValues);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, float logicalWidth) {
-		this(name, type.texture, logicalWidth, type.color, (Class<T>) type.klass);
+		this(name, type.texture, logicalWidth, type.color, (Class<T>) type.klass, type.otherValues);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, float logicalWidth, Color color) {
-		this(name, type.texture, logicalWidth, color, (Class<T>) type.klass);
+		this(name, type.texture, logicalWidth, color, (Class<T>) type.klass, type.otherValues);
 	}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
-		this(name, new Texture(texturePath), logicalWidth, color, klass);
+	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass, float... otherValues) {
+		this(name, new Texture(texturePath), logicalWidth, color, klass, otherValues);
 	}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass) {
+	private <T extends Square2dObject> Square2dObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass, float... otherValues) {
 		this.name = name;
 		this.texture = texture;
 		this.logicalWidth = logicalWidth;
 		this.color = color;
 		this.klass = klass;
+		this.otherValues = otherValues;
 	}
 
 	private final Class<?> klass;
@@ -72,6 +75,7 @@ public enum Square2dObjectType {
 	private final Texture texture;
 	private final float logicalWidth;
 	private final Color color;
+	private final float[] otherValues;
 
 	public String getName() {
 		return this.name;
@@ -87,6 +91,10 @@ public enum Square2dObjectType {
 
 	public Color getColor() {
 		return this.color;
+	}
+	
+	public float[] getOtherValues(){
+		return this.otherValues;
 	}
 
 	public Square2dObject create() {

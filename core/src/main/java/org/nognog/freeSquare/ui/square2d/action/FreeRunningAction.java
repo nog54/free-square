@@ -23,7 +23,6 @@ public class FreeRunningAction extends RepeatAction {
 	 */
 	public FreeRunningAction(StopTimeGenerator stopTimeGenerator, TargetPositionGenerator targetPositionGenerator, float speed) {
 		this();
-
 		Action moveAction = new MoveToNextTargetPositionAction(targetPositionGenerator, speed);
 		Action delayAction = new DelayNextStopTimeAction(stopTimeGenerator);
 		this.setAction(new SequenceAction(moveAction, delayAction));

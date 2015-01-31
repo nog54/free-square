@@ -26,7 +26,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private final float logicalHeight;
 
 	protected Square2d square;
-	private final Image image;
+	protected final Image image;
 
 	private boolean enableAction = true;
 
@@ -53,7 +53,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.image.setWidth(this.logicalWidth);
 		this.image.setHeight(this.getLogicalHeight());
 		this.addActor(this.image);
-		this.image.setOriginX(this.logicalWidth / 2);
 		this.pausingActions = new Array<>();
 		this.addListener(new ActorGestureListener() {
 			private boolean lastTouchCallLongPress;
