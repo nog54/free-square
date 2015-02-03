@@ -221,10 +221,11 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 
 	@Override
 	public void act(float delta) {
-		final float yBeforeAct = this.getY();
-		if (this.isEnabledAction()) {
-			super.act(delta);
+		if (!this.isEnabledAction() || this.isBeingTouched) {
+			return;
 		}
+		final float yBeforeAct = this.getY();
+		super.act(delta);
 		final float yAfterAct = this.getY();
 		if (yBeforeAct != yAfterAct) {
 			this.square.requestDrawOrderUpdate();

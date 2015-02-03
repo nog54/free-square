@@ -10,73 +10,74 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  */
 public class EatableObject extends Square2dObject {
 
-	private final int baseQuantity;
+	private final int baseAmount;
 	private final int originTextureRegionWidth;
 	private final int originTextureRegionHeight;
 	private final int originTextureRegionArea;
-	private int quantity;
+	private int amount;
 
 	/**
 	 * @param type
 	 */
 	public EatableObject(Square2dObjectType type) {
 		super(type);
-		this.baseQuantity = (int) type.getOtherValues()[0];
-		this.quantity = this.baseQuantity;
+		this.baseAmount = (int) type.getOtherValues()[0];
+		this.amount = this.baseAmount;
 		this.originTextureRegionWidth = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionWidth();
 		this.originTextureRegionHeight = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionHeight();
 		this.originTextureRegionArea = this.originTextureRegionWidth * this.originTextureRegionHeight;
 	}
 
 	/**
-	 * @param amount
+	 * @param eatAmount
 	 * @param direction
 	 * @return amount of actually eaten
 	 */
-	public int eaten(int amount, Direction direction) {
-		if(this.quantity == 0){
-			return this.quantity;
+	public int eaten(int eatAmount, Direction direction) {
+		if (this.amount == 0) {
+			return this.amount;
 		}
-		final int eatenAmount = (this.quantity > amount) ? amount : this.quantity;
-		this.quantity -= eatenAmount;
-		if (this.quantity == 0) {
+		final int eatenAmount = (this.amount > eatAmount) ? eatAmount : this.amount;
+		this.amount -= eatenAmount;
+		if (this.amount == 0) {
 			this.getSquare().removeSquareObject(this);
-			return this.quantity;
+			return this.amount;
 		}
-		final float eatenRatio = eatenAmount / (float) this.baseQuantity;
+		final float eatenRatio = eatenAmount / (float) this.baseAmount;
 
-		final int eatenArea = (int) (this.originTextureRegionArea * eatenRatio);
+		final int eatenRegionArea = (int) (this.originTextureRegionArea * eatenRatio);
 		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
 		final int currentTextureRegionWidth = imageTextureRegion.getRegionWidth();
 		final int currentTextureRegionHeight = imageTextureRegion.getRegionHeight();
 
 		if (direction == Direction.UP) {
-			final int eatenHeight = eatenArea / currentTextureRegionWidth;
-			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenHeight;
-			imageTextureRegion.setRegionY(imageTextureRegion.getRegionY() + eatenHeight);
+			final int eatenRegionHeight = eatenRegionArea / currentTextureRegionWidth;
+			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenRegionHeight;
+			imageTextureRegion.setRegionY(imageTextureRegion.getRegionY() + eatenRegionHeight);
 			imageTextureRegion.setRegionHeight(afterEatenTextureRegionHeight);
 			this.image.setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
 		}
 
 		if (direction == Direction.DOWN) {
-			final int eatenHeight = eatenArea / currentTextureRegionWidth;
-			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenHeight;
+			final int eatenRegionHeight = eatenRegionArea / currentTextureRegionWidth;
+			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenRegionHeight;
 			imageTextureRegion.setRegionHeight(afterEatenTextureRegionHeight);
 			this.image.setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
 		}
 
 		if (direction == Direction.LEFT) {
-			final int eatenWidth = eatenArea / currentTextureRegionHeight;
-			final int afterEatenTextureRegionWidth = currentTextureRegionWidth - eatenWidth;
-			imageTextureRegion.setRegionX(imageTextureRegion.getRegionX() + eatenWidth);
+			final int eatenRegionWidth = eatenRegionArea / currentTextureRegionHeight;
+			final int afterEatenTextureRegionWidth = currentTextureRegionWidth - eatenRegionWidth;
+			imageTextureRegion.setRegionX(imageTextureRegion.getRegionX() + eatenRegionWidth);
 			imageTextureRegion.setRegionWidth(afterEatenTextureRegionWidth);
-			this.image.moveBy(eatenWidth / 4, 0);
-			this.image.setScaleX(afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth);
+			float newScaleX = afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth;
+			this.image.setScaleX(newScaleX);
+			this.image.setX((1 - newScaleX) * this.image.getWidth());
 		}
 
 		if (direction == Direction.RIGHT) {
-			final int eatenWidth = eatenArea / currentTextureRegionHeight;
-			final int afterEatenTextureRegionWidth = currentTextureRegionWidth - eatenWidth;
+			final int eatenRegionWidth = eatenRegionArea / currentTextureRegionHeight;
+			final int afterEatenTextureRegionWidth = currentTextureRegionWidth - eatenRegionWidth;
 			imageTextureRegion.setRegionWidth(afterEatenTextureRegionWidth);
 			this.image.setScaleX(afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth);
 		}
@@ -87,7 +88,7 @@ public class EatableObject extends Square2dObject {
 	 * resurrection!
 	 */
 	public void resurrection() {
-		this.quantity = this.baseQuantity;
+		this.amount = this.baseAmount;
 		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
 		imageTextureRegion.setRegionX(0);
 		imageTextureRegion.setRegionY(0);
@@ -96,12 +97,19 @@ public class EatableObject extends Square2dObject {
 		this.image.setPosition(0, 0);
 		this.image.setScale(1);
 	}
+	
+	/**
+	 * @return true if this is being eaten.
+	 */
+	public boolean isBeingEaten(){
+		return this.baseAmount != this.amount;
+	}
 
 	/**
-	 * @return quantity
+	 * @return the amount
 	 */
-	public int getQuantity() {
-		return this.quantity;
+	public int getAmount() {
+		return this.amount;
 	}
 
 }

@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 /**
  * @author goshi 2015/01/03
  */
-public class FreeRunningObject extends LifeObject implements TargetPositionGenerator{
+public class FreeRunningObject extends LifeObject implements TargetPositionGenerator {
 
 	protected static final float defaultMoveSpeed = 32;
 
@@ -101,6 +101,14 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	 * 
 	 */
 	public void setEnableFreeRun(boolean enable) {
+		if (this.isEnabledFreeRun == enable) {
+			return;
+		}
+		if (enable) {
+			this.resumePausingAction(this.freeRunningAction);
+		} else {
+			this.pauseAction(this.freeRunningAction);
+		}
 		this.isEnabledFreeRun = enable;
 	}
 
@@ -109,17 +117,6 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	 */
 	public boolean isEnabledFreeRun() {
 		return this.isEnabledFreeRun;
-	}
-
-	@Override
-	public void act(float delta) {
-		if (this.isEnabledFreeRun() && this.isPausingAction(this.freeRunningAction)) {
-			this.resumePausingAction(this.freeRunningAction);
-		}
-		if (!this.isEnabledFreeRun() && this.isPerformingAction(this.freeRunningAction) || this.isBeingTouched() || this.isLongPressedInLastTouch()) {
-			this.pauseAction(this.freeRunningAction);
-		}
-		super.act(delta);
 	}
 
 	@Override

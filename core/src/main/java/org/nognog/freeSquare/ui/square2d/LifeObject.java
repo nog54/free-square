@@ -64,38 +64,39 @@ public class LifeObject extends Square2dObject {
 	 * @param enable
 	 */
 	public void setEnableUpDownRoutine(boolean enable) {
-		this.isEnabledUpDownRoutineAction = enable;
-	}
-
-	@Override
-	public void act(float delta) {
-		if (this.isEnabledUpDownRoutine() && this.isPausingAction(this.upDownRoutineAction)) {
-			this.resumePausingAction(this.upDownRoutineAction);
+		if (this.isEnabledUpDownRoutineAction == enable) {
+			return;
 		}
-		if (!this.isEnabledUpDownRoutine() && this.isPerformingAction(this.upDownRoutineAction) || this.isBeingTouched() || this.isLongPressedInLastTouch()) {
+		if (enable) {
+			this.resumePausingAction(this.upDownRoutineAction);
+		} else {
 			this.pauseAction(this.upDownRoutineAction);
 		}
-		super.act(delta);
+		this.isEnabledUpDownRoutineAction = enable;
 	}
 
 	/**
 	 * @param eatObject
 	 * @param quantity
+	 * @return actually eat amount
 	 */
-	public void eat(EatableObject eatObject, int quantity) {
-		this.eat(eatObject, quantity, Direction.UP);
+	public int eat(EatableObject eatObject, int quantity) {
+		return this.eat(eatObject, quantity, Direction.UP);
 	}
 
 	/**
 	 * @param eatObject
 	 * @param amount
 	 * @param eatDirection
+	 * @return actually eat amount
 	 */
-	public void eat(EatableObject eatObject, int amount, Direction eatDirection) {
-		if (this.square == null || eatObject == null || eatObject.getQuantity() == 0) {
-			return;
+	public int eat(EatableObject eatObject, int amount, Direction eatDirection) {
+		if (this.square == null || eatObject == null || eatObject.getAmount() == 0) {
+			return 0;
 		}
-		final int eatenAmount = eatObject.eaten(amount, eatDirection);
-		this.square.notifyObservers(new EatObjectEvent(this, eatObject, eatenAmount));
+		final int actuallyEatAmount = eatObject.eaten(amount, eatDirection);
+		this.square.notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
+		return actuallyEatAmount;
 	}
+
 }

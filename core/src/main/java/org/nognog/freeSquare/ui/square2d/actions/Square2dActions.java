@@ -16,16 +16,32 @@ public class Square2dActions {
 
 	/**
 	 * @param eatObject
-	 * @param eatAmount 
+	 * @param eatAmount
+	 * @param moveSpeed 
 	 * @return action
 	 */
-	public static EatAction eat(EatableObject eatObject, int eatAmount) {
+	public static EatAction eat(EatableObject eatObject, int eatAmount, float moveSpeed) {
+		return eat(eatObject, eatAmount, 1, 0, moveSpeed);
+	}
+
+	/**
+	 * @param eatObject
+	 * @param eatAmount
+	 * @param eatCount 
+	 * @param eatInterval 
+	 * @param moveSpeed 
+	 * @return action
+	 */
+	public static EatAction eat(EatableObject eatObject, int eatAmount, int eatCount, float eatInterval, float moveSpeed) {
 		EatAction action = Actions.action(EatAction.class);
 		action.setEatObject(eatObject);
 		action.setEatAmount(eatAmount);
+		action.setEatCount(eatCount);
+		action.setEatInterval(eatInterval);
+		action.setMoveSpeed(moveSpeed);
 		return action;
 	}
-
+	
 	/**
 	 * @param targetObject
 	 * @param speed
@@ -137,29 +153,6 @@ public class Square2dActions {
 		Action down = Actions.moveBy(0, -upDownAmount, cycleTime / 2, interpolation);
 
 		return Actions.forever(Actions.sequence(up, down));
-	}
-
-	/**
-	 * @param eatObject
-	 * @param eatAmount 
-	 * @param moveSpeed
-	 * @return action
-	 */
-	public static Action moveAndEat(EatableObject eatObject, int eatAmount, float moveSpeed) {
-		return moveAndEat(eatObject, eatAmount, moveSpeed, 0);
-	}
-
-	/**
-	 * @param eatObject
-	 * @param eatAmount 
-	 * @param speed
-	 * @param torelance
-	 * @return action
-	 */
-	public static Action moveAndEat(EatableObject eatObject, int eatAmount, float speed, float torelance) {
-		Action moveToEatObjectAction = moveToSquareObject(eatObject, speed, torelance);
-		Action eatAction = eat(eatObject, eatAmount);
-		return Actions.sequence(moveToEatObjectAction, eatAction);
 	}
 
 }

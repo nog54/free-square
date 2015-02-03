@@ -19,6 +19,7 @@ public enum Square2dObjectType {
 	// EatableObject : otherValues[0] = quantity
 
 	RIKI(getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
+	EATABLE_RIKI(getString("riki"), Resources.rikiPath, 80, EatableObject.class, 100), //$NON-NLS-1$
 	TOFU(getString("tofu"), Resources.tofuPath, 75, EatableObject.class, 100), //$NON-NLS-1$
 	RED_PEPPER_TOFU(TOFU, getString("red-pepper-tofu"), Colors.RED), //$NON-NLS-1$
 	MINT_TOFU(TOFU, getString("mint-tofu"), Colors.CYAN), //$NON-NLS-1$

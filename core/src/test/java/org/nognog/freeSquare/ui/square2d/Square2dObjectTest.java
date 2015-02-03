@@ -34,11 +34,6 @@ public class Square2dObjectTest {
 			object.act(delta);
 		}
 		verify(mock, times(actCount)).act(delta);
-		object.setEnabledAction(false);
-		for (int i = 0; i < actCount; i++) {
-			object.act(delta);
-		}
-		verify(mock, times(actCount)).act(delta);
 	}
 
 	@Test

@@ -49,7 +49,7 @@ public class FreeSquare extends ApplicationAdapter {
 	private boolean isLockingCameraMove;
 
 	private EatableObject eatenObject;
-	
+
 	private Array<CameraObserver> cameraObservers;
 
 	private BitmapFont font;
@@ -70,12 +70,12 @@ public class FreeSquare extends ApplicationAdapter {
 
 		this.square = Square2dType.GRASSY_SQUARE1.create();
 		this.square.setX(-this.square.getWidth() / 2);
-//		for (Square2dObjectType object : Square2dObjectType.values()) {
-//			for (int i = 0; i < 1; i++) {
-//				this.square.addSquareObject(object.create(), false);
-//			}
-//		}
-		
+		// for (Square2dObjectType object : Square2dObjectType.values()) {
+		// for (int i = 0; i < 1; i++) {
+		// this.square.addSquareObject(object.create(), false);
+		// }
+		// }
+
 		this.eatenObject = new EatableObject(Square2dObjectType.MINT_TOFU);
 		this.square.addSquareObject(this.eatenObject);
 
@@ -121,43 +121,49 @@ public class FreeSquare extends ApplicationAdapter {
 		});
 
 		this.playerItemList = new PlayerItemList(this.stage.getCamera(), this.player, this.font) {
-			private Square2dObject addedActor;
+			private Square2dObject addedObject;
 
 			@Override
 			protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
 				}
-				if (this.addedActor == null) {
+				if (this.addedObject == null) {
 					Item<?, ?> item = pannedItem.getItem();
 					if (item instanceof Square2dObjectItem) {
-						this.addedActor = ((Square2dObjectItem) item).createSquare2dObject();
-						this.addedActor.setEnabledAction(false);
+						this.addedObject = ((Square2dObjectItem) item).createSquare2dObject();
+						this.addedObject.setEnabledAction(false);
 						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
 							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-							FreeSquare.this.getSquare().addSquareObject(this.addedActor, squareCoodinateXY.x, squareCoodinateXY.y, false);
+							FreeSquare.this.getSquare().addSquareObject(this.addedObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
 							FreeSquare.this.showSquareOnly();
 						}
 					}
 				} else {
-					this.addedActor.moveBy(deltaX, deltaY);
+					if (!this.addedObjectisBeingEaten()) {
+						this.addedObject.moveBy(deltaX, deltaY);
+					}
 				}
+			}
+
+			private boolean addedObjectisBeingEaten() {
+				return (this.addedObject instanceof EatableObject) && ((EatableObject) this.addedObject).isBeingEaten();
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				if (this.addedActor != null) {
-					if (this.addedActor.isLandingOnSquare()) {
-						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
-						this.addedActor.setEnabledAction(true);
-						Square2dEvent event = new AddObjectEvent(this.addedActor);
-						event.addExceptObserver(this.addedActor);
+				if (this.addedObject != null) {
+					if (this.addedObject.isLandingOnSquare()) {
+						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedObject.getType()));
+						this.addedObject.setEnabledAction(true);
+						Square2dEvent event = new AddObjectEvent(this.addedObject);
+						event.addExceptObserver(this.addedObject);
 						FreeSquare.this.getSquare().notifyObservers(event);
 					} else {
-						FreeSquare.this.getSquare().removeSquareObject(this.addedActor);
+						FreeSquare.this.getSquare().removeSquareObject(this.addedObject);
 					}
 					FreeSquare.this.showPlayerItemList();
-					this.addedActor = null;
+					this.addedObject = null;
 					this.getColor().a = 1f;
 				}
 			}
@@ -291,7 +297,7 @@ public class FreeSquare extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		this.stage.draw();
 	}
-	
+
 	@Override
 	public void pause() {
 		PersistItem.PLAYER.save(this.player);
