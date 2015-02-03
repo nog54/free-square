@@ -21,7 +21,6 @@ public class EatableObject extends Square2dObject {
 	 */
 	public EatableObject(Square2dObjectType type) {
 		super(type);
-		this.setDebug(true);
 		this.baseQuantity = (int) type.getOtherValues()[0];
 		this.quantity = this.baseQuantity;
 		this.originTextureRegionWidth = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionWidth();
@@ -35,10 +34,14 @@ public class EatableObject extends Square2dObject {
 	 * @return amount of actually eaten
 	 */
 	public int eaten(int amount, Direction direction) {
+		if(this.quantity == 0){
+			return this.quantity;
+		}
 		final int eatenAmount = (this.quantity > amount) ? amount : this.quantity;
 		this.quantity -= eatenAmount;
-		if(this.quantity == 0){
-			this.image.setScale(0);
+		if (this.quantity == 0) {
+			this.getSquare().removeSquareObject(this);
+			return this.quantity;
 		}
 		final float eatenRatio = eatenAmount / (float) this.baseQuantity;
 
@@ -59,7 +62,6 @@ public class EatableObject extends Square2dObject {
 			final int eatenHeight = eatenArea / currentTextureRegionWidth;
 			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenHeight;
 			imageTextureRegion.setRegionHeight(afterEatenTextureRegionHeight);
-			this.image.moveBy(0, eatenHeight / 4);
 			this.image.setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
 		}
 
@@ -93,6 +95,13 @@ public class EatableObject extends Square2dObject {
 		imageTextureRegion.setRegionHeight(this.originTextureRegionHeight);
 		this.image.setPosition(0, 0);
 		this.image.setScale(1);
+	}
+
+	/**
+	 * @return quantity
+	 */
+	public int getQuantity() {
+		return this.quantity;
 	}
 
 }

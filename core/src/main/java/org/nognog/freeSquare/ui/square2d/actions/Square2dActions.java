@@ -1,5 +1,6 @@
-package org.nognog.freeSquare.ui.square2d.action;
+package org.nognog.freeSquare.ui.square2d.actions;
 
+import org.nognog.freeSquare.ui.square2d.EatableObject;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
 import com.badlogic.gdx.math.Interpolation;
@@ -12,16 +13,39 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 public class Square2dActions {
 	private Square2dActions() {
 	}
-	
+
+	/**
+	 * @param eatObject
+	 * @param eatAmount 
+	 * @return action
+	 */
+	public static EatAction eat(EatableObject eatObject, int eatAmount) {
+		EatAction action = Actions.action(EatAction.class);
+		action.setEatObject(eatObject);
+		action.setEatAmount(eatAmount);
+		return action;
+	}
+
 	/**
 	 * @param targetObject
 	 * @param speed
 	 * @return action
 	 */
-	public static MoveToSquareObjectAction moveToSquareObject(Square2dObject targetObject, float speed){
+	public static MoveToSquareObjectAction moveToSquareObject(Square2dObject targetObject, float speed) {
+		return moveToSquareObject(targetObject, speed, 0);
+	}
+
+	/**
+	 * @param targetObject
+	 * @param speed
+	 * @param tolerance
+	 * @return action
+	 */
+	public static MoveToSquareObjectAction moveToSquareObject(Square2dObject targetObject, float speed, float tolerance) {
 		MoveToSquareObjectAction action = Actions.action(MoveToSquareObjectAction.class);
 		action.setTargetObject(targetObject);
 		action.setSpeed(speed);
+		action.setTolerance(tolerance);
 		return action;
 	}
 
@@ -76,12 +100,12 @@ public class Square2dActions {
 		action.setMoveActionDelayActionSequence(Actions.sequence(moveAction, delayAction));
 		return action;
 	}
-	
+
 	/**
 	 * @param mainAction
 	 * @return action
 	 */
-	public static ExcludeObjectOtherActionAction excludeObjectOtherAction(Action mainAction){
+	public static ExcludeObjectOtherActionAction excludeObjectOtherAction(Action mainAction) {
 		ExcludeObjectOtherActionAction action = Actions.action(ExcludeObjectOtherActionAction.class);
 		action.setAction(mainAction);
 		return action;
@@ -113,6 +137,29 @@ public class Square2dActions {
 		Action down = Actions.moveBy(0, -upDownAmount, cycleTime / 2, interpolation);
 
 		return Actions.forever(Actions.sequence(up, down));
+	}
+
+	/**
+	 * @param eatObject
+	 * @param eatAmount 
+	 * @param moveSpeed
+	 * @return action
+	 */
+	public static Action moveAndEat(EatableObject eatObject, int eatAmount, float moveSpeed) {
+		return moveAndEat(eatObject, eatAmount, moveSpeed, 0);
+	}
+
+	/**
+	 * @param eatObject
+	 * @param eatAmount 
+	 * @param speed
+	 * @param torelance
+	 * @return action
+	 */
+	public static Action moveAndEat(EatableObject eatObject, int eatAmount, float speed, float torelance) {
+		Action moveToEatObjectAction = moveToSquareObject(eatObject, speed, torelance);
+		Action eatAction = eat(eatObject, eatAmount);
+		return Actions.sequence(moveToEatObjectAction, eatAction);
 	}
 
 }

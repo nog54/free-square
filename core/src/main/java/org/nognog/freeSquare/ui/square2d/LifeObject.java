@@ -1,7 +1,8 @@
 package org.nognog.freeSquare.ui.square2d;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
+import org.nognog.freeSquare.ui.square2d.actions.Square2dActions;
+import org.nognog.freeSquare.ui.square2d.events.EatObjectEvent;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 
 import com.badlogic.gdx.Gdx;
@@ -75,5 +76,26 @@ public class LifeObject extends Square2dObject {
 			this.pauseAction(this.upDownRoutineAction);
 		}
 		super.act(delta);
+	}
+
+	/**
+	 * @param eatObject
+	 * @param quantity
+	 */
+	public void eat(EatableObject eatObject, int quantity) {
+		this.eat(eatObject, quantity, Direction.UP);
+	}
+
+	/**
+	 * @param eatObject
+	 * @param amount
+	 * @param eatDirection
+	 */
+	public void eat(EatableObject eatObject, int amount, Direction eatDirection) {
+		if (this.square == null || eatObject == null || eatObject.getQuantity() == 0) {
+			return;
+		}
+		final int eatenAmount = eatObject.eaten(amount, eatDirection);
+		this.square.notifyObservers(new EatObjectEvent(this, eatObject, eatenAmount));
 	}
 }

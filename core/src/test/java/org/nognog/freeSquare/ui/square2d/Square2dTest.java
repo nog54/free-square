@@ -171,7 +171,7 @@ public class Square2dTest {
 		SquareObserver observer2 = mock(SquareObserver.class);
 		SquareObserver observer3 = mock(SquareObserver.class);
 
-		Square2dEvent event = Square2dEvent.getSimpleSquareUpdateEvent();
+		Square2dEvent event = new Square2dEvent();
 		square.addSquareObserver(observer1);
 		square.addSquareObserver(observer3);
 		square.notifyObservers(event);

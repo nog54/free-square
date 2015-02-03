@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.ui.square2d.action;
+package org.nognog.freeSquare.ui.square2d.actions;
 
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
@@ -11,22 +11,33 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 public class MoveToSquareObjectAction extends Action {
 	private Square2dObject targetObject;
 	private float speed;
+	private float tolerance;
 	private boolean isFinished = false;
 
 	/**
 	 * 
 	 */
 	public MoveToSquareObjectAction() {
-		
+
 	}
-	
+
 	/**
 	 * @param targetObject
-	 * @param speed 
+	 * @param speed
 	 */
 	public MoveToSquareObjectAction(Square2dObject targetObject, float speed) {
+		this(targetObject, speed, targetObject.getWidth() / 2);
+	}
+
+	/**
+	 * @param targetObject
+	 * @param speed
+	 * @param tolerance
+	 */
+	public MoveToSquareObjectAction(Square2dObject targetObject, float speed, float tolerance) {
 		this.targetObject = targetObject;
 		this.speed = speed;
+		this.tolerance = tolerance;
 	}
 
 	@Override
@@ -34,7 +45,7 @@ public class MoveToSquareObjectAction extends Action {
 		if (this.isFinished) {
 			return true;
 		}
-		if (this.targetObject == null || this.targetObject.getSquare() == null) {
+		if (this.targetObject == null || ((Square2dObject) this.actor).getSquare() != this.targetObject.getSquare()) {
 			this.isFinished = true;
 			return true;
 		}
@@ -42,6 +53,10 @@ public class MoveToSquareObjectAction extends Action {
 		final float targetPositionY = this.targetObject.getY();
 		final float remainingDistanceX = targetPositionX - this.actor.getX();
 		final float remainingDistanceY = targetPositionY - this.actor.getY();
+		final float remainingR = (float) Math.sqrt(remainingDistanceX * remainingDistanceX + remainingDistanceY * remainingDistanceY);
+		if (remainingR <= this.tolerance) {
+			return true;
+		}
 		final float theta = MathUtils.atan2(targetPositionY - this.actor.getY(), targetPositionX - this.actor.getX());
 		final float r = delta * this.speed;
 		final float moveX = r * MathUtils.cos(theta);
@@ -58,6 +73,7 @@ public class MoveToSquareObjectAction extends Action {
 		}
 
 		this.actor.moveBy(moveX, moveY);
+
 		return false;
 	}
 
@@ -87,6 +103,21 @@ public class MoveToSquareObjectAction extends Action {
 	 */
 	public void setSpeed(float speed) {
 		this.speed = speed;
+	}
+
+	/**
+	 * @return the tolerance
+	 */
+	public float getTolerance() {
+		return this.tolerance;
+	}
+
+	/**
+	 * @param tolerance
+	 *            the tolerance to set
+	 */
+	public void setTolerance(float tolerance) {
+		this.tolerance = tolerance;
 	}
 
 	/**

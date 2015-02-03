@@ -18,8 +18,8 @@ import org.nognog.freeSquare.ui.PlayerItemList;
 import org.nognog.freeSquare.ui.square2d.EatableObject;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.Square2dEvent;
-import org.nognog.freeSquare.ui.square2d.Square2dEvent.EventType;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.events.AddObjectEvent;
 import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 import org.nognog.freeSquare.util.font.FontUtil;
@@ -150,7 +150,7 @@ public class FreeSquare extends ApplicationAdapter {
 					if (this.addedActor.isLandingOnSquare()) {
 						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedActor.getType()));
 						this.addedActor.setEnabledAction(true);
-						Square2dEvent event = new Square2dEvent(EventType.ADD_OBJECT, this.addedActor);
+						Square2dEvent event = new AddObjectEvent(this.addedActor);
 						event.addExceptObserver(this.addedActor);
 						FreeSquare.this.getSquare().notifyObservers(event);
 					} else {

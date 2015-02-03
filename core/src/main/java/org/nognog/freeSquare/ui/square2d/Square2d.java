@@ -4,7 +4,8 @@ import java.util.Comparator;
 
 import org.nognog.freeSquare.ui.Square;
 import org.nognog.freeSquare.ui.SquareObserver;
-import org.nognog.freeSquare.ui.square2d.Square2dEvent.EventType;
+import org.nognog.freeSquare.ui.square2d.events.AddObjectEvent;
+import org.nognog.freeSquare.ui.square2d.events.RemoveObjectEvent;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -152,7 +153,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		object.setPosition(x, y);
 		this.objects.add(object);
 		if (notifyObserver) {
-			this.notifyObservers(new Square2dEvent(EventType.ADD_OBJECT, object));
+			this.notifyObservers(new AddObjectEvent(object));
 		}
 		this.addSquareObserver(object);
 	}
@@ -173,15 +174,22 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 * @return true if object is removed
 	 */
 	public boolean removeSquareObject(Square2dObject object, boolean notifyObserver) {
-		boolean isRemoved = super.removeActor(object);
+		if (!this.getChildren().contains(object, true)) {
+			return false;
+		}
+		if (notifyObserver) {
+			this.notifyObservers(new RemoveObjectEvent(object, object));
+		}
+		super.removeActor(object);
 		object.setSquare(null);
 		object.setPosition(0, 0);
 		this.objects.removeValue(object, true);
-		if (notifyObserver) {
-			this.notifyObservers(new Square2dEvent(EventType.REMOVE_OBJECT, object));
-		}
 		this.removeSquareObserver(object);
-		return isRemoved;
+		if (notifyObserver) {
+			this.notifyObservers(new RemoveObjectEvent(object));
+		}
+		return true;
+
 	}
 
 	@Override

@@ -1,14 +1,15 @@
 package org.nognog.freeSquare.ui.square2d.objects;
 
+import org.nognog.freeSquare.ui.square2d.EatableObject;
 import org.nognog.freeSquare.ui.square2d.FreeRunningLandObject;
 import org.nognog.freeSquare.ui.square2d.Square2dEvent;
-import org.nognog.freeSquare.ui.square2d.Square2dEvent.EventType;
-import org.nognog.freeSquare.ui.square2d.Square2dObject;
-import org.nognog.freeSquare.ui.square2d.action.MoveToSquareObjectAction;
+import org.nognog.freeSquare.ui.square2d.actions.Square2dActions;
+import org.nognog.freeSquare.ui.square2d.events.AddObjectEvent;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 /**
  * @author goshi 2014/12/19
@@ -16,7 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 public class Riki extends FreeRunningLandObject {
 
 	private static final float moveSpeed = 100;
-	protected MoveToSquareObjectAction moveToTargetObjectAction;
+	private static final int eatAmountPerOnce = 20;
+	protected SequenceAction currectTryingMoveAndEatAction;
+	protected EatableObject currentTryingEatableObject;
 
 	/**
 	 * create Riki
@@ -27,53 +30,57 @@ public class Riki extends FreeRunningLandObject {
 
 	@Override
 	public void notify(Square2dEvent event) {
-		if (event.getEventType() != EventType.ADD_OBJECT) {
+		if (!(event instanceof AddObjectEvent)) {
 			return;
 		}
+		AddObjectEvent addEvent = (AddObjectEvent) event;
 		Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
 		Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
 		Action hop = Actions.sequence(up, down);
 		this.addAction(hop);
-		Square2dObject relatedObject = event.getRelatedObject();
-		if (relatedObject == null) {
-			return;
-		}
-		if (relatedObject.getType() == Square2dObjectType.ICE_TOFU) {
+		if (addEvent.getAddedObject() instanceof EatableObject) {
+			EatableObject eatObject = (EatableObject) addEvent.getAddedObject();
 			if (this.isMovingToTargetObject()) {
-				final float distanceToTarget = this.getDistanceTo(this.moveToTargetObjectAction.getTargetObject());
-				final float distanceToRelatedObject = this.getDistanceTo(relatedObject);
+				final float distanceToTarget = this.getDistanceTo(this.currentTryingEatableObject);
+				final float distanceToRelatedObject = this.getDistanceTo(eatObject);
 				if (distanceToRelatedObject < distanceToTarget) {
-					this.moveToTargetObjectAction.setTargetObject(relatedObject);
+					this.changeEatTargetTo(eatObject);
 				}
 				return;
 			}
+
 			final boolean wasEnabledFreeRun = this.isEnabledFreeRun();
 			this.setEnableFreeRun(false);
-			this.moveToTargetObjectAction = new MoveToSquareObjectAction(relatedObject, moveSpeed) {
+			Action moveAndEat = Square2dActions.moveAndEat(eatObject, eatAmountPerOnce, moveSpeed, eatObject.getWidth() / 2);
+			Action setFreeRunModeAction = new Action() {
 				@Override
 				public boolean act(float delta) {
-					if (Riki.this.isBeingTouched() || Riki.this.isLongPressedInLastTouch()) {
-						return false;
-					}
-
-					if (super.act(delta) == true) {
-						Riki.this.setEnableFreeRun(wasEnabledFreeRun);
-						Riki.this.moveToTargetObjectAction = null;
-						return true;
-					}
-					return false;
+					Riki.this.currectTryingMoveAndEatAction = null;
+					Riki.this.currentTryingEatableObject = null;
+					Riki.this.setEnableFreeRun(wasEnabledFreeRun);
+					return true;
 				}
 			};
-			this.addAction(this.moveToTargetObjectAction);
+
+			this.currectTryingMoveAndEatAction = Actions.sequence(moveAndEat, setFreeRunModeAction);
+			this.currentTryingEatableObject = eatObject;
+			this.addAction(this.currectTryingMoveAndEatAction);
 			return;
 		}
 	}
 
+	private void changeEatTargetTo(EatableObject relatedObject) {
+		int index = this.currectTryingMoveAndEatAction.getActions().size - 1;
+		Action setFreeRunModeAction = this.currectTryingMoveAndEatAction.getActions().get(index);
+		this.removeAction(this.currectTryingMoveAndEatAction);
+		Action moveAndEat = Square2dActions.moveAndEat(relatedObject, eatAmountPerOnce, moveSpeed);
+		this.currectTryingMoveAndEatAction = Actions.sequence(moveAndEat, setFreeRunModeAction);
+		this.currentTryingEatableObject = relatedObject;
+		this.addAction(this.currectTryingMoveAndEatAction);
+	}
+
 	private boolean isMovingToTargetObject() {
-		if (this.moveToTargetObjectAction == null || this.moveToTargetObjectAction.isFinished()) {
-			return false;
-		}
-		return true;
+		return this.currectTryingMoveAndEatAction != null && this.currentTryingEatableObject != null;
 	}
 
 }
