@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.ui.square2d.EatableObject;
+import org.nognog.freeSquare.ui.square2d.LifeObject;
 import org.nognog.freeSquare.ui.square2d.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
@@ -15,111 +16,316 @@ import com.badlogic.gdx.graphics.Texture;
  * @author goshi 2015/01/14
  */
 @SuppressWarnings("javadoc")
-public enum Square2dObjectType {
-	// EatableObject : otherValues[0] = quantity
+public interface Square2dObjectType<T extends Square2dObject> {
 
-	RIKI(getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
-	EATABLE_RIKI(getString("riki"), Resources.rikiPath, 80, EatableObject.class, 100), //$NON-NLS-1$
-	TOFU(getString("tofu"), Resources.tofuPath, 75, EatableObject.class, 100), //$NON-NLS-1$
-	RED_PEPPER_TOFU(TOFU, getString("red-pepper-tofu"), Colors.RED), //$NON-NLS-1$
-	MINT_TOFU(TOFU, getString("mint-tofu"), Colors.CYAN), //$NON-NLS-1$
-	WORMWOOD_TOFU(TOFU, getString("wormwood-tofu"), Colors.OLIVE), //$NON-NLS-1$
-	FREEZE_DRIED_TOFU(TOFU, getString("freeze-dried-tofu"), Colors.KHAKI), //$NON-NLS-1$
-	MASTATD_TOFU(TOFU, getString("mastard-tofu"), Colors.YELLOW), //$NON-NLS-1$
-	ICE_TOFU(TOFU, getString("ice-tofu"), Colors.ICE), //$NON-NLS-1$
-	GOLD_SESAME_TOFU(TOFU, getString("gold-sesame-tofu"), Colors.GOLD), //$NON-NLS-1$
-	BLACK_SESAME_TOFU(TOFU, getString("black-sesame-tofu"), Colors.LIGHT_GRAY), //$NON-NLS-1$
-	;
+	String getName();
 
-	private Square2dObjectType(String name, String texturePath, float logicalWidth) {
-		this(name, texturePath, logicalWidth, Square2dObject.class);
+	Texture getTexture();
+
+	float getLogicalWidth();
+
+	Color getColor();
+
+	T create();
+
+	public static enum LifeObjectType implements Square2dObjectType<LifeObject> {
+		RIKI(getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
+
+		;
+
+		private LifeObjectType(String name, String texturePath, float logicalWidth) {
+			this(name, texturePath, logicalWidth, Colors.WHITE, LifeObject.class);
+		}
+
+		private <T extends LifeObject> LifeObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
+			this(name, texturePath, logicalWidth, Colors.WHITE, klass);
+		}
+
+		private LifeObjectType(String name, String texturePath, float logicalWidth, Color color) {
+			this(name, texturePath, logicalWidth, color, LifeObject.class);
+		}
+
+		private <T extends LifeObject> LifeObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
+			this(name, new Texture(texturePath), logicalWidth, color, klass);
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T extends LifeObject> LifeObjectType(LifeObjectType type, String name, float logicalWidth, Color color) {
+			this(name, type.texture, logicalWidth, color, (Class<T>) type.klass);
+		}
+
+		private <T extends LifeObject> LifeObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass) {
+			this.name = name;
+			this.texture = texture;
+			this.logicalWidth = logicalWidth;
+			this.color = color;
+			this.klass = klass;
+		}
+
+		private final Class<?> klass;
+		private final String name;
+		private final Texture texture;
+		private final float logicalWidth;
+		private final Color color;
+
+		@Override
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public Texture getTexture() {
+			return this.texture;
+		}
+
+		@Override
+		public float getLogicalWidth() {
+			return this.logicalWidth;
+		}
+
+		@Override
+		public Color getColor() {
+			return this.color;
+		}
+
+		@Override
+		public LifeObject create() {
+			try {
+				Constructor<?> c = this.klass.getConstructor(LifeObjectType.class);
+				return (LifeObject) c.newInstance(this);
+			} catch (Exception e) {
+				// nothing
+			}
+
+			try {
+				return (LifeObject) this.klass.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public static void dispose() {
+			for (LifeObjectType type : LifeObjectType.values()) {
+				type.getTexture().dispose();
+			}
+		}
 	}
 
-	private Square2dObjectType(String name, String texturePath, float logicalWidth, Color color) {
-		this(name, texturePath, logicalWidth, color, Square2dObject.class);
+	public static enum EatableObjectType implements Square2dObjectType<EatableObject> {
+
+		EATABLE_RIKI(getString("riki"), Resources.rikiPath, 80, EatableObject.class, 100), //$NON-NLS-1$
+		TOFU(getString("tofu"), Resources.tofuPath, 75, EatableObject.class, 100), //$NON-NLS-1$
+		RED_PEPPER_TOFU(TOFU, getString("red-pepper-tofu"), Colors.RED), //$NON-NLS-1$
+		MINT_TOFU(TOFU, getString("mint-tofu"), Colors.CYAN), //$NON-NLS-1$
+		WORMWOOD_TOFU(TOFU, getString("wormwood-tofu"), Colors.OLIVE), //$NON-NLS-1$
+		FREEZE_DRIED_TOFU(TOFU, getString("freeze-dried-tofu"), Colors.KHAKI), //$NON-NLS-1$
+		MASTATD_TOFU(TOFU, getString("mastard-tofu"), Colors.YELLOW), //$NON-NLS-1$
+		ICE_TOFU(TOFU, getString("ice-tofu"), Colors.ICE), //$NON-NLS-1$
+		GOLD_SESAME_TOFU(TOFU, getString("gold-sesame-tofu"), Colors.GOLD), //$NON-NLS-1$
+		BLACK_SESAME_TOFU(TOFU, getString("black-sesame-tofu"), Colors.LIGHT_GRAY), //$NON-NLS-1$
+		;
+
+		private EatableObjectType(String name, String texturePath, float logicalWidth, int quantity) {
+			this(name, texturePath, logicalWidth, EatableObject.class, quantity);
+		}
+
+		private EatableObjectType(String name, String texturePath, float logicalWidth, Color color, int quantity) {
+			this(name, texturePath, logicalWidth, color, EatableObject.class, quantity);
+		}
+
+		private <T extends EatableObject> EatableObjectType(String name, String texturePath, float logicalWidth, Class<T> klass, int quantity) {
+			this(name, texturePath, logicalWidth, Colors.WHITE, klass, quantity);
+		}
+
+		private <T extends EatableObject> EatableObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass, int quantity) {
+			this(name, new Texture(texturePath), logicalWidth, color, klass, quantity);
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T extends EatableObject> EatableObjectType(EatableObjectType type, String name, Color color) {
+			this(name, type.texture, type.logicalWidth, color, (Class<T>) type.klass, type.quantity);
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T extends EatableObject> EatableObjectType(EatableObjectType type, String name, float logicalWidth, Color color, int quantity) {
+			this(name, type.texture, logicalWidth, color, (Class<T>) type.klass, quantity);
+		}
+
+		private <T extends EatableObject> EatableObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass, int quantity) {
+			this.name = name;
+			this.texture = texture;
+			this.logicalWidth = logicalWidth;
+			this.color = color;
+			this.klass = klass;
+			this.quantity = quantity;
+		}
+
+		private final Class<?> klass;
+		private final String name;
+		private final Texture texture;
+		private final float logicalWidth;
+		private final Color color;
+		private final int quantity;
+
+		@Override
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public Texture getTexture() {
+			return this.texture;
+		}
+
+		@Override
+		public float getLogicalWidth() {
+			return this.logicalWidth;
+		}
+
+		@Override
+		public Color getColor() {
+			return this.color;
+		}
+
+		public int getQuantity() {
+			return this.quantity;
+		}
+
+		@Override
+		public EatableObject create() {
+			try {
+				Constructor<?> c = this.klass.getConstructor(EatableObjectType.class);
+				return (EatableObject) c.newInstance(this);
+			} catch (Exception e) {
+				// nothing
+			}
+
+			try {
+				return (EatableObject) this.klass.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public static void dispose() {
+			for (EatableObjectType type : EatableObjectType.values()) {
+				type.getTexture().dispose();
+			}
+		}
+
 	}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Class<T> klass, float... otherValues) {
-		this(name, texturePath, logicalWidth, Colors.WHITE, klass, otherValues);
-	}
+	public static enum OtherObjectType implements Square2dObjectType<Square2dObject> {
 
-	@SuppressWarnings("unchecked")
-	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, Color color) {
-		this(name, type.texture, type.logicalWidth, color, (Class<T>) type.klass, type.otherValues);
-	}
+		;
 
-	@SuppressWarnings("unchecked")
-	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, float logicalWidth) {
-		this(name, type.texture, logicalWidth, type.color, (Class<T>) type.klass, type.otherValues);
-	}
+		private OtherObjectType(String name, String texturePath, float logicalWidth) {
+			this(name, texturePath, logicalWidth, EatableObject.class);
+		}
 
-	@SuppressWarnings("unchecked")
-	private <T extends Square2dObject> Square2dObjectType(Square2dObjectType type, String name, float logicalWidth, Color color) {
-		this(name, type.texture, logicalWidth, color, (Class<T>) type.klass, type.otherValues);
-	}
+		private OtherObjectType(String name, String texturePath, float logicalWidth, Color color) {
+			this(name, texturePath, logicalWidth, color, EatableObject.class);
+		}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass, float... otherValues) {
-		this(name, new Texture(texturePath), logicalWidth, color, klass, otherValues);
-	}
+		private <T extends Square2dObject> OtherObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
+			this(name, texturePath, logicalWidth, Colors.WHITE, klass);
+		}
 
-	private <T extends Square2dObject> Square2dObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass, float... otherValues) {
-		this.name = name;
-		this.texture = texture;
-		this.logicalWidth = logicalWidth;
-		this.color = color;
-		this.klass = klass;
-		this.otherValues = otherValues;
-	}
+		private <T extends Square2dObject> OtherObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
+			this(name, new Texture(texturePath), logicalWidth, color, klass);
+		}
 
-	private final Class<?> klass;
-	private final String name;
-	private final Texture texture;
-	private final float logicalWidth;
-	private final Color color;
-	private final float[] otherValues;
+		@SuppressWarnings("unchecked")
+		private <T extends Square2dObject> OtherObjectType(OtherObjectType type, String name, Color color) {
+			this(name, type.texture, type.logicalWidth, color, (Class<T>) type.klass);
+		}
 
-	public String getName() {
-		return this.name;
-	}
+		@SuppressWarnings("unchecked")
+		private <T extends EatableObject> OtherObjectType(OtherObjectType type, String name, float logicalWidth, Color color) {
+			this(name, type.texture, logicalWidth, color, (Class<T>) type.klass);
+		}
 
-	public Texture getTexture() {
-		return this.texture;
-	}
+		private <T extends Square2dObject> OtherObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass) {
+			this.name = name;
+			this.texture = texture;
+			this.logicalWidth = logicalWidth;
+			this.color = color;
+			this.klass = klass;
+		}
 
-	public float getLogicalWidth() {
-		return this.logicalWidth;
-	}
+		private final Class<?> klass;
+		private final String name;
+		private final Texture texture;
+		private final float logicalWidth;
+		private final Color color;
 
-	public Color getColor() {
-		return this.color;
+		@Override
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public Texture getTexture() {
+			return this.texture;
+		}
+
+		@Override
+		public float getLogicalWidth() {
+			return this.logicalWidth;
+		}
+
+		@Override
+		public Color getColor() {
+			return this.color;
+		}
+
+		@Override
+		public Square2dObject create() {
+			try {
+				Constructor<?> c = this.klass.getConstructor(Square2dObjectType.class);
+				return (Square2dObject) c.newInstance(this);
+			} catch (Exception e) {
+				// nothing
+			}
+
+			try {
+				return (Square2dObject) this.klass.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public static void dispose() {
+			for (OtherObjectType type : OtherObjectType.values()) {
+				type.getTexture().dispose();
+			}
+		}
+
 	}
 	
-	public float[] getOtherValues(){
-		return this.otherValues;
-	}
+	public static class Manager{
+		public static Square2dObjectType<?>[] getAllTypeValues(){
+			int allValuesLength = EatableObjectType.values().length + LifeObjectType.values().length + OtherObjectType.values().length;
+			final Square2dObjectType<?>[] allValues = new Square2dObjectType[allValuesLength];
+			int i = 0;
+			for (LifeObjectType type : LifeObjectType.values()) {
+				allValues[i] = type;
+				i++;
+			}
+			for (EatableObjectType type : EatableObjectType.values()) {
+				allValues[i] = type;
+				i++;
+			}
+			for (OtherObjectType type : OtherObjectType.values()) {
+				allValues[i] = type;
+				i++;
+			}
+			return allValues;
 
-	public Square2dObject create() {
-		try {
-			Constructor<?> c = this.klass.getConstructor(Square2dObjectType.class);
-			return (Square2dObject) c.newInstance(this);
-		} catch (Exception e) {
-			// nothing
-		}
-
-		try {
-			return (Square2dObject) this.klass.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static void dispose() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
-			type.getTexture().dispose();
 		}
 	}
 
-	private static class Colors {
+	static class Colors {
 
 		public static final Color WHITE = Color.WHITE;
 

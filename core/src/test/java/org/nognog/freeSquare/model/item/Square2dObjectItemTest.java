@@ -19,9 +19,9 @@ public class Square2dObjectItemTest {
 
 	@Test
 	public final void testGetInstance() {
-		Square2dObjectItem item1 = Square2dObjectItem.getInstance(Square2dObjectType.TOFU);
-		Square2dObjectItem item2 = Square2dObjectItem.getInstance(Square2dObjectType.TOFU);
-		Square2dObjectItem item3 = Square2dObjectItem.getInstance(Square2dObjectType.BLACK_SESAME_TOFU);
+		Square2dObjectItem item1 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.TOFU);
+		Square2dObjectItem item2 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.TOFU);
+		Square2dObjectItem item3 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.BLACK_SESAME_TOFU);
 
 		assertThat(item1, is(item2));
 		assertThat(item1, is(not(item3)));
@@ -29,9 +29,9 @@ public class Square2dObjectItemTest {
 
 	@Test
 	public final void testIsSameItem() {
-		Square2dObjectItem item1 = Square2dObjectItem.getInstance(Square2dObjectType.TOFU);
-		Square2dObjectItem item2 = Square2dObjectItem.getInstance(Square2dObjectType.TOFU);
-		Square2dObjectItem item3 = Square2dObjectItem.getInstance(Square2dObjectType.BLACK_SESAME_TOFU);
+		Square2dObjectItem item1 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.TOFU);
+		Square2dObjectItem item2 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.TOFU);
+		Square2dObjectItem item3 = Square2dObjectItem.getInstance(Square2dObjectType.EatableObjectType.BLACK_SESAME_TOFU);
 
 		final boolean expected1 = true;
 		final boolean actual1 = item1.isSameItem(item2);
@@ -56,7 +56,7 @@ public class Square2dObjectItemTest {
 
 	@Test
 	public final void testGetTexture() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObjectItem item = Square2dObjectItem.getInstance(type);
 			final Texture expected = type.getTexture();
 			final Texture actual = item.getTexture();
@@ -66,7 +66,7 @@ public class Square2dObjectItemTest {
 
 	@Test
 	public final void testGetColor() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObjectItem item = Square2dObjectItem.getInstance(type);
 			final Color expected = type.getColor();
 			final Color actual = item.getColor();
@@ -76,7 +76,7 @@ public class Square2dObjectItemTest {
 
 	@Test
 	public final void testIsValid() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObjectItem item = Square2dObjectItem.getInstance(type);
 			final boolean expected = true;
 			final boolean actual = item.isValid();

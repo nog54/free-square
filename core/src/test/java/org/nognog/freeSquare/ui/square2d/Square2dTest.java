@@ -77,7 +77,7 @@ public class Square2dTest {
 
 	@Test
 	public final void testAddSquareObjectSquare2dObjectFloatFloat() {
-		Square2dObject object = Square2dObjectType.TOFU.create();
+		Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
 		final float expected1 = object.getOriginX();
 		final float actual1 = object.getX();
 		final float expected2 = object.getOriginY();

@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.ui.square2d;
 
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType.EatableObjectType;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -19,9 +19,9 @@ public class EatableObject extends Square2dObject {
 	/**
 	 * @param type
 	 */
-	public EatableObject(Square2dObjectType type) {
+	public EatableObject(EatableObjectType type) {
 		super(type);
-		this.baseAmount = (int) type.getOtherValues()[0];
+		this.baseAmount = type.getQuantity();
 		this.amount = this.baseAmount;
 		this.originTextureRegionWidth = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionWidth();
 		this.originTextureRegionHeight = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionHeight();

@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Array;
  */
 public class Square2dObject extends Group implements SquareObject<Square2d>, SquareObserver, SelfValidatable {
 
-	private final Square2dObjectType type;
+	private final Square2dObjectType<?> type;
 	private final float logicalWidth;
 	private final float logicalHeight;
 
@@ -39,7 +39,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	/**
 	 * @param type
 	 */
-	public Square2dObject(Square2dObjectType type) {
+	public Square2dObject(Square2dObjectType<?> type) {
 		this.type = type;
 		final Texture texture = type.getTexture();
 		this.image = new Image(texture);
@@ -133,7 +133,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	/**
 	 * @return type of this object
 	 */
-	public Square2dObjectType getType() {
+	public Square2dObjectType<?> getType() {
 		return this.type;
 	}
 
@@ -391,6 +391,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 
 	@Override
 	public String toString() {
-		return this.type.name();
+		return this.type.getName();
 	}
 }

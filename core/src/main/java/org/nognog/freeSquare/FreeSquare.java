@@ -76,7 +76,7 @@ public class FreeSquare extends ApplicationAdapter {
 		// }
 		// }
 
-		this.eatenObject = new EatableObject(Square2dObjectType.MINT_TOFU);
+		this.eatenObject = new EatableObject(Square2dObjectType.EatableObjectType.MINT_TOFU);
 		this.square.addSquareObject(this.eatenObject);
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
@@ -312,7 +312,8 @@ public class FreeSquare extends ApplicationAdapter {
 			}
 			this.stage.dispose();
 			Square2dType.dispose();
-			Square2dObjectType.dispose();
+			Square2dObjectType.EatableObjectType.dispose();
+			Square2dObjectType.LifeObjectType.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;

@@ -3,7 +3,7 @@ package org.nognog.freeSquare.ui.square2d;
 import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
 import org.nognog.freeSquare.ui.square2d.actions.Square2dActions;
 import org.nognog.freeSquare.ui.square2d.actions.StopTimeGenerator;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +20,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	/**
 	 * @param info
 	 */
-	public FreeRunningLandObject(Square2dObjectType info) {
+	public FreeRunningLandObject(LifeObjectType info) {
 		this(info, defaultMoveSpeed);
 	}
 
@@ -28,7 +28,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param info
 	 * @param moveSpeed
 	 */
-	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed) {
+	public FreeRunningLandObject(LifeObjectType info, float moveSpeed) {
 		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
 
@@ -37,7 +37,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FreeRunningLandObject(Square2dObjectType info, float moveSpeed, StopTimeGenerator generator) {
+	public FreeRunningLandObject(LifeObjectType info, float moveSpeed, StopTimeGenerator generator) {
 		super(info, moveSpeed, generator);
 		this.addListener(new ActorGestureListener() {
 			@Override

@@ -9,7 +9,7 @@ import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
  */
 public class Square2dObjectItemType implements TypeInItem<Square2dObjectItem, Square2dObjectItemType> {
 
-	private Square2dObjectType type;
+	private Square2dObjectType<?> type;
 
 	@SuppressWarnings("unused")
 	private Square2dObjectItemType() {
@@ -19,7 +19,7 @@ public class Square2dObjectItemType implements TypeInItem<Square2dObjectItem, Sq
 	/**
 	 * @param type
 	 */
-	Square2dObjectItemType(Square2dObjectType type) {
+	Square2dObjectItemType(Square2dObjectType<?> type) {
 		this.type = type;
 	}
 
@@ -45,7 +45,7 @@ public class Square2dObjectItemType implements TypeInItem<Square2dObjectItem, Sq
 	/**
 	 * @return square2d-object-type
 	 */
-	public Square2dObjectType getSquare2dObjectType() {
+	public Square2dObjectType<?> getSquare2dObjectType() {
 		return this.type;
 	}
 }

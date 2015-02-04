@@ -3,7 +3,7 @@ package org.nognog.freeSquare.ui.square2d;
 import org.nognog.freeSquare.ui.square2d.actions.Square2dActions;
 import org.nognog.freeSquare.ui.square2d.actions.StopTimeGenerator;
 import org.nognog.freeSquare.ui.square2d.actions.TargetPositionGenerator;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType.LifeObjectType;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -33,7 +33,7 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	/**
 	 * @param info
 	 */
-	public FreeRunningObject(Square2dObjectType info) {
+	public FreeRunningObject(LifeObjectType info) {
 		this(info, defaultMoveSpeed);
 	}
 
@@ -41,7 +41,7 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	 * @param info
 	 * @param moveSpeed
 	 */
-	public FreeRunningObject(Square2dObjectType info, float moveSpeed) {
+	public FreeRunningObject(LifeObjectType info, float moveSpeed) {
 		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
 
@@ -50,7 +50,7 @@ public class FreeRunningObject extends LifeObject implements TargetPositionGener
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FreeRunningObject(Square2dObjectType type, float moveSpeed, StopTimeGenerator generator) {
+	public FreeRunningObject(LifeObjectType type, float moveSpeed, StopTimeGenerator generator) {
 		super(type);
 		this.isEnabledFreeRun = true;
 		this.moveSpeed = moveSpeed;

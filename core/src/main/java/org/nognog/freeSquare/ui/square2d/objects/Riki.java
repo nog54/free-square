@@ -29,7 +29,7 @@ public class Riki extends FreeRunningLandObject {
 	 * create Riki
 	 */
 	public Riki() {
-		super(Square2dObjectType.RIKI, moveSpeed);
+		super(Square2dObjectType.LifeObjectType.RIKI, moveSpeed);
 	}
 
 	@Override

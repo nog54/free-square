@@ -25,7 +25,7 @@ public class Square2dObjectTest {
 	@Test
 	public final void testAct() {
 		final Action mock = Mockito.mock(Action.class);
-		final Square2dObject object = new Square2dObject(Square2dObjectType.TOFU);
+		final Square2dObject object = new Square2dObject(Square2dObjectType.EatableObjectType.TOFU);
 		object.addAction(mock);
 		
 		final float delta = 0.1f;
@@ -38,7 +38,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetX() {
-		Square2dObject object = Square2dObjectType.TOFU.create();
+		Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
 		object.setX(1);
 		float expected1 = object.getX(Align.center);
 		float actual1 = object.getX();
@@ -47,7 +47,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetY() {
-		Square2dObject object = Square2dObjectType.TOFU.create();
+		Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
 		object.setY(0.3f);
 		float expected1 = object.getY(Align.bottom) + object.getOriginY();
 		float actual1 = object.getY();
@@ -56,8 +56,8 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testSetPositionFloatFloat() {
-		Square2dObject object1 = Square2dObjectType.TOFU.create();
-		Square2dObject object2 = Square2dObjectType.TOFU.create();
+		Square2dObject object1 = Square2dObjectType.EatableObjectType.TOFU.create();
+		Square2dObject object2 = Square2dObjectType.EatableObjectType.TOFU.create();
 		final float x = 0.1f;
 		final float y = 0.3f;
 
@@ -71,7 +71,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testSetSquare() {
-		Square2dObject object = Square2dObjectType.TOFU.create();
+		Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
 		Square2d square = mock(Square2d.class);
 		object.setSquare(square);
 		try {
@@ -86,7 +86,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetType() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObject object = type.create();
 			assertThat(object.getType(), is(type));
 		}
@@ -94,7 +94,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalWidth() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObject object = type.create();
 			assertThat(object.getLogicalWidth(), is(type.getLogicalWidth()));
 		}
@@ -102,7 +102,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalHeight() {
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType type : Square2dObjectType.EatableObjectType.values()) {
 			Square2dObject object = type.create();
 			final float ratio = type.getTexture().getHeight() / type.getTexture().getWidth();
 			assertThat(object.getLogicalHeight(), is(type.getLogicalWidth() * ratio));
@@ -113,7 +113,7 @@ public class Square2dObjectTest {
 	public final void testIsLandingOnSquare() {
 		for (Square2dType type : Square2dType.values()) {
 			Square2d square = type.create();
-			Square2dObject object = Square2dObjectType.TOFU.create();
+			Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
 			square.addSquareObject(object, MathUtils.random(square.getWidth()), MathUtils.random(square.getHeight()));
 
 			boolean expected1 = square.containsInSquareArea(object.getX(), object.getY());

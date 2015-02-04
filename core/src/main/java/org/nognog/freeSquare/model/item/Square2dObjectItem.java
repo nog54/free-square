@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.ObjectMap;
  */
 public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2dObjectItemType> implements DrawableItem {
 
-	private static final ObjectMap<Square2dObjectType, Square2dObjectItem> items = new ObjectMap<>();
+	private static final ObjectMap<Square2dObjectType<?>, Square2dObjectItem> items = new ObjectMap<>();
 
 	private Square2dObjectItem() {
 		super(null);
@@ -21,7 +21,7 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	/**
 	 * @param type
 	 */
-	private Square2dObjectItem(Square2dObjectType type) {
+	private Square2dObjectItem(Square2dObjectType<?> type) {
 		super(new Square2dObjectItemType(type));
 	}
 
@@ -29,7 +29,7 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	 * @param type
 	 * @return type instance
 	 */
-	public static synchronized Square2dObjectItem getInstance(Square2dObjectType type) {
+	public static synchronized Square2dObjectItem getInstance(Square2dObjectType<?> type) {
 		if (items.containsKey(type)) {
 			return items.get(type);
 		}
@@ -68,9 +68,10 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	 * @return all items
 	 */
 	public static Square2dObjectItem[] getAllItems() {
-		final Square2dObjectItem[] allItems = new Square2dObjectItem[Square2dObjectType.values().length];
+		final Square2dObjectType<?>[] allTypes = Square2dObjectType.Manager.getAllTypeValues();
+		final Square2dObjectItem[] allItems = new Square2dObjectItem[allTypes.length];
 		int i = 0;
-		for (Square2dObjectType type : Square2dObjectType.values()) {
+		for (Square2dObjectType<?> type : allTypes) {
 			allItems[i] = Square2dObjectItem.getInstance(type);
 			i++;
 		}
