@@ -1,6 +1,7 @@
-package org.nognog.freeSquare.ui.square2d;
+package org.nognog.freeSquare.ui.square2d.object;
 
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType.EatableObjectType;
+import org.nognog.freeSquare.ui.square2d.Direction;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType.EatableObjectType;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -8,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 /**
  * @author goshi 2015/01/30
  */
-public class EatableObject extends Square2dObject {
+public class EatableObject extends Square2dObject implements LandObject {
 
 	private final int baseAmount;
 	private final int originTextureRegionWidth;

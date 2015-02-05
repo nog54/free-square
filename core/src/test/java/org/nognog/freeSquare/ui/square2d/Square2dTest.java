@@ -13,7 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.ui.SquareObserver;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.Gdx;

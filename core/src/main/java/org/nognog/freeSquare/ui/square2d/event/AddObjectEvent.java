@@ -1,8 +1,8 @@
-package org.nognog.freeSquare.ui.square2d.events;
+package org.nognog.freeSquare.ui.square2d.event;
 
 import org.nognog.freeSquare.ui.SquareObserver;
 import org.nognog.freeSquare.ui.square2d.Square2dEvent;
-import org.nognog.freeSquare.ui.square2d.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObject;
 
 /**
  * @author goshi 2015/02/02

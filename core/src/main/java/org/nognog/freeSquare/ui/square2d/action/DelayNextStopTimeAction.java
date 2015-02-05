@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.ui.square2d.actions;
+package org.nognog.freeSquare.ui.square2d.action;
 
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 

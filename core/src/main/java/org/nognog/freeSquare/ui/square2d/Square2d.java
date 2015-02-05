@@ -4,8 +4,9 @@ import java.util.Comparator;
 
 import org.nognog.freeSquare.ui.Square;
 import org.nognog.freeSquare.ui.SquareObserver;
-import org.nognog.freeSquare.ui.square2d.events.AddObjectEvent;
-import org.nognog.freeSquare.ui.square2d.events.RemoveObjectEvent;
+import org.nognog.freeSquare.ui.square2d.event.AddObjectEvent;
+import org.nognog.freeSquare.ui.square2d.event.RemoveObjectEvent;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObject;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.graphics.g2d.Batch;

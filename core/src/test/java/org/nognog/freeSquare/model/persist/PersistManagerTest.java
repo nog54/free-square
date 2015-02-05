@@ -9,8 +9,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.player.PlayLog;
 
 @SuppressWarnings({ "javadoc", "static-method", "boxing" })
@@ -39,7 +39,7 @@ public class PersistManagerTest {
 		assertThat(PersistManager.isAlreadyPersisted(PersistItem.TEST_ITEM), is(false));
 		assertThat(PersistManager.delete(PersistItem.TEST_ITEM), is(false));
 
-		PersistManager.save(PersistItem.TEST_ITEM, new Life(new ShibaInu()));
+		PersistManager.save(PersistItem.TEST_ITEM, new Life(Family.RIKI));
 		Life revivalItem = PersistManager.load(PersistItem.TEST_ITEM);
 		assertThat(revivalItem, is(not(nullValue())));
 		assertThat(PersistManager.isAlreadyPersisted(PersistItem.TEST_ITEM), is(true));

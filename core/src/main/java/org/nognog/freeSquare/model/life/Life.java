@@ -56,9 +56,6 @@ public class Life implements PersistItemClass {
 		if (this.status == null) {
 			return false;
 		}
-		if (!this.family.isValid()) {
-			return false;
-		}
 		if (!this.status.isValid()) {
 			return false;
 		}

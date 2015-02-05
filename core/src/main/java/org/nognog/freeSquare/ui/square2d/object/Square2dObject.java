@@ -1,9 +1,10 @@
-package org.nognog.freeSquare.ui.square2d;
+package org.nognog.freeSquare.ui.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.ui.SquareObject;
 import org.nognog.freeSquare.ui.SquareObserver;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.Square2d;
+import org.nognog.freeSquare.ui.square2d.Square2dEvent;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

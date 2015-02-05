@@ -4,8 +4,8 @@ import java.util.Date;
 
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.item.Square2dObjectItem;
+import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.model.life.family.ShibaInu;
 import org.nognog.freeSquare.model.persist.PersistItem;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
@@ -15,12 +15,12 @@ import org.nognog.freeSquare.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.ui.ItemList;
 import org.nognog.freeSquare.ui.Menu;
 import org.nognog.freeSquare.ui.PlayerItemList;
-import org.nognog.freeSquare.ui.square2d.EatableObject;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.Square2dEvent;
-import org.nognog.freeSquare.ui.square2d.Square2dObject;
-import org.nognog.freeSquare.ui.square2d.events.AddObjectEvent;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType;
+import org.nognog.freeSquare.ui.square2d.event.AddObjectEvent;
+import org.nognog.freeSquare.ui.square2d.object.EatableObject;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.ui.square2d.squares.Square2dType;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -68,7 +68,7 @@ public class FreeSquare extends ApplicationAdapter {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = Square2dType.GRASSY_SQUARE1.create();
+		this.square = Square2dType.GRASSY_SQUARE1_SMALL.create();
 		this.square.setX(-this.square.getWidth() / 2);
 		// for (Square2dObjectType object : Square2dObjectType.values()) {
 		// for (int i = 0; i < 1; i++) {
@@ -85,7 +85,6 @@ public class FreeSquare extends ApplicationAdapter {
 
 		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
 		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY() + Math.max(this.square.getHeight(), logicalCameraHeight));
-
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
@@ -336,7 +335,7 @@ public class FreeSquare extends ApplicationAdapter {
 		this.life = PersistItem.LIFE1.load();
 		if (this.life == null) {
 			System.out.println("new life"); //$NON-NLS-1$
-			this.life = new Life(new ShibaInu());
+			this.life = new Life(Family.RIKI);
 		}
 		this.life.getStatus().addCuriosity(1);
 		this.lastRun = LastPlay.getLastPlayDate();

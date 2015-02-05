@@ -1,8 +1,8 @@
-package org.nognog.freeSquare.ui.square2d.actions;
+package org.nognog.freeSquare.ui.square2d.action;
 
 import org.nognog.freeSquare.ui.square2d.Direction;
-import org.nognog.freeSquare.ui.square2d.EatableObject;
-import org.nognog.freeSquare.ui.square2d.LifeObject;
+import org.nognog.freeSquare.ui.square2d.object.EatableObject;
+import org.nognog.freeSquare.ui.square2d.object.LifeObject;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -136,7 +136,7 @@ public class EatAction extends Action {
 		}
 
 		this.timeFromLastEat += delta;
-		if (eater.getDistanceTo(this.eatObject) > this.eatObject.getWidth() / 2) {
+		if (eater.getDistanceTo(this.eatObject) > (this.eatObject.getWidth() + eater.getWidth()) / 4) {
 			this.moveTowardEatObject(delta);
 			return false;
 		}

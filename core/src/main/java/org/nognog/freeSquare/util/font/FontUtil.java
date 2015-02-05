@@ -14,12 +14,13 @@ public class FontUtil {
 
 	private static final String HIRAGANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔぁぃぅぇぉっゃゅょゎ"; //$NON-NLS-1$
 	private static final String KATAKANA = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポヴァィゥェォッャュョヮヶ"; //$NON-NLS-1$
-	private static final String USE_KANJI = "風水火土雷氷光闇"; //$NON-NLS-1$
+	private static final String USE_KANJI = "大中小風水火土雷氷光闇"; //$NON-NLS-1$
+	private static final String OTHERS = "（）"; //$NON-NLS-1$
 	private static final String ALL_CHARACTORS = createAllCharactors();
 
 	private static String createAllCharactors() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(FreeTypeFontGenerator.DEFAULT_CHARS).append(HIRAGANA).append(KATAKANA).append(USE_KANJI);
+		builder.append(FreeTypeFontGenerator.DEFAULT_CHARS).append(HIRAGANA).append(KATAKANA).append(USE_KANJI).append(OTHERS);
 		return builder.toString();
 	}
 

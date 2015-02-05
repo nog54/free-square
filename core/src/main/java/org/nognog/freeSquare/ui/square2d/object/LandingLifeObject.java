@@ -1,9 +1,10 @@
-package org.nognog.freeSquare.ui.square2d;
+package org.nognog.freeSquare.ui.square2d.object;
 
 import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
-import org.nognog.freeSquare.ui.square2d.actions.Square2dActions;
-import org.nognog.freeSquare.ui.square2d.actions.StopTimeGenerator;
-import org.nognog.freeSquare.ui.square2d.objects.Square2dObjectType.LifeObjectType;
+import org.nognog.freeSquare.ui.square2d.Square2dUtils;
+import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
+import org.nognog.freeSquare.ui.square2d.action.StopTimeGenerator;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -15,12 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2015/01/11
  */
-public class FreeRunningLandObject extends FreeRunningObject implements LandObject {
+public class LandingLifeObject extends LifeObject implements LandObject {
 
 	/**
 	 * @param info
 	 */
-	public FreeRunningLandObject(LifeObjectType info) {
+	public LandingLifeObject(LifeObjectType info) {
 		this(info, defaultMoveSpeed);
 	}
 
@@ -28,7 +29,7 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param info
 	 * @param moveSpeed
 	 */
-	public FreeRunningLandObject(LifeObjectType info, float moveSpeed) {
+	public LandingLifeObject(LifeObjectType info, float moveSpeed) {
 		this(info, moveSpeed, defaultStopTimeGenerator);
 	}
 
@@ -37,13 +38,13 @@ public class FreeRunningLandObject extends FreeRunningObject implements LandObje
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FreeRunningLandObject(LifeObjectType info, float moveSpeed, StopTimeGenerator generator) {
+	public LandingLifeObject(LifeObjectType info, float moveSpeed, StopTimeGenerator generator) {
 		super(info, moveSpeed, generator);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				if (!FreeRunningLandObject.this.isLandingOnSquare()) {
-					FreeRunningLandObject.this.goToSquareNearestVertex();
+				if (!LandingLifeObject.this.isLandingOnSquare()) {
+					LandingLifeObject.this.goToSquareNearestVertex();
 				}
 			}
 		});

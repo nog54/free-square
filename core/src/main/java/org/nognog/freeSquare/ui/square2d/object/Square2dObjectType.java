@@ -1,13 +1,11 @@
-package org.nognog.freeSquare.ui.square2d.objects;
+package org.nognog.freeSquare.ui.square2d.object;
 
 import static org.nognog.freeSquare.Messages.getString;
 
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.ui.square2d.EatableObject;
-import org.nognog.freeSquare.ui.square2d.LifeObject;
-import org.nognog.freeSquare.ui.square2d.Square2dObject;
+import org.nognog.freeSquare.model.life.Family;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,33 +27,31 @@ public interface Square2dObjectType<T extends Square2dObject> {
 	T create();
 
 	public static enum LifeObjectType implements Square2dObjectType<LifeObject> {
-		RIKI(getString("riki"), Resources.rikiPath, 100, Riki.class), //$NON-NLS-1$
+		RIKI(Family.RIKI, Resources.rikiPath, 100, FryingLifeObject.class),
+		SMALL_RIKI(Family.SMALL_RIKI, RIKI, 80, RIKI.getColor()),
+		BIG_RIKI(Family.BIG_RIKI, RIKI, 120, RIKI.getColor()),
+		FLY_RIKI(Family.FLY_RIKI, Resources.rikiPath, 100, FryingLifeObject.class),
+		FLY_SMALL_RIKI(Family.SMALL_FLY_RIKI, RIKI, 80, RIKI.getColor()),
+		FLY_BIG_RIKI(Family.BIG_FLY_RIKI, RIKI, 120, RIKI.getColor()),
 
 		;
 
-		private LifeObjectType(String name, String texturePath, float logicalWidth) {
-			this(name, texturePath, logicalWidth, Colors.WHITE, LifeObject.class);
+
+		private <T extends LifeObject> LifeObjectType(Family family, String texturePath, float logicalWidth, Class<T> klass) {
+			this(family, texturePath, logicalWidth, Colors.WHITE, klass);
 		}
 
-		private <T extends LifeObject> LifeObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
-			this(name, texturePath, logicalWidth, Colors.WHITE, klass);
-		}
-
-		private LifeObjectType(String name, String texturePath, float logicalWidth, Color color) {
-			this(name, texturePath, logicalWidth, color, LifeObject.class);
-		}
-
-		private <T extends LifeObject> LifeObjectType(String name, String texturePath, float logicalWidth, Color color, Class<T> klass) {
-			this(name, new Texture(texturePath), logicalWidth, color, klass);
+		private <T extends LifeObject> LifeObjectType(Family family, String texturePath, float logicalWidth, Color color, Class<T> klass) {
+			this(family, new Texture(texturePath), logicalWidth, color, klass);
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T extends LifeObject> LifeObjectType(LifeObjectType type, String name, float logicalWidth, Color color) {
-			this(name, type.texture, logicalWidth, color, (Class<T>) type.klass);
+		private <T extends LifeObject> LifeObjectType(Family family, LifeObjectType type, float logicalWidth, Color color) {
+			this(family, type.texture, logicalWidth, color, (Class<T>) type.klass);
 		}
 
-		private <T extends LifeObject> LifeObjectType(String name, Texture texture, float logicalWidth, Color color, Class<T> klass) {
-			this.name = name;
+		private <T extends LifeObject> LifeObjectType(Family family, Texture texture, float logicalWidth, Color color, Class<T> klass) {
+			this.family = family;
 			this.texture = texture;
 			this.logicalWidth = logicalWidth;
 			this.color = color;
@@ -63,14 +59,14 @@ public interface Square2dObjectType<T extends Square2dObject> {
 		}
 
 		private final Class<?> klass;
-		private final String name;
+		private final Family family;
 		private final Texture texture;
 		private final float logicalWidth;
 		private final Color color;
 
 		@Override
 		public String getName() {
-			return this.name;
+			return this.family.getName();
 		}
 
 		@Override
@@ -302,9 +298,9 @@ public interface Square2dObjectType<T extends Square2dObject> {
 		}
 
 	}
-	
-	public static class Manager{
-		public static Square2dObjectType<?>[] getAllTypeValues(){
+
+	public static class Manager {
+		public static Square2dObjectType<?>[] getAllTypeValues() {
 			int allValuesLength = EatableObjectType.values().length + LifeObjectType.values().length + OtherObjectType.values().length;
 			final Square2dObjectType<?>[] allValues = new Square2dObjectType[allValuesLength];
 			int i = 0;

@@ -1,7 +1,7 @@
-package org.nognog.freeSquare.ui.square2d.actions;
+package org.nognog.freeSquare.ui.square2d.action;
 
-import org.nognog.freeSquare.ui.square2d.EatableObject;
-import org.nognog.freeSquare.ui.square2d.Square2dObject;
+import org.nognog.freeSquare.ui.square2d.object.EatableObject;
+import org.nognog.freeSquare.ui.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
