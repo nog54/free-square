@@ -68,7 +68,7 @@ public class FreeSquare extends ApplicationAdapter {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		this.square = Square2dType.GRASSY_SQUARE1.create();
 		this.square.setX(-this.square.getWidth() / 2);
 		// for (Square2dObjectType object : Square2dObjectType.values()) {
 		// for (int i = 0; i < 1; i++) {

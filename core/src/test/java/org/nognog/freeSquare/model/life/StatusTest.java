@@ -79,9 +79,9 @@ public class StatusTest {
 	@Test
 	public void testGetCondition() {
 		final Status status = new Status();
-		final int actual = status.getCondition();
+		final double actual = status.getCondition();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -92,22 +92,22 @@ public class StatusTest {
 	public void testAddCondition() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addCondition(addend1);
-		final int actual1 = status.getCondition();
-		final int expected1 = addend1;
+		final double actual1 = status.getCondition();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addCondition(addend2);
-		final int actual2 = status.getCondition();
-		final int expected2 = 0;
+		final double actual2 = status.getCondition();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addCondition(addend3);
-		final int actual3 = status.getCondition();
-		final int expected3 = 100;
+		final double actual3 = status.getCondition();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -117,9 +117,9 @@ public class StatusTest {
 	@Test
 	public void testGetHunger() {
 		final Status status = new Status();
-		final int actual = status.getHunger();
+		final double actual = status.getHunger();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -130,22 +130,22 @@ public class StatusTest {
 	public void testAddHunger() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addHunger(addend1);
-		final int actual1 = status.getHunger();
-		final int expected1 = addend1;
+		final double actual1 = status.getHunger();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addHunger(addend2);
-		final int actual2 = status.getHunger();
-		final int expected2 = 0;
+		final double actual2 = status.getHunger();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addHunger(addend3);
-		final int actual3 = status.getHunger();
-		final int expected3 = 100;
+		final double actual3 = status.getHunger();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -155,9 +155,9 @@ public class StatusTest {
 	@Test
 	public void testGetPower() {
 		final Status status = new Status();
-		final int actual = status.getPower();
+		final double actual = status.getPower();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -168,22 +168,22 @@ public class StatusTest {
 	public void testAddPower() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addPower(addend1);
-		final int actual1 = status.getPower();
-		final int expected1 = addend1;
+		final double actual1 = status.getPower();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addPower(addend2);
-		final int actual2 = status.getPower();
-		final int expected2 = 0;
+		final double actual2 = status.getPower();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addPower(addend3);
-		final int actual3 = status.getPower();
-		final int expected3 = 1000;
+		final double actual3 = status.getPower();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -193,9 +193,9 @@ public class StatusTest {
 	@Test
 	public void testGetAgility() {
 		final Status status = new Status();
-		final int actual = status.getAgility();
+		final double actual = status.getAgility();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -206,22 +206,22 @@ public class StatusTest {
 	public void testAddAgility() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addAgility(addend1);
-		final int actual1 = status.getAgility();
-		final int expected1 = addend1;
+		final double actual1 = status.getAgility();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addAgility(addend2);
-		final int actual2 = status.getAgility();
-		final int expected2 = 0;
+		final double actual2 = status.getAgility();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addAgility(addend3);
-		final int actual3 = status.getAgility();
-		final int expected3 = 1000;
+		final double actual3 = status.getAgility();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -231,9 +231,9 @@ public class StatusTest {
 	@Test
 	public void testGetFlexibility() {
 		final Status status = new Status();
-		final int actual = status.getFlexibility();
+		final double actual = status.getFlexibility();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -244,22 +244,22 @@ public class StatusTest {
 	public void testAddFlexibility() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addFlexibility(addend1);
-		final int actual1 = status.getFlexibility();
-		final int expected1 = addend1;
+		final double actual1 = status.getFlexibility();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addFlexibility(addend2);
-		final int actual2 = status.getFlexibility();
-		final int expected2 = 0;
+		final double actual2 = status.getFlexibility();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addFlexibility(addend3);
-		final int actual3 = status.getFlexibility();
-		final int expected3 = 1000;
+		final double actual3 = status.getFlexibility();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -269,9 +269,9 @@ public class StatusTest {
 	@Test
 	public void testGetFortitude() {
 		final Status status = new Status();
-		final int actual = status.getFortitude();
+		final double actual = status.getFortitude();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -282,22 +282,22 @@ public class StatusTest {
 	public void testAddFortitude() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addFortitude(addend1);
-		final int actual1 = status.getFortitude();
-		final int expected1 = addend1;
+		final double actual1 = status.getFortitude();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addFortitude(addend2);
-		final int actual2 = status.getFortitude();
-		final int expected2 = 0;
+		final double actual2 = status.getFortitude();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addFortitude(addend3);
-		final int actual3 = status.getFortitude();
-		final int expected3 = 1000;
+		final double actual3 = status.getFortitude();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -307,9 +307,9 @@ public class StatusTest {
 	@Test
 	public void testGetKnowledge() {
 		final Status status = new Status();
-		final int actual = status.getKnowledge();
+		final double actual = status.getKnowledge();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -320,22 +320,22 @@ public class StatusTest {
 	public void testAddKnowledge() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addKnowledge(addend1);
-		final int actual1 = status.getKnowledge();
-		final int expected1 = addend1;
+		final double actual1 = status.getKnowledge();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addKnowledge(addend2);
-		final int actual2 = status.getKnowledge();
-		final int expected2 = 0;
+		final double actual2 = status.getKnowledge();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addKnowledge(addend3);
-		final int actual3 = status.getKnowledge();
-		final int expected3 = 1000;
+		final double actual3 = status.getKnowledge();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -345,9 +345,9 @@ public class StatusTest {
 	@Test
 	public void testGetSmart() {
 		final Status status = new Status();
-		final int actual = status.getSmart();
+		final double actual = status.getSmart();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -358,22 +358,22 @@ public class StatusTest {
 	public void testAddSmart() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addSmart(addend1);
-		final int actual1 = status.getSmart();
-		final int expected1 = addend1;
+		final double actual1 = status.getSmart();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addSmart(addend2);
-		final int actual2 = status.getSmart();
-		final int expected2 = 0;
+		final double actual2 = status.getSmart();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addSmart(addend3);
-		final int actual3 = status.getSmart();
-		final int expected3 = 1000;
+		final double actual3 = status.getSmart();
+		final double expected3 = 1000;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -383,9 +383,9 @@ public class StatusTest {
 	@Test
 	public void testGetCuriosity() {
 		final Status status = new Status();
-		final int actual = status.getCuriosity();
+		final double actual = status.getCuriosity();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -396,22 +396,22 @@ public class StatusTest {
 	public void testAddCuriosity() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addCuriosity(addend1);
-		final int actual1 = status.getCuriosity();
-		final int expected1 = addend1;
+		final double actual1 = status.getCuriosity();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addCuriosity(addend2);
-		final int actual2 = status.getCuriosity();
-		final int expected2 = 0;
+		final double actual2 = status.getCuriosity();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addCuriosity(addend3);
-		final int actual3 = status.getCuriosity();
-		final int expected3 = 100;
+		final double actual3 = status.getCuriosity();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -421,9 +421,9 @@ public class StatusTest {
 	@Test
 	public void testGetCommunication() {
 		final Status status = new Status();
-		final int actual = status.getCommunication();
+		final double actual = status.getCommunication();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -434,22 +434,22 @@ public class StatusTest {
 	public void testAddCommunication() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addCommunication(addend1);
-		final int actual1 = status.getCommunication();
-		final int expected1 = addend1;
+		final double actual1 = status.getCommunication();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addCommunication(addend2);
-		final int actual2 = status.getCommunication();
-		final int expected2 = 0;
+		final double actual2 = status.getCommunication();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addCommunication(addend3);
-		final int actual3 = status.getCommunication();
-		final int expected3 = 100;
+		final double actual3 = status.getCommunication();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -459,9 +459,9 @@ public class StatusTest {
 	@Test
 	public void testGetTolerance() {
 		final Status status = new Status();
-		final int actual = status.getTolerance();
+		final double actual = status.getTolerance();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -472,22 +472,22 @@ public class StatusTest {
 	public void testAddTolerance() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addTolerance(addend1);
-		final int actual1 = status.getTolerance();
-		final int expected1 = addend1;
+		final double actual1 = status.getTolerance();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addTolerance(addend2);
-		final int actual2 = status.getTolerance();
-		final int expected2 = 0;
+		final double actual2 = status.getTolerance();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addTolerance(addend3);
-		final int actual3 = status.getTolerance();
-		final int expected3 = 100;
+		final double actual3 = status.getTolerance();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -497,9 +497,9 @@ public class StatusTest {
 	@Test
 	public void testGetDefiance() {
 		final Status status = new Status();
-		final int actual = status.getDefiance();
+		final double actual = status.getDefiance();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -510,22 +510,22 @@ public class StatusTest {
 	public void testAddDefiance() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addDefiance(addend1);
-		final int actual1 = status.getDefiance();
-		final int expected1 = addend1;
+		final double actual1 = status.getDefiance();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addDefiance(addend2);
-		final int actual2 = status.getDefiance();
-		final int expected2 = 0;
+		final double actual2 = status.getDefiance();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addDefiance(addend3);
-		final int actual3 = status.getDefiance();
-		final int expected3 = 100;
+		final double actual3 = status.getDefiance();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -535,9 +535,9 @@ public class StatusTest {
 	@Test
 	public void testGetCalm() {
 		final Status status = new Status();
-		final int actual = status.getCalm();
+		final double actual = status.getCalm();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -548,22 +548,22 @@ public class StatusTest {
 	public void testAddClam() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addClam(addend1);
-		final int actual1 = status.getCalm();
-		final int expected1 = addend1;
+		final double actual1 = status.getCalm();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addClam(addend2);
-		final int actual2 = status.getCalm();
-		final int expected2 = 0;
+		final double actual2 = status.getCalm();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addClam(addend3);
-		final int actual3 = status.getCalm();
-		final int expected3 = 100;
+		final double actual3 = status.getCalm();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -573,9 +573,9 @@ public class StatusTest {
 	@Test
 	public void testGetStress() {
 		final Status status = new Status();
-		final int actual = status.getStress();
+		final double actual = status.getStress();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -586,22 +586,22 @@ public class StatusTest {
 	public void testAddStress() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addStress(addend1);
-		final int actual1 = status.getStress();
-		final int expected1 = addend1;
+		final double actual1 = status.getStress();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addStress(addend2);
-		final int actual2 = status.getStress();
-		final int expected2 = 0;
+		final double actual2 = status.getStress();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addStress(addend3);
-		final int actual3 = status.getStress();
-		final int expected3 = 100;
+		final double actual3 = status.getStress();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -611,9 +611,9 @@ public class StatusTest {
 	@Test
 	public void testGetMasculinity() {
 		final Status status = new Status();
-		final int actual = status.getMasculinity();
+		final double actual = status.getMasculinity();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -624,22 +624,22 @@ public class StatusTest {
 	public void testAddMasculinity() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addMasculinity(addend1);
-		final int actual1 = status.getMasculinity();
-		final int expected1 = addend1;
+		final double actual1 = status.getMasculinity();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addMasculinity(addend2);
-		final int actual2 = status.getMasculinity();
-		final int expected2 = 0;
+		final double actual2 = status.getMasculinity();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addMasculinity(addend3);
-		final int actual3 = status.getMasculinity();
-		final int expected3 = 100;
+		final double actual3 = status.getMasculinity();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -649,9 +649,9 @@ public class StatusTest {
 	@Test
 	public void testGetEffeminacy() {
 		final Status status = new Status();
-		final int actual = status.getAge();
+		final double actual = status.getAge();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -662,22 +662,22 @@ public class StatusTest {
 	public void testAddEffeminacy() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addEffeminacy(addend1);
-		final int actual1 = status.getEffeminacy();
-		final int expected1 = addend1;
+		final double actual1 = status.getEffeminacy();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addEffeminacy(addend2);
-		final int actual2 = status.getEffeminacy();
-		final int expected2 = 0;
+		final double actual2 = status.getEffeminacy();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addEffeminacy(addend3);
-		final int actual3 = status.getEffeminacy();
-		final int expected3 = 100;
+		final double actual3 = status.getEffeminacy();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 
@@ -687,9 +687,9 @@ public class StatusTest {
 	@Test
 	public void testGetGift() {
 		final Status status = new Status();
-		final int actual = status.getGift();
+		final double actual = status.getGift();
 
-		final int expected = 0;
+		final double expected = 0;
 		assertThat(actual, is(expected));
 	}
 
@@ -700,22 +700,22 @@ public class StatusTest {
 	public void testAddGift() {
 		final Status status = new Status();
 
-		final int addend1 = 15;
+		final double addend1 = 15;
 		status.addGift(addend1);
-		final int actual1 = status.getGift();
-		final int expected1 = addend1;
+		final double actual1 = status.getGift();
+		final double expected1 = addend1;
 		assertThat(actual1, is(expected1));
 
-		final int addend2 = -30;
+		final double addend2 = -30;
 		status.addGift(addend2);
-		final int actual2 = status.getGift();
-		final int expected2 = 0;
+		final double actual2 = status.getGift();
+		final double expected2 = 0;
 		assertThat(actual2, is(expected2));
 
-		final int addend3 = 50000;
+		final double addend3 = 50000;
 		status.addGift(addend3);
-		final int actual3 = status.getGift();
-		final int expected3 = 100;
+		final double actual3 = status.getGift();
+		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}
 

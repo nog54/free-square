@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.ui.square2d.object;
 
 import org.nognog.freeSquare.Resources;
+import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.ui.square2d.Direction;
 import org.nognog.freeSquare.ui.square2d.Square2d;
 import org.nognog.freeSquare.ui.square2d.Square2dEvent;
@@ -28,60 +29,63 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  */
 public abstract class LifeObject extends Square2dObject implements TargetPositionGenerator {
 
-	private static final int eatAmountPerOnce = 20;
-	private static final float eatInterval = 1;
-	
 	private static final Texture frameTexture = new Texture(Gdx.files.internal(Resources.frame1Path));
-	protected static final float defaultMoveSpeed = 100;
 	protected static final StopTimeGenerator defaultStopTimeGenerator = new StopTimeGenerator() {
 		@Override
 		public float nextStopTime() {
 			return MathUtils.random(0, 1f);
 		}
 	};
-	
 
-	private Image frame;
-	private float moveSpeed; // [logicalWidth / sec]
+	private final Life life;
 
-	private boolean isEnabledUpDownRoutineAction;
+	private int eatAmountPerSec; // [amount / sec]
+
 	private Action upDownRoutineAction;
+	private boolean isEnabledUpDownRoutineAction;
 
 	protected Action freeRunningAction = null;
 	private boolean isEnabledFreeRun;
-	
+
 	protected SequenceAction currectTryingMoveAndEatAction;
 	protected EatAction currentEatAction;
 	protected Action setFreeRunModeAction;
 
-	private StopTimeGenerator stopTimeGenerator;
+	private StopTimeGenerator stopTime;
+
+	/**
+	 * @param life
+	 */
+	public LifeObject(Life life) {
+		this(LifeObjectType.getBindingLifeObjectType(life), life);
+	}
 
 	/**
 	 * @param type
 	 */
 	public LifeObject(LifeObjectType type) {
-		this(type, defaultMoveSpeed, defaultStopTimeGenerator);
+		this(type, new Life(type.getFamily()));
 	}
 
 	/**
 	 * @param type
-	 * @param moveSpeed
-	 * @param generator
+	 * @param life
 	 */
-	public LifeObject(LifeObjectType type, float moveSpeed, StopTimeGenerator generator) {
+	public LifeObject(LifeObjectType type, Life life) {
 		super(type);
+		this.life = life;
 		this.isEnabledFreeRun = true;
-		this.moveSpeed = moveSpeed;
-		this.stopTimeGenerator = generator;
+		this.eatAmountPerSec = type.getEatAmountPerSec();
+		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
 		this.upDownRoutineAction = createUpDownAction();
 		this.addAction(this.upDownRoutineAction);
 		this.isEnabledUpDownRoutineAction = true;
-		
-		this.frame = new Image(frameTexture);
-		this.frame.setWidth(this.getWidth());
-		this.frame.setHeight(this.getHeight());
-		this.addActor(this.frame);
+
+		Image frame = new Image(frameTexture);
+		frame.setWidth(this.getWidth());
+		frame.setHeight(this.getHeight());
+		this.addActor(frame);
 
 		this.addListener(new ActorGestureListener() {
 			@Override
@@ -123,19 +127,21 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this.square.notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
 		return actuallyEatAmount;
 	}
-	
+
 	/**
-	 * @param moveSpeed
+	 * @return the life
 	 */
-	public void setMoveSpeed(float moveSpeed) {
-		this.moveSpeed = moveSpeed;
+	public Life getLife() {
+		return this.life;
 	}
 
 	/**
-	 * @return move speed
+	 * @param lifeObject
+	 * @return calculated moveSpeed
 	 */
-	public float getMoveSpeed() {
-		return this.moveSpeed;
+	public static float toMoveSpeed(LifeObject lifeObject) {
+		final float moveSpeed = (float) (lifeObject.getLife().getStatus().getAgility() / 4);
+		return Math.max(50, moveSpeed);
 	}
 
 	/**
@@ -143,7 +149,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 */
 	public void setStopTimeGenerator(StopTimeGenerator generator) {
 		if (generator != null) {
-			this.stopTimeGenerator = generator;
+			this.stopTime = generator;
 		}
 	}
 
@@ -151,7 +157,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return using stopTimeGenerator
 	 */
 	public StopTimeGenerator getStopTimeGenerator() {
-		return this.stopTimeGenerator;
+		return this.stopTime;
 	}
 
 	/**
@@ -175,7 +181,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		}
 		this.isEnabledUpDownRoutineAction = enable;
 	}
-	
+
 	/**
 	 * @param enable
 	 * 
@@ -191,23 +197,23 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		}
 		this.isEnabledFreeRun = enable;
 	}
-	
+
 	/**
 	 * @return true if free run is enabled.
 	 */
 	public boolean isEnabledFreeRun() {
 		return this.isEnabledFreeRun;
 	}
-	
+
 	@Override
 	public void setSquare(Square2d square) {
 		super.setSquare(square);
 		if (this.freeRunningAction == null) {
-			this.freeRunningAction = Square2dActions.freeRunning(this.stopTimeGenerator, this, this.moveSpeed);
+			this.freeRunningAction = Square2dActions.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
 			this.addAction(this.freeRunningAction);
 		}
 	}
-	
+
 	@Override
 	public void act(float delta) {
 		final EatableObject nearestEatableLandingObject = this.getNearestEatableLandingObject();
@@ -243,11 +249,11 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		}
 		return result;
 	}
-	
+
 	private void setEatAction(EatableObject eatObject) {
 		final boolean wasEnabledFreeRun = this.isEnabledFreeRun();
 		this.setEnableFreeRun(false);
-		EatAction eatAction = Square2dActions.eat(eatObject, eatAmountPerOnce, EatAction.UNTIL_RUN_OUT, eatInterval, this.getMoveSpeed());
+		EatAction eatAction = Square2dActions.eat(eatObject, this.eatAmountPerSec, EatAction.UNTIL_RUN_OUT);
 		this.setFreeRunModeAction = new Action() {
 			@Override
 			public boolean act(float delta) {
@@ -283,5 +289,4 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		Action hop = Actions.sequence(up, down);
 		this.addAction(hop);
 	}
-	
 }

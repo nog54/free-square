@@ -21,7 +21,6 @@ public class EatAction extends Action {
 	private int eatAmount;
 	private int eatCount = UNTIL_RUN_OUT;
 	private float eatInterval;
-	private float moveSpeed;
 
 	private float timeFromLastEat = 0;
 	private int executedCount = 0;
@@ -38,13 +37,11 @@ public class EatAction extends Action {
 	 * @param eatObject
 	 * @param eatAmount
 	 * @param eatInterval
-	 * @param moveSpeed
 	 */
-	public EatAction(EatableObject eatObject, int eatAmount, float eatInterval, float moveSpeed) {
+	public EatAction(EatableObject eatObject, int eatAmount, float eatInterval) {
 		this.eatObject = eatObject;
 		this.eatAmount = eatAmount;
 		this.eatInterval = eatInterval;
-		this.setMoveSpeed(moveSpeed);
 	}
 
 	/**
@@ -93,21 +90,6 @@ public class EatAction extends Action {
 	}
 
 	/**
-	 * @return the moveSpeed
-	 */
-	public float getMoveSpeed() {
-		return this.moveSpeed;
-	}
-
-	/**
-	 * @param moveSpeed
-	 *            the moveSpeed to set
-	 */
-	public void setMoveSpeed(float moveSpeed) {
-		this.moveSpeed = moveSpeed;
-	}
-
-	/**
 	 * @return the eatInterval
 	 */
 	public float getEatInterval() {
@@ -121,13 +103,18 @@ public class EatAction extends Action {
 	public void setEatInterval(float eatInterval) {
 		this.eatInterval = eatInterval;
 	}
+	
+	private LifeObject getEater() {
+		return (LifeObject) this.actor;
+	}
 
 	@Override
 	public boolean act(float delta) {
 		if (this.isRequestedForceFinish) {
 			return true;
 		}
-		LifeObject eater = (LifeObject) this.actor;
+		
+		LifeObject eater = this.getEater();
 		if (this.eatCount != UNTIL_RUN_OUT && this.executedCount >= this.eatCount) {
 			return true;
 		}
@@ -159,15 +146,12 @@ public class EatAction extends Action {
 	}
 
 	private void moveTowardEatObject(float delta) {
-		if (this.moveSpeed == 0) {
-			throw new RuntimeException("moveSpeed is zero."); //$NON-NLS-1$
-		}
 		final float targetPositionX = this.eatObject.getX();
 		final float targetPositionY = this.eatObject.getY();
 		final float remainingDistanceX = targetPositionX - this.actor.getX();
 		final float remainingDistanceY = targetPositionY - this.actor.getY();
 		final float theta = MathUtils.atan2(targetPositionY - this.actor.getY(), targetPositionX - this.actor.getX());
-		final float r = delta * this.moveSpeed;
+		final float r = delta * LifeObject.toMoveSpeed(this.getEater());
 		final float moveX = r * MathUtils.cos(theta);
 		if (Math.abs(remainingDistanceX) < Math.abs(moveX)) {
 			this.actor.setPosition(targetPositionX, targetPositionY);

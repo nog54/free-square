@@ -8,60 +8,60 @@ import org.nognog.freeSquare.model.SelfValidatable;
 public class Status implements SelfValidatable {
 
 	private int age; // 年
-	private int condition; // コンディション
-	private int hunger; // 空腹度
-	private int power; // 力
-	private int agility; // 敏捷性
-	private int flexibility; // 柔軟性
-	private int fortitude; // 忍耐力
-	private int knowledge; // 知識
-	private int smart; // かしこさ
-	private int curiosity; // 好奇心
-	private int communication; // 交流力
-	private int tolerance; // 包容力
-	private int defiance; // 反抗心
-	private int calm; // 落ち着き
-	private int stress; // ストレス
-	private int masculinity; // 男らしさ
-	private int effeminacy; // 女らしさ
-	private int gift; // 個体値
+	private double condition; // コンディション
+	private double hunger; // 空腹度
+	private double power; // 力
+	private double agility; // 敏捷性
+	private double flexibility; // 柔軟性
+	private double fortitude; // 忍耐力
+	private double knowledge; // 知識
+	private double smart; // かしこさ
+	private double curiosity; // 好奇心
+	private double communication; // 交流力
+	private double tolerance; // 包容力
+	private double defiance; // 反抗心
+	private double calm; // 落ち着き
+	private double stress; // ストレス
+	private double masculinity; // 男らしさ
+	private double effeminacy; // 女らしさ
+	private double gift; // 個体値
 
 	private static final int MIN_AGE = 0;
 	private static final int MAX_AGE = 1000;
-	private static final int MIN_CONDITION = 0;
-	private static final int MAX_CONDITION = 100;
-	private static final int MIN_HUNGER = 0;
-	private static final int MAX_HUNGER = 100;
-	private static final int MIN_POWER = 0;
-	private static final int MAX_POWER = 1000;
-	private static final int MIN_AGILITY = 0;
-	private static final int MAX_AGILITY = 1000;
-	private static final int MIN_FLEXIBILITY = 0;
-	private static final int MAX_FLEXIBILITY = 1000;
-	private static final int MIN_FORTITUDE = 0;
-	private static final int MAX_FORTITUDE = 1000;
-	private static final int MIN_KNOWLEDGE = 0;
-	private static final int MAX_KNOWLEDGE = 1000;
-	private static final int MIN_SMART = 0;
-	private static final int MAX_SMART = 1000;
-	private static final int MIN_CURIOSITY = 0;
-	private static final int MAX_CURIOSITY = 100;
-	private static final int MIN_COMMUNICATION = 0;
-	private static final int MAX_COMMUNICATION = 100;
-	private static final int MIN_TOLERANCE = 0;
-	private static final int MAX_TOLERANCE = 100;
-	private static final int MIN_DEFIANCE = 0;
-	private static final int MAX_DEFIANCE = 100;
-	private static final int MIN_CALM = 0;
-	private static final int MAX_CALM = 100;
-	private static final int MIN_STRESS = 0;
-	private static final int MAX_STRESS = 100;
-	private static final int MIN_MASCULINITY = 0;
-	private static final int MAX_MASCULINITY = 100;
-	private static final int MIN_EFFEMINACY = 0;
-	private static final int MAX_EFFEMINACY = 100;
-	private static final int MIN_GIFT = 0;
-	private static final int MAX_GIFT = 100;
+	private static final double MIN_CONDITION = 0;
+	private static final double MAX_CONDITION = 100;
+	private static final double MIN_HUNGER = 0;
+	private static final double MAX_HUNGER = 100;
+	private static final double MIN_POWER = 0;
+	private static final double MAX_POWER = 1000;
+	private static final double MIN_AGILITY = 0;
+	private static final double MAX_AGILITY = 1000;
+	private static final double MIN_FLEXIBILITY = 0;
+	private static final double MAX_FLEXIBILITY = 1000;
+	private static final double MIN_FORTITUDE = 0;
+	private static final double MAX_FORTITUDE = 1000;
+	private static final double MIN_KNOWLEDGE = 0;
+	private static final double MAX_KNOWLEDGE = 1000;
+	private static final double MIN_SMART = 0;
+	private static final double MAX_SMART = 1000;
+	private static final double MIN_CURIOSITY = 0;
+	private static final double MAX_CURIOSITY = 100;
+	private static final double MIN_COMMUNICATION = 0;
+	private static final double MAX_COMMUNICATION = 100;
+	private static final double MIN_TOLERANCE = 0;
+	private static final double MAX_TOLERANCE = 100;
+	private static final double MIN_DEFIANCE = 0;
+	private static final double MAX_DEFIANCE = 100;
+	private static final double MIN_CALM = 0;
+	private static final double MAX_CALM = 100;
+	private static final double MIN_STRESS = 0;
+	private static final double MAX_STRESS = 100;
+	private static final double MIN_MASCULINITY = 0;
+	private static final double MAX_MASCULINITY = 100;
+	private static final double MIN_EFFEMINACY = 0;
+	private static final double MAX_EFFEMINACY = 100;
+	private static final double MIN_GIFT = 0;
+	private static final double MAX_GIFT = 100;
 
 	/**
 	 * 全てのステータス値を０で初期化
@@ -124,7 +124,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return condition
 	 */
-	public int getCondition() {
+	public double getCondition() {
 		return this.condition;
 	}
 
@@ -133,8 +133,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addCondition(int addend) {
-		final int result = this.condition + addend;
+	public void addCondition(double addend) {
+		final double result = this.condition + addend;
 		if (result > MAX_CONDITION) {
 			this.condition = MAX_CONDITION;
 			return;
@@ -151,7 +151,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return hunger
 	 */
-	public int getHunger() {
+	public double getHunger() {
 		return this.hunger;
 	}
 
@@ -160,8 +160,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addHunger(int addend) {
-		final int result = this.hunger + addend;
+	public void addHunger(double addend) {
+		final double result = this.hunger + addend;
 		if (result > MAX_HUNGER) {
 			this.hunger = MAX_HUNGER;
 			return;
@@ -178,7 +178,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return power
 	 */
-	public int getPower() {
+	public double getPower() {
 		return this.power;
 	}
 
@@ -187,8 +187,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addPower(int addend) {
-		final int result = this.power + addend;
+	public void addPower(double addend) {
+		final double result = this.power + addend;
 		if (result > MAX_POWER) {
 			this.power = MAX_POWER;
 			return;
@@ -205,7 +205,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return agility
 	 */
-	public int getAgility() {
+	public double getAgility() {
 		return this.agility;
 	}
 
@@ -214,8 +214,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addAgility(int addend) {
-		final int result = this.agility + addend;
+	public void addAgility(double addend) {
+		final double result = this.agility + addend;
 		if (result > MAX_AGILITY) {
 			this.agility = MAX_AGILITY;
 			return;
@@ -232,7 +232,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return flexibility
 	 */
-	public int getFlexibility() {
+	public double getFlexibility() {
 		return this.flexibility;
 	}
 
@@ -241,8 +241,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addFlexibility(int addend) {
-		final int result = this.flexibility + addend;
+	public void addFlexibility(double addend) {
+		final double result = this.flexibility + addend;
 		if (result > MAX_FLEXIBILITY) {
 			this.flexibility = MAX_FLEXIBILITY;
 			return;
@@ -259,7 +259,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return fortitude
 	 */
-	public int getFortitude() {
+	public double getFortitude() {
 		return this.fortitude;
 	}
 
@@ -268,8 +268,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addFortitude(int addend) {
-		final int result = this.fortitude + addend;
+	public void addFortitude(double addend) {
+		final double result = this.fortitude + addend;
 		if (result > MAX_FORTITUDE) {
 			this.fortitude = MAX_FORTITUDE;
 			return;
@@ -286,7 +286,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return knowledge
 	 */
-	public int getKnowledge() {
+	public double getKnowledge() {
 		return this.knowledge;
 	}
 
@@ -295,8 +295,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addKnowledge(int addend) {
-		final int result = this.knowledge + addend;
+	public void addKnowledge(double addend) {
+		final double result = this.knowledge + addend;
 		if (result > MAX_KNOWLEDGE) {
 			this.knowledge = MAX_KNOWLEDGE;
 			return;
@@ -313,7 +313,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return smart
 	 */
-	public int getSmart() {
+	public double getSmart() {
 		return this.smart;
 	}
 
@@ -322,8 +322,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addSmart(int addend) {
-		final int result = this.smart + addend;
+	public void addSmart(double addend) {
+		final double result = this.smart + addend;
 		if (result > MAX_SMART) {
 			this.smart = MAX_SMART;
 			return;
@@ -340,7 +340,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return curiosity
 	 */
-	public int getCuriosity() {
+	public double getCuriosity() {
 		return this.curiosity;
 	}
 
@@ -349,8 +349,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addCuriosity(int addend) {
-		final int result = this.curiosity + addend;
+	public void addCuriosity(double addend) {
+		final double result = this.curiosity + addend;
 		if (result > MAX_CURIOSITY) {
 			this.curiosity = MAX_CURIOSITY;
 			return;
@@ -367,7 +367,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return communication
 	 */
-	public int getCommunication() {
+	public double getCommunication() {
 		return this.communication;
 	}
 
@@ -376,8 +376,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addCommunication(int addend) {
-		final int result = this.communication + addend;
+	public void addCommunication(double addend) {
+		final double result = this.communication + addend;
 		if (result > MAX_COMMUNICATION) {
 			this.communication = MAX_COMMUNICATION;
 			return;
@@ -394,7 +394,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return tolerance
 	 */
-	public int getTolerance() {
+	public double getTolerance() {
 		return this.tolerance;
 	}
 
@@ -403,8 +403,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addTolerance(int addend) {
-		final int result = this.tolerance + addend;
+	public void addTolerance(double addend) {
+		final double result = this.tolerance + addend;
 		if (result > MAX_TOLERANCE) {
 			this.tolerance = MAX_TOLERANCE;
 			return;
@@ -421,7 +421,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return defiance
 	 */
-	public int getDefiance() {
+	public double getDefiance() {
 		return this.defiance;
 	}
 
@@ -430,8 +430,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addDefiance(int addend) {
-		final int result = this.defiance + addend;
+	public void addDefiance(double addend) {
+		final double result = this.defiance + addend;
 		if (result > MAX_DEFIANCE) {
 			this.defiance = MAX_DEFIANCE;
 			return;
@@ -448,7 +448,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return clam
 	 */
-	public int getCalm() {
+	public double getCalm() {
 		return this.calm;
 	}
 
@@ -457,8 +457,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addClam(int addend) {
-		final int result = this.calm + addend;
+	public void addClam(double addend) {
+		final double result = this.calm + addend;
 		if (result > MAX_CALM) {
 			this.calm = MAX_CALM;
 			return;
@@ -475,7 +475,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return stress
 	 */
-	public int getStress() {
+	public double getStress() {
 		return this.stress;
 	}
 
@@ -484,8 +484,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addStress(int addend) {
-		final int result = this.stress + addend;
+	public void addStress(double addend) {
+		final double result = this.stress + addend;
 		if (result > MAX_STRESS) {
 			this.stress = MAX_STRESS;
 			return;
@@ -502,7 +502,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return masculinity
 	 */
-	public int getMasculinity() {
+	public double getMasculinity() {
 		return this.masculinity;
 	}
 
@@ -511,8 +511,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addMasculinity(int addend) {
-		final int result = this.masculinity + addend;
+	public void addMasculinity(double addend) {
+		final double result = this.masculinity + addend;
 		if (result > MAX_MASCULINITY) {
 			this.masculinity = MAX_MASCULINITY;
 			return;
@@ -529,7 +529,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return effeminacy
 	 */
-	public int getEffeminacy() {
+	public double getEffeminacy() {
 		return this.effeminacy;
 	}
 
@@ -538,8 +538,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addEffeminacy(int addend) {
-		final int result = this.effeminacy + addend;
+	public void addEffeminacy(double addend) {
+		final double result = this.effeminacy + addend;
 		if (result > MAX_EFFEMINACY) {
 			this.effeminacy = MAX_EFFEMINACY;
 			return;
@@ -556,7 +556,7 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @return gift
 	 */
-	public int getGift() {
+	public double getGift() {
 		return this.gift;
 	}
 
@@ -565,8 +565,8 @@ public class Status implements SelfValidatable {
 	 * 
 	 * @param addend
 	 */
-	public void addGift(int addend) {
-		final int result = this.gift + addend;
+	public void addGift(double addend) {
+		final double result = this.gift + addend;
 		if (result > MAX_GIFT) {
 			this.gift = MAX_GIFT;
 			return;
@@ -637,7 +637,7 @@ public class Status implements SelfValidatable {
 		return true;
 	}
 
-	private static boolean isRange(int value, int min, int max) {
+	private static boolean isRange(double value, double min, double max) {
 		return (value >= min) && (value <= max);
 	}
 }

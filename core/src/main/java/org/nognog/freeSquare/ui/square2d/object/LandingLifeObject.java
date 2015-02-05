@@ -3,7 +3,6 @@ package org.nognog.freeSquare.ui.square2d.object;
 import org.nognog.freeSquare.ui.square2d.Square2d.Vertex;
 import org.nognog.freeSquare.ui.square2d.Square2dUtils;
 import org.nognog.freeSquare.ui.square2d.action.Square2dActions;
-import org.nognog.freeSquare.ui.square2d.action.StopTimeGenerator;
 import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
@@ -19,27 +18,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 public class LandingLifeObject extends LifeObject implements LandObject {
 
 	/**
-	 * @param info
-	 */
-	public LandingLifeObject(LifeObjectType info) {
-		this(info, defaultMoveSpeed);
-	}
-
-	/**
-	 * @param info
-	 * @param moveSpeed
-	 */
-	public LandingLifeObject(LifeObjectType info, float moveSpeed) {
-		this(info, moveSpeed, defaultStopTimeGenerator);
-	}
-
-	/**
-	 * @param info
+	 * @param type
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public LandingLifeObject(LifeObjectType info, float moveSpeed, StopTimeGenerator generator) {
-		super(info, moveSpeed, generator);
+	public LandingLifeObject(LifeObjectType type) {
+		super(type);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
