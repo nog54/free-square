@@ -8,7 +8,8 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.ui.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

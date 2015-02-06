@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.model.player;
 
-import org.nognog.freeSquare.model.PersistItemClass;
+import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.model.item.Item;
 
 import com.badlogic.gdx.utils.Array;
@@ -8,11 +8,11 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/01/15
  */
-public class ItemBox implements PersistItemClass {
-	
+public class ItemBox implements SelfValidatable{
+
 	private final Array<PossessedItem<?>> possessedItems;
 	private transient final Array<ItemBoxObserver> observers;
-	
+
 	/** アイテムの最大保持数 */
 	public static final int maxQuantity = PossessedItem.maxQuantity;
 
@@ -151,7 +151,7 @@ public class ItemBox implements PersistItemClass {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * @param observer
 	 */
@@ -167,18 +167,13 @@ public class ItemBox implements PersistItemClass {
 	public void removeObserver(ItemBoxObserver observer) {
 		this.observers.removeValue(observer, true);
 	}
-	
+
 	/**
 	 * 
 	 */
-	public void notifyObservers(){
+	public void notifyObservers() {
 		for (int i = 0; i < this.observers.size; i++) {
 			this.observers.get(i).updateItemBox();
 		}
-	}
-
-	@Override
-	public void reconstruction() {
-		// 
 	}
 }

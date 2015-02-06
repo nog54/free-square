@@ -2,9 +2,9 @@ package org.nognog.freeSquare.model.player;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.persist.LoadFailureException;
-import org.nognog.freeSquare.model.persist.PersistItem;
+import org.nognog.freeSquare.model.persist.PersistItems;
+import org.nognog.freeSquare.model.persist.PersistItemClass;
 
 /**
  * @author goshi 2014/11/18
@@ -27,7 +27,7 @@ public class LastPlay implements PersistItemClass {
 	 * @throws LoadFailureException
 	 */
 	public static Date getLastPlayDate() {
-		LastPlay date = PersistItem.LAST_PLAY.load();
+		LastPlay date = PersistItems.LAST_PLAY.load();
 		if (date != null) {
 			return new Date(date.lastPlayDateTime);
 		}
@@ -41,7 +41,7 @@ public class LastPlay implements PersistItemClass {
 	 */
 	public static Date update() {
 		LastPlay saveObject = new LastPlay(new Date());
-		boolean isSaveSuccess = PersistItem.LAST_PLAY.save(saveObject);
+		boolean isSaveSuccess = PersistItems.LAST_PLAY.save(saveObject);
 		if (isSaveSuccess) {
 			return new Date(saveObject.lastPlayDateTime);
 		}

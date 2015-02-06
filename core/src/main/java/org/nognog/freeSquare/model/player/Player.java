@@ -2,8 +2,9 @@ package org.nognog.freeSquare.model.player;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.item.Item;
+import org.nognog.freeSquare.model.life.Life;
+import org.nognog.freeSquare.model.persist.PersistItemClass;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -19,6 +20,7 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 	private transient Array<PlayerObserver> playerObservers;
 
 	private ItemBox itemBox;
+	private Array<Life> lifes;
 
 	@SuppressWarnings("unused")
 	private Player() {
@@ -29,14 +31,11 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 	 * @param name
 	 */
 	public Player(String name) {
-		if (name == null) {
-			this.name = defaultName;
-		} else {
-			this.name = name;
-		}
+		this.name = name;
 		this.startDate = new Date().getTime();
 		this.itemBox = new ItemBox();
 		this.itemBox.addObserver(this);
+		this.lifes = new Array<>();
 		this.playerObservers = new Array<>();
 	}
 
@@ -68,6 +67,40 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 	 */
 	public ItemBox getItemBox() {
 		return this.itemBox;
+	}
+	
+	/**
+	 * @param addedLife 
+	 */
+	public void addLife(Life addedLife){
+		if(!this.lifes.contains(addedLife, true)){
+			this.lifes.add(addedLife);
+			this.notifyPlayerObservers();
+		}
+	}
+	
+	/**
+	 * @param removedLife 
+	 */
+	public void removeLife(Life removedLife){
+		if(this.lifes.removeValue(removedLife, true)){
+			this.notifyPlayerObservers();	
+		}
+	}
+	
+	/**
+	 * @return life array
+	 */
+	public Array<Life> getLifes(){
+		return this.lifes;
+	}
+	
+	/**
+	 * @param searchLife
+	 * @return true if searchLife is contained
+	 */
+	public boolean containsLife(Life searchLife){
+		return this.lifes.contains(searchLife, true);
 	}
 
 	/**

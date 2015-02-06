@@ -1,11 +1,12 @@
 package org.nognog.freeSquare.model.life;
 
-import org.nognog.freeSquare.model.PersistItemClass;
+import org.nognog.freeSquare.model.SelfValidatable;
 
 /**
  * @author goshi 2014/08/25
  */
-public class Life implements PersistItemClass {
+public class Life implements SelfValidatable {
+	private String name;
 	private Family family;
 	private Status status;
 
@@ -13,21 +14,46 @@ public class Life implements PersistItemClass {
 	private Life() {
 		// used by json
 	}
-
+	
 	/**
 	 * @param family
 	 */
-	public Life(Family family) {
-		this(family, new Status());
+	public Life(Family family){
+		this(family.getName(), family);
 	}
 
 	/**
+	 * @param name 
+	 * @param family
+	 */
+	public Life(String name, Family family) {
+		this(name, family, new Status());
+	}
+
+	/**
+	 * @param name 
 	 * @param family
 	 * @param status
 	 */
-	public Life(Family family, Status status) {
+	public Life(String name, Family family, Status status) {
+		this.name = name;
 		this.family = family;
 		this.status = status;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -61,9 +87,9 @@ public class Life implements PersistItemClass {
 		}
 		return true;
 	}
-
+	
 	@Override
-	public void reconstruction() {
-		// 
+	public String toString() {
+		return this.name;
 	}
 }

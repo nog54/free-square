@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.model.player;
 
-import org.nognog.freeSquare.model.PersistItemClass;
 import org.nognog.freeSquare.model.item.Item;
+import org.nognog.freeSquare.model.persist.PersistItemClass;
 
 import com.badlogic.gdx.math.MathUtils;
 

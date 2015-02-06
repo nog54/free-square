@@ -3,8 +3,8 @@ package org.nognog.freeSquare.model.player;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.nognog.freeSquare.model.PersistItemClass;
-import org.nognog.freeSquare.model.persist.PersistItem;
+import org.nognog.freeSquare.model.persist.PersistItems;
+import org.nognog.freeSquare.model.persist.PersistItemClass;
 
 /**
  * @author goshi 2015/01/15
@@ -41,7 +41,7 @@ public class PlayLog implements PersistItemClass {
 	public boolean update(String addLog) {
 		String dateString = new SimpleDateFormat("yyyy/MM/dd/ ").format(new Date()); //$NON-NLS-1$
 		this.log = new StringBuilder(this.log).append(System.getProperty("line.separator")).append(dateString).append(addLog).toString(); //$NON-NLS-1$
-		return PersistItem.PLAY_LOG.save(this);
+		return PersistItems.PLAY_LOG.save(this);
 	}
 
 	/**
