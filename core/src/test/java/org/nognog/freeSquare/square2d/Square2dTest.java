@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,18 +11,14 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dEvent;
-import org.nognog.freeSquare.square2d.Square2dSize;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.scenes.scene2d.Action;
 
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
@@ -81,7 +76,7 @@ public class Square2dTest {
 
 	@Test
 	public final void testAddSquareObjectSquare2dObjectFloatFloat() {
-		Square2dObject object = Square2dObjectType.EatableObjectType.TOFU.create();
+		Square2dObject object = EatableObjectType.TOFU.create();
 		final float expected1 = object.getOriginX();
 		final float actual1 = object.getX();
 		final float expected2 = object.getOriginY();

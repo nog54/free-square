@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.object;
 
-import org.nognog.freeSquare.square2d.object.Square2dObjectType.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;

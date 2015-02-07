@@ -17,14 +17,14 @@ import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
 import org.nognog.freeSquare.square2d.ui.PlayerItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
-import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -364,9 +364,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				this.font.dispose();
 			}
 			this.stage.dispose();
-			Square2dType.dispose();
-			Square2dObjectType.EatableObjectType.dispose();
-			Square2dObjectType.LifeObjectType.dispose();
+			Square2dObjectType.Manager.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;

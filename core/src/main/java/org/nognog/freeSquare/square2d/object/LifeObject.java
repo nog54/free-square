@@ -12,7 +12,7 @@ import org.nognog.freeSquare.square2d.action.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;

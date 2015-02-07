@@ -4,7 +4,7 @@ import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PlayerObserver;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
