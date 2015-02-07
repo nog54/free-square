@@ -195,6 +195,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			protected void touchUp(float x, float y) {
 				if (this.addedObject != null) {
 					if (this.addedObject.isValid()) {
+						System.out.println(this.addedObject.getLife().getStatus().getAgility());
 						FreeSquare.this.getPlayer().removeLife(this.addedObject.getLife());
 						this.addedObject.setEnabledAction(true);
 						Square2dEvent event = new AddObjectEvent(this.addedObject);

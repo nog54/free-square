@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  * @author goshi 2015/01/30
  */
 public class EatableObject extends Square2dObject implements LandObject {
-	//private final Food food;
 	private final int baseAmount;
 	private final int originTextureRegionWidth;
 	private final int originTextureRegionHeight;
@@ -30,16 +29,18 @@ public class EatableObject extends Square2dObject implements LandObject {
 	}
 
 	/**
+	 * @param eater 
 	 * @param eatAmount
 	 * @param direction
 	 * @return amount of actually eaten
 	 */
-	public int eaten(int eatAmount, Direction direction) {
+	public int eatenBy(LifeObject eater, int eatAmount, Direction direction) {
 		if (this.amount == 0) {
 			return this.amount;
 		}
 		final int eatenAmount = (this.amount > eatAmount) ? eatAmount : this.amount;
 		this.amount -= eatenAmount;
+		this.getEatableObjectType().applyStatusInfluenceTo(eater, eatenAmount);
 		if (this.amount == 0) {
 			this.getSquare().removeSquareObject(this);
 			return this.amount;
@@ -98,11 +99,11 @@ public class EatableObject extends Square2dObject implements LandObject {
 		this.image.setPosition(0, 0);
 		this.image.setScale(1);
 	}
-	
+
 	/**
 	 * @return true if this is being eaten.
 	 */
-	public boolean isBeingEaten(){
+	public boolean isBeingEaten() {
 		return this.baseAmount != this.amount;
 	}
 
@@ -113,4 +114,8 @@ public class EatableObject extends Square2dObject implements LandObject {
 		return this.amount;
 	}
 
+
+	private EatableObjectType getEatableObjectType() {
+		return (EatableObjectType) super.getType();
+	}
 }

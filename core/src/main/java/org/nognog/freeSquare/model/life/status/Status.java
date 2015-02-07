@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.model.life;
+package org.nognog.freeSquare.model.life.status;
 
 import org.nognog.freeSquare.model.SelfValidatable;
 

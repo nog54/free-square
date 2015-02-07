@@ -4,6 +4,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2014/10/04

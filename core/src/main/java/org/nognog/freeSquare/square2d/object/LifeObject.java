@@ -135,7 +135,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		if (this.square == null || eatObject == null || eatObject.getAmount() == 0) {
 			return 0;
 		}
-		final int actuallyEatAmount = eatObject.eaten(amount, eatDirection);
+		final int actuallyEatAmount = eatObject.eatenBy(this, amount, eatDirection);
 		this.square.notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
 		return actuallyEatAmount;
 	}
