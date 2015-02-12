@@ -22,9 +22,9 @@ public class Square2dUtils {
 		}
 		boolean useV1V2V3Triangle = MathUtils.randomBoolean();
 		if (useV1V2V3Triangle) {
-			return getRandomPointOn(square.vertex1, square.vertex2, square.vertex3);
+			return getRandomPointOn(square.getVertex1(), square.getVertex2(), square.getVertex3());
 		}
-		return getRandomPointOn(square.vertex1, square.vertex4, square.vertex3);
+		return getRandomPointOn(square.getVertex1(), square.getVertex4(), square.getVertex3());
 	}
 
 	/**

@@ -56,10 +56,4 @@ public class LastPlay implements PersistItemClass {
 		}
 		return true;
 	}
-
-	@Override
-	public void reconstruction() {
-		//
-	}
-
 }

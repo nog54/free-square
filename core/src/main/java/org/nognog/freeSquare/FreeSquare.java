@@ -69,14 +69,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
-		this.square = Square2dType.GRASSY_SQUARE1.create();
+		if (this.player.getSquares().size == 0) {
+			this.square = Square2dType.GRASSY_SQUARE1.create();
+		} else {
+			this.square = (Square2d) this.player.getSquares().get(0);
+		}
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
-		// for (Square2dObjectType object : Square2dObjectType.values()) {
-		// for (int i = 0; i < 1; i++) {
-		// this.square.addSquareObject(object.create(), false);
-		// }
-		// }
+		this.player.addSquare(this.square);
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.stage.addActor(this.square);
@@ -195,7 +195,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			protected void touchUp(float x, float y) {
 				if (this.addedObject != null) {
 					if (this.addedObject.isValid()) {
-						System.out.println(this.addedObject.getLife().getStatus().getAgility());
 						FreeSquare.this.getPlayer().removeLife(this.addedObject.getLife());
 						this.addedObject.setEnabledAction(true);
 						Square2dEvent event = new AddObjectEvent(this.addedObject);
@@ -381,15 +380,17 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
-			System.out.println("new player"); //$NON-NLS-1$
-			this.player = new Player("goshi"); //$NON-NLS-1$
-			PersistItems.PLAYER.save(this.player);
+			throw new RuntimeException();
+			//System.out.println("new player"); //$NON-NLS-1$
+			//this.player = new Player("goshi"); //$NON-NLS-1$
+			//PersistItems.PLAYER.save(this.player);
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$
 			this.lastRun = new Date();
 		}
+
 	}
 
 	/**

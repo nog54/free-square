@@ -1,5 +1,6 @@
 package org.nognog.freeSquare.square2d.object;
 
+import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -10,14 +11,18 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class FryingLifeObject extends LifeObject {
 
-
+	private FryingLifeObject(){
+		super();
+	}
 	/**
 	 * @param type
 	 * @param moveSpeed
 	 * @param generator
 	 */
 	public FryingLifeObject(LifeObjectType type) {
-		super(type);
+		this();
+		this.setupType(type);
+		this.setLife(new Life(type.getFamily()));
 	}
 
 	@Override

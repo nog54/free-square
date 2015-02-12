@@ -15,16 +15,16 @@ public class Life implements SelfValidatable {
 	private Life() {
 		// used by json
 	}
-	
+
 	/**
 	 * @param family
 	 */
-	public Life(Family family){
+	public Life(Family family) {
 		this(family.getName(), family);
 	}
 
 	/**
-	 * @param name 
+	 * @param name
 	 * @param family
 	 */
 	public Life(String name, Family family) {
@@ -32,7 +32,7 @@ public class Life implements SelfValidatable {
 	}
 
 	/**
-	 * @param name 
+	 * @param name
 	 * @param family
 	 * @param status
 	 */
@@ -88,9 +88,18 @@ public class Life implements SelfValidatable {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.name;
+	}
+	
+	/**
+	 * @return status string
+	 */
+	public String getStatusString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("name :").append(this.name).append(System.getProperty("line.separator")).append(this.status); //$NON-NLS-1$ //$NON-NLS-2$
+		return sb.toString();
 	}
 }

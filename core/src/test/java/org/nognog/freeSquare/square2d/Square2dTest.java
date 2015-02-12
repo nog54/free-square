@@ -142,15 +142,15 @@ public class Square2dTest {
 	public final void testContainsInSquareArea() {
 		Square2d square = Square2dType.GRASSY_SQUARE1.create();
 		boolean expected1 = true;
-		boolean actual1 = square.containsInSquareArea(square.vertex1.x, square.vertex1.y);
+		boolean actual1 = square.containsInSquareArea(square.getVertex1().x, square.getVertex1().y);
 		assertThat(actual1, is(expected1));
 
 		boolean expected2 = true;
-		boolean actual2 = square.containsInSquareArea(square.vertex1.x, (square.vertex1.y + square.vertex3.y) / 2);
+		boolean actual2 = square.containsInSquareArea(square.getVertex1().x, (square.getVertex1().y + square.getVertex3().y) / 2);
 		assertThat(actual2, is(expected2));
 
 		boolean expected3 = false;
-		boolean actual3 = square.containsInSquareArea(square.vertex1.x, Math.nextAfter(square.vertex1.y, Float.NEGATIVE_INFINITY));
+		boolean actual3 = square.containsInSquareArea(square.getVertex1().x, Math.nextAfter(square.getVertex1().y, Float.NEGATIVE_INFINITY));
 		assertThat(actual3, is(expected3));
 	}
 

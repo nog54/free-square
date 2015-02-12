@@ -40,7 +40,7 @@ public class FreeRunningAction extends RepeatAction {
 	/**
 	 * @param speed
 	 */
-	public void setSpeed(float speed) {
+	public void setMoveSpeed(float speed) {
 		this.getMoveToNextTargetPositionAciton().setSpeed(speed);
 	}
 

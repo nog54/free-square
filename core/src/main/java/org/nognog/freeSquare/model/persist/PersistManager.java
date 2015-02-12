@@ -18,12 +18,9 @@ import com.badlogic.gdx.utils.Json;
 /**
  * @author goshi 2014/10/28
  */
-class PersistManager {
+public class PersistManager {
 	private static final String charSet = "UTF-8"; //$NON-NLS-1$
 	private static final Json json = new Json();
-
-	private PersistManager() {
-	}
 
 	private static byte[] encryptionKey;
 
@@ -34,6 +31,13 @@ class PersistManager {
 		} catch (Throwable t) {
 			encryptionKey = null;
 		}
+	}
+	
+	/**
+	 * @return json
+	 */
+	public static Json getUseJson(){
+		return json;
 	}
 
 	private static String reverse(String target) {
@@ -79,6 +83,11 @@ class PersistManager {
 		return cipher;
 	}
 
+	/**
+	 * @param saveItem
+	 * @param saveObject
+	 * @throws SaveFailureException
+	 */
 	public static <T extends PersistItemClass> void save(PersistItems<T> saveItem, T saveObject) throws SaveFailureException {
 		save(saveItem, saveObject, encryptionKey);
 	}
@@ -109,6 +118,7 @@ class PersistManager {
 				file.writeBytes(encryptedSaveJson, false);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new SaveFailureException(e);
 		}
 
@@ -143,6 +153,11 @@ class PersistManager {
 		}
 	}
 
+	/**
+	 * @param loadItem
+	 * @return load instance
+	 * @throws LoadFailureException
+	 */
 	public static <T extends PersistItemClass> T load(PersistItems<T> loadItem) throws LoadFailureException {
 		return load(loadItem, encryptionKey);
 	}
@@ -172,12 +187,12 @@ class PersistManager {
 			}
 			String loadJson = new String(decrypt(enctyptedLoadJson), charSet);
 			T loadData = json.fromJson(loadItem.getSaveClass(), loadJson);
-			loadData.reconstruction();
 			if (!(loadData.isValid())) {
 				throw new InvalidLoadDataException();
 			}
 			return loadData;
 		} catch (Throwable t) {
+			t.printStackTrace();
 			throw new LoadFailureException(t);
 		}
 
@@ -202,6 +217,10 @@ class PersistManager {
 		}
 	}
 
+	/**
+	 * @param removeItem
+	 * @return true if delete item.
+	 */
 	public static <T extends PersistItemClass> boolean delete(PersistItems<T> removeItem) {
 		FileHandle file = Gdx.files.local(removeItem.getFileName());
 		return file.delete();

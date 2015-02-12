@@ -1,5 +1,8 @@
 package org.nognog.freeSquare.model.life.status;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import org.nognog.freeSquare.model.SelfValidatable;
 
 /**
@@ -639,5 +642,23 @@ public class Status implements SelfValidatable {
 
 	private static boolean isRange(double value, double min, double max) {
 		return (value >= min) && (value <= max);
+	}
+	
+	@Override
+	public String toString() {
+		String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
+		StringBuilder sb = new StringBuilder();
+		Class<Status> class1 = Status.class;
+		for(Field field : class1.getDeclaredFields()){
+			if(Modifier.isStatic(field.getModifiers())){
+				continue;
+			}
+			try {
+				sb.append(field.getName()).append(":").append(field.get(this)).append(newLine); //$NON-NLS-1$
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				//
+			}
+		}
+		return sb.toString();
 	}
 }

@@ -7,13 +7,12 @@ import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dSize;
 import org.nognog.freeSquare.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.square2d.Square2dSize;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
  * @author goshi 2015/01/14
@@ -54,10 +53,10 @@ public enum Square2dType {
 
 		final float scale = size.getWidth() / texture.getWidth();
 		this.squarePositionOffsetY = size.getWidth() / 12;
-		this.vertex1 = vertex(baseVertex1.x * scale, baseVertex1.y * scale + this.squarePositionOffsetY);
-		this.vertex2 = vertex(baseVertex2.x * scale, baseVertex2.y * scale + this.squarePositionOffsetY);
-		this.vertex3 = vertex(baseVertex3.x * scale, baseVertex3.y * scale + this.squarePositionOffsetY);
-		this.vertex4 = vertex(baseVertex4.x * scale, baseVertex4.y * scale + this.squarePositionOffsetY);
+		this.vertex1 = vertex(baseVertex1.x * scale, baseVertex1.y * scale + this.getSquarePositionOffsetY());
+		this.vertex2 = vertex(baseVertex2.x * scale, baseVertex2.y * scale + this.getSquarePositionOffsetY());
+		this.vertex3 = vertex(baseVertex3.x * scale, baseVertex3.y * scale + this.getSquarePositionOffsetY());
+		this.vertex4 = vertex(baseVertex4.x * scale, baseVertex4.y * scale + this.getSquarePositionOffsetY());
 
 		if (this.isInvalidVertex()) {
 			throw new RuntimeException("Square corners are invalid."); //$NON-NLS-1$
@@ -93,24 +92,15 @@ public enum Square2dType {
 		return this.texture;
 	}
 
-	public Vertex getVertex1() {
-		return this.vertex1;
-	}
-
-	public Vertex getVertex2() {
-		return this.vertex2;
-	}
-
-	public Vertex getVertex3() {
-		return this.vertex3;
-	}
-
-	public Vertex getVertex4() {
-		return this.vertex4;
-	}
-
 	public Square2dSize getSize() {
 		return this.size;
+	}
+
+	/**
+	 * @return the squarePositionOffsetY
+	 */
+	public float getSquarePositionOffsetY() {
+		return this.squarePositionOffsetY;
 	}
 
 	public boolean isConcave() {
@@ -130,15 +120,6 @@ public enum Square2dType {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public Image createSquareImage() {
-		Image squareImage = new Image(this.texture);
-		squareImage.setWidth(this.size.getWidth());
-		squareImage.setHeight(squareImage.getHeight() * (this.size.getWidth() / this.texture.getWidth()));
-		squareImage.setY(this.squarePositionOffsetY);
-		squareImage.setName(this.name);
-		return squareImage;
 	}
 	
 	public static void dispose(){

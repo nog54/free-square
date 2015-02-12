@@ -71,9 +71,4 @@ public class PossessedItem<T extends Item<?, ?>> implements PersistItemClass {
 	public boolean isValid() {
 		return this.item.isValid();
 	}
-
-	@Override
-	public void reconstruction() {
-		//
-	}
 }

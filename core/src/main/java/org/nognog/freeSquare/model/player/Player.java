@@ -1,17 +1,22 @@
 package org.nognog.freeSquare.model.player;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Date;
 
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
+import org.nognog.freeSquare.square2d.ui.Square;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2014/10/28
  */
-public class Player implements PersistItemClass, ItemBoxObserver {
+public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializable {
 	private static final String defaultName = "noname"; //$NON-NLS-1$
 
 	private String name;
@@ -21,9 +26,11 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 
 	private ItemBox itemBox;
 	private Array<Life> lifes;
+	private Array<Square<?>> squares;
 
 	@SuppressWarnings("unused")
 	private Player() {
+		// used by json
 		this(defaultName);
 	}
 
@@ -35,8 +42,9 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 		this.startDate = new Date().getTime();
 		this.itemBox = new ItemBox();
 		this.itemBox.addObserver(this);
-		this.lifes = new Array<>();
 		this.playerObservers = new Array<>();
+		this.lifes = new Array<>();
+		this.squares = new Array<>();
 	}
 
 	/**
@@ -68,38 +76,64 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 	public ItemBox getItemBox() {
 		return this.itemBox;
 	}
-	
+
 	/**
-	 * @param addedLife 
+	 * @param addedLife
 	 */
-	public void addLife(Life addedLife){
-		if(!this.lifes.contains(addedLife, true)){
+	public void addLife(Life addedLife) {
+		if (!this.lifes.contains(addedLife, true)) {
 			this.lifes.add(addedLife);
 			this.notifyPlayerObservers();
 		}
 	}
-	
+
 	/**
-	 * @param removedLife 
+	 * @param removedLife
 	 */
-	public void removeLife(Life removedLife){
-		if(this.lifes.removeValue(removedLife, true)){
-			this.notifyPlayerObservers();	
+	public void removeLife(Life removedLife) {
+		if (this.lifes.removeValue(removedLife, true)) {
+			this.notifyPlayerObservers();
 		}
 	}
-	
+
 	/**
 	 * @return life array
 	 */
-	public Array<Life> getLifes(){
+	public Array<Life> getLifes() {
 		return this.lifes;
 	}
-	
+
+	/**
+	 * @param addedSquare
+	 */
+	public void addSquare(Square<?> addedSquare) {
+		if (!this.squares.contains(addedSquare, true)) {
+			this.squares.add(addedSquare);
+			this.notifyPlayerObservers();
+		}
+	}
+
+	/**
+	 * @param removedSquare
+	 */
+	public void removeSquare(Square<?> removedSquare) {
+		if (this.squares.removeValue(removedSquare, true)) {
+			this.notifyPlayerObservers();
+		}
+	}
+
+	/**
+	 * @return the squares
+	 */
+	public Array<Square<?>> getSquares() {
+		return this.squares;
+	}
+
 	/**
 	 * @param searchLife
 	 * @return true if searchLife is contained
 	 */
-	public boolean containsLife(Life searchLife){
+	public boolean containsLife(Life searchLife) {
 		return this.lifes.contains(searchLife, true);
 	}
 
@@ -152,8 +186,25 @@ public class Player implements PersistItemClass, ItemBoxObserver {
 	}
 
 	@Override
-	public void reconstruction() {
-		this.itemBox.addObserver(this);
+	public void write(Json json) {
+		for (Field field : Player.class.getDeclaredFields()) {
+			final int modifiers = field.getModifiers();
+			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
+				continue;
+			}
+			json.writeField(this, field.getName());
+		}
 	}
 
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		for (Field field : Player.class.getDeclaredFields()) {
+			final int modifiers = field.getModifiers();
+			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
+				continue;
+			}
+			json.readField(this, field.getName(), jsonData);
+		}
+		this.itemBox.addObserver(this);
+	}
 }

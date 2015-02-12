@@ -2,25 +2,45 @@ package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2015/01/30
  */
 public class EatableObject extends Square2dObject implements LandObject {
-	private final int baseAmount;
-	private final int originTextureRegionWidth;
-	private final int originTextureRegionHeight;
-	private final int originTextureRegionArea;
+	private int baseAmount;
+	private int originTextureRegionWidth;
+	private int originTextureRegionHeight;
+	private int originTextureRegionArea;
 	private int amount;
+
+	private EatableObject() {
+		// used by json
+		super();
+	}
 
 	/**
 	 * @param type
 	 */
 	public EatableObject(EatableObjectType type) {
-		super(type);
+		this();
+		this.setupType(type);
+	}
+
+	@Override
+	protected void setupType(Square2dObjectType<?> type) {
+		super.setupType(type);
+		if (type instanceof EatableObjectType) {
+			this.setupEatableType((EatableObjectType) type);
+		}
+	}
+
+	private void setupEatableType(EatableObjectType type) {
 		this.baseAmount = type.getQuantity();
 		this.amount = this.baseAmount;
 		this.originTextureRegionWidth = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionWidth();
@@ -29,7 +49,7 @@ public class EatableObject extends Square2dObject implements LandObject {
 	}
 
 	/**
-	 * @param eater 
+	 * @param eater
 	 * @param eatAmount
 	 * @param direction
 	 * @return amount of actually eaten
@@ -114,8 +134,38 @@ public class EatableObject extends Square2dObject implements LandObject {
 		return this.amount;
 	}
 
-
 	private EatableObjectType getEatableObjectType() {
 		return (EatableObjectType) super.getType();
+	}
+
+	@SuppressWarnings("boxing")
+	@Override
+	public void write(Json json) {
+		super.write(json);
+		json.writeField(this, "amount"); //$NON-NLS-1$
+		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
+		json.writeValue("imageX", this.image.getX()); //$NON-NLS-1$
+		json.writeValue("imageY", this.image.getY()); //$NON-NLS-1$
+		json.writeValue("imageScaleX", this.image.getScaleX()); //$NON-NLS-1$
+		json.writeValue("imageScaleY", this.image.getScaleY()); //$NON-NLS-1$
+		json.writeValue("imageTextureRegionRegionX", imageTextureRegion.getRegionX()); //$NON-NLS-1$
+		json.writeValue("imageTextureRegionRegionY", imageTextureRegion.getRegionY()); //$NON-NLS-1$
+		json.writeValue("imageTextureRegionRegionWidth", imageTextureRegion.getRegionWidth()); //$NON-NLS-1$
+		json.writeValue("imageTextureRegionRegionHeight", imageTextureRegion.getRegionHeight()); //$NON-NLS-1$
+	}
+
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
+		json.readField(this, "amount", jsonData); //$NON-NLS-1$
+		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
+		this.image.setX(json.readValue("imageX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.image.setY(json.readValue("imageY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.image.setScaleX(json.readValue("imageScaleX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.image.setScaleY(json.readValue("imageScaleY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		imageTextureRegion.setRegionX(json.readValue("imageTextureRegionRegionX", Integer.class, jsonData).intValue()); //$NON-NLS-1$
+		imageTextureRegion.setRegionY(json.readValue("imageTextureRegionRegionY", Integer.class, jsonData).intValue()); //$NON-NLS-1$
+		imageTextureRegion.setRegionWidth(json.readValue("imageTextureRegionRegionWidth", Integer.class, jsonData).intValue()); //$NON-NLS-1$
+		imageTextureRegion.setRegionHeight(json.readValue("imageTextureRegionRegionHeight", Integer.class, jsonData).intValue()); //$NON-NLS-1$
 	}
 }

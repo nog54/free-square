@@ -1,4 +1,4 @@
-package org.nognog.freeSquare.square2d;
+package org.nognog.freeSquare.square2d.object;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,14 +11,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.utils.Json;
 
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
@@ -29,7 +34,7 @@ public class Square2dObjectTest {
 		final Action mock = Mockito.mock(Action.class);
 		final Square2dObject object = new Square2dObject(EatableObjectType.TOFU);
 		object.addAction(mock);
-		
+
 		final float delta = 0.1f;
 		final int actCount = 10;
 		for (int i = 0; i < actCount; i++) {
@@ -127,6 +132,24 @@ public class Square2dObjectTest {
 			boolean actual2 = object.isLandingOnSquare();
 			assertThat(actual2, is(expected2));
 		}
+	}
+
+	@Test
+	public final void testReadWrite() {
+		Json json = PersistManager.getUseJson();
+		for (Square2dObjectType type : Square2dObjectType.Manager.getAllTypeValues()) {
+			serializeAndDeserialize(json, type);
+		}
+	}
+
+	private void serializeAndDeserialize(Json json, Square2dObjectType type) {
+		Square2d square = Square2dType.GRASSY_SQUARE1.create();
+		Square2dObject object = type.create();
+		Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
+		object.setPosition(randomPoint.x, randomPoint.y);
+		String jsonString = json.toJson(object);
+		Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
+		assertThat(object, is(deserializedObject));
 	}
 
 }

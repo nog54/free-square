@@ -12,6 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  */
 public class HopSquare extends Square2d {
 
+	@SuppressWarnings("unused")
+	private HopSquare() {
+		// used by json
+		this(null);
+	}
+
 	/**
 	 * @param type
 	 */
@@ -25,13 +31,11 @@ public class HopSquare extends Square2d {
 			@Override
 			public void tap(InputEvent event, float x, float y, int pointer, int button) {
 				if (HopSquare.this.containsInSquareArea(x, y)) {
-					Action upDown = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2),
-							Actions.moveBy(0, -hopAmount, hopTime / 2));
+					Action upDown = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 					this.target.addAction(upDown);
 				}
 			}
-			
-		});
 
+		});
 	}
 }

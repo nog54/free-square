@@ -6,6 +6,7 @@ import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.action.EatAction;
+import org.nognog.freeSquare.square2d.action.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.action.StopTimeGenerator;
 import org.nognog.freeSquare.square2d.action.TargetPositionGenerator;
@@ -13,6 +14,7 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -24,6 +26,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2014/12/31
@@ -40,12 +44,10 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 
 	private Life life;
 
-	private int eatAmountPerSec; // [amount / sec]
-
 	private Action upDownRoutineAction;
 	private boolean isEnabledUpDownRoutineAction;
 
-	protected Action freeRunningAction = null;
+	protected FreeRunningAction freeRunningAction = null;
 	private boolean isEnabledFreeRun;
 
 	protected SequenceAction currectTryingMoveAndEatAction;
@@ -53,6 +55,10 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	protected Action setFreeRunModeAction;
 
 	private StopTimeGenerator stopTime;
+
+	protected LifeObject() {
+		super();
+	}
 
 	/**
 	 * @param life
@@ -68,21 +74,28 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this(type, new Life(type.getFamily()));
 	}
 
-	/**
-	 * @param type
-	 * @param life
-	 */
-	public LifeObject(LifeObjectType type, Life life) {
-		super(type);
+	private LifeObject(LifeObjectType type, Life life) {
+		this();
+		this.setupType(type);
 		this.life = life;
+	}
+
+	@Override
+	protected void setupType(Square2dObjectType<?> type) {
+		super.setupType(type);
+		if (type instanceof LifeObjectType) {
+			this.setupLifeType((LifeObjectType) type);
+		}
+	}
+
+	private void setupLifeType(LifeObjectType type) {
+		this.life = new Life(type.getFamily());
 		this.isEnabledFreeRun = true;
-		this.eatAmountPerSec = type.getEatAmountPerSec();
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
 		this.upDownRoutineAction = createUpDownAction();
 		this.addAction(this.upDownRoutineAction);
 		this.isEnabledUpDownRoutineAction = true;
-
 		Image frame = new Image(frameTexture);
 		frame.setWidth(this.getWidth());
 		frame.setHeight(this.getHeight());
@@ -93,10 +106,10 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
 				LifeObject.this.moveBy(deltaX, deltaY);
 			}
-			
+
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
-				if(this.isTripleTapped(count)){
+				if (this.isTripleTapped(count)) {
 					LifeObject.this.square.notifyObservers(new CollectObjectRequestEvent(LifeObject.this));
 				}
 			}
@@ -146,9 +159,16 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	public Life getLife() {
 		return this.life;
 	}
-	
-	private void setLife(Life life){
+
+	protected void setLife(Life life) {
 		this.life = life;
+	}
+
+	/**
+	 * @return eat amount / second
+	 */
+	public int getEatAmountPerSecond() {
+		return LifeObjectType.getBindingLifeObjectType(this.life).getEatAmountPerSec();
 	}
 
 	/**
@@ -269,7 +289,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	private void setEatAction(EatableObject eatObject) {
 		final boolean wasEnabledFreeRun = this.isEnabledFreeRun();
 		this.setEnableFreeRun(false);
-		EatAction eatAction = Square2dActions.eat(eatObject, this.eatAmountPerSec, EatAction.UNTIL_RUN_OUT);
+		EatAction eatAction = Square2dActions.eat(eatObject, this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT);
 		this.setFreeRunModeAction = new Action() {
 			@Override
 			public boolean act(float delta) {
@@ -297,13 +317,15 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	@Override
 	public void notify(Square2dEvent event) {
 		super.notify(event);
-		if (!(event instanceof AddObjectEvent)) {
-			return;
+		if (event instanceof EatObjectEvent && ((EatObjectEvent) event).getEater() == this) {
+			this.freeRunningAction.setMoveSpeed(LifeObject.toMoveSpeed(this));
 		}
-		Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
-		Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
-		Action hop = Actions.sequence(up, down);
-		this.addAction(hop);
+		if (event instanceof AddObjectEvent) {
+			Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
+			Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
+			Action hop = Actions.sequence(up, down);
+			this.addAction(hop);
+		}
 	}
 
 	/**
@@ -315,4 +337,17 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		newInstance.setLife(life);
 		return newInstance;
 	}
+
+	@Override
+	public void write(Json json) {
+		super.write(json);
+		json.writeField(this, "life"); //$NON-NLS-1$
+	}
+
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		super.read(json, jsonData);
+		json.readField(this, "life", jsonData); //$NON-NLS-1$
+	}
+
 }

@@ -56,9 +56,4 @@ public class PlayLog implements PersistItemClass {
 		return this.log != null;
 	}
 
-	@Override
-	public void reconstruction() {
-		//
-	}
-
 }

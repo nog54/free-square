@@ -18,27 +18,20 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2014/12/10
  */
-public class Square2d extends Group implements Square<Square2dObject> {
+public class Square2d extends Group implements Square<Square2dObject>, Json.Serializable {
 
-	private final Square2dType type;
+	private Square2dType type;
 
-	/** vertex 1 */
-	public final Vertex vertex1;
-	/** vertex 2 */
-	public final Vertex vertex2;
-	/** vertex 3 */
-	public final Vertex vertex3;
-	/** vertex 4 */
-	public final Vertex vertex4;
+	private Image squareImage;
 
-	private final Image squareImage;
-
-	private final Array<SquareObserver> observers;
-	private final Array<Square2dObject> objects;
+	private Array<SquareObserver> observers;
+	private Array<Square2dObject> objects;
 
 	private boolean isRequestedDrawOrderUpdate = false;
 
@@ -58,20 +51,10 @@ public class Square2d extends Group implements Square<Square2dObject> {
 
 	};
 
-	/**
-	 * @param type
-	 */
-	public Square2d(Square2dType type) {
-		this.type = type;
-		this.vertex1 = type.vertex1;
-		this.vertex2 = type.vertex2;
-		this.vertex3 = type.vertex3;
-		this.vertex4 = type.vertex4;
-		this.squareImage = type.createSquareImage();
-		super.addActor(this.squareImage);
+	private Square2d() {
+		// used by json.
 		this.observers = new Array<>();
 		this.objects = new Array<>();
-
 		this.addCaptureListener(new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -87,6 +70,35 @@ public class Square2d extends Group implements Square<Square2dObject> {
 				return touchedActor != Square2d.this.getSquareImage();
 			}
 		});
+	}
+
+	/**
+	 * @param type
+	 */
+	public Square2d(Square2dType type) {
+		this();
+		setupType(type);
+	}
+
+	protected void setupType(Square2dType type) {
+		if (type == null) {
+			return;
+		}
+		if (this.type != null) {
+			throw new RuntimeException("type is already setted"); //$NON-NLS-1$
+		}
+		this.type = type;
+		this.squareImage = createSquareImage(type);
+		super.addActor(this.squareImage);
+	}
+
+	private static Image createSquareImage(Square2dType type) {
+		Image image = new Image(type.getTexture());
+		image.setWidth(type.getSize().getWidth());
+		image.setHeight(image.getHeight() * (type.getSize().getWidth() / type.getTexture().getWidth()));
+		image.setY(type.getSquarePositionOffsetY());
+		image.setName(type.getName());
+		return image;
 	}
 
 	@Override
@@ -152,11 +164,11 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		super.addActor(object);
 		object.setSquare(this);
 		object.setPosition(x, y);
-		this.objects.add(object);
 		if (notifyObserver) {
 			this.notifyObservers(new AddObjectEvent(object));
 		}
 		this.addSquareObserver(object);
+		this.objects.add(object);
 	}
 
 	/**
@@ -166,6 +178,7 @@ public class Square2d extends Group implements Square<Square2dObject> {
 	 */
 	@Override
 	public boolean removeSquareObject(Square2dObject object) {
+		this.objects.removeValue(object, true);
 		return this.removeSquareObject(object, true);
 	}
 
@@ -184,8 +197,8 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		super.removeActor(object);
 		object.setSquare(null);
 		object.setPosition(0, 0);
-		this.objects.removeValue(object, true);
 		this.removeSquareObserver(object);
+		this.objects.removeValue(object, true);
 		if (notifyObserver) {
 			this.notifyObservers(new RemoveObjectEvent(object));
 		}
@@ -253,20 +266,52 @@ public class Square2d extends Group implements Square<Square2dObject> {
 		if (this.isVertexPoint(x, y)) {
 			return true;
 		}
-		float[] vertices = { this.vertex1.x, this.vertex1.y, this.vertex2.x, this.vertex2.y, this.vertex3.x, this.vertex3.y, this.vertex4.x, this.vertex4.y };
+		Vertex vertex1 = this.getVertex1();
+		Vertex vertex2 = this.getVertex2();
+		Vertex vertex3 = this.getVertex3();
+		Vertex vertex4 = this.getVertex4();
+		float[] vertices = { vertex1.x, vertex1.y, vertex2.x, vertex2.y, vertex3.x, vertex3.y, vertex4.x, vertex4.y };
 		Polygon p = new Polygon(vertices);
 		return p.contains(x, y);
 	}
 
+	/**
+	 * @return vertex1
+	 */
+	public Vertex getVertex1() {
+		return this.type.vertex1;
+	}
+
+	/**
+	 * @return vertex1
+	 */
+	public Vertex getVertex2() {
+		return this.type.vertex2;
+	}
+
+	/**
+	 * @return vertex1
+	 */
+	public Vertex getVertex3() {
+		return this.type.vertex3;
+	}
+
+	/**
+	 * @return vertex1
+	 */
+	public Vertex getVertex4() {
+		return this.type.vertex4;
+	}
+
 	private boolean isVertexPoint(float x, float y) {
-		return this.vertex1.equals(x, y) || this.vertex2.equals(x, y) || this.vertex3.equals(x, y) || this.vertex4.equals(x, y);
+		return this.getVertex1().equals(x, y) || this.getVertex2().equals(x, y) || this.getVertex3().equals(x, y) || this.getVertex4().equals(x, y);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(this.type.getName());
-		sb.append(this.vertex1).append("-").append(this.vertex2).append("-").append(this.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				.append(this.vertex4);
+		sb.append(this.getVertex1()).append("-").append(this.getVertex2()).append("-").append(this.getVertex3()).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				.append(this.getVertex4());
 		return sb.toString();
 	}
 
@@ -361,4 +406,22 @@ public class Square2d extends Group implements Square<Square2dObject> {
 			this.observers.get(i).notify(event);
 		}
 	}
+
+	@Override
+	public void write(Json json) {
+		json.writeField(this, "type"); //$NON-NLS-1$
+		json.writeField(this, "objects"); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		Square2dType readType = json.readValue(Square2dType.class, jsonData.get("type")); //$NON-NLS-1$
+		this.setupType(readType);
+		Array<Square2dObject> readObjects = json.readValue(Array.class, jsonData.get("objects")); //$NON-NLS-1$
+		for (Square2dObject object : readObjects) {
+			this.addSquareObject(object, object.getX(), object.getY(), false);
+		}
+	}
+
 }
