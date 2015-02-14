@@ -3,6 +3,7 @@ package org.nognog.freeSquare.square2d.object.types;
 import static org.nognog.freeSquare.model.life.status.StatusInfluences.*;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.food.Food;
@@ -122,6 +123,10 @@ public enum EatableObjectType implements Square2dObjectType<EatableObject> {
 
 	public Taste[] getTaste() {
 		return this.bindFood.getTaste();
+	}
+	
+	public StatusInfluence[] getStatusInfluences(){
+		return Arrays.copyOf(this.influences, this.influences.length);
 	}
 
 	/**

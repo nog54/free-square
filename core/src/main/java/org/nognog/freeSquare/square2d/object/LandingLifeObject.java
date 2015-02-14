@@ -49,24 +49,6 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		this.addAction(Square2dActions.excludeObjectOtherAction(moveToNearestSquareVertexAction));
 	}
 
-	private Vertex getNearestSquareVertex() {
-		final float r1 = this.square.getVertex1().calculateR(this.getX(), this.getY());
-		final float r2 = this.square.getVertex2().calculateR(this.getX(), this.getY());
-		final float r3 = this.square.getVertex3().calculateR(this.getX(), this.getY());
-		final float r4 = this.square.getVertex4().calculateR(this.getX(), this.getY());
-		final float minR = Math.min(Math.min(Math.min(r1, r2), r3), r4);
-		if (minR == r1) {
-			return this.square.getVertex1();
-		}
-		if (minR == r2) {
-			return this.square.getVertex2();
-		}
-		if (minR == r3) {
-			return this.square.getVertex3();
-		}
-		return this.square.getVertex4();
-	}
-
 	@Override
 	public Vector2 nextTargetPosition() {
 		return Square2dUtils.getRandomPointOn(this.square);

@@ -643,14 +643,36 @@ public class Status implements SelfValidatable {
 	private static boolean isRange(double value, double min, double max) {
 		return (value >= min) && (value <= max);
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Status) {
+			return this.equals((Status) obj);
+		}
+		return super.equals(obj);
+	}
+
+	/**
+	 * @param status
+	 * @return true if same value.
+	 */
+	public boolean equals(Status status) {
+		if (this.age != status.age || this.agility != status.agility || this.calm != status.calm || this.communication != status.communication || this.condition != status.condition
+				|| this.curiosity != status.curiosity || this.defiance != status.defiance || this.effeminacy != status.effeminacy || this.flexibility != status.flexibility
+				|| this.fortitude != status.fortitude || this.gift != status.gift || this.hunger != status.hunger || this.knowledge != status.knowledge || this.masculinity != status.masculinity
+				|| this.power != status.power || this.smart != status.smart || this.stress != status.stress || this.tolerance != status.tolerance) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
 		Class<Status> class1 = Status.class;
-		for(Field field : class1.getDeclaredFields()){
-			if(Modifier.isStatic(field.getModifiers())){
+		for (Field field : class1.getDeclaredFields()) {
+			if (Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
 			try {
@@ -660,5 +682,11 @@ public class Status implements SelfValidatable {
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
 	}
 }

@@ -55,6 +55,9 @@ public class EatableObject extends Square2dObject implements LandObject {
 	 * @return amount of actually eaten
 	 */
 	public int eatenBy(LifeObject eater, int eatAmount, Direction direction) {
+		if (eatAmount <= 0) {
+			return 0;
+		}
 		if (this.amount == 0) {
 			return this.amount;
 		}
@@ -136,6 +139,39 @@ public class EatableObject extends Square2dObject implements LandObject {
 
 	private EatableObjectType getEatableObjectType() {
 		return (EatableObjectType) super.getType();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof EatableObject) {
+			return this.equals((EatableObject) obj);
+		}
+		return super.equals(obj);
+	}
+
+	/**
+	 * @param obj
+	 * @return true if type, amount and values of image is same.
+	 */
+	public boolean equals(EatableObject obj) {
+		if (this.getType() != obj.getType()) {
+			return false;
+		}
+		if (this.image.getX() != obj.image.getX() || this.image.getY() != obj.image.getY()) {
+			return false;
+		}
+		if (this.image.getScaleX() != obj.image.getScaleX() || this.image.getScaleY() != obj.image.getScaleY()) {
+			return false;
+		}
+		TextureRegion thisImageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
+		TextureRegion objImageTextureRegion = ((TextureRegionDrawable) obj.image.getDrawable()).getRegion();
+		if (thisImageTextureRegion.getRegionX() != objImageTextureRegion.getRegionX() || thisImageTextureRegion.getRegionY() != objImageTextureRegion.getRegionY()) {
+			return false;
+		}
+		if (thisImageTextureRegion.getRegionWidth() != objImageTextureRegion.getRegionWidth() || thisImageTextureRegion.getRegionHeight() != objImageTextureRegion.getRegionHeight()) {
+			return false;
+		}
+		return true;
 	}
 
 	@SuppressWarnings("boxing")

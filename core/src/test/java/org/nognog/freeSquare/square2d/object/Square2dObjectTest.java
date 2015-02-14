@@ -145,8 +145,7 @@ public class Square2dObjectTest {
 	private void serializeAndDeserialize(Json json, Square2dObjectType type) {
 		Square2d square = Square2dType.GRASSY_SQUARE1.create();
 		Square2dObject object = type.create();
-		Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
-		object.setPosition(randomPoint.x, randomPoint.y);
+		square.addSquareObject(object);
 		String jsonString = json.toJson(object);
 		Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
 		assertThat(object, is(deserializedObject));

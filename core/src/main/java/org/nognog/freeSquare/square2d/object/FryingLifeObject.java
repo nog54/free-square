@@ -11,9 +11,10 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class FryingLifeObject extends LifeObject {
 
-	private FryingLifeObject(){
+	private FryingLifeObject() {
 		super();
 	}
+
 	/**
 	 * @param type
 	 * @param moveSpeed

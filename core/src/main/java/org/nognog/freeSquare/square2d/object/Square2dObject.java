@@ -3,6 +3,7 @@ package org.nognog.freeSquare.square2d.object;
 import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.Square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.SquareObject;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
@@ -277,6 +278,30 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	@Override
 	public boolean isValid() {
 		return this.square != null;
+	}
+
+	/**
+	 * @return nearest vertex
+	 */
+	public Vertex getNearestSquareVertex() {
+		if (this.square == null) {
+			return null;
+		}
+		final float r1 = this.square.getVertex1().calculateR(this.getX(), this.getY());
+		final float r2 = this.square.getVertex2().calculateR(this.getX(), this.getY());
+		final float r3 = this.square.getVertex3().calculateR(this.getX(), this.getY());
+		final float r4 = this.square.getVertex4().calculateR(this.getX(), this.getY());
+		final float minR = Math.min(Math.min(Math.min(r1, r2), r3), r4);
+		if (minR == r1) {
+			return this.square.getVertex1();
+		}
+		if (minR == r2) {
+			return this.square.getVertex2();
+		}
+		if (minR == r3) {
+			return this.square.getVertex3();
+		}
+		return this.square.getVertex4();
 	}
 
 	/**
