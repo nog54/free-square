@@ -12,7 +12,7 @@ import org.nognog.freeSquare.model.life.status.Status;
 import org.nognog.freeSquare.model.life.status.StatusInfluence;
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
-import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
@@ -31,7 +31,7 @@ public class EatableObjectTest {
 	@Test
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
-		Square2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
 		for (EatableObjectType type : EatableObjectType.values()) {
 			EatableObject object = type.create();
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);

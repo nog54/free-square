@@ -130,7 +130,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 					return false;
 				}
 				Vector2 squareCoordinateTapPosition = freeSquare.getSquare().screenToLocalCoordinates(new Vector2(x, y));
-				return freeSquare.getSquare().containsInSquareArea(squareCoordinateTapPosition.x, squareCoordinateTapPosition.y);
+				return freeSquare.getSquare().containsInSquare(squareCoordinateTapPosition.x, squareCoordinateTapPosition.y);
 			}
 
 			private void adjustCameraPositionIfRangeOver() {

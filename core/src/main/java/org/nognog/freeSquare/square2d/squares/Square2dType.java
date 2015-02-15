@@ -1,13 +1,13 @@
 package org.nognog.freeSquare.square2d.squares;
 
 import static org.nognog.freeSquare.Messages.getString;
-import static org.nognog.freeSquare.square2d.Square2d.Vertex.vertex;
+import static org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex.vertex;
 
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
-import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.square2d.SimpleSquare2d;
+import org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex;
 import org.nognog.freeSquare.square2d.Square2dSize;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -28,19 +28,19 @@ public enum Square2dType {
 	;
 
 	@SuppressWarnings("unchecked")
-	private <T extends Square2d> Square2dType(Square2dType type, String name, Square2dSize size) {
+	private <T extends SimpleSquare2d> Square2dType(Square2dType type, String name, Square2dSize size) {
 		this(name, type.texture, type.baseVertex1, type.baseVertex2, type.baseVertex3, type.baseVertex4, size, (Class<T>) type.klass);
 	}
 
-	private <T extends Square2d> Square2dType(String name, String texturePath, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size) {
-		this(name, texturePath, baseVertex1, baseVertex2, baseVertex3, baseVertex4, size, Square2d.class);
+	private <T extends SimpleSquare2d> Square2dType(String name, String texturePath, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size) {
+		this(name, texturePath, baseVertex1, baseVertex2, baseVertex3, baseVertex4, size, SimpleSquare2d.class);
 	}
 
-	private <T extends Square2d> Square2dType(String name, String texturePath, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size, Class<T> klass) {
+	private <T extends SimpleSquare2d> Square2dType(String name, String texturePath, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size, Class<T> klass) {
 		this(name, new Texture(texturePath), baseVertex1, baseVertex2, baseVertex3, baseVertex4, size, klass);
 	}
 
-	private <T extends Square2d> Square2dType(String name, Texture texture, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size, Class<T> klass) {
+	private <T extends SimpleSquare2d> Square2dType(String name, Texture texture, Vertex baseVertex1, Vertex baseVertex2, Vertex baseVertex3, Vertex baseVertex4, Square2dSize size, Class<T> klass) {
 		this.name = name;
 		this.klass = klass;
 		this.texture = texture;
@@ -107,16 +107,16 @@ public enum Square2dType {
 		return this.isConcave;
 	}
 
-	public Square2d create() {
+	public SimpleSquare2d create() {
 		try {
 			Constructor<?> c = this.klass.getConstructor(Square2dType.class);
-			return (Square2d) c.newInstance(this);
+			return (SimpleSquare2d) c.newInstance(this);
 		} catch (Exception e) {
 			// nothing
 		}
 
 		try {
-			return (Square2d) this.klass.newInstance();
+			return (SimpleSquare2d) this.klass.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

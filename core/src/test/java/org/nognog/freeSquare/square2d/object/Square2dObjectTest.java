@@ -12,16 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
-import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dUtils;
+import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.Json;
 
@@ -79,7 +76,7 @@ public class Square2dObjectTest {
 	@Test
 	public final void testSetSquare() {
 		Square2dObject object = EatableObjectType.TOFU.create();
-		Square2d square = mock(Square2d.class);
+		SimpleSquare2d square = mock(SimpleSquare2d.class);
 		object.setSquare(square);
 		try {
 			object.setSquare(square);
@@ -88,7 +85,7 @@ public class Square2dObjectTest {
 			// ok
 		}
 
-		assertThat(object.getSquare(), is(square));
+		assertThat((SimpleSquare2d) object.getSquare(), is(square));
 	}
 
 	@Test
@@ -119,11 +116,11 @@ public class Square2dObjectTest {
 	@Test
 	public final void testIsLandingOnSquare() {
 		for (Square2dType type : Square2dType.values()) {
-			Square2d square = type.create();
+			SimpleSquare2d square = type.create();
 			Square2dObject object = EatableObjectType.TOFU.create();
 			square.addSquareObject(object, MathUtils.random(square.getWidth()), MathUtils.random(square.getHeight()));
 
-			boolean expected1 = square.containsInSquareArea(object.getX(), object.getY());
+			boolean expected1 = square.containsInSquare(object.getX(), object.getY());
 			boolean actual1 = object.isLandingOnSquare();
 			assertThat(actual1, is(expected1));
 
@@ -143,7 +140,7 @@ public class Square2dObjectTest {
 	}
 
 	private void serializeAndDeserialize(Json json, Square2dObjectType type) {
-		Square2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
 		Square2dObject object = type.create();
 		square.addSquareObject(object);
 		String jsonString = json.toJson(object);

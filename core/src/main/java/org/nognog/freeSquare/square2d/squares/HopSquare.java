@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.squares;
 
-import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.SimpleSquare2d;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2014/12/15
  */
-public class HopSquare extends Square2d {
+public class HopSquare extends SimpleSquare2d {
 
 	@SuppressWarnings("unused")
 	private HopSquare() {
@@ -30,7 +30,7 @@ public class HopSquare extends Square2d {
 
 			@Override
 			public void tap(InputEvent event, float x, float y, int pointer, int button) {
-				if (HopSquare.this.containsInSquareArea(x, y)) {
+				if (HopSquare.this.containsInSquare(x, y)) {
 					Action upDown = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 					this.target.addAction(upDown);
 				}

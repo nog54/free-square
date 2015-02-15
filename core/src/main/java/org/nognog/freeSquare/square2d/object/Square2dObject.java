@@ -1,9 +1,10 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
+import org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
-import org.nognog.freeSquare.square2d.Square2d.Vertex;
+import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.SquareObject;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
@@ -204,7 +205,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return false;
 		}
-		return this.square.containsInSquareArea(this.getX(), this.getY());
+		return this.square.containsInSquare(this.getX(), this.getY());
 	}
 
 	/**
@@ -246,7 +247,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		super.act(delta);
 		final float yAfterAct = this.getY();
 		if (yBeforeAct != yAfterAct) {
-			this.square.requestDrawOrderUpdate();
+			this.square.notify(new UpdateObjectEvent(this));
 		}
 	}
 
@@ -287,21 +288,17 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return null;
 		}
-		final float r1 = this.square.getVertex1().calculateR(this.getX(), this.getY());
-		final float r2 = this.square.getVertex2().calculateR(this.getX(), this.getY());
-		final float r3 = this.square.getVertex3().calculateR(this.getX(), this.getY());
-		final float r4 = this.square.getVertex4().calculateR(this.getX(), this.getY());
-		final float minR = Math.min(Math.min(Math.min(r1, r2), r3), r4);
-		if (minR == r1) {
-			return this.square.getVertex1();
+		Vertex[] vertices = this.square.getVertices();
+		int minIndex = -1;
+		float minR = Float.MAX_VALUE;
+		for (int i = 0; i < vertices.length; i++) {
+			final float r = vertices[i].calculateR(this.getX(), this.getY());
+			if (r < minR) {
+				minR = r;
+				minIndex = i;
+			}
 		}
-		if (minR == r2) {
-			return this.square.getVertex2();
-		}
-		if (minR == r3) {
-			return this.square.getVertex3();
-		}
-		return this.square.getVertex4();
+		return vertices[minIndex];
 	}
 
 	/**

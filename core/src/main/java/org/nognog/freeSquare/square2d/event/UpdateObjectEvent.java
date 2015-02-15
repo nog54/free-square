@@ -1,14 +1,14 @@
 package org.nognog.freeSquare.square2d.event;
 
-import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 /**
  * @author goshi 2015/02/02
  */
 public class UpdateObjectEvent extends Square2dEvent {
-	private final Square2d updatedSquare;
+	private final Square2dObject updatedSquare;
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ public class UpdateObjectEvent extends Square2dEvent {
 	/**
 	 * @param updatedSquare
 	 */
-	public UpdateObjectEvent(Square2d updatedSquare) {
+	public UpdateObjectEvent(Square2dObject updatedSquare) {
 		this(updatedSquare, null);
 	}
 
@@ -35,7 +35,7 @@ public class UpdateObjectEvent extends Square2dEvent {
 	 * @param updatedSquare
 	 * @param target
 	 */
-	public UpdateObjectEvent(Square2d updatedSquare, SquareObserver target) {
+	public UpdateObjectEvent(Square2dObject updatedSquare, SquareObserver target) {
 		super(target);
 		this.updatedSquare = updatedSquare;
 	}
@@ -43,7 +43,7 @@ public class UpdateObjectEvent extends Square2dEvent {
 	/**
 	 * @return the updatedObject
 	 */
-	public Square2d getUpdatedObject() {
+	public Square2dObject getUpdatedObject() {
 		return this.updatedSquare;
 	}
 

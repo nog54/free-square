@@ -43,7 +43,7 @@ public class UpdateSquareEvent extends Square2dEvent {
 	/**
 	 * @return the updatedObject
 	 */
-	public Square2d getUpdatedObject() {
+	public Square2d getUpdatedSquare() {
 		return this.updatedSquare;
 	}
 

@@ -9,7 +9,7 @@ import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
-import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
@@ -44,7 +44,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Stage stage;
-	private Square2d square;
+	private SimpleSquare2d square;
 
 	private Vector2 cameraRangeLowerLeft;
 	private Vector2 cameraRangeUpperRight;
@@ -64,15 +64,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void create() {
-		setupPersistItems();
 		this.cameraObservers = new Array<>();
 		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
+		final float timeFromLastRun = setupPersistItems();
 		if (this.player.getSquares().size == 0) {
 			this.square = Square2dType.GRASSY_SQUARE1.create();
 		} else {
-			this.square = (Square2d) this.player.getSquares().get(0);
+			this.square = (SimpleSquare2d) this.player.getSquares().get(0);
 		}
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
@@ -80,6 +80,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
 		this.stage.addActor(this.square);
+		this.actLongTime(timeFromLastRun);
 		this.stage.getCamera().position.x -= this.stage.getCamera().viewportWidth / 2;
 
 		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
@@ -90,6 +91,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		Gdx.input.setInputProcessor(multiplexer);
 		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 24);
 		this.initializeWidgets(logicalCameraWidth);
+		
 	}
 
 	private void initializeWidgets(final int logicalCameraWidth) {
@@ -228,7 +230,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	/**
 	 * @return square
 	 */
-	public Square2d getSquare() {
+	public SimpleSquare2d getSquare() {
 		return this.square;
 	}
 
@@ -344,6 +346,18 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage.act();
 		this.drawStage();
 	}
+	
+	private void actLongTime(float longDelta) {
+		float ramainActTime = longDelta;
+		while(ramainActTime > 0){
+			float delta = 0.5f;
+			ramainActTime -= delta;
+			if(ramainActTime < 0){
+				delta += ramainActTime;
+			}
+			this.stage.act(delta);
+		}
+	}
 
 	private void drawStage() {
 		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1);
@@ -355,6 +369,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void pause() {
 		PersistItems.PLAYER.save(this.player);
 		LastPlay.update();
+		Gdx.graphics.setContinuousRendering(false);
+	}
+	
+	@Override
+	public void resume() {
+		Date lastPauseDate = LastPlay.getLastPlayDate();
+		Date now = new Date();
+		this.actLongTime((now.getTime() - lastPauseDate.getTime()) / 1000f);
+		Gdx.graphics.setContinuousRendering(true);
 	}
 
 	@Override
@@ -371,7 +394,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 	}
 
-	private void setupPersistItems() {
+	private float setupPersistItems() {
 		this.playlog = PersistItems.PLAY_LOG.load();
 		if (this.playlog == null) {
 			System.out.println("new playlog"); //$NON-NLS-1$
@@ -389,8 +412,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$
 			this.lastRun = new Date();
+			return 0;
 		}
-
+		Date now = new Date();
+		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
+		return diffSecond;
 	}
 
 	/**
