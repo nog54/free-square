@@ -10,10 +10,11 @@ import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
-import org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex;
+import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 /**
@@ -44,7 +45,7 @@ public class LandingLifeObjectTest {
 			final boolean actual2 = object.isValid();
 			assertThat(actual2, is(expected2));
 
-			object.setPosition(square.getVertices()[0].x, square.getVertices()[0].y - 1);
+			object.setPosition(square.getVertex1().x, square.getVertex1().y - 1);
 
 			final boolean expected3 = false;
 			final boolean actual3 = object.isValid();
@@ -70,8 +71,9 @@ public class LandingLifeObjectTest {
 			Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
 			assertThat(object, is(deserializedObject));
 
-			object.setX(square.getVertices()[0].x);
-			object.setY(square.getVertices()[0].y - 1);
+			Array<Vertex> vertices = square.getVertices();
+			object.setX(vertices.get(0).x);
+			object.setY(vertices.get(0).y - 1);
 			assertThat(object.isLandingOnSquare(), is(false));
 			jsonString = json.toJson(object);
 			assertThat(object.isLandingOnSquare(), is(true));
@@ -95,8 +97,9 @@ public class LandingLifeObjectTest {
 				// ok
 			}
 			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
-			final float x = (square.getVertices()[1].x + square.getVertices()[3].x) / 2;
-			final float y = (square.getVertices()[0].y + square.getVertices()[2].y) / 2;
+			Array<Vertex> vertices = square.getVertices();
+			final float x = (vertices.get(1).x + vertices.get(3).x) / 2;
+			final float y = (vertices.get(0).y + vertices.get(2).y) / 2;
 			square.addSquareObject(object, x, y);
 			Vertex nearestVertex = object.getNearestSquareVertex();
 			object.goToSquareNearestVertex();

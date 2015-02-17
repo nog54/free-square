@@ -1,5 +1,7 @@
 package org.nognog.freeSquare;
 
+import org.nognog.freeSquare.square2d.Square2d;
+
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -56,7 +58,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 			}
 
 			private boolean isLastTouchBackGround() {
-				return this.lastTouchDownActor == freeSquare.getSquare().getSquareImage() || this.lastTouchDownActor == null;
+				return this.lastTouchDownActor == null || this.lastTouchDownActor.getParent() instanceof Square2d;
 			}
 
 			@Override
@@ -69,7 +71,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				}
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				float currentZoom = camera.zoom;
-				
+
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
 				this.adjustCameraPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());

@@ -28,8 +28,8 @@ public class FryingLifeObject extends LifeObject {
 
 	@Override
 	public Vector2 nextTargetPosition() {
-		final float x = MathUtils.random(0, this.square.getImageWidth());
-		final float y = MathUtils.random(0, this.square.getImageHeight());
+		final float x = MathUtils.random(0, this.square.getWidth());
+		final float y = MathUtils.random(0, this.square.getHeight());
 		return new Vector2(x, y);
 	}
 }

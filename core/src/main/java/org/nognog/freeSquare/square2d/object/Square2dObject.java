@@ -1,9 +1,9 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
-import org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.SquareObject;
@@ -288,17 +288,17 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return null;
 		}
-		Vertex[] vertices = this.square.getVertices();
+		Array<Vertex> vertices = this.square.getVertices();
 		int minIndex = -1;
 		float minR = Float.MAX_VALUE;
-		for (int i = 0; i < vertices.length; i++) {
-			final float r = vertices[i].calculateR(this.getX(), this.getY());
+		for (int i = 0; i < vertices.size; i++) {
+			final float r = vertices.get(i).calculateR(this.getX(), this.getY());
 			if (r < minR) {
 				minR = r;
 				minIndex = i;
 			}
 		}
-		return vertices[minIndex];
+		return vertices.get(minIndex);
 	}
 
 	/**

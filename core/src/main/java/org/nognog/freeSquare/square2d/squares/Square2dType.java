@@ -1,14 +1,14 @@
 package org.nognog.freeSquare.square2d.squares;
 
 import static org.nognog.freeSquare.Messages.getString;
-import static org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex.vertex;
 
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
-import org.nognog.freeSquare.square2d.SimpleSquare2d.Vertex;
 import org.nognog.freeSquare.square2d.Square2dSize;
+import org.nognog.freeSquare.square2d.Vertex;
+import static org.nognog.freeSquare.square2d.Vertex.vertex;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -112,7 +112,7 @@ public enum Square2dType {
 			Constructor<?> c = this.klass.getConstructor(Square2dType.class);
 			return (SimpleSquare2d) c.newInstance(this);
 		} catch (Exception e) {
-			// nothing
+			//
 		}
 
 		try {
@@ -121,9 +121,9 @@ public enum Square2dType {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static void dispose(){
-		for(Square2dType type : Square2dType.values()){
+
+	public static void dispose() {
+		for (Square2dType type : Square2dType.values()) {
 			type.getTexture().dispose();
 		}
 	}

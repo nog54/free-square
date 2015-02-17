@@ -9,7 +9,9 @@ import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
+import org.nognog.freeSquare.square2d.CombinedSquare2d;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
+import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
@@ -44,10 +46,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Stage stage;
-	private SimpleSquare2d square;
+	private Square2d square;
 
-	private Vector2 cameraRangeLowerLeft;
-	private Vector2 cameraRangeUpperRight;
+	private int logicalCameraWidth;
+	private int logicalCameraHeight;
+
 	private boolean isLockingCameraZoom;
 	private boolean isLockingCameraMove;
 
@@ -65,9 +68,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void create() {
 		this.cameraObservers = new Array<>();
-		final int logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
-		final int logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
-
+		this.logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
+		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
+		
 		final float timeFromLastRun = setupPersistItems();
 		if (this.player.getSquares().size == 0) {
 			this.square = Square2dType.GRASSY_SQUARE1.create();
@@ -76,26 +79,28 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
-		this.player.addSquare(this.square);
 
-		this.stage = new Stage(new FitViewport(logicalCameraWidth, logicalCameraHeight));
-		this.stage.addActor(this.square);
+		this.player.addSquare(this.square);
+		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
+		CombinedSquare2d combineSquare = new CombinedSquare2d(this.square);
+		SimpleSquare2d appendSquare = Square2dType.GRASSY_SQUARE1.create();
+		combineSquare.combine(this.square.getVertices().get(0), appendSquare, appendSquare.getVertices().get(3));
+		this.stage.addActor(combineSquare);
+		this.square = combineSquare;
 		this.actLongTime(timeFromLastRun);
 		this.stage.getCamera().position.x -= this.stage.getCamera().viewportWidth / 2;
 
-		this.cameraRangeLowerLeft = new Vector2(this.square.getX(), this.square.getY());
-		this.cameraRangeUpperRight = new Vector2(this.square.getX() + this.square.getWidth(), this.square.getY() + Math.max(this.square.getHeight(), logicalCameraHeight));
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.font = FontUtil.createMPlusFont(logicalCameraWidth / 24);
-		this.initializeWidgets(logicalCameraWidth);
-		
+		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 24);
+		this.initializeWidgets();
+
 	}
 
-	private void initializeWidgets(final int logicalCameraWidth) {
-		this.menu = new Menu(this.font, logicalCameraWidth / 6, new FlickInputListener() {
+	private void initializeWidgets() {
+		this.menu = new Menu(this.font, this.logicalCameraWidth / 6, new FlickInputListener() {
 			@Override
 			public void up() {
 				FreeSquare.this.showSquareOnly();
@@ -230,7 +235,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	/**
 	 * @return square
 	 */
-	public SimpleSquare2d getSquare() {
+	public Square2d getSquare() {
 		return this.square;
 	}
 
@@ -252,14 +257,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 * @return lower-left point of camera range
 	 */
 	public Vector2 getCameraRangeLowerLeft() {
-		return this.cameraRangeLowerLeft;
+		return new Vector2(this.square.getLeftEndX(), this.square.getButtomEndY());
 	}
 
 	/**
 	 * @return upper-right point of camera range
 	 */
 	public Vector2 getCameraRangeUpperRight() {
-		return this.cameraRangeUpperRight;
+		return new Vector2(this.square.getRightEndX(), this.square.getTopEndY());
 	}
 
 	/**
@@ -346,13 +351,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage.act();
 		this.drawStage();
 	}
-	
+
 	private void actLongTime(float longDelta) {
 		float ramainActTime = longDelta;
-		while(ramainActTime > 0){
+		while (ramainActTime > 0) {
 			float delta = 0.5f;
 			ramainActTime -= delta;
-			if(ramainActTime < 0){
+			if (ramainActTime < 0) {
 				delta += ramainActTime;
 			}
 			this.stage.act(delta);
@@ -371,7 +376,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		LastPlay.update();
 		Gdx.graphics.setContinuousRendering(false);
 	}
-	
+
 	@Override
 	public void resume() {
 		Date lastPauseDate = LastPlay.getLastPlayDate();
@@ -406,7 +411,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			throw new RuntimeException();
 			//System.out.println("new player"); //$NON-NLS-1$
 			//this.player = new Player("goshi"); //$NON-NLS-1$
-			//PersistItems.PLAYER.save(this.player);
+			// PersistItems.PLAYER.save(this.player);
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
