@@ -30,12 +30,12 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 
 		@Override
 		public int compare(Actor actor1, Actor actor2) {
-			boolean actor1IsImage = actor1 instanceof Square2dObject;
-			boolean actor2IsImage = actor2 instanceof Square2dObject;
-			if (actor1IsImage && !actor2IsImage) {
+			boolean actor1IsSquareObject = actor1 instanceof Square2dObject;
+			boolean actor2IsSquareObject = actor2 instanceof Square2dObject;
+			if (actor1IsSquareObject && !actor2IsSquareObject) {
 				return 1;
 			}
-			if (!actor1IsImage && actor2IsImage) {
+			if (!actor1IsSquareObject && actor2IsSquareObject) {
 				return -1;
 			}
 			float actor1Y = actor1.getY() - actor1.getOriginY();
@@ -245,7 +245,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 	}
 
-	private void requestDrawOrderUpdate() {
+	protected void requestDrawOrderUpdate() {
 		this.isRequestedDrawOrderUpdate = true;
 	}
 

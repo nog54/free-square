@@ -12,6 +12,13 @@ public class Vertex {
 	public final float y;
 
 	/**
+	 * @param vertex
+	 */
+	public Vertex(Vertex vertex) {
+		this(vertex.x, vertex.y);
+	}
+
+	/**
 	 * @param x
 	 * @param y
 	 */
@@ -29,6 +36,14 @@ public class Vertex {
 		final float diffX = this.x - x1;
 		final float diffY = this.y - y1;
 		return (float) Math.sqrt(diffX * diffX + diffY * diffY);
+	}
+
+	/**
+	 * @param vertex
+	 * @return sqrt((this.x - x) ^ 2 + (this.y - y) ^ 2 )
+	 */
+	public float calculateR(Vertex vertex) {
+		return this.calculateR(vertex.x, vertex.y);
 	}
 
 	/**
