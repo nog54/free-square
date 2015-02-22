@@ -230,9 +230,21 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 
 	@Override
 	public void addSquareObserver(SquareObserver observer) {
+		if (this.observers.contains(observer, true)) {
+			return;
+		}
 		this.observers.add(observer);
 	}
-
+	
+	/**
+	 * @param addObservers
+	 */
+	public void addSquareObservers(SquareObserver... addObservers) {
+		for(SquareObserver observer : addObservers){
+			this.addSquareObserver(observer);
+		}
+	}
+	
 	@Override
 	public void removeSquareObserver(SquareObserver observer) {
 		this.observers.removeValue(observer, true);

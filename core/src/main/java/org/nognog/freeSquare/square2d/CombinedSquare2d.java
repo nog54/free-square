@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -265,11 +266,11 @@ public class CombinedSquare2d extends Square2d {
 		}
 		return false;
 	}
-	
-	private static float[] toFloatArray(Vertex[] target){
+
+	private static float[] toFloatArray(Vertex[] target) {
 		float[] result = new float[target.length * 2];
 		int i = 0;
-		for(Vertex vertex : target){
+		for (Vertex vertex : target) {
 			result[i++] = vertex.x;
 			result[i++] = vertex.y;
 		}
@@ -284,6 +285,7 @@ public class CombinedSquare2d extends Square2d {
 		}
 		this.squares.add(square);
 		this.addActorForce(square);
+		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
 		this.requestDrawOrderUpdate();
 	}
 

@@ -10,7 +10,6 @@ import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 /**
  * @author goshi 2015/01/17
@@ -99,10 +98,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 
 			@Override
 			public boolean tap(float x, float y, int count, int button) {
-				if (!this.isLastTouchBackGround()) {
-					return false;
-				}
-				if (this.tapsSquare(x, y)) {
+				if(this.lastTouchDownActor != null){
 					return false;
 				}
 
@@ -125,14 +121,6 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 					return true;
 				}
 				return false;
-			}
-
-			private boolean tapsSquare(float x, float y) {
-				if (freeSquare.getSquare().getTouchable() == Touchable.disabled) {
-					return false;
-				}
-				Vector2 squareCoordinateTapPosition = freeSquare.getSquare().screenToLocalCoordinates(new Vector2(x, y));
-				return freeSquare.getSquare().containsInSquare(squareCoordinateTapPosition.x, squareCoordinateTapPosition.y);
 			}
 
 			private void adjustCameraPositionIfRangeOver() {

@@ -36,6 +36,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
@@ -307,53 +308,54 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void showMenu(float x, float y) {
 		this.menu.setPosition(x, y);
-		final float currentCameraZoom = ((OrthographicCamera) this.stage.getCamera()).zoom;
-		this.menu.setScale(currentCameraZoom);
-		this.stage.getRoot().addActor(this.menu);
-		this.addCameraObserver(this.menu);
-		this.menu.updateCamera(this.stage.getCamera());
-		this.disableSquare();
+		this.menu.setScale(((OrthographicCamera) this.stage.getCamera()).zoom);
+		this.show(this.menu);
 	}
 
 	void hideMenu() {
 		this.stage.getRoot().removeActor(this.menu);
 		this.removeCameraObserver(this.menu);
 	}
+	
+	private void show(Actor actor){
+		this.stage.getRoot().addActor(actor);
+		if(actor instanceof CameraObserver){
+			this.addCameraObserver((CameraObserver) actor);
+			((CameraObserver) actor).updateCamera(this.stage.getCamera());
+		}
+		this.stage.cancelTouchFocus();
+		this.disableSquare();
+	}
+	
+	private void hide(Actor actor){
+		this.stage.getRoot().removeActor(actor);
+		if(actor instanceof CameraObserver){
+			this.removeCameraObserver((CameraObserver) actor);
+		}
+	}
 
 	void showPlayerItemList() {
-		this.stage.getRoot().addActor(this.playerItemList);
-		this.addCameraObserver(this.playerItemList);
-		this.playerItemList.updateCamera(this.stage.getCamera());
-		this.disableSquare();
+		this.show(this.playerItemList);
 	}
 
 	void hidePlayerItemList() {
-		this.stage.getRoot().removeActor(this.playerItemList);
-		this.removeCameraObserver(this.playerItemList);
+		this.hide(this.playerItemList);
 	}
 
 	void showPlayersLifeList() {
-		this.stage.getRoot().addActor(this.playersLifeList);
-		this.addCameraObserver(this.playersLifeList);
-		this.playersLifeList.updateCamera(this.stage.getCamera());
-		this.disableSquare();
+		this.show(this.playersLifeList);
 	}
 
 	void hidePlayersLifeList() {
-		this.stage.getRoot().removeActor(this.playersLifeList);
-		this.removeCameraObserver(this.playersLifeList);
+		this.hide(this.playersLifeList);
 	}
 
 	void showItemList() {
-		this.stage.getRoot().addActor(this.itemList);
-		this.addCameraObserver(this.itemList);
-		this.itemList.updateCamera(this.stage.getCamera());
-		this.disableSquare();
+		this.show(this.itemList);
 	}
 
 	void hideItemList() {
-		this.stage.getRoot().removeActor(this.itemList);
-		this.removeCameraObserver(this.itemList);
+		this.hide(this.itemList);
 	}
 
 	@Override
