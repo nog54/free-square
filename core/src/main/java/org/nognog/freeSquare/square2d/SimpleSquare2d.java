@@ -152,6 +152,13 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 	public Vertex getVertex4() {
 		return this.type.vertex4;
 	}
+	
+	/**
+	 * @return type
+	 */
+	public Square2dType getSquare2dType(){
+		return this.type;
+	}
 
 	@Override
 	public String toString() {

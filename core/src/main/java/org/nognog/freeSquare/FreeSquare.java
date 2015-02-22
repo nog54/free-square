@@ -26,6 +26,8 @@ import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
 import org.nognog.freeSquare.square2d.ui.PlayerItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
+import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
+import org.nognog.freeSquare.square2d.ui.Square;
 import org.nognog.freeSquare.square2d.ui.SquareObserver;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -64,6 +66,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Menu menu;
 	private PlayerItemList playerItemList;
 	private PlayersLifeList playersLifeList;
+	private PlayersSquareList playersSquareList;
 	private ItemList itemList;
 
 	@Override
@@ -114,7 +117,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.menu = new Menu(this.font, this.logicalCameraWidth / 6, new FlickInputListener() {
 			@Override
 			public void up() {
-				FreeSquare.this.showSquareOnly();
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.showPlayersSquareList();
 			}
 
 			@Override
@@ -227,6 +231,19 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				}
 			}
 		};
+		
+		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
+
+			@Override
+			protected void selectedItemPanned(Square<?> pannedItem, float x, float y, float deltaX, float deltaY) {
+				//
+			}
+
+			@Override
+			protected void touchUp(float x, float y) {
+				//
+			}
+		};
 
 		this.itemList = new ItemList(this.stage.getCamera(), Square2dObjectItem.getAllItems(), this.font) {
 			@Override
@@ -289,6 +306,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.hideMenu();
 		this.hidePlayerItemList();
 		this.hidePlayersLifeList();
+		this.hidePlayersSquareList();
 		this.hideItemList();
 		this.enableSquare();
 	}
@@ -348,6 +366,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void hidePlayersLifeList() {
 		this.hide(this.playersLifeList);
+	}
+	
+	void showPlayersSquareList() {
+		this.show(this.playersSquareList);
+	}
+
+	void hidePlayersSquareList() {
+		this.hide(this.playersSquareList);
 	}
 
 	void showItemList() {
