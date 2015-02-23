@@ -2,7 +2,6 @@ package org.nognog.freeSquare.square2d.object.types;
 
 import java.lang.reflect.Constructor;
 
-import org.junit.runners.model.InitializationError;
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
@@ -15,11 +14,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * @author goshi
- * 2015/02/08
+ * @author goshi 2015/02/08
  */
 @SuppressWarnings("javadoc")
-public  enum LifeObjectType implements Square2dObjectType<LifeObject> {
+public enum LifeObjectType implements Square2dObjectType<LifeObject> {
 	RIKI(Family.RIKI, Resources.rikiPath, LandingLifeObject.class, 100),
 
 	SMALL_RIKI(Family.SMALL_RIKI, RIKI, 50),
@@ -74,11 +72,7 @@ public  enum LifeObjectType implements Square2dObjectType<LifeObject> {
 	private final Color color;
 
 	static {
-		try {
-			validateFamilyDuplication();
-		} catch (InitializationError e) {
-			throw new RuntimeException(e);
-		}
+		validateFamilyDuplication();
 	}
 
 	@Override
@@ -129,12 +123,10 @@ public  enum LifeObjectType implements Square2dObjectType<LifeObject> {
 		}
 	}
 
-	private static void validateFamilyDuplication() throws InitializationError {
+	private static void validateFamilyDuplication() {
 		Array<Family> families = new Array<>();
 		for (LifeObjectType type : LifeObjectType.values()) {
-			if (families.contains(type.family, true)) {
-				throw new InitializationError("Family is duplicated"); //$NON-NLS-1$
-			}
+			assert !families.contains(type.family, true);
 		}
 	}
 

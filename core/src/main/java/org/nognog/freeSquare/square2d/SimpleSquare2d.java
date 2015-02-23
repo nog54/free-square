@@ -58,6 +58,7 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		this.type = type;
 		this.squareImage = this.createSquareImage(type);
 		super.addActorForce(this.squareImage);
+		this.setName(type.getName());
 	}
 
 	private Image createSquareImage(Square2dType createSquareType) {
@@ -152,16 +153,18 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 	public Vertex getVertex4() {
 		return this.type.vertex4;
 	}
-	
+
 	/**
 	 * @return type
 	 */
-	public Square2dType getSquare2dType(){
+	public Square2dType getSquare2dType() {
 		return this.type;
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * @return vertices string
+	 */
+	public String toVerticesString() {
 		StringBuilder sb = new StringBuilder(this.type.getName());
 		sb.append(this.type.vertex1).append("-").append(this.type.vertex2).append("-").append(this.type.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				.append(this.type.vertex4);

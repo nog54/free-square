@@ -84,6 +84,7 @@ project(":core") {
 		compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
 		compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 		compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+		compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 		testCompile "junit:junit:+"
 		testCompile "org.exparity:hamcrest-date:1.0.1"
 		testCompile "org.mockito:mockito-core:1.+"
