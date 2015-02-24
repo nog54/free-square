@@ -7,7 +7,7 @@ import java.util.Date;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
-import org.nognog.freeSquare.square2d.ui.Square;
+import org.nognog.freeSquare.model.square.Square;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;

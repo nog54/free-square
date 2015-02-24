@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 
 import com.badlogic.gdx.graphics.Camera;

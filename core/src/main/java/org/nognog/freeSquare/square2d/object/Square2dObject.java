@@ -1,13 +1,13 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
+import org.nognog.freeSquare.model.square.SquareObject;
+import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.ui.SquareObject;
-import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

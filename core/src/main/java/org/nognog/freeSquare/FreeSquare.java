@@ -9,6 +9,8 @@ import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
+import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.CombinedSquare2d;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
@@ -27,8 +29,6 @@ import org.nognog.freeSquare.square2d.ui.Menu;
 import org.nognog.freeSquare.square2d.ui.PlayerItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
-import org.nognog.freeSquare.square2d.ui.Square;
-import org.nognog.freeSquare.square2d.ui.SquareObserver;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;

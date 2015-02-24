@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d;
 
-import org.nognog.freeSquare.square2d.ui.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareObserver;
 
 import com.badlogic.gdx.utils.Array;
 

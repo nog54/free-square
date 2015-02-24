@@ -11,11 +11,11 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
-import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;

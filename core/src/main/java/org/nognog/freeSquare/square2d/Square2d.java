@@ -2,12 +2,12 @@ package org.nognog.freeSquare.square2d;
 
 import java.util.Comparator;
 
+import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.RemoveObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.ui.Square;
-import org.nognog.freeSquare.square2d.ui.SquareObserver;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Polygon;
