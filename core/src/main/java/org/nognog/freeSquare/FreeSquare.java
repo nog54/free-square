@@ -74,7 +74,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.cameraObservers = new Array<>();
 		this.logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
-		
+
 		final float timeFromLastRun = setupPersistItems();
 		if (this.player.getSquares().size == 0) {
 			this.square = Square2dType.GRASSY_SQUARE1.create();
@@ -89,21 +89,20 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		CombinedSquare2d combineSquare = new CombinedSquare2d(this.square);
 		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
 		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-		combineSquare.combine(this.square.getVertices().get(0), appendSquare1, appendSquare1.getVertices().get(3));
+		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+
+		combineSquare.combine(combineSquare.getVertices().get(0), appendSquare1, appendSquare1.getVertices().get(1));
+		System.out.println(combineSquare.getVertices());
 		combineSquare.combine(combineSquare.getVertices().get(0), appendSquare2, appendSquare2.getVertex2());
-		combineSquare.combine(combineSquare.getVertices().get(1), appendSquare3, appendSquare3.getVertex1());
-		combineSquare.combine(combineSquare.getVertices().get(1), appendSquare4, appendSquare4.getVertex1());
-		combineSquare.combine(combineSquare.getVertices().get(1), appendSquare5, appendSquare5.getVertex1());
+		combineSquare.combine(combineSquare.getVertices().get(combineSquare.getVertices().size - 1), appendSquare3, appendSquare3.getVertex2());
+
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
 		this.actLongTime(timeFromLastRun);
 		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
 		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
-		
+
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
@@ -189,7 +188,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					}
 					FreeSquare.this.showPlayerItemList();
 					this.addedObject = null;
-					this.getColor().a = 1f;
 				}
 			}
 		};
@@ -227,21 +225,39 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					}
 					FreeSquare.this.showPlayersLifeList();
 					this.addedObject = null;
-					this.getColor().a = 1f;
 				}
 			}
 		};
-		
+
 		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
+
+			private Square2d addedSquare;
 
 			@Override
 			protected void selectedItemPanned(Square<?> pannedItem, float x, float y, float deltaX, float deltaY) {
-				//
+				if (pannedItem == null) {
+					return;
+				}
+				if (this.addedSquare == null) {
+					if (pannedItem instanceof Square2d) {
+						this.addedSquare = (Square2d) pannedItem;
+						Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
+						this.addedSquare.setPosition(squareCoodinateXY.x, squareCoodinateXY.y);
+						FreeSquare.this.getStage().getRoot().addActor(this.addedSquare);
+						FreeSquare.this.showSquareOnly();
+					}
+				} else {
+					this.addedSquare.moveBy(deltaX, deltaY);
+				}
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				//
+				if (this.addedSquare != null) {
+					FreeSquare.this.getStage().getRoot().removeActor(this.addedSquare);
+					FreeSquare.this.showPlayersSquareList();
+					this.addedSquare = null;
+				}
 			}
 		};
 
@@ -334,20 +350,20 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage.getRoot().removeActor(this.menu);
 		this.removeCameraObserver(this.menu);
 	}
-	
-	private void show(Actor actor){
+
+	private void show(Actor actor) {
 		this.stage.getRoot().addActor(actor);
-		if(actor instanceof CameraObserver){
+		if (actor instanceof CameraObserver) {
 			this.addCameraObserver((CameraObserver) actor);
 			((CameraObserver) actor).updateCamera(this.stage.getCamera());
 		}
 		this.stage.cancelTouchFocus();
 		this.disableSquare();
 	}
-	
-	private void hide(Actor actor){
+
+	private void hide(Actor actor) {
 		this.stage.getRoot().removeActor(actor);
-		if(actor instanceof CameraObserver){
+		if (actor instanceof CameraObserver) {
 			this.removeCameraObserver((CameraObserver) actor);
 		}
 	}
@@ -367,7 +383,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	void hidePlayersLifeList() {
 		this.hide(this.playersLifeList);
 	}
-	
+
 	void showPlayersSquareList() {
 		this.show(this.playersSquareList);
 	}
