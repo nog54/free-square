@@ -14,7 +14,6 @@ import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 /**
@@ -71,9 +70,9 @@ public class LandingLifeObjectTest {
 			Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
 			assertThat(object, is(deserializedObject));
 
-			Array<Vertex> vertices = square.getVertices();
-			object.setX(vertices.get(0).x);
-			object.setY(vertices.get(0).y - 1);
+			Vertex[] vertices = square.getVertices();
+			object.setX(vertices[0].x);
+			object.setY(vertices[0].y - 1);
 			assertThat(object.isLandingOnSquare(), is(false));
 			jsonString = json.toJson(object);
 			assertThat(object.isLandingOnSquare(), is(true));
@@ -97,9 +96,9 @@ public class LandingLifeObjectTest {
 				// ok
 			}
 			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
-			Array<Vertex> vertices = square.getVertices();
-			final float x = (vertices.get(1).x + vertices.get(3).x) / 2;
-			final float y = (vertices.get(0).y + vertices.get(2).y) / 2;
+			Vertex[] vertices = square.getVertices();
+			final float x = (vertices[1].x + vertices[3].x) / 2;
+			final float y = (vertices[0].y + vertices[2].y) / 2;
 			square.addSquareObject(object, x, y);
 			Vertex nearestVertex = object.getNearestSquareVertex();
 			object.goToSquareNearestVertex();

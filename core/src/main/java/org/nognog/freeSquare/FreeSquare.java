@@ -87,15 +87,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.player.addSquare(this.square);
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		CombinedSquare2d combineSquare = new CombinedSquare2d(this.square);
-		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-
-		combineSquare.combine(combineSquare.getVertices().get(0), appendSquare1, appendSquare1.getVertices().get(1));
-		System.out.println(combineSquare.getVertices());
-		combineSquare.combine(combineSquare.getVertices().get(0), appendSquare2, appendSquare2.getVertex2());
-		combineSquare.combine(combineSquare.getVertices().get(combineSquare.getVertices().size - 1), appendSquare3, appendSquare3.getVertex2());
-
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
+		// for (int i = 0; i < combineSquare.getVertices().length; i++) {
+		// for (int j = 0; j < appendSquare2.getVertices().length; j++) {
+		combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
+		combineSquare.separate(appendSquare2);
+		// }
+		// }
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;

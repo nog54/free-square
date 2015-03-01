@@ -288,17 +288,17 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return null;
 		}
-		Array<Vertex> vertices = this.square.getVertices();
+		Vertex[] vertices = this.square.getVertices();
 		int minIndex = -1;
 		float minR = Float.MAX_VALUE;
-		for (int i = 0; i < vertices.size; i++) {
-			final float r = vertices.get(i).calculateR(this.getX(), this.getY());
+		for (int i = 0; i < vertices.length; i++) {
+			final float r = vertices[i].calculateR(this.getX(), this.getY());
 			if (r < minR) {
 				minR = r;
 				minIndex = i;
 			}
 		}
-		return vertices.get(minIndex);
+		return vertices[minIndex];
 	}
 
 	/**

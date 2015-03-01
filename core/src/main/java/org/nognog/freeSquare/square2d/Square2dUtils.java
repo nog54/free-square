@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2014/12/24
@@ -18,7 +17,7 @@ public class Square2dUtils {
 	 * @return true if square vertices is twist.
 	 */
 	public static boolean isTwist(Square2d square) {
-		return isTwist(square.getVertices().<Vertex> toArray(Vertex.class));
+		return isTwist(square.getVertices());
 	}
 
 	/**
@@ -77,7 +76,12 @@ public class Square2dUtils {
 		return new Polygon(points);
 	}
 
-	private static boolean contains(Object[] objects, Object findObject) {
+	/**
+	 * @param objects
+	 * @param findObject
+	 * @return true if contains same object.
+	 */
+	public static boolean contains(Object[] objects, Object findObject) {
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] == findObject) {
 				return true;
@@ -105,14 +109,14 @@ public class Square2dUtils {
 	 * @return random point in square2d
 	 */
 	public static Vector2 getRandomPointOn(Square2d square) {
-		Array<Vertex> vertices = square.getVertices();
-		if (vertices.size < 3) {
+		Vertex[] vertices = square.getVertices();
+		if (vertices.length < 3) {
 			return null;
 		}
-		Vertex baseVertex = vertices.get(0);
-		final int randomVertexIndex1 = MathUtils.random(1, vertices.size - 2);
+		Vertex baseVertex = vertices[0];
+		final int randomVertexIndex1 = MathUtils.random(1, vertices.length - 2);
 		final int randomVertexIndex2 = randomVertexIndex1 + 1;
-		return getRandomPointOn(baseVertex, vertices.get(randomVertexIndex1), vertices.get(randomVertexIndex2));
+		return getRandomPointOn(baseVertex, vertices[randomVertexIndex1], vertices[randomVertexIndex2]);
 	}
 
 	/**

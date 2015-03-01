@@ -144,16 +144,16 @@ public class SimpleSquare2dTest {
 	public final void testContainsInSquareArea() {
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
 		boolean expected1 = true;
-		Array<Vertex> vertices = square.getVertices();
-		boolean actual1 = square.containsInSquare(vertices.get(0).x, vertices.get(0).y);
+		Vertex[] vertices = square.getVertices();
+		boolean actual1 = square.containsInSquare(vertices[0].x, vertices[0].y);
 		assertThat(actual1, is(expected1));
 
 		boolean expected2 = true;
-		boolean actual2 = square.containsInSquare(vertices.get(0).x, (vertices.get(1).y + vertices.get(2).y) / 2);
+		boolean actual2 = square.containsInSquare(vertices[0].x, (vertices[1].y + vertices[2].y) / 2);
 		assertThat(actual2, is(expected2));
 
 		boolean expected3 = false;
-		boolean actual3 = square.containsInSquare(vertices.get(0).x, Math.nextAfter(vertices.get(0).y, Float.NEGATIVE_INFINITY));
+		boolean actual3 = square.containsInSquare(vertices[0].x, Math.nextAfter(vertices[0].y, Float.NEGATIVE_INFINITY));
 		assertThat(actual3, is(expected3));
 	}
 

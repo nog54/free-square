@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.GeometryUtils;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
@@ -17,11 +16,14 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2015/02/15
  */
 public class CombinedSquare2d extends Square2d {
+	private Square2d base;
 	private Array<Square2d> squares;
 	private Array<Vertex> vertices;
 	private Array<CombinePoint> combinePoints;
 	private float leftEndX, rightEndX;
 	private float buttomEndY, topEndY;
+
+	private transient Array<Square2d> separatableSquares;
 
 	private boolean drawEdge;
 
@@ -29,10 +31,13 @@ public class CombinedSquare2d extends Square2d {
 	 * @param base
 	 */
 	public CombinedSquare2d(Square2d base) {
+		this.base = base;
 		this.squares = new Array<>();
 		this.addSquare(base, 0, 0);
 		this.vertices = new Array<>();
-		this.vertices.addAll(base.getVertices());
+		for (Vertex baseVertex : base.getVertices()) {
+			this.vertices.add(new Vertex(baseVertex));
+		}
 		this.combinePoints = new Array<>();
 		this.leftEndX = base.getLeftEndX();
 		this.rightEndX = base.getRightEndX();
@@ -41,8 +46,15 @@ public class CombinedSquare2d extends Square2d {
 	}
 
 	@Override
-	public Array<Vertex> getVertices() {
-		return new Array<>(this.vertices);
+	public Vertex[] getVertices() {
+		return this.vertices.<Vertex> toArray(Vertex.class);
+	}
+
+	/**
+	 * @return combine points
+	 */
+	public CombinePoint[] getCombinePoints() {
+		return this.combinePoints.<CombinePoint> toArray(CombinePoint.class);
 	}
 
 	private void addCombinePoint(CombinePoint... points) {
@@ -122,51 +134,59 @@ public class CombinedSquare2d extends Square2d {
 	 * @return true if success
 	 */
 	public boolean combine(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetsCombineVertex) {
-		if (!this.vertices.contains(thisCombineVertex, true)) {
-			return false;
-		}
-		if (this.contains(targetSquare)) {
-			return false;
-		}
-		final Array<Vertex> targetSquareVertices = targetSquare.getVertices();
-		if (!targetSquareVertices.contains(targetsCombineVertex, true)) {
-			return false;
-		}
 		if (!this.isCombinableWith(thisCombineVertex, targetSquare, targetsCombineVertex)) {
 			return false;
 		}
-		Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquareVertices, targetsCombineVertex);
+		Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquare, targetsCombineVertex);
 		this.addCombinePoint(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 		this.normalizeVertices();
 		this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
-		recalculateBorder();
+		this.separatableSquares = null;
 		return true;
 	}
 
-	private Array<CombinePoint> combineVertices(Vertex thisCombineVertex, Array<Vertex> targetSquareVertices, Vertex targetsCombineVertex) {
-		return combineVertices(this.vertices, thisCombineVertex, targetSquareVertices, targetsCombineVertex);
+	private boolean isCombinableWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetsCombineVertex) {
+		if (!this.contains(thisCombineVertex)) {
+			return false;
+		}
+		if (this.contains(targetSquare) || targetSquare == this) {
+			return false;
+		}
+		if (!targetSquare.contains(targetsCombineVertex)) {
+			return false;
+		}
+		if (!this.isValidEvenIfCombinedWith(thisCombineVertex, targetSquare, targetsCombineVertex)) {
+			return false;
+		}
+		return true;
 	}
 
-	private static Array<CombinePoint> combineVertices(Array<Vertex> dest, Vertex destCombineVertex, Array<Vertex> target, Vertex targetCombineVertex) {
-		Array<CombinePoint> combinePoints = new Array<>();
-		Vertex[] destVertices = dest.<Vertex> toArray(Vertex.class);
-		Vertex[] targetVertices = target.<Vertex> toArray(Vertex.class);
+	private Array<CombinePoint> combineVertices(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
+		return combineVertices(this, this.vertices, thisCombineVertex, targetSquare, targetSquare.getVertices(), targetCombineVertex);
+	}
+
+	private static Array<CombinePoint> combineVertices(Square2d destSquare, Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Vertex[] target, Vertex targetCombineVertex) {
+		return combineVertices(destSquare, dest, destCombineVertex, targetSquare, new Array<>(target), targetCombineVertex);
+	}
+
+	private static Array<CombinePoint> combineVertices(Square2d destSquare, Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Array<Vertex> target, Vertex targetCombineVertex) {
+		Array<CombinePoint> newCombinePoints = new Array<>();
+		Vertex[] beforeDestVertices = dest.<Vertex> toArray(Vertex.class);
+		Vertex[] beforeTargetVertices = target.<Vertex> toArray(Vertex.class);
 		final int verteciesInsertStartIndex = dest.indexOf(destCombineVertex, true) + 1;
-		for (int i = 0; i < targetVertices.length; i++) {
+		for (int i = 0; i < beforeTargetVertices.length; i++) {
 			final int insertTargetSquareVertexIndex = (target.indexOf(targetCombineVertex, true) + 1 + i) % target.size;
-			final float insertVertexX = destCombineVertex.x + (targetVertices[insertTargetSquareVertexIndex].x - targetCombineVertex.x);
-			final float insertVertexY = destCombineVertex.y + (targetVertices[insertTargetSquareVertexIndex].y - targetCombineVertex.y);
-			Vertex insertVertex = new Vertex(insertVertexX, insertVertexY);
-			for (int j = 0; j < destVertices.length; j++) {
-				if (CombinedSquare2dUtils.canBeRegardedAsSameVertex(destVertices[j], insertVertex)) {
-					combinePoints.add(new CombinePoint(destVertices[j], targetVertices[insertTargetSquareVertexIndex]));
-					insertVertex = new Vertex(destVertices[j]);
+			Vertex insertVertex = createAfterCombineTargetVertex(beforeTargetVertices[insertTargetSquareVertexIndex], destCombineVertex, targetCombineVertex);
+			for (int j = 0; j < beforeDestVertices.length; j++) {
+				if (CombinedSquare2dUtils.canBeRegardedAsSameVertex(beforeDestVertices[j], insertVertex)) {
+					insertVertex = new Vertex(beforeDestVertices[j]);
+					newCombinePoints.add(new CombinePoint(destSquare, beforeDestVertices[j], targetSquare, beforeTargetVertices[insertTargetSquareVertexIndex], insertVertex));
 					break;
 				}
 			}
 			dest.insert(verteciesInsertStartIndex + i, insertVertex);
 		}
-		return combinePoints;
+		return newCombinePoints;
 	}
 
 	private void recalculateBorder() {
@@ -176,8 +196,7 @@ public class CombinedSquare2d extends Square2d {
 		this.recalculateTopEndY();
 	}
 
-	private boolean isCombinableWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
-		final Vertex[] thisPolygonVertices = this.vertices.<Vertex> toArray(Vertex.class);
+	private boolean isValidEvenIfCombinedWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
 		final Vertex[] afterCombineTargetPolygonVertices = this.createAfterCombineTargetVertices(thisCombineVertex, targetSquare, targetCombineVertex);
 		if (afterCombineTargetPolygonVertices == null) {
 			return false;
@@ -185,37 +204,20 @@ public class CombinedSquare2d extends Square2d {
 
 		Array<Vertex> simulatedAfterCombineVertices = new Array<>();
 		simulatedAfterCombineVertices.addAll(this.getVertices());
-		combineVertices(simulatedAfterCombineVertices, thisCombineVertex, targetSquare.getVertices(), targetCombineVertex);
-		normalizeVertices(simulatedAfterCombineVertices);
+		combineVertices(this, simulatedAfterCombineVertices, thisCombineVertex, targetSquare, targetSquare.getVertices(), targetCombineVertex);
+		CombinedSquare2dUtils.normalizeVertices(simulatedAfterCombineVertices);
 		if (Square2dUtils.isTwist(simulatedAfterCombineVertices.<Vertex> toArray(Vertex.class))) {
-			 return false;
+			return false;
 		}
-		// if (CombinedSquare2dUtils.countAdjacentPoint(thisPolygonVertices,
-		// afterCombineTargetPolygonVertices) <= 1) {
-		// return false;
-		// }
-		//
-		// if
-		// (CombinedSquare2dUtils.existsInvalidContainedVertex(thisPolygonVertices,
-		// afterCombineTargetPolygonVertices)) {
-		// return false;
-		// }
-		// if
-		// (CombinedSquare2dUtils.existsInvalidContainedVertex(afterCombineTargetPolygonVertices,
-		// thisPolygonVertices)) {
-		// return false;
-		// }
 		return true;
 	}
 
 	private Vertex[] createAfterCombineTargetVertices(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
 		final Vertex[] thisPolygonVertices = this.vertices.<Vertex> toArray(Vertex.class);
-		final Vertex[] result = new Vertex[targetSquare.getVertices().size];
+		final Vertex[] result = new Vertex[targetSquare.getVertices().length];
 		int sameVertexCounter = 0;
 		for (int i = 0; i < result.length; i++) {
-			final float x = thisCombineVertex.x + (targetSquare.getVertices().get(i).x - targetCombineVertex.x);
-			final float y = thisCombineVertex.y + (targetSquare.getVertices().get(i).y - targetCombineVertex.y);
-			result[i] = new Vertex(x, y);
+			result[i] = createAfterCombineTargetVertex(targetSquare.getVertices()[i], thisCombineVertex, targetCombineVertex);
 			for (int j = 0; j < thisPolygonVertices.length; j++) {
 				if (CombinedSquare2dUtils.canBeRegardedAsSameVertex(result[i], thisPolygonVertices[j])) {
 					result[i] = new Vertex(thisPolygonVertices[j]);
@@ -230,6 +232,12 @@ public class CombinedSquare2d extends Square2d {
 			}
 		}
 		return result;
+	}
+
+	private static Vertex createAfterCombineTargetVertex(Vertex baseVertex, Vertex beCombinedVertex, Vertex combineVertex) {
+		final float x = beCombinedVertex.x + (baseVertex.x - combineVertex.x);
+		final float y = beCombinedVertex.y + (baseVertex.y - combineVertex.y);
+		return new Vertex(x, y);
 	}
 
 	private static boolean largerVertexPolygonContainsSmallerVertexPolygonCentroid(final Vertex[] vertices1, final Vertex[] vertices2) {
@@ -259,7 +267,21 @@ public class CombinedSquare2d extends Square2d {
 		this.squares.add(square);
 		this.addActorForce(square);
 		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
+		this.recalculateBorder();
 		this.requestDrawOrderUpdate();
+	}
+
+	private boolean removeSquare(Square2d square) {
+		if (this.squares.removeValue(square, true) == false) {
+			return false;
+		}
+		if (square == this.base) {
+			this.base = null;
+		}
+		this.removeActorForce(square);
+		this.requestDrawOrderUpdate();
+		this.recalculateBorder();
+		return true;
 	}
 
 	/**
@@ -270,51 +292,7 @@ public class CombinedSquare2d extends Square2d {
 	}
 
 	private void normalizeVertices() {
-		normalizeVertices(this.vertices);
-	}
-
-	private static void normalizeVertices(Array<Vertex> vertices) {
-		Vertex[] verticesArray = vertices.toArray(Vertex.class);
-		Vertex[][] commonVertex = CombinedSquare2dUtils.getCommonVertex(verticesArray);
-		for (int i = 0; i < verticesArray.length; i++) {
-			if (commonVertex[i].length == 0 || !vertices.contains(verticesArray[i], true)) {
-				continue;
-			}
-			Vertex[] removeCandidateVertices = new Vertex[commonVertex[i].length + 1];
-			removeCandidateVertices[0] = verticesArray[i];
-			System.arraycopy(commonVertex[i], 0, removeCandidateVertices, 1, commonVertex[i].length);
-			if (hasSameAreaEvenIfRemoveVertices(verticesArray, removeCandidateVertices)) {
-				for (int j = 0; j < removeCandidateVertices.length; j++) {
-					vertices.removeValue(removeCandidateVertices[j], true);
-				}
-			}
-		}
-		verticesArray = vertices.toArray(Vertex.class);
-		for (Vertex vertex : verticesArray) {
-			if (hasSameAreaEvenIfRemoveVertices(verticesArray, vertex)) {
-				vertices.removeValue(vertex, true);
-			}
-		}
-	}
-
-	private boolean hasSameAreaEvenIfRemoveVertices(Vertex... removeVertices) {
-		return hasSameAreaEvenIfRemoveVertices(this.vertices.<Vertex> toArray(Vertex.class), removeVertices);
-	}
-
-	private static boolean hasSameAreaEvenIfRemoveVertices(Vertex[] vertices, Vertex... removeVertices) {
-		float beforeArea = Math.abs(Square2dUtils.createPolygon(vertices).area());
-		float afterArea = Math.abs(Square2dUtils.createPolygon(vertices, removeVertices).area());
-		float relativeError = Math.abs(afterArea - beforeArea) / beforeArea;
-		final float permissibleRelativeError = 1 / 100f;
-		return relativeError < permissibleRelativeError;
-	}
-
-	private Polygon getVertexPolygon() {
-		return this.getVertexPolygonExcept();
-	}
-
-	private Polygon getVertexPolygonExcept(Vertex... exceptVertices) {
-		return Square2dUtils.createPolygon(this.vertices.<Vertex> toArray(Vertex.class), exceptVertices);
+		CombinedSquare2dUtils.normalizeVertices(this.vertices);
 	}
 
 	/**
@@ -328,13 +306,140 @@ public class CombinedSquare2d extends Square2d {
 		return false;
 	}
 
+	/**
+	 * @param separateTarget
+	 * @return true if success.
+	 */
 	public boolean separate(Square2d separateTarget) {
 		if (!this.contains(separateTarget)) {
 			return false;
 		}
-		this.squares.removeValue(separateTarget, true);
-		// this
+		final Vertex[] rollbackVertices = this.vertices.<Vertex> toArray(Vertex.class);
+		final boolean isSuccessSeparate = this.trySeparate(separateTarget);
+		if (!isSuccessSeparate) {
+			this.vertices.clear();
+			this.vertices.addAll(rollbackVertices);
+			return false;
+		}
+		final CombinePoint[] separateTargetCombinePoints = this.getCombinePointOf(separateTarget);
+		for (CombinePoint separateTargetCombinePoint : separateTargetCombinePoints) {
+			this.combinePoints.removeValue(separateTargetCombinePoint, true);
+		}
+		this.removeSquare(separateTarget);
+		this.separatableSquares = null;
 		return true;
+	}
+
+	private boolean trySeparate(Square2d separateTarget) {
+		if (separateTarget == this.base) {
+			return false;
+		}
+		final CombinePoint[] separateTargetCombinePoints = this.getCombinePointOf(separateTarget);
+		if (separateTargetCombinePoints.length == 0) {
+			return false;
+		}
+		Array<Vertex> addedCombinePointVertices = new Array<>();
+		for (CombinePoint combinePoint : separateTargetCombinePoints) {
+			try {
+				Vertex addedCombinePointVertex = this.addCombinePointVertexIfRemoved(combinePoint);
+				if (addedCombinePointVertex != null) {
+					addedCombinePointVertices.add(addedCombinePointVertex);
+				}
+			} catch (IllegalStateException e) {
+				return false;
+			}
+		}
+		Vertex targetCombineVertex = separateTargetCombinePoints[0].getVertexOf(separateTarget);
+		Vertex thisCombineVertex = separateTargetCombinePoints[0].getOtherOneOf(targetCombineVertex);
+		Vertex[] afterCombineVertices = new Vertex[separateTarget.getVertices().length];
+		for (int i = 0; i < afterCombineVertices.length; i++) {
+			afterCombineVertices[i] = createAfterCombineTargetVertex(separateTarget.getVertices()[i], thisCombineVertex, targetCombineVertex);
+		}
+		this.removeVerticesExcept(afterCombineVertices, addedCombinePointVertices.<Vertex> toArray(Vertex.class));
+		this.normalizeVertices();
+		if (this.isTwist()) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param square
+	 * @return true if separatable square.
+	 */
+	public boolean isSeparatable(Square2d square) {
+		if (!this.contains(square)) {
+			return false;
+		}
+		if (this.separatableSquares != null) {
+			return this.separatableSquares.contains(square, true);
+		}
+		final Vertex[] rollbackVertices = this.vertices.<Vertex> toArray(Vertex.class);
+		final boolean isSuccessSeparate = this.trySeparate(square);
+		this.vertices.clear();
+		this.vertices.addAll(rollbackVertices);
+		return isSuccessSeparate;
+	}
+
+	/**
+	 * @return separatable squares.
+	 */
+	public Square2d[] getSeparatableSquares() {
+		if (this.separatableSquares != null) {
+			return this.separatableSquares.<Square2d> toArray(Square2d.class);
+		}
+		Array<Square2d> result = new Array<>();
+		for (Square2d combinedSquare : this.squares) {
+			if (this.isSeparatable(combinedSquare)) {
+				result.add(combinedSquare);
+			}
+		}
+		this.separatableSquares = result;
+		return this.separatableSquares.<Square2d> toArray(Square2d.class);
+	}
+
+	private boolean isTwist() {
+		return Square2dUtils.isTwist(this);
+	}
+
+	private CombinePoint[] getCombinePointOf(Square2d square) {
+		Array<CombinePoint> result = new Array<>();
+		for (CombinePoint combinePoint : this.combinePoints) {
+			for (Vertex vertex : square.getVertices()) {
+				if (combinePoint.contains(square, vertex)) {
+					result.add(combinePoint);
+					break;
+				}
+			}
+		}
+		return result.<CombinePoint> toArray(CombinePoint.class);
+	}
+
+	private Vertex addCombinePointVertexIfRemoved(CombinePoint combinePoint) {
+		Vertex combinePointActualVertex = combinePoint.actualVertex;
+		if (!this.contains(combinePointActualVertex)) {
+			Vertex insertVertex = combinePoint.getVertexOf(this);
+			final int insertIndex = CombinedSquare2dUtils.getUnchangeSquareAreaIndexEvenIfInsert(this.getVertices(), insertVertex);
+			if (insertIndex == -1) {
+				throw new IllegalStateException();
+			}
+			this.vertices.insert(insertIndex, insertVertex);
+			return combinePointActualVertex;
+		}
+		return null;
+	}
+
+	private void removeVerticesExcept(Vertex[] removeVertices, Vertex[] exceptVertices) {
+		for (Vertex removeVertex : removeVertices) {
+			if (CombinedSquare2dUtils.existsSufficientlyCloseVertex(removeVertex, exceptVertices)) {
+				continue;
+			}
+			for (Vertex thisVertex : this.vertices) {
+				if (CombinedSquare2dUtils.canBeRegardedAsSameVertex(thisVertex, removeVertex)) {
+					this.vertices.removeValue(thisVertex, true);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -364,9 +469,7 @@ public class CombinedSquare2d extends Square2d {
 			return this.removeSquareObject((Square2dObject) actor);
 		}
 		if (actor instanceof Square2d) {
-			if (this.separate((Square2d) actor)) {
-				return true;
-			}
+			return this.removeSquare((Square2d) actor);
 		}
 		throw new RuntimeException("Invalid argument is passed to CombinedSquare$removeActor."); //$NON-NLS-1$
 	}
@@ -381,22 +484,68 @@ public class CombinedSquare2d extends Square2d {
 		return sb.toString();
 	}
 
-	private static class CombinePoint {
+	/**
+	 * @author goshi 2015/02/15
+	 */
+	@SuppressWarnings("javadoc")
+	public static class CombinePoint {
+		public final Vertex actualVertex;
+
+		public final Square2d square1;
 		public final Vertex vertex1;
+
+		public final Square2d square2;
 		public final Vertex vertex2;
 
-		CombinePoint(Vertex vertex1, Vertex vertex2) {
+		CombinePoint(Square2d square1, Vertex vertex1, Square2d square2, Vertex vertex2, Vertex actualVertex) {
+			if (square1 == square2) {
+				throw new RuntimeException("square1 must be different from square2"); //$NON-NLS-1$
+			}
+			this.square1 = square1;
 			this.vertex1 = vertex1;
+			this.square2 = square2;
 			this.vertex2 = vertex2;
+			this.actualVertex = actualVertex;
+		}
+
+		public boolean contains(Square2d square, Vertex checkVertex) {
+			if (square == null || checkVertex == null) {
+				return false;
+			}
+			return this.getVertexOf(square) == checkVertex;
+		}
+
+		public Vertex getOtherOneOf(Vertex vertex) {
+			if (vertex == this.vertex1) {
+				return this.vertex2;
+			}
+			if (vertex == this.vertex2) {
+				return this.vertex1;
+			}
+			return null;
+		}
+
+		public Vertex getVertexOf(Square2d square) {
+			if (square == this.square1) {
+				return this.vertex1;
+			}
+			if (square == this.square2) {
+				return this.vertex2;
+			}
+			return null;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof CombinePoint) {
-				if (this.vertex1 == ((CombinePoint) obj).vertex1 && this.vertex2 == ((CombinePoint) obj).vertex2) {
+				CombinePoint compareObj = (CombinePoint) obj;
+				if (this.actualVertex != compareObj.actualVertex) {
+					return false;
+				}
+				if ((this.square1 == compareObj.square1 && this.vertex1 == compareObj.vertex1) && (this.square2 == compareObj.square2 && this.vertex2 == compareObj.vertex2)) {
 					return true;
 				}
-				if (this.vertex1 == ((CombinePoint) obj).vertex2 && this.vertex2 == ((CombinePoint) obj).vertex2) {
+				if ((this.square1 == compareObj.square2 && this.vertex1 == compareObj.vertex2) && (this.square2 == compareObj.square1 && this.vertex2 == compareObj.vertex1)) {
 					return true;
 				}
 				return false;

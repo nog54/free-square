@@ -1,11 +1,9 @@
 package org.nognog.freeSquare.square2d;
 
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * @author goshi 2014/12/24
+ * @author goshi 2015/02/25
  */
 public class CombinedSquare2dUtils {
 	private CombinedSquare2dUtils() {
@@ -26,36 +24,14 @@ public class CombinedSquare2dUtils {
 	}
 
 	/**
-	 * @param polygonVertices
 	 * @param checkVertex
-	 * @return true if exists sufficiently close edge
+	 * @param vertices
+	 * @return true if exists vertex that is sufficiently close to checkVertex
+	 *         in vertices.
 	 */
-	public static boolean existsSufficientlyCloseEdge(Vertex[] polygonVertices, Vertex checkVertex) {
-		for (int i = 0; i < polygonVertices.length; i++) {
-			final Vertex vertex1 = polygonVertices[i];
-			final Vertex vertex2 = polygonVertices[(i + 1) % polygonVertices.length];
-			float distance = Intersector.distanceSegmentPoint(vertex1.x, vertex1.y, vertex2.x, vertex2.y, checkVertex.x, checkVertex.y);
-			if (isSufficientlyCloseDistance(distance)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param polygonVertices
-	 * @param checkVertices
-	 * @return true if exists vertex that is contained in polygonVertices and
-	 *         not exists sufficiently close edge.
-	 */
-	public static boolean existsInvalidContainedVertex(Vertex[] polygonVertices, Vertex[] checkVertices) {
-		Polygon polygon = Square2dUtils.createPolygon(polygonVertices);
-		for (int i = 0; i < checkVertices.length; i++) {
-			Vertex checkVertex = checkVertices[i];
-			if (polygon.contains(checkVertex.x, checkVertex.y) == false) {
-				continue;
-			}
-			if (existsSufficientlyCloseEdge(polygonVertices, checkVertex) == false) {
+	public static boolean existsSufficientlyCloseVertex(Vertex checkVertex, Vertex[] vertices) {
+		for (int i = 0; i < vertices.length; i++) {
+			if (canBeRegardedAsSameVertex(checkVertex, vertices[i])) {
 				return true;
 			}
 		}
@@ -87,24 +63,77 @@ public class CombinedSquare2dUtils {
 	}
 
 	/**
-	 * @param vertices1
-	 * @param vertices2
-	 * @return count of adjacent point
+	 * @param vertices
 	 */
-	public static int countAdjacentPoint(Vertex[] vertices1, Vertex[] vertices2) {
-		int count1 = 0;
-		for (Vertex checkVertex : vertices1) {
-			if (existsSufficientlyCloseEdge(vertices2, checkVertex)) {
-				count1++;
+	public static void normalizeVertices(Array<Vertex> vertices) {
+		// Vertex[] verticesArray = vertices.toArray(Vertex.class);
+		// Vertex[][] commonVertex =
+		// CombinedSquare2dUtils.getCommonVertex(verticesArray);
+		// for (int i = 0; i < verticesArray.length; i++) {
+		// if (commonVertex[i].length == 0 ||
+		// !vertices.contains(verticesArray[i], true)) {
+		// continue;
+		// }
+		// Vertex[] removeCandidateVertices = new Vertex[commonVertex[i].length
+		// + 1];
+		// removeCandidateVertices[0] = verticesArray[i];
+		// System.arraycopy(commonVertex[i], 0, removeCandidateVertices, 1,
+		// commonVertex[i].length);
+		// if (hasSameAreaEvenIfRemoveVertices(verticesArray,
+		// removeCandidateVertices)) {
+		// for (int j = 0; j < removeCandidateVertices.length; j++) {
+		// vertices.removeValue(removeCandidateVertices[j], true);
+		// }
+		// }
+		// }
+
+		boolean changed;
+		do {
+			changed = false;
+			for (Vertex vertex : vertices) {
+				Vertex[] currentVerticesArray = vertices.toArray(Vertex.class);
+				if (hasSameAreaEvenIfRemoveVertices(currentVerticesArray, vertex)) {
+					vertices.removeValue(vertex, true);
+					changed = true;
+				}
 			}
-		}
-		int count2 = 0;
-		for (Vertex checkVertex : vertices2) {
-			if (existsSufficientlyCloseEdge(vertices1, checkVertex)) {
-				count2++;
-			}
-		}
-		return Math.max(count1, count2);
+		} while (changed);
 	}
 
+	/**
+	 * @param vertices
+	 * @param removeVertices
+	 * @return true if change of square area is sufficiently small.
+	 */
+	public static boolean hasSameAreaEvenIfRemoveVertices(Vertex[] vertices, Vertex... removeVertices) {
+		float beforeArea = Math.abs(Square2dUtils.createPolygon(vertices).area());
+		float afterArea = Math.abs(Square2dUtils.createPolygon(vertices, removeVertices).area());
+		return isSufficientlySameArea(beforeArea, afterArea);
+	}
+
+	private static boolean isSufficientlySameArea(float area1, float area2) {
+		float relativeError = Math.abs((area2 - area1) / area1);
+		final float permissibleRelativeError = 1 / 100f;
+		return relativeError < permissibleRelativeError;
+	}
+
+	/**
+	 * @param vertices
+	 * @param insertVertex
+	 * @return unchange area insert index. if not exists, return -1.
+	 */
+	public static int getUnchangeSquareAreaIndexEvenIfInsert(Vertex[] vertices, Vertex insertVertex) {
+		final float baseArea = Square2dUtils.createPolygon(vertices).area();
+		for (int insertIndex = 0; insertIndex <= vertices.length; insertIndex++) {
+			final Vertex[] afterInsertVertices = new Vertex[vertices.length + 1];
+			System.arraycopy(vertices, 0, afterInsertVertices, 0, insertIndex);
+			afterInsertVertices[insertIndex] = insertVertex;
+			System.arraycopy(vertices, insertIndex, afterInsertVertices, insertIndex + 1, vertices.length - insertIndex);
+			final float afterInsertArea = Square2dUtils.createPolygon(afterInsertVertices).area();
+			if (isSufficientlySameArea(baseArea, afterInsertArea)) {
+				return insertIndex;
+			}
+		}
+		return -1;
+	}
 }

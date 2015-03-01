@@ -36,7 +36,7 @@ public class FlickButtonControllerTest {
 	 */
 	@Before
 	public void setup() {
-		this.font = FontUtil.createMPlusFont(24);
+		this.font = FontUtil.createMPlusFont(42);
 		this.buttonWidthHeight = 64;
 		this.listener = mock(FlickInputListener.class);
 		doThrow(new RuntimeException(this.centerMessage)).when(this.listener).center();

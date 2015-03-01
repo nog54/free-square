@@ -27,7 +27,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	private boolean isRequestedDrawOrderUpdate = false;
 
 	private static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
-
+		
 		@Override
 		public int compare(Actor actor1, Actor actor2) {
 			boolean actor1IsSquareObject = actor1 instanceof Square2dObject;
@@ -48,6 +48,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			return 0;
 		}
 	};
+	
+	/**
+	 * @param vertex
+	 * @return true if contains vertex.
+	 */
+	public boolean contains(Vertex vertex) {
+		return Square2dUtils.contains(this.getVertices(), vertex);
+	}
 
 	/**
 	 * @param x
@@ -58,8 +66,8 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		if (this.isPointOfVertex(x, y)) {
 			return true;
 		}
-		Array<Vertex> vertices = this.getVertices();
-		float[] floatVertices = new float[vertices.size * 2];
+		Vertex[] vertices = this.getVertices();
+		float[] floatVertices = new float[vertices.length * 2];
 		int i = 0;
 		for (Vertex vertex : vertices) {
 			floatVertices[i++] = vertex.x;
@@ -92,7 +100,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	/**
 	 * @return square vertices.
 	 */
-	public abstract Array<Vertex> getVertices();
+	public abstract Vertex[] getVertices();
 
 	/**
 	 * @return x of left end
@@ -206,6 +214,10 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		super.addActor(actor);
 	}
 
+	protected void removeActorForce(Actor actor) {
+		super.removeActor(actor);
+	}
+
 	@Override
 	public boolean removeActor(Actor actor) {
 		if (actor instanceof Square2dObject) {
@@ -235,16 +247,16 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 		this.observers.add(observer);
 	}
-	
+
 	/**
 	 * @param addObservers
 	 */
 	public void addSquareObservers(SquareObserver... addObservers) {
-		for(SquareObserver observer : addObservers){
+		for (SquareObserver observer : addObservers) {
 			this.addSquareObserver(observer);
 		}
 	}
-	
+
 	@Override
 	public void removeSquareObserver(SquareObserver observer) {
 		this.observers.removeValue(observer, true);

@@ -122,8 +122,8 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 	}
 
 	@Override
-	public Array<Vertex> getVertices() {
-		return new Array<>(new Vertex[] { this.type.vertex1, this.type.vertex2, this.type.vertex3, this.type.vertex4 });
+	public Vertex[] getVertices() {
+		return new Vertex[] { this.type.vertex1, this.type.vertex2, this.type.vertex3, this.type.vertex4 };
 	}
 
 	/**
