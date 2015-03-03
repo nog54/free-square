@@ -91,17 +91,33 @@ public class Square2dUtils {
 	}
 
 	/**
-	 * @param target
+	 * @param vertices
 	 * @return float array
 	 */
-	public static float[] toFloatArray(Vertex[] target) {
-		float[] result = new float[target.length * 2];
+	public static float[] toFloatArray(Vertex[] vertices) {
+		float[] result = new float[vertices.length * 2];
 		int i = 0;
-		for (Vertex vertex : target) {
+		for (Vertex vertex : vertices) {
 			result[i++] = vertex.x;
 			result[i++] = vertex.y;
 		}
 		return result;
+	}
+
+	/**
+	 * @param vertex
+	 * @return Vector2
+	 */
+	public static Vector2 toVector2(Vertex vertex) {
+		return new Vector2(vertex.x, vertex.y);
+	}
+
+	/**
+	 * @param vector
+	 * @return Vertex
+	 */
+	public static Vertex toVertex(Vector2 vector) {
+		return new Vertex(vector.x, vector.y);
 	}
 
 	/**

@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  */
 public class FreeSquareGestureDetector extends InputMultiplexer {
 
-	private static final float MAX_CAMERA_ZOOM = 1;
+	private static final float MAX_CAMERA_ZOOM = Float.MAX_VALUE;
 	private static final float MIN_CAMERA_ZOOM = 0.5f;
 
 	boolean isLastLongPressed;

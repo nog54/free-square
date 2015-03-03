@@ -7,14 +7,14 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.square2d.CombinedSquare2d.CombinePoint;
+import org.nognog.freeSquare.square2d.CombineSquare2d.CombinePoint;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.utils.Array;
 
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
-public class CombinedSquare2dTest {
+public class CombineSquare2dTest {
 
 	@Test
 	public final void testGetVertices() {
@@ -45,7 +45,7 @@ public class CombinedSquare2dTest {
 	public final void testCombine() {
 		{
 			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
-			CombinedSquare2d combineSquare = new CombinedSquare2d(base);
+			CombineSquare2d combineSquare = new CombineSquare2d(base);
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
 			boolean actual1 = combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertices()[2]);
 			boolean actual2 = combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertices()[0]);
@@ -78,7 +78,7 @@ public class CombinedSquare2dTest {
 		}
 		{
 			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
-			CombinedSquare2d combineSquare = new CombinedSquare2d(base);
+			CombineSquare2d combineSquare = new CombineSquare2d(base);
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			boolean actual1 = combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
@@ -97,7 +97,7 @@ public class CombinedSquare2dTest {
 	public final void testSeparate() {
 		{
 			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
-			CombinedSquare2d combineSquare = new CombinedSquare2d(base);
+			CombineSquare2d combineSquare = new CombineSquare2d(base);
 			Vertex[] baseVertices = combineSquare.getVertices();
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
@@ -133,7 +133,7 @@ public class CombinedSquare2dTest {
 			}
 		}
 		{
-			CombinedSquare2d combineSquare = new CombinedSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
@@ -154,9 +154,46 @@ public class CombinedSquare2dTest {
 					for (CombinePoint actualCombinePoint : actualCombinePoints) {
 						assertThat(Square2dUtils.contains(expectedCombinePoints, actualCombinePoint), is(true));
 					}
-
 				}
 			}
+		}
+		{
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
+			combineSquare.separate(appendSquare2);
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare3, appendSquare3.getVertices()[1]);
+			combineSquare.combine(combineSquare.getVertices()[4], appendSquare4, appendSquare4.getVertices()[0]);
+			
+			boolean actual1 = combineSquare.separate(appendSquare4);
+			boolean actual2 = combineSquare.separate(appendSquare3);
+//			boolean expected1 = true;
+//			boolean expected2 = true;
+//			assertThat(actual1, is(expected1));
+//			assertThat(actual2, is(expected2));
+		}
+		{
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
+			combineSquare.separate(appendSquare2);
+			combineSquare.combine(combineSquare.getVertices()[2],appendSquare3, appendSquare3.getVertices()[0]);
+			combineSquare.combine(combineSquare.getVertices()[2],appendSquare4, appendSquare4.getVertices()[0]);
+			
+			boolean actual1 = combineSquare.separate(appendSquare4);
+			boolean actual2 = combineSquare.separate(appendSquare3);
+//			boolean expected1 = true;
+//			boolean expected2 = true;
+//			assertThat(actual1, is(expected1));
+//			assertThat(actual2, is(expected2));
 		}
 	}
 }

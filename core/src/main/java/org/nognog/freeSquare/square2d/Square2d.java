@@ -27,7 +27,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	private boolean isRequestedDrawOrderUpdate = false;
 
 	private static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
-		
+
 		@Override
 		public int compare(Actor actor1, Actor actor2) {
 			boolean actor1IsSquareObject = actor1 instanceof Square2dObject;
@@ -48,7 +48,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			return 0;
 		}
 	};
-	
+
 	/**
 	 * @param vertex
 	 * @return true if contains vertex.
@@ -121,6 +121,18 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	 * @return y of top end
 	 */
 	public abstract float getTopEndY();
+
+	/**
+	 * @return stage coordinates vertices
+	 */
+	public Vector2[] getStageCoordinatesVertices() {
+		Vertex[] vertices = this.getVertices();
+		Vector2[] result = new Vector2[vertices.length];
+		for (int i = 0; i < vertices.length; i++) {
+			result[i] = this.localToStageCoordinates(new Vector2(vertices[i].x, vertices[i].y));
+		}
+		return result;
+	}
 
 	/**
 	 * @param object

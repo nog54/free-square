@@ -11,10 +11,12 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.model.square.SquareObserver;
-import org.nognog.freeSquare.square2d.CombinedSquare2d;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
+import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
@@ -85,17 +87,22 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 
 		this.player.addSquare(this.square);
+		this.player.addSquare(Square2dType.GRASSY_SQUARE1_SMALL.create());
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		CombinedSquare2d combineSquare = new CombinedSquare2d(this.square);
+		CombineSquare2d combineSquare = new CombineSquare2d(this.square);
 		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-		// for (int i = 0; i < combineSquare.getVertices().length; i++) {
-		// for (int j = 0; j < appendSquare2.getVertices().length; j++) {
 		combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
 		combineSquare.separate(appendSquare2);
-		// }
-		// }
+		
+		combineSquare.combine(combineSquare.getVertices()[1], appendSquare3, appendSquare3.getVertices()[1]);
+		combineSquare.combine(combineSquare.getVertices()[4], appendSquare4, appendSquare4.getVertices()[0]);
+		//combineSquare.combine(combineSquare.getVertices()[2], appendSquare3, appendSquare3.getVertices()[0]);
+		//combineSquare.combine(combineSquare.getVertices()[2], appendSquare4, appendSquare4.getVertices()[0]);
+		//combineSquare.separate(appendSquare3);
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
@@ -145,120 +152,148 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		});
 
 		this.playerItemList = new PlayerItemList(this.stage.getCamera(), this.player, this.font) {
-			private Square2dObject addedObject;
+			private Square2dObject addObject;
 
 			@Override
 			protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
 				}
-				if (this.addedObject == null) {
+				if (this.addObject == null) {
 					Item<?, ?> item = pannedItem.getItem();
 					if (item instanceof Square2dObjectItem) {
-						this.addedObject = ((Square2dObjectItem) item).createSquare2dObject();
-						this.addedObject.setEnabledAction(false);
+						this.addObject = ((Square2dObjectItem) item).createSquare2dObject();
+						this.addObject.setEnabledAction(false);
 						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
 							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-							FreeSquare.this.getSquare().addSquareObject(this.addedObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
+							FreeSquare.this.getSquare().addSquareObject(this.addObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
 							FreeSquare.this.showSquareOnly();
 						}
 					}
 				} else {
 					if (!this.addedObjectisBeingEaten()) {
-						this.addedObject.moveBy(deltaX, deltaY);
+						this.addObject.moveBy(deltaX, deltaY);
 					}
 				}
 			}
 
 			private boolean addedObjectisBeingEaten() {
-				return (this.addedObject instanceof EatableObject) && ((EatableObject) this.addedObject).isBeingEaten();
+				return (this.addObject instanceof EatableObject) && ((EatableObject) this.addObject).isBeingEaten();
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				if (this.addedObject != null) {
-					if (this.addedObject.isLandingOnSquare()) {
-						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addedObject.getType()));
-						this.addedObject.setEnabledAction(true);
-						Square2dEvent event = new AddObjectEvent(this.addedObject);
-						event.addExceptObserver(this.addedObject);
+				if (this.addObject != null) {
+					if (this.addObject.isLandingOnSquare()) {
+						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addObject.getType()));
+						this.addObject.setEnabledAction(true);
+						Square2dEvent event = new AddObjectEvent(this.addObject);
+						event.addExceptObserver(this.addObject);
 						FreeSquare.this.getSquare().notifyObservers(event);
 					} else {
-						FreeSquare.this.getSquare().removeSquareObject(this.addedObject);
+						FreeSquare.this.getSquare().removeSquareObject(this.addObject);
 					}
 					FreeSquare.this.showPlayerItemList();
-					this.addedObject = null;
+					this.addObject = null;
 				}
 			}
 		};
 
 		this.playersLifeList = new PlayersLifeList(this.stage.getCamera(), this.player, this.font) {
-			private LifeObject addedObject;
+			private LifeObject addObject;
 
 			@Override
 			protected void selectedItemPanned(Life pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
 				}
-				if (this.addedObject == null) {
-					this.addedObject = LifeObject.create(pannedItem);
-					this.addedObject.setEnabledAction(false);
+				if (this.addObject == null) {
+					this.addObject = LifeObject.create(pannedItem);
+					this.addObject.setEnabledAction(false);
 					Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-					FreeSquare.this.getSquare().addSquareObject(this.addedObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
+					FreeSquare.this.getSquare().addSquareObject(this.addObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
 					FreeSquare.this.showSquareOnly();
 				} else {
-					this.addedObject.moveBy(deltaX, deltaY);
+					this.addObject.moveBy(deltaX, deltaY);
 				}
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				if (this.addedObject != null) {
-					if (this.addedObject.isValid()) {
-						FreeSquare.this.getPlayer().removeLife(this.addedObject.getLife());
-						this.addedObject.setEnabledAction(true);
-						Square2dEvent event = new AddObjectEvent(this.addedObject);
-						event.addExceptObserver(this.addedObject);
+				if (this.addObject != null) {
+					if (this.addObject.isValid()) {
+						FreeSquare.this.getPlayer().removeLife(this.addObject.getLife());
+						this.addObject.setEnabledAction(true);
+						Square2dEvent event = new AddObjectEvent(this.addObject);
+						event.addExceptObserver(this.addObject);
 						FreeSquare.this.getSquare().notifyObservers(event);
 					} else {
-						FreeSquare.this.getSquare().removeSquareObject(this.addedObject);
+						FreeSquare.this.getSquare().removeSquareObject(this.addObject);
 					}
 					FreeSquare.this.showPlayersLifeList();
-					this.addedObject = null;
+					this.addObject = null;
 				}
 			}
 		};
 
 		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
 
-			private Square2d addedSquare;
+			private Square2d addSquare;
 
 			@Override
 			protected void selectedItemPanned(Square<?> pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
 				}
-				if (this.addedSquare == null) {
+				if (this.addSquare == null) {
 					if (pannedItem instanceof Square2d) {
-						this.addedSquare = (Square2d) pannedItem;
+						this.addSquare = (Square2d) pannedItem;
+						final float previousX = this.addSquare.getX();
+						final float previousY = this.addSquare.getY();
 						Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-						this.addedSquare.setPosition(squareCoodinateXY.x, squareCoodinateXY.y);
-						FreeSquare.this.getStage().getRoot().addActor(this.addedSquare);
+						this.addSquare.setPosition(squareCoodinateXY.x - this.addSquare.getWidth() / 2, squareCoodinateXY.y - this.addSquare.getHeight() / 2);
+						try {
+							FreeSquare.this.getStage().getRoot().addActor(this.addSquare);
+						} catch (IllegalArgumentException e) {
+							this.addSquare.setPosition(previousX, previousY);
+							this.addSquare = null;
+							return;
+						}
+						this.addSquare.toBack();
 						FreeSquare.this.showSquareOnly();
 					}
 				} else {
-					this.addedSquare.moveBy(deltaX, deltaY);
+					this.addSquare.moveBy(deltaX, deltaY);
 				}
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				if (this.addedSquare != null) {
-					FreeSquare.this.getStage().getRoot().removeActor(this.addedSquare);
-					FreeSquare.this.showPlayersSquareList();
-					this.addedSquare = null;
+				if (this.addSquare == null) {
+					return;
 				}
+				FreeSquare.this.getStage().getRoot().removeActor(this.addSquare);
+				FreeSquare.this.showPlayersSquareList();
+				if (!(FreeSquare.this.getSquare() instanceof CombineSquare2d)) {
+					this.addSquare = null;
+					return;
+				}
+				final Vector2[] stageCoordinatesBaseSquareVertices = FreeSquare.this.getSquare().getStageCoordinatesVertices();
+				for (Vertex addSquareVertex : this.addSquare.getVertices()) {
+					final Vector2 stageCoordinatesAddSquareVertex = this.addSquare.localToStageCoordinates(new Vector2(addSquareVertex.x, addSquareVertex.y));
+					for (int i = 0; i < stageCoordinatesBaseSquareVertices.length; i++) {
+						final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
+						if (CombineSquare2dUtils.canBeRegardedAsSameVertex(stageCoordinatesAddSquareVertex, stageCoordinatesBaseSquareVertex)) {
+							final CombineSquare2d baseSquare = (CombineSquare2d) FreeSquare.this.getSquare();
+							baseSquare.combine(baseSquare.getVertices()[i], this.addSquare, addSquareVertex);
+							this.addSquare = null;
+							return;
+						}
+					}
+				}
+				this.addSquare = null;
 			}
+
 		};
 
 		this.itemList = new ItemList(this.stage.getCamera(), Square2dObjectItem.getAllItems(), this.font) {
@@ -462,10 +497,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
-			throw new RuntimeException();
-			//System.out.println("new player"); //$NON-NLS-1$
-			//this.player = new Player("goshi"); //$NON-NLS-1$
-			// PersistItems.PLAYER.save(this.player);
+			System.out.println("new player"); //$NON-NLS-1$
+			this.player = new Player("goshi"); //$NON-NLS-1$
+			PersistItems.PLAYER.save(this.player);
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {

@@ -1,17 +1,32 @@
 package org.nognog.freeSquare.square2d;
 
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/02/25
  */
-public class CombinedSquare2dUtils {
-	private CombinedSquare2dUtils() {
+public class CombineSquare2dUtils {
+	private CombineSquare2dUtils() {
 	}
 
-	private static boolean isSufficientlyCloseDistance(float a) {
+	/**
+	 * @param r
+	 * @return true if r can be regarded as sufficiently small.
+	 */
+	public static boolean isSufficientlyCloseDistance(float r) {
 		final float regardAsSufficientlyCloseThreshold = 5;
-		return Math.abs(a) < regardAsSufficientlyCloseThreshold;
+		return Math.abs(r) < regardAsSufficientlyCloseThreshold;
+	}
+
+	/**
+	 * @param vector1
+	 * @param vector2
+	 * @return true if distance to vertex2 from vertex1
+	 */
+	public static boolean canBeRegardedAsSameVertex(Vector2 vector1, Vector2 vector2) {
+		return canBeRegardedAsSameVertex(Square2dUtils.toVertex(vector1), Square2dUtils.toVertex(vector2));
 	}
 
 	/**
@@ -30,12 +45,21 @@ public class CombinedSquare2dUtils {
 	 *         in vertices.
 	 */
 	public static boolean existsSufficientlyCloseVertex(Vertex checkVertex, Vertex[] vertices) {
+		return getSufficientlyCloseVertex(checkVertex, vertices) != null;
+	}
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return may be null.
+	 */
+	public static Vertex getSufficientlyCloseVertex(Vertex checkVertex, Vertex[] vertices) {
 		for (int i = 0; i < vertices.length; i++) {
 			if (canBeRegardedAsSameVertex(checkVertex, vertices[i])) {
-				return true;
+				return vertices[i];
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -135,5 +159,23 @@ public class CombinedSquare2dUtils {
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return distance to most nearest point from checkVertex.
+	 */
+	public static float getDistanceToNearestEdge(Vertex checkVertex, Vertex[] vertices) {
+		float minR = Float.MAX_VALUE;
+		for(int i = 0; i < vertices.length; i++){
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			final float r = Intersector.distanceSegmentPoint(v1.x, v1.y, v2.x, v2.y, checkVertex.x, checkVertex.y);
+			if(r < minR){
+				minR = r;
+			}
+		}
+		return minR;
 	}
 }
