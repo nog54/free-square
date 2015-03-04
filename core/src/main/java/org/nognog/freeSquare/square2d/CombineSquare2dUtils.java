@@ -63,30 +63,6 @@ public class CombineSquare2dUtils {
 	}
 
 	/**
-	 * @param checkVertices
-	 * @return common vertices
-	 */
-	public static Vertex[][] getCommonVertex(Vertex[] checkVertices) {
-		Vertex[][] result = new Vertex[checkVertices.length][];
-		for (int i = 0; i < checkVertices.length; i++) {
-			Vertex checkVertex = checkVertices[i];
-			Array<Vertex> commonVertices = new Array<>();
-			for (int j = 0; j < checkVertices.length; j++) {
-				Vertex compareVertex = checkVertices[j];
-				if (checkVertex == compareVertex) {
-					continue;
-				}
-
-				if (canBeRegardedAsSameVertex(checkVertex, compareVertex)) {
-					commonVertices.add(compareVertex);
-				}
-				result[i] = commonVertices.toArray(Vertex.class);
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * @param vertices
 	 */
 	public static void normalizeVertices(Array<Vertex> vertices) {

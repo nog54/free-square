@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.GeometryUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * @author goshi 2015/02/15
@@ -19,7 +20,7 @@ public class CombineSquare2d extends Square2d {
 	private Square2d base;
 	private Array<Square2d> squares;
 	private Array<Vertex> vertices;
-	private Array<CombinePoint> combinePoints;
+	private ObjectMap<Vertex, CombinePoint> combinePoints;
 	private float leftEndX, rightEndX;
 	private float buttomEndY, topEndY;
 
@@ -35,10 +36,12 @@ public class CombineSquare2d extends Square2d {
 		this.squares = new Array<>();
 		this.addSquare(base, 0, 0);
 		this.vertices = new Array<>();
+		this.combinePoints = new ObjectMap<>();
 		for (Vertex baseVertex : base.getVertices()) {
-			this.vertices.add(new Vertex(baseVertex));
+			final Vertex vertex = new Vertex(baseVertex);
+			this.vertices.add(vertex);
+			this.combinePoints.put(vertex, new CombinePoint(vertex, base, baseVertex));
 		}
-		this.combinePoints = new Array<>();
 		this.leftEndX = base.getLeftEndX();
 		this.rightEndX = base.getRightEndX();
 		this.buttomEndY = base.getButtomEndY();
@@ -54,16 +57,24 @@ public class CombineSquare2d extends Square2d {
 	 * @return combine points
 	 */
 	public CombinePoint[] getCombinePoints() {
-		return this.combinePoints.<CombinePoint> toArray(CombinePoint.class);
+		return this.combinePoints.values().toArray().<CombinePoint> toArray(CombinePoint.class);
 	}
 
-	private void addCombinePoint(CombinePoint... points) {
-		for (CombinePoint combinePoint : points) {
-			if (this.combinePoints.contains(combinePoint, false)) {
+	private void mergeCombinePoints(CombinePoint[] mergeCombinePoints) {
+		for (CombinePoint mergeCombinePoint : mergeCombinePoints) {
+			this.mergeCombinePoint(mergeCombinePoint);
+		}
+	}
+
+	private void mergeCombinePoint(CombinePoint mergeCombinePoint) {
+		for (Vertex alreadyExistActualVertex : this.combinePoints.keys()) {
+			if (CombineSquare2dUtils.canBeRegardedAsSameVertex(mergeCombinePoint.actualVertex, alreadyExistActualVertex)) {
+				CombinePoint mergeTargetCombinePoint = this.combinePoints.get(alreadyExistActualVertex);
+				mergeTargetCombinePoint.addCombinedVertices(mergeCombinePoint.combinedVertices.<CombinedVertex> toArray(CombinedVertex.class));
 				return;
 			}
-			this.combinePoints.add(combinePoint);
 		}
+		this.combinePoints.put(mergeCombinePoint.actualVertex, mergeCombinePoint);
 	}
 
 	@Override
@@ -138,7 +149,7 @@ public class CombineSquare2d extends Square2d {
 			return false;
 		}
 		Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquare, targetsCombineVertex);
-		this.addCombinePoint(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
+		this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 		this.normalizeVertices();
 		this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
 		this.separatableSquares = null;
@@ -162,14 +173,14 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private Array<CombinePoint> combineVertices(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
-		return combineVertices(this, this.vertices, thisCombineVertex, targetSquare, targetSquare.getVertices(), targetCombineVertex);
+		return combineVertices(this.vertices, thisCombineVertex, targetSquare, targetCombineVertex);
 	}
 
-	private static Array<CombinePoint> combineVertices(Square2d destSquare, Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Vertex[] target, Vertex targetCombineVertex) {
-		return combineVertices(destSquare, dest, destCombineVertex, targetSquare, new Array<>(target), targetCombineVertex);
+	private static Array<CombinePoint> combineVertices(Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
+		return combineVertices(dest, destCombineVertex, targetSquare, new Array<>(targetSquare.getVertices()), targetCombineVertex);
 	}
 
-	private static Array<CombinePoint> combineVertices(Square2d destSquare, Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Array<Vertex> target, Vertex targetCombineVertex) {
+	private static Array<CombinePoint> combineVertices(Array<Vertex> dest, Vertex destCombineVertex, Square2d targetSquare, Array<Vertex> target, Vertex targetCombineVertex) {
 		Array<CombinePoint> newCombinePoints = new Array<>();
 		Vertex[] beforeDestVertices = dest.<Vertex> toArray(Vertex.class);
 		Vertex[] beforeTargetVertices = target.<Vertex> toArray(Vertex.class);
@@ -182,13 +193,9 @@ public class CombineSquare2d extends Square2d {
 				final Vertex sufficientlyCloseVertex = CombineSquare2dUtils.getSufficientlyCloseVertex(insertVertex, beforeDestVertices);
 				if (sufficientlyCloseVertex != null) {
 					insertVertex = new Vertex(sufficientlyCloseVertex);
-					newCombinePoints.add(new CombinePoint(destSquare, sufficientlyCloseVertex, targetSquare, beforeTargetVertices[insertTargetSquareVertexIndex], insertVertex));
-				}else{
-					final Vertex dummyVertex = new Vertex(insertVertex);
-					newCombinePoints.add(new CombinePoint(destSquare, dummyVertex, targetSquare, beforeTargetVertices[insertTargetSquareVertexIndex], insertVertex));
 				}
-				
 			}
+			newCombinePoints.add(new CombinePoint(insertVertex, targetSquare, beforeTargetVertices[insertTargetSquareVertexIndex]));
 			dest.insert(verteciesInsertStartIndex + i, insertVertex);
 		}
 		return newCombinePoints;
@@ -209,7 +216,7 @@ public class CombineSquare2d extends Square2d {
 
 		Array<Vertex> simulatedAfterCombineVertices = new Array<>();
 		simulatedAfterCombineVertices.addAll(this.getVertices());
-		combineVertices(this, simulatedAfterCombineVertices, thisCombineVertex, targetSquare, targetSquare.getVertices(), targetCombineVertex);
+		combineVertices(simulatedAfterCombineVertices, thisCombineVertex, targetSquare, targetCombineVertex);
 		CombineSquare2dUtils.normalizeVertices(simulatedAfterCombineVertices);
 		if (Square2dUtils.isTwist(simulatedAfterCombineVertices.<Vertex> toArray(Vertex.class))) {
 			return false;
@@ -328,7 +335,10 @@ public class CombineSquare2d extends Square2d {
 		}
 		final CombinePoint[] separateTargetCombinePoints = this.getCombinePointOf(separateTarget);
 		for (CombinePoint separateTargetCombinePoint : separateTargetCombinePoints) {
-			this.combinePoints.removeValue(separateTargetCombinePoint, true);
+			separateTargetCombinePoint.removeCombinedVertex(separateTarget);
+			if (separateTargetCombinePoint.combinedVertices.size == 0) {
+				this.combinePoints.remove(separateTargetCombinePoint.actualVertex);
+			}
 		}
 		this.removeSquare(separateTarget);
 		this.separatableSquares = null;
@@ -343,24 +353,31 @@ public class CombineSquare2d extends Square2d {
 		if (separateTargetCombinePoints.length == 0) {
 			return false;
 		}
+		Array<Vertex> removeVertices = new Array<>();
+		for (CombinePoint combinePoint : separateTargetCombinePoints) {
+			if (this.vertices.contains(combinePoint.actualVertex, true)) {
+				removeVertices.add(combinePoint.actualVertex);
+			}
+		}
+		Array<CombinePoint> recessCombinePoints = new Array<>();
 		Array<Vertex> addedCombinePointVertices = new Array<>();
 		for (CombinePoint combinePoint : separateTargetCombinePoints) {
 			try {
-				Vertex addedCombinePointVertex = this.addCombinePointVertexIfRemoved(combinePoint);
+				Vertex addedCombinePointVertex = this.addNotRecessedCombinePointVertexIfRemoved(combinePoint);
 				if (addedCombinePointVertex != null) {
 					addedCombinePointVertices.add(addedCombinePointVertex);
 				}
-			} catch (IllegalStateException e) {
-				return false;
+			} catch (IllegalArgumentException e) {
+				recessCombinePoints.add(combinePoint);
 			}
 		}
-		Vertex targetCombineVertex = separateTargetCombinePoints[0].getVertexOf(separateTarget);
-		Vertex thisCombineVertex = separateTargetCombinePoints[0].getOtherOneOf(targetCombineVertex);
-		Vertex[] afterCombineVertices = new Vertex[separateTarget.getVertices().length];
-		for (int i = 0; i < afterCombineVertices.length; i++) {
-			afterCombineVertices[i] = createAfterCombineTargetVertex(separateTarget.getVertices()[i], thisCombineVertex, targetCombineVertex);
+
+		for (CombinePoint recessCombinePoint : recessCombinePoints) {
+			Vertex recessCombinePointVertex = recessCombinePoint.actualVertex;
+			this.vertices.insert(this.vertices.indexOf(removeVertices.get(0), true), recessCombinePointVertex);
 		}
-		this.removeVerticesExcept(afterCombineVertices, addedCombinePointVertices.<Vertex> toArray(Vertex.class));
+		this.vertices.removeAll(removeVertices, true);
+
 		this.normalizeVertices();
 		if (this.isTwist()) {
 			return false;
@@ -409,42 +426,26 @@ public class CombineSquare2d extends Square2d {
 
 	private CombinePoint[] getCombinePointOf(Square2d square) {
 		Array<CombinePoint> result = new Array<>();
-		for (CombinePoint combinePoint : this.combinePoints) {
-			for (Vertex vertex : square.getVertices()) {
-				if (combinePoint.contains(square, vertex)) {
-					result.add(combinePoint);
-					break;
-				}
+		for (CombinePoint combinePoint : this.combinePoints.values()) {
+			if (combinePoint.isCombine(square)) {
+				result.add(combinePoint);
 			}
 		}
 		return result.<CombinePoint> toArray(CombinePoint.class);
 	}
 
-	private Vertex addCombinePointVertexIfRemoved(CombinePoint combinePoint) {
+	private Vertex addNotRecessedCombinePointVertexIfRemoved(CombinePoint combinePoint) {
 		Vertex combinePointActualVertex = combinePoint.actualVertex;
 		if (!this.contains(combinePointActualVertex)) {
-			Vertex insertVertex = combinePoint.getVertexOf(this);
-			final int insertIndex = CombineSquare2dUtils.getUnchangeSquareAreaIndexEvenIfInsert(this.getVertices(), insertVertex);
+			final Vertex insertVertex = combinePointActualVertex;
+			int insertIndex = CombineSquare2dUtils.getUnchangeSquareAreaIndexEvenIfInsert(this.getVertices(), insertVertex);
 			if (insertIndex == -1) {
-				throw new IllegalStateException();
+				throw new IllegalArgumentException();
 			}
 			this.vertices.insert(insertIndex, insertVertex);
 			return combinePointActualVertex;
 		}
 		return null;
-	}
-
-	private void removeVerticesExcept(Vertex[] removeVertices, Vertex[] exceptVertices) {
-		for (Vertex removeVertex : removeVertices) {
-			if (CombineSquare2dUtils.existsSufficientlyCloseVertex(removeVertex, exceptVertices)) {
-				continue;
-			}
-			for (Vertex thisVertex : this.vertices) {
-				if (CombineSquare2dUtils.canBeRegardedAsSameVertex(thisVertex, removeVertex)) {
-					this.vertices.removeValue(thisVertex, true);
-				}
-			}
-		}
 	}
 
 	@Override
@@ -502,78 +503,75 @@ public class CombineSquare2d extends Square2d {
 	@SuppressWarnings("javadoc")
 	public static class CombinePoint {
 		public final Vertex actualVertex;
+		public final Array<CombinedVertex> combinedVertices;
 
-		public final Square2d square1;
-		public final Vertex vertex1;
-
-		public final Square2d square2;
-		public final Vertex vertex2;
-
-		CombinePoint(Square2d square1, Vertex vertex1, Square2d square2, Vertex vertex2, Vertex actualVertex) {
-			if (square1 == square2) {
-				throw new RuntimeException("square1 must be different from square2"); //$NON-NLS-1$
-			}
-			this.square1 = square1;
-			this.vertex1 = vertex1;
-			this.square2 = square2;
-			this.vertex2 = vertex2;
+		CombinePoint(Vertex actualVertex, Square2d square, Vertex vertex) {
 			this.actualVertex = actualVertex;
+			this.combinedVertices = new Array<>();
+			this.combinedVertices.add(new CombinedVertex(square, vertex));
 		}
 
-		public boolean contains(Square2d square, Vertex checkVertex) {
-			if (square == null || checkVertex == null) {
-				return false;
-			}
-			return this.getVertexOf(square) == checkVertex;
-		}
-
-		public Vertex getOtherOneOf(Vertex vertex) {
-			if (vertex == this.vertex1) {
-				return this.vertex2;
-			}
-			if (vertex == this.vertex2) {
-				return this.vertex1;
-			}
-			return null;
+		public boolean isCombine(Square2d square) {
+			return this.getVertexOf(square) != null;
 		}
 
 		public Vertex getVertexOf(Square2d square) {
-			if (square == this.square1) {
-				return this.vertex1;
-			}
-			if (square == this.square2) {
-				return this.vertex2;
+			for (CombinedVertex combinedVertex : this.combinedVertices) {
+				if (combinedVertex.square == square) {
+					return combinedVertex.vertex;
+				}
 			}
 			return null;
 		}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof CombinePoint) {
-				CombinePoint compareObj = (CombinePoint) obj;
-				if (this.actualVertex != compareObj.actualVertex) {
-					return false;
-				}
-				if ((this.square1 == compareObj.square1 && this.vertex1 == compareObj.vertex1) && (this.square2 == compareObj.square2 && this.vertex2 == compareObj.vertex2)) {
-					return true;
-				}
-				if ((this.square1 == compareObj.square2 && this.vertex1 == compareObj.vertex2) && (this.square2 == compareObj.square1 && this.vertex2 == compareObj.vertex1)) {
-					return true;
-				}
-				return false;
-			}
-			return super.equals(obj);
+		public void addCombinedVertex(Square2d square, Vertex vertex) {
+			this.addCombinedVertex(new CombinedVertex(square, vertex));
 		}
 
-		@Override
-		public int hashCode() {
-			return super.hashCode();
+		public void addCombinedVertex(CombinedVertex combinedVertex) {
+			if (this.getVertexOf(combinedVertex.square) != null) {
+				throw new IllegalArgumentException();
+			}
+			this.combinedVertices.add(combinedVertex);
+		}
+
+		public void addCombinedVertices(CombinedVertex[] addCombinedVertices) {
+			for (CombinedVertex addCombinedVertex : addCombinedVertices) {
+				this.addCombinedVertex(addCombinedVertex);
+			}
+		}
+
+		public void removeCombinedVertex(Square2d square) {
+			for (CombinedVertex combinedVertex : this.combinedVertices) {
+				if (combinedVertex.square == square) {
+					this.combinedVertices.removeValue(combinedVertex, true);
+				}
+			}
 		}
 
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			return sb.append("[").append(this.vertex1).append(", ").append(this.vertex2).append("]").toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return sb.append(this.actualVertex).append(" | ").append(this.combinedVertices).toString(); //$NON-NLS-1$
+		}
+	}
+
+	private static class CombinedVertex {
+		public final Square2d square;
+		public final Vertex vertex;
+
+		CombinedVertex(Square2d square, Vertex vertex) {
+			if (!square.contains(vertex)) {
+				throw new IllegalArgumentException();
+			}
+			this.square = square;
+			this.vertex = vertex;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			return sb.append(this.square).append(" ").append(this.vertex).toString(); //$NON-NLS-1$
 		}
 	}
 }

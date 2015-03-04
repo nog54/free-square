@@ -1,8 +1,11 @@
 package org.nognog.freeSquare.square2d;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.isNotNull;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +13,7 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.square2d.CombineSquare2d.CombinePoint;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
@@ -63,18 +66,58 @@ public class CombineSquare2dTest {
 			}
 			CombinePoint[] combinePoints = combineSquare.getCombinePoints();
 			int actual5 = combinePoints.length;
-			int expected5 = 2;
+			int expected5 = 6;
 			assertThat(actual5, is(expected5));
 
-			CombinePoint actual6 = combinePoints[0];
-			CombinePoint actual7 = combinePoints[1];
-			CombinePoint expected6 = new CombinePoint(combineSquare, combinePoints[0].vertex1, appendSquare1, appendSquare1.getVertex3(), combinePoints[0].actualVertex);
-			CombinePoint expected7 = new CombinePoint(combineSquare, combinePoints[1].vertex1, appendSquare1, appendSquare1.getVertex2(), combinePoints[1].actualVertex);
-
-			assertThat(actual6, is(expected6));
-			assertThat(actual7, is(expected7));
-			assertThat(combineSquare.contains(combinePoints[0].actualVertex), is(false));
-			assertThat(combineSquare.contains(combinePoints[1].actualVertex), is(false));
+			int size1Counter = 0, size2Counter = 0;
+			int containsBaseVertex1Counter = 0, containsBaseVertex2Counter = 0, containsBaseVertex3Counter = 0, containsBaseVertex4Counter = 0;
+			int containsAppendSquareVertex1Counter = 0, containsAppendSquareVertex2Counter = 0, containsAppendSquareVertex3Counter = 0, containsAppendSquareVertex4Counter = 0;
+			for (CombinePoint combinePoint : combinePoints) {
+				if (combinePoint.combinedVertices.size == 1) {
+					size1Counter++;
+					assertThat(combineSquare.contains(combinePoint.actualVertex), is(true));
+				}
+				if (combinePoint.combinedVertices.size == 2) {
+					size2Counter++;
+					assertThat(combinePoint.getVertexOf(base), is(notNullValue()));
+					assertThat(combinePoint.getVertexOf(appendSquare1), is(notNullValue()));
+					assertThat(combineSquare.contains(combinePoint.actualVertex), is(false));
+				}
+				if (combinePoint.getVertexOf(base) == base.getVertex1()) {
+					containsBaseVertex1Counter++;
+				}
+				if (combinePoint.getVertexOf(base) == base.getVertex2()) {
+					containsBaseVertex2Counter++;
+				}
+				if (combinePoint.getVertexOf(base) == base.getVertex3()) {
+					containsBaseVertex3Counter++;
+				}
+				if (combinePoint.getVertexOf(base) == base.getVertex4()) {
+					containsBaseVertex4Counter++;
+				}
+				if (combinePoint.getVertexOf(appendSquare1) == appendSquare1.getVertex1()) {
+					containsAppendSquareVertex1Counter++;
+				}
+				if (combinePoint.getVertexOf(appendSquare1) == appendSquare1.getVertex2()) {
+					containsAppendSquareVertex2Counter++;
+				}
+				if (combinePoint.getVertexOf(appendSquare1) == appendSquare1.getVertex3()) {
+					containsAppendSquareVertex3Counter++;
+				}
+				if (combinePoint.getVertexOf(appendSquare1) == appendSquare1.getVertex4()) {
+					containsAppendSquareVertex4Counter++;
+				}
+			}
+			assertThat(size1Counter, is(4));
+			assertThat(size2Counter, is(2));
+			assertThat(containsBaseVertex1Counter, is(1));
+			assertThat(containsBaseVertex2Counter, is(1));
+			assertThat(containsBaseVertex3Counter, is(1));
+			assertThat(containsBaseVertex4Counter, is(1));
+			assertThat(containsAppendSquareVertex1Counter, is(1));
+			assertThat(containsAppendSquareVertex2Counter, is(1));
+			assertThat(containsAppendSquareVertex3Counter, is(1));
+			assertThat(containsAppendSquareVertex4Counter, is(1));
 		}
 		{
 			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
@@ -141,8 +184,8 @@ public class CombineSquare2dTest {
 			CombinePoint[] expectedCombinePoints = combineSquare.getCombinePoints();
 			for (int i = 0; i < combineSquare.getVertices().length; i++) {
 				for (int j = 0; j < appendSquare2.getVertices().length; j++) {
-					boolean isCombined = combineSquare.combine(combineSquare.getVertices()[i], appendSquare2, appendSquare2.getVertices()[j]);
-					boolean isSeparated = combineSquare.separate(appendSquare2);
+					combineSquare.combine(combineSquare.getVertices()[i], appendSquare2, appendSquare2.getVertices()[j]);
+					combineSquare.separate(appendSquare2);
 					Vertex[] actualVertices = combineSquare.getVertices();
 					CombinePoint[] actualCombinePoints = combineSquare.getCombinePoints();
 
@@ -158,42 +201,60 @@ public class CombineSquare2dTest {
 			}
 		}
 		{
-			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
-			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
-			combineSquare.separate(appendSquare2);
-			combineSquare.combine(combineSquare.getVertices()[1], appendSquare3, appendSquare3.getVertices()[1]);
-			combineSquare.combine(combineSquare.getVertices()[4], appendSquare4, appendSquare4.getVertices()[0]);
-			
-			boolean actual1 = combineSquare.separate(appendSquare4);
-			boolean actual2 = combineSquare.separate(appendSquare3);
-//			boolean expected1 = true;
-//			boolean expected2 = true;
-//			assertThat(actual1, is(expected1));
-//			assertThat(actual2, is(expected2));
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[3], appendSquare1, appendSquare1.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare2, appendSquare2.getVertex2());
+
+			boolean actual1 = combineSquare.separate(appendSquare1);
+			boolean actual2 = combineSquare.separate(appendSquare2);
+			boolean expected1 = true;
+			boolean expected2 = true;
+			assertThat(actual1, is(expected1));
+			assertThat(actual2, is(expected2));
 		}
 		{
-			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
-			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertices()[0]);
-			combineSquare.separate(appendSquare2);
-			combineSquare.combine(combineSquare.getVertices()[2],appendSquare3, appendSquare3.getVertices()[0]);
-			combineSquare.combine(combineSquare.getVertices()[2],appendSquare4, appendSquare4.getVertices()[0]);
-			
-			boolean actual1 = combineSquare.separate(appendSquare4);
-			boolean actual2 = combineSquare.separate(appendSquare3);
-//			boolean expected1 = true;
-//			boolean expected2 = true;
-//			assertThat(actual1, is(expected1));
-//			assertThat(actual2, is(expected2));
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[3], appendSquare1, appendSquare1.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare2, appendSquare2.getVertex2());
+
+			boolean actual1 = combineSquare.separate(appendSquare2);
+			boolean actual2 = combineSquare.separate(appendSquare1);
+			boolean expected1 = true;
+			boolean expected2 = true;
+			assertThat(actual1, is(expected1));
+			assertThat(actual2, is(expected2));
+		}
+		{
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare1, appendSquare1.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertex1());
+
+			boolean actual1 = combineSquare.separate(appendSquare1);
+			boolean actual2 = combineSquare.separate(appendSquare2);
+			boolean expected1 = true;
+			boolean expected2 = true;
+			assertThat(actual1, is(expected1));
+			assertThat(actual2, is(expected2));
+		}
+		{
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare1, appendSquare1.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[5], appendSquare2, appendSquare2.getVertex1());
+
+			boolean actual1 = combineSquare.separate(appendSquare2);
+			boolean actual2 = combineSquare.separate(appendSquare1);
+			boolean expected1 = true;
+			boolean expected2 = true;
+			assertThat(actual1, is(expected1));
+			assertThat(actual2, is(expected2));
 		}
 	}
 }
