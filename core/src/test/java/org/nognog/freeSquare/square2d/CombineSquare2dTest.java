@@ -138,7 +138,7 @@ public class CombineSquare2dTest {
 
 	@Test
 	public final void testSeparate() {
-		{
+		{ // separate to base only
 			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
 			CombineSquare2d combineSquare = new CombineSquare2d(base);
 			Vertex[] baseVertices = combineSquare.getVertices();
@@ -175,7 +175,7 @@ public class CombineSquare2dTest {
 				}
 			}
 		}
-		{
+		{ // separate last combine square
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
@@ -188,7 +188,6 @@ public class CombineSquare2dTest {
 					combineSquare.separate(appendSquare2);
 					Vertex[] actualVertices = combineSquare.getVertices();
 					CombinePoint[] actualCombinePoints = combineSquare.getCombinePoints();
-
 					assertThat(actualVertices.length, is(expectedVertices.length));
 					for (Vertex actualVertex : actualVertices) {
 						assertThat(Square2dUtils.contains(expectedVertices, actualVertex), is(true));
@@ -200,7 +199,7 @@ public class CombineSquare2dTest {
 				}
 			}
 		}
-		{
+		{ // separate square that contains cancave point 1
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
@@ -214,7 +213,7 @@ public class CombineSquare2dTest {
 			assertThat(actual1, is(expected1));
 			assertThat(actual2, is(expected2));
 		}
-		{
+		{ // separate square that contains cancave point 2
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
@@ -228,7 +227,7 @@ public class CombineSquare2dTest {
 			assertThat(actual1, is(expected1));
 			assertThat(actual2, is(expected2));
 		}
-		{
+		{ // separate square that contains cancave point 3
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
@@ -242,7 +241,7 @@ public class CombineSquare2dTest {
 			assertThat(actual1, is(expected1));
 			assertThat(actual2, is(expected2));
 		}
-		{
+		{ // separate square that contains cancave point 4
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
@@ -255,6 +254,120 @@ public class CombineSquare2dTest {
 			boolean expected2 = true;
 			assertThat(actual1, is(expected1));
 			assertThat(actual2, is(expected2));
+		}
+		{ // separate sandwiched square 1
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1.create();
+			combineSquare.combine(combineSquare.getVertices()[3], appendSquare1, appendSquare1.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[3], appendSquare2, appendSquare2.getVertex1());
+			boolean actual1 = combineSquare.separate(appendSquare1);
+			boolean expected1 = false;
+			assertThat(actual1, is(expected1));
+		}
+		{ // separate sandwiched square 2
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_LARGE.create());
+			Vertex[] firstVertices = combineSquare.getVertices();
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 1時の方向
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 2時の方向
+			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 3時の方向
+			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 4時の方向
+			SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 5時の方向
+			SimpleSquare2d appendSquare6 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 6時の方向
+			SimpleSquare2d appendSquare7 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 7時の方向
+			SimpleSquare2d appendSquare8 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 8時の方向
+			SimpleSquare2d appendSquare9 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 9時の方向
+			SimpleSquare2d appendSquare10 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 10時の方向
+			SimpleSquare2d appendSquare11 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 11時の方向
+			SimpleSquare2d appendSquare12 = Square2dType.GRASSY_SQUARE1_SMALL.create(); // 12時の方向
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare1, appendSquare1.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare2, appendSquare2.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare3, appendSquare3.getVertex3());
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex3());
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare5, appendSquare5.getVertex3());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare6, appendSquare6.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare7, appendSquare7.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare8, appendSquare8.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare9, appendSquare9.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare10, appendSquare10.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare11, appendSquare11.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare12, appendSquare12.getVertex1());
+
+			boolean actual1 = combineSquare.separate(appendSquare1);
+			boolean actual2 = combineSquare.separate(appendSquare2);
+			boolean actual3 = combineSquare.separate(appendSquare4);
+			boolean actual4 = combineSquare.separate(appendSquare5);
+			boolean actual5 = combineSquare.separate(appendSquare7);
+			boolean actual6 = combineSquare.separate(appendSquare8);
+			boolean actual7 = combineSquare.separate(appendSquare10);
+			boolean actual8 = combineSquare.separate(appendSquare11);
+
+			boolean actual9 = combineSquare.separate(appendSquare12);
+			boolean actual10 = combineSquare.separate(appendSquare3);
+			boolean actual11 = combineSquare.separate(appendSquare6);
+			boolean actual12 = combineSquare.separate(appendSquare9);
+
+			boolean actual13 = combineSquare.separate(appendSquare4);
+			boolean actual14 = combineSquare.separate(appendSquare7);
+			boolean actual15 = combineSquare.separate(appendSquare10);
+			boolean actual16 = combineSquare.separate(appendSquare11);
+
+			assertThat(actual1, is(true));
+			assertThat(actual2, is(true));
+			assertThat(actual3, is(false));
+			assertThat(actual4, is(true));
+			assertThat(actual5, is(false));
+			assertThat(actual6, is(true));
+			assertThat(actual7, is(false));
+			assertThat(actual8, is(false));
+			assertThat(actual9, is(true));
+			assertThat(actual10, is(true));
+			assertThat(actual11, is(true));
+			assertThat(actual12, is(true));
+			assertThat(actual13, is(true));
+			assertThat(actual14, is(true));
+			assertThat(actual15, is(true));
+			assertThat(actual16, is(true));
+
+			Vertex[] afterVertices = combineSquare.getVertices();
+			assertThat(afterVertices.length, is(firstVertices.length));
+			for (Vertex afterVertex : afterVertices) {
+				assertThat(Square2dUtils.contains(firstVertices, afterVertex), is(true));
+			}
+		}
+		{ // separate sandwiched square 3
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare6 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
+			SimpleSquare2d appendSquare7 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
+			SimpleSquare2d appendSquare8 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
+			SimpleSquare2d appendSquare9 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
+
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare3, appendSquare3.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[1], appendSquare5, appendSquare5.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare6, appendSquare6.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[2], appendSquare7, appendSquare7.getVertex2());
+			combineSquare.combine(combineSquare.getVertices()[5], appendSquare8, appendSquare8.getVertex1());
+			combineSquare.combine(combineSquare.getVertices()[3], appendSquare9, appendSquare9.getVertex3());
+
+			boolean actual1 = combineSquare.separate(appendSquare8);
+			boolean actual2 = combineSquare.separate(appendSquare3);
+			boolean actual3 = combineSquare.separate(appendSquare8);
+			boolean actual4 = combineSquare.separate(appendSquare4);
+			boolean actual5 = combineSquare.separate(appendSquare8);
+			assertThat(actual1, is(false));
+			assertThat(actual2, is(true));
+			assertThat(actual3, is(false));
+			assertThat(actual4, is(true));
+			assertThat(actual5, is(true));
+
 		}
 	}
 }

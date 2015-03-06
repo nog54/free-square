@@ -38,11 +38,24 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			if (!actor1IsSquareObject && actor2IsSquareObject) {
 				return -1;
 			}
-			float actor1Y = actor1.getY() - actor1.getOriginY();
-			float actor2Y = actor2.getY() - actor2.getOriginY();
-			if (actor1Y < actor2Y) {
+
+			if (actor1 instanceof Square2d && actor2 instanceof Square2d) {
+				final Square2d square1 = (Square2d) actor1;
+				final Square2d square2 = (Square2d) actor2;
+				final float square1BottomVertexY = square1.getY() + square1.getMostBottomVertex().y;
+				final float square2ButtomVertexY = square2.getY() + square2.getMostBottomVertex().y;
+				if (square1BottomVertexY < square2ButtomVertexY) {
+					return 1;
+				} else if (square1BottomVertexY > square2ButtomVertexY) {
+					return -1;
+				}
+				return 0;
+			}
+			final float squareObject1Y = actor1.getY() - actor1.getOriginY();
+			final float squareObject2Y = actor2.getY() - actor2.getOriginY();
+			if (squareObject1Y < squareObject2Y) {
 				return 1;
-			} else if (actor1Y > actor2Y) {
+			} else if (squareObject1Y > squareObject2Y) {
 				return -1;
 			}
 			return 0;
@@ -122,6 +135,62 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	 */
 	public abstract float getTopEndY();
 
+	/**
+	 * @return most right vertex
+	 */
+	public Vertex getMostRightVertex() {
+		Vertex[] vertices = this.getVertices();
+		Vertex mostRightVertex = vertices[0];
+		for (int i = 1; i < vertices.length; i++) {
+			if (mostRightVertex.x < vertices[i].x) {
+				mostRightVertex = vertices[i];
+			}
+		}
+		return mostRightVertex;
+	}
+
+	/**
+	 * @return most left vertex
+	 */
+	public Vertex getMostLeftVertex() {
+		Vertex[] vertices = this.getVertices();
+		Vertex mostLeftVertex = vertices[0];
+		for (int i = 1; i < vertices.length; i++) {
+			if (mostLeftVertex.x > vertices[i].x) {
+				mostLeftVertex = vertices[i];
+			}
+		}
+		return mostLeftVertex;
+	}
+	
+	/**
+	 * @return most top vertex
+	 */
+	public Vertex getMostTopVertex() {
+		Vertex[] vertices = this.getVertices();
+		Vertex mostTopVertex = vertices[0];
+		for (int i = 1; i < vertices.length; i++) {
+			if (mostTopVertex.y < vertices[i].y) {
+				mostTopVertex = vertices[i];
+			}
+		}
+		return mostTopVertex;
+	}
+	
+	/**
+	 * @return most bottom vertex
+	 */
+	public Vertex getMostBottomVertex() {
+		Vertex[] vertices = this.getVertices();
+		Vertex mostButtomVertex = vertices[0];
+		for (int i = 1; i < vertices.length; i++) {
+			if (mostButtomVertex.y > vertices[i].y) {
+				mostButtomVertex = vertices[i];
+			}
+		}
+		return mostButtomVertex;
+	}
+	
 	/**
 	 * @return stage coordinates vertices
 	 */
@@ -219,14 +288,20 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			this.addSquareObject((Square2dObject) actor);
 			return;
 		}
-		throw new RuntimeException("Non-sqaure2d-object is passed to AbstractSquare2d$addActor."); //$NON-NLS-1$
-	}
-
-	protected void addActorForce(Actor actor) {
 		super.addActor(actor);
 	}
 
-	protected void removeActorForce(Actor actor) {
+	/**
+	 * @param actor
+	 */
+	public void addActorForce(Actor actor) {
+		super.addActor(actor);
+	}
+
+	/**
+	 * @param actor
+	 */
+	public void removeActorForce(Actor actor) {
 		super.removeActor(actor);
 	}
 
@@ -235,7 +310,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		if (actor instanceof Square2dObject) {
 			return this.removeSquareObject((Square2dObject) actor);
 		}
-		throw new RuntimeException("Non-sqaure2d-object is passed to square2d$removeActor."); //$NON-NLS-1$
+		return super.removeActor(actor);
 	}
 
 	@Override

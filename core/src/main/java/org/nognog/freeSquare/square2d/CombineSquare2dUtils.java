@@ -66,27 +66,6 @@ public class CombineSquare2dUtils {
 	 * @param vertices
 	 */
 	public static void normalizeVertices(Array<Vertex> vertices) {
-		// Vertex[] verticesArray = vertices.toArray(Vertex.class);
-		// Vertex[][] commonVertex =
-		// CombinedSquare2dUtils.getCommonVertex(verticesArray);
-		// for (int i = 0; i < verticesArray.length; i++) {
-		// if (commonVertex[i].length == 0 ||
-		// !vertices.contains(verticesArray[i], true)) {
-		// continue;
-		// }
-		// Vertex[] removeCandidateVertices = new Vertex[commonVertex[i].length
-		// + 1];
-		// removeCandidateVertices[0] = verticesArray[i];
-		// System.arraycopy(commonVertex[i], 0, removeCandidateVertices, 1,
-		// commonVertex[i].length);
-		// if (hasSameAreaEvenIfRemoveVertices(verticesArray,
-		// removeCandidateVertices)) {
-		// for (int j = 0; j < removeCandidateVertices.length; j++) {
-		// vertices.removeValue(removeCandidateVertices[j], true);
-		// }
-		// }
-		// }
-
 		boolean changed;
 		do {
 			changed = false;
@@ -126,9 +105,11 @@ public class CombineSquare2dUtils {
 		final float baseArea = Square2dUtils.createPolygon(vertices).area();
 		for (int insertIndex = 0; insertIndex <= vertices.length; insertIndex++) {
 			final Vertex[] afterInsertVertices = new Vertex[vertices.length + 1];
+			
 			System.arraycopy(vertices, 0, afterInsertVertices, 0, insertIndex);
 			afterInsertVertices[insertIndex] = insertVertex;
 			System.arraycopy(vertices, insertIndex, afterInsertVertices, insertIndex + 1, vertices.length - insertIndex);
+			
 			final float afterInsertArea = Square2dUtils.createPolygon(afterInsertVertices).area();
 			if (isSufficientlySameArea(baseArea, afterInsertArea)) {
 				return insertIndex;
@@ -144,14 +125,49 @@ public class CombineSquare2dUtils {
 	 */
 	public static float getDistanceToNearestEdge(Vertex checkVertex, Vertex[] vertices) {
 		float minR = Float.MAX_VALUE;
-		for(int i = 0; i < vertices.length; i++){
+		for (int i = 0; i < vertices.length; i++) {
 			final Vertex v1 = vertices[i];
 			final Vertex v2 = vertices[(i + 1) % vertices.length];
 			final float r = Intersector.distanceSegmentPoint(v1.x, v1.y, v2.x, v2.y, checkVertex.x, checkVertex.y);
-			if(r < minR){
+			if (r < minR) {
 				minR = r;
 			}
 		}
 		return minR;
+	}
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return true if checkVertex can be regarded as online.
+	 */
+	public static boolean canBeRegardedAsOnline(Vertex checkVertex, Vertex[] vertices) {
+		final float distanceToNearestEdge = getDistanceToNearestEdge(checkVertex, vertices);
+		return isSufficientlyCloseDistance(distanceToNearestEdge);
+	}
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return edge under vertex. may be null.
+	 */
+	public static Edge getOnlineEdge(Vertex checkVertex, Vertex[] vertices) {
+		Vertex minV1 = null;
+		Vertex minV2 = null;
+		float minR = Float.MAX_VALUE;
+		for (int i = 0; i < vertices.length; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			final float r = Intersector.distanceSegmentPoint(v1.x, v1.y, v2.x, v2.y, checkVertex.x, checkVertex.y);
+			if (r < minR) {
+				minR = r;
+				minV1 = v1;
+				minV2 = v2;
+			}
+		}
+		if (!isSufficientlyCloseDistance(minR)) {
+			return null;
+		}
+		return new Edge(minV1, minV2);
 	}
 }

@@ -70,6 +70,7 @@ public class Square2dUtils {
 			if (contains(exceptVertices, vertex)) {
 				continue;
 			}
+
 			points[i++] = vertex.x;
 			points[i++] = vertex.y;
 		}
