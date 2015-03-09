@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.square2d.CombinePoint.CombinedVertex;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
@@ -377,7 +378,7 @@ public class CombineSquare2d extends Square2d {
 			if (this.contains(combinePoint.actualVertex)) {
 				continue;
 			}
-			final Edge onlineEdge = this.getOnlineEdgeOf(combinePoint.actualVertex);
+			final Edge onlineEdge = this.getNearestSufficientlyCloseEdgeOf(combinePoint.actualVertex);
 			if (onlineEdge == null) {
 				recessedCombinePoints.add(combinePoint);
 			} else {
@@ -457,10 +458,17 @@ public class CombineSquare2d extends Square2d {
 		if (!targetIsHalfBuried) {
 			return -1;
 		}
-		if (!this.getOnlineEdgeOf(onlineSeparateTargetVertices.get(0)).equals(this.getOnlineEdgeOf(onlineSeparateTargetVertices.get(1)))) {
+		if (!this.getNearestSufficientlyCloseEdgeOf(onlineSeparateTargetVertices.get(0)).equals(this.getNearestSufficientlyCloseEdgeOf(onlineSeparateTargetVertices.get(1)))) {
+			final boolean eitherOnlineVertexIsContained = this.contains(onlineSeparateTargetVertices.get(0)) || this.contains(onlineSeparateTargetVertices.get(1));
+			if (!eitherOnlineVertexIsContained) {
+				return -1;
+			}
+
+		}
+		final Edge onlineEdge = this.getSameOnlineEdge(onlineSeparateTargetVertices.get(0), onlineSeparateTargetVertices.get(1));
+		if (onlineEdge == null) {
 			return -1;
 		}
-		final Edge onlineEdge = this.getOnlineEdgeOf(onlineSeparateTargetVertices.get(0));
 		final int onlineEdgeLargerIndex, onlineEdgeSmallerIndex;
 		if (this.vertices.indexOf(onlineEdge.v1, true) < this.vertices.indexOf(onlineEdge.v2, true)) {
 			onlineEdgeSmallerIndex = this.vertices.indexOf(onlineEdge.v1, true);
@@ -507,8 +515,22 @@ public class CombineSquare2d extends Square2d {
 		return result;
 	}
 
-	private Edge getOnlineEdgeOf(Vertex vertex) {
-		return CombineSquare2dUtils.getOnlineEdge(vertex, this.getVertices());
+	private Edge getNearestSufficientlyCloseEdgeOf(Vertex vertex) {
+		return CombineSquare2dUtils.getNearestSufficientlyCloseEdge(vertex, this.getVertices());
+	}
+
+	private Edge getSameOnlineEdge(Vertex vertex1, Vertex vertex2) {
+		final Vertex[] searchVertices = this.getVertices();
+		final Edge[] vertex1OnliseEdges = CombineSquare2dUtils.getOnlineEdge(vertex1, searchVertices);
+		final Edge[] vertex2OnliseEdges = CombineSquare2dUtils.getOnlineEdge(vertex2, searchVertices);
+		for (Edge vertex1OnlineEdge : vertex1OnliseEdges) {
+			for (Edge vertex2OnlineEdge : vertex2OnliseEdges) {
+				if (vertex1OnlineEdge.equals(vertex2OnlineEdge)) {
+					return vertex1OnlineEdge;
+				}
+			}
+		}
+		return null;
 	}
 
 	private static Vertex[] getSingleCombineVertices(final CombinePoint[] separateTargetCombinePoints) {
@@ -521,10 +543,6 @@ public class CombineSquare2d extends Square2d {
 		return result.<Vertex> toArray(Vertex.class);
 	}
 
-	private boolean isTwist() {
-		return Square2dUtils.isTwist(this);
-	}
-
 	private CombinePoint[] getCombinePointOf(Square2d square) {
 		Array<CombinePoint> result = new Array<>();
 		for (CombinePoint combinePoint : this.combinePoints.values()) {
@@ -533,6 +551,10 @@ public class CombineSquare2d extends Square2d {
 			}
 		}
 		return result.<CombinePoint> toArray(CombinePoint.class);
+	}
+
+	private boolean isTwist() {
+		return Square2dUtils.isTwist(this);
 	}
 
 	/**
@@ -617,83 +639,5 @@ public class CombineSquare2d extends Square2d {
 			sb.append("-").append(this.vertices.get(i)); //$NON-NLS-1$
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * @author goshi 2015/02/15
-	 */
-	@SuppressWarnings("javadoc")
-	public static class CombinePoint {
-		public final Vertex actualVertex;
-		public final Array<CombinedVertex> combinedVertices;
-
-		CombinePoint(Vertex actualVertex, Square2d square, Vertex vertex) {
-			this.actualVertex = actualVertex;
-			this.combinedVertices = new Array<>();
-			this.combinedVertices.add(new CombinedVertex(square, vertex));
-		}
-
-		public boolean isCombine(Square2d square) {
-			return this.getVertexOf(square) != null;
-		}
-
-		public Vertex getVertexOf(Square2d square) {
-			for (CombinedVertex combinedVertex : this.combinedVertices) {
-				if (combinedVertex.square == square) {
-					return combinedVertex.vertex;
-				}
-			}
-			return null;
-		}
-
-		public void addCombinedVertex(Square2d square, Vertex vertex) {
-			this.addCombinedVertex(new CombinedVertex(square, vertex));
-		}
-
-		public void addCombinedVertex(CombinedVertex combinedVertex) {
-			if (this.getVertexOf(combinedVertex.square) != null) {
-				throw new IllegalArgumentException();
-			}
-			this.combinedVertices.add(combinedVertex);
-		}
-
-		public void addCombinedVertices(CombinedVertex[] addCombinedVertices) {
-			for (CombinedVertex addCombinedVertex : addCombinedVertices) {
-				this.addCombinedVertex(addCombinedVertex);
-			}
-		}
-
-		public void removeCombinedVertex(Square2d square) {
-			for (CombinedVertex combinedVertex : this.combinedVertices) {
-				if (combinedVertex.square == square) {
-					this.combinedVertices.removeValue(combinedVertex, true);
-				}
-			}
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			return sb.append(this.actualVertex).append(" | ").append(this.combinedVertices).toString(); //$NON-NLS-1$
-		}
-	}
-
-	private static class CombinedVertex {
-		public final Square2d square;
-		public final Vertex vertex;
-
-		CombinedVertex(Square2d square, Vertex vertex) {
-			if (!square.contains(vertex)) {
-				throw new IllegalArgumentException();
-			}
-			this.square = square;
-			this.vertex = vertex;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			return sb.append(this.square).append(" ").append(this.vertex).toString(); //$NON-NLS-1$
-		}
 	}
 }

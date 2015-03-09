@@ -88,25 +88,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
-		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
+		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1.create();
 		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare6 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
-		SimpleSquare2d appendSquare7 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
-		SimpleSquare2d appendSquare8 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
-		SimpleSquare2d appendSquare9 = Square2dType.GRASSY_SQUARE1_SMALL.create(); 
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare3, appendSquare3.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[1], appendSquare5, appendSquare5.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[2], appendSquare6, appendSquare6.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[2], appendSquare7, appendSquare7.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[5], appendSquare8, appendSquare8.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[3], appendSquare9, appendSquare9.getVertex3());
+
+		combineSquare.combine(combineSquare.getVertices()[1], appendSquare1, appendSquare1.getVertex1());
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex2());
+		combineSquare.combine(combineSquare.getVertices()[7], appendSquare3, appendSquare3.getVertex1());
+		combineSquare.separate(appendSquare3);
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
@@ -261,6 +251,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 						} catch (IllegalArgumentException e) {
 							this.addSquare.setX(previousX);
 							this.addSquare.setY(previousY);
+							this.addSquare = null;
 						}
 						FreeSquare.this.showSquareOnly();
 					}

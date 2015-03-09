@@ -105,11 +105,11 @@ public class CombineSquare2dUtils {
 		final float baseArea = Square2dUtils.createPolygon(vertices).area();
 		for (int insertIndex = 0; insertIndex <= vertices.length; insertIndex++) {
 			final Vertex[] afterInsertVertices = new Vertex[vertices.length + 1];
-			
+
 			System.arraycopy(vertices, 0, afterInsertVertices, 0, insertIndex);
 			afterInsertVertices[insertIndex] = insertVertex;
 			System.arraycopy(vertices, insertIndex, afterInsertVertices, insertIndex + 1, vertices.length - insertIndex);
-			
+
 			final float afterInsertArea = Square2dUtils.createPolygon(afterInsertVertices).area();
 			if (isSufficientlySameArea(baseArea, afterInsertArea)) {
 				return insertIndex;
@@ -151,7 +151,26 @@ public class CombineSquare2dUtils {
 	 * @param vertices
 	 * @return edge under vertex. may be null.
 	 */
-	public static Edge getOnlineEdge(Vertex checkVertex, Vertex[] vertices) {
+	public static Edge[] getOnlineEdge(Vertex checkVertex, Vertex[] vertices) {
+		Array<Edge> result = new Array<>();
+		for (int i = 0; i < vertices.length; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			final float r = Intersector.distanceSegmentPoint(v1.x, v1.y, v2.x, v2.y, checkVertex.x, checkVertex.y);
+			if (isSufficientlyCloseDistance(r)) {
+				result.add(new Edge(v1, v2));
+			}
+		}
+		return result.toArray(Edge.class);
+	}
+
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return edge under vertex. may be null.
+	 */
+	public static Edge getNearestSufficientlyCloseEdge(Vertex checkVertex, Vertex[] vertices) {
 		Vertex minV1 = null;
 		Vertex minV2 = null;
 		float minR = Float.MAX_VALUE;
