@@ -1,11 +1,37 @@
 package org.nognog.freeSquare.square2d;
 
+import org.nognog.freeSquare.model.persist.PersistManager;
+
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
 /**
  * Immutable vector
  * 
  * @author goshi 2014/12/17
  */
 public class Vertex {
+	static {
+		Json json = PersistManager.getUseJson();
+		json.setSerializer(Vertex.class, new Json.Serializer<Vertex>() {
+
+			@Override
+			@SuppressWarnings({ "hiding", "rawtypes" })
+			public void write(Json json, Vertex object, Class knownType) {
+				json.writeObjectStart();
+				json.writeFields(object);
+				json.writeObjectEnd();
+			}
+
+			@Override
+			@SuppressWarnings({ "boxing", "hiding", "rawtypes" })
+			public Vertex read(Json json, JsonValue jsonData, Class type) {
+				final float x = json.readValue("x", Float.class, jsonData); //$NON-NLS-1$
+				final float y = json.readValue("y", Float.class, jsonData); //$NON-NLS-1$
+				return new Vertex(x, y);
+			}
+		});
+	}
 	/** x-axis point */
 	public final float x;
 	/** y-axis point */

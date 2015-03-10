@@ -16,6 +16,7 @@ import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
@@ -88,22 +89,20 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
-		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
-		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1.create();
-		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-
-		combineSquare.combine(combineSquare.getVertices()[1], appendSquare1, appendSquare1.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[7], appendSquare3, appendSquare3.getVertex1());
-		combineSquare.separate(appendSquare3);
+		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
+		combineSquare.combine(combineSquare.getVertices()[combineSquare.getVertices().length - 1], appendSquare2, appendSquare2.getVertex1());
+		combineSquare.separate(appendSquare1);
+		combineSquare.separate(appendSquare2);
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
 		this.actLongTime(timeFromLastRun);
 		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
 		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
-		
+
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
@@ -277,7 +276,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					final Vector2 stageCoordinatesAddSquareVertex = this.addSquare.localToStageCoordinates(new Vector2(addSquareVertex.x, addSquareVertex.y));
 					for (int i = 0; i < stageCoordinatesBaseSquareVertices.length; i++) {
 						final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
-						if (CombineSquare2dUtils.canBeRegardedAsSameVertex(stageCoordinatesAddSquareVertex, stageCoordinatesBaseSquareVertex)) {
+						final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
+						if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
 							final CombineSquare2d baseSquare = (CombineSquare2d) FreeSquare.this.getSquare();
 							baseSquare.combine(baseSquare.getVertices()[i], this.addSquare, addSquareVertex);
 							this.addSquare = null;

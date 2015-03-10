@@ -8,6 +8,11 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2015/02/25
  */
 public class CombineSquare2dUtils {
+	/**
+	 * threshold of regard as sufficiently close.
+	 */
+	public static final float regardAsSufficientlyCloseThreshold = 5;
+
 	private CombineSquare2dUtils() {
 	}
 
@@ -16,7 +21,6 @@ public class CombineSquare2dUtils {
 	 * @return true if r can be regarded as sufficiently small.
 	 */
 	public static boolean isSufficientlyCloseDistance(float r) {
-		final float regardAsSufficientlyCloseThreshold = 5;
 		return Math.abs(r) < regardAsSufficientlyCloseThreshold;
 	}
 
@@ -164,7 +168,6 @@ public class CombineSquare2dUtils {
 		return result.toArray(Edge.class);
 	}
 
-
 	/**
 	 * @param checkVertex
 	 * @param vertices
@@ -188,5 +191,19 @@ public class CombineSquare2dUtils {
 			return null;
 		}
 		return new Edge(minV1, minV2);
+	}
+
+	/**
+	 * @param findVertex 
+	 * @param vertices
+	 * @return same value vertex
+	 */
+	public static Vertex getSameValueVertex(Vertex findVertex, Vertex[] vertices) {
+		for (Vertex vertex : vertices) {
+			if (vertex.equals(findVertex)) {
+				return vertex;
+			}
+		}
+		return null;
 	}
 }

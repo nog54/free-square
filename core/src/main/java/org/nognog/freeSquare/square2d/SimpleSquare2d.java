@@ -57,8 +57,6 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		}
 		this.type = type;
 		this.squareImage = this.createSquareImage(type);
-		this.setWidth(this.squareImage.getWidth());
-		this.setHeight(this.squareImage.getHeight());
 		super.addActorForce(this.squareImage);
 		this.setName(type.getName());
 	}
