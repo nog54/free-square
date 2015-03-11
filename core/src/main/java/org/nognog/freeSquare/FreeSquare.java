@@ -90,12 +90,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.addSquareObserver(this);
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
-		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[combineSquare.getVertices().length - 1], appendSquare2, appendSquare2.getVertex1());
-		combineSquare.separate(appendSquare1);
-		combineSquare.separate(appendSquare2);
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;

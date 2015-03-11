@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.Json;
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
 public class CombineSquare2dTest {
-	
-	private final void testReadWrite(Square2d combineSquare){
+
+	private final void testReadWrite(Square2d combineSquare) {
 		Json json = PersistManager.getUseJson();
 		String jsonString = json.toJson(combineSquare);
 		CombineSquare2d readObject = json.fromJson(CombineSquare2d.class, jsonString);
@@ -318,6 +318,15 @@ public class CombineSquare2dTest {
 			assertThat(actual2, is(expected2));
 			this.testReadWrite(combineSquare);
 		}
+		{ // separate square that contains cancave point 5
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex4());
+			combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare1.getVertex2());
+			boolean actual1 = combineSquare.separate(appendSquare1);
+			assertThat(actual1, is(false));
+		}
 		{ // separate sandwiched square 1
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
@@ -453,7 +462,7 @@ public class CombineSquare2dTest {
 			// }
 			this.testReadWrite(combineSquare);
 		}
-		{	// lost valid combinePoint of square in combineSquare.
+		{ // lost valid combinePoint of square in combineSquare.
 			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
@@ -470,7 +479,7 @@ public class CombineSquare2dTest {
 			combineSquare.combine(combineSquare.getVertices()[5], appendSquare5, appendSquare5.getVertex1());
 			combineSquare.combine(combineSquare.getVertices()[7], appendSquare6, appendSquare6.getVertex1());
 			combineSquare.combine(combineSquare.getVertices()[5], appendSquare7, appendSquare7.getVertex1());
-			
+
 			boolean actual1 = combineSquare.separate(appendSquare5);
 			assertThat(actual1, is(false));
 		}
