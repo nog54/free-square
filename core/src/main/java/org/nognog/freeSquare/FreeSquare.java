@@ -93,6 +93,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
+		this.square.addSquareObserver(this);
 		this.actLongTime(timeFromLastRun);
 		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
 		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;

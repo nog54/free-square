@@ -7,6 +7,8 @@ import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -51,7 +53,30 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 
 	@Override
 	public Vector2 nextTargetPosition() {
-		return Square2dUtils.getRandomPointOn(this.square);
+		if (!this.isLandingOnSquare()) {
+			return Square2dUtils.getRandomPointOn(this.square);
+		}
+		final float thisX = this.getX();
+		final float thisY = this.getY();
+		final float angle = MathUtils.random(0, 2 * (float) Math.PI);
+		float maxMoveDistance = 1000;
+		float maxMoveX = maxMoveDistance * MathUtils.cos(angle);
+		float maxMoveY = maxMoveDistance * MathUtils.sin(angle);
+		final Vertex[] vertices = this.square.getVertices();
+		for (int i = 0; i < vertices.length; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			Vector2 intersection = new Vector2();
+			if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, thisX, thisY, thisX + maxMoveX, thisY + maxMoveY, intersection)) {
+				maxMoveX = intersection.x - thisX;
+				maxMoveY = intersection.y - thisY;
+				maxMoveDistance = (float) Math.sqrt(maxMoveX * maxMoveX + maxMoveY * maxMoveY);
+			}
+		}
+		final float moveDistance = MathUtils.random(0, maxMoveDistance);
+		final float moveX = moveDistance * MathUtils.cos(angle);
+		final float moveY = moveDistance * MathUtils.sin(angle);
+		return new Vector2(thisX + moveX, thisY + moveY);
 	}
 
 	@Override

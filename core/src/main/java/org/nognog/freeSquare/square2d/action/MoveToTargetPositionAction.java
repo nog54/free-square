@@ -1,5 +1,9 @@
 package org.nognog.freeSquare.square2d.action;
 
+import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.object.LandingLifeObject;
+
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -45,6 +49,17 @@ public class MoveToTargetPositionAction extends Action {
 	public boolean act(float delta) {
 		if (this.isFinished) {
 			return true;
+		}
+		if (this.actor instanceof LandingLifeObject) {
+			Vertex[] vertices = ((LandingLifeObject) this.actor).getSquare().getVertices();
+			for (int i = 0; i < vertices.length; i++) {
+				final Vertex v1 = vertices[i];
+				final Vertex v2 = vertices[(i + 1) % vertices.length];
+				if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, this.actor.getX(), this.actor.getY(), this.targetPositionX, this.targetPositionY, null)) {
+					this.isFinished = true;
+					return true;
+				}
+			}
 		}
 		final float remainingDistanceX = this.targetPositionX - this.actor.getX();
 		final float remainingDistanceY = this.targetPositionY - this.actor.getY();
