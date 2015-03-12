@@ -112,7 +112,7 @@ public class CombineSquare2d extends Square2d {
 
 	private CombineInfo combineInfo;
 
-	private Array<Square2d> separatableSquares;
+	private Array<Square2d> separatableIfNotExistsObjectSquares;
 
 	private boolean drawEdge;
 
@@ -247,7 +247,7 @@ public class CombineSquare2d extends Square2d {
 			this.normalizeVertices();
 			this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 			this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
-			this.separatableSquares = null;
+			this.separatableIfNotExistsObjectSquares = null;
 		} catch (Exception e) {
 			this.combineInfo.removeCombineInfo(targetSquare);
 		}
@@ -435,7 +435,7 @@ public class CombineSquare2d extends Square2d {
 		this.removeNoLongerRequiredCombinePoints(separateTarget);
 		this.removeSquare(separateTarget);
 		this.combineInfo.removeCombineInfo(separateTarget);
-		this.separatableSquares = null;
+		this.separatableIfNotExistsObjectSquares = null;
 		return true;
 	}
 
@@ -458,7 +458,7 @@ public class CombineSquare2d extends Square2d {
 		if (separateTargetCombinePoints.length == 0) {
 			return false;
 		}
-		if (this.validateRemoveCombinePoints(separateTarget, separateTargetCombinePoints) == false) {
+		if (this.validateRemoveCombinePoints(separateTarget) == false) {
 			return false;
 		}
 		Vertex[] singleVertices = getSingleCombineVertices(separateTargetCombinePoints);
@@ -469,7 +469,7 @@ public class CombineSquare2d extends Square2d {
 		return this.trySeparateBuriedSquare(separateTarget);
 	}
 
-	private boolean validateRemoveCombinePoints(Square2d separateTarget, CombinePoint[] separateTargetCombinePoints) {
+	private boolean validateRemoveCombinePoints(Square2d separateTarget) {
 		if (this.squares.contains(separateTarget, true) && this.squares.size == 2) {
 			return true;
 		}
@@ -710,8 +710,8 @@ public class CombineSquare2d extends Square2d {
 		if (!this.contains(square)) {
 			return false;
 		}
-		if (this.separatableSquares != null) {
-			return this.separatableSquares.contains(square, true);
+		if (this.separatableIfNotExistsObjectSquares != null) {
+			return this.separatableIfNotExistsObjectSquares.contains(square, true);
 		}
 		final Vertex[] rollbackVertices = this.vertices.<Vertex> toArray(Vertex.class);
 		final boolean isSuccessSeparate = this.trySeparate(square);
@@ -724,8 +724,8 @@ public class CombineSquare2d extends Square2d {
 	 * @return separatable squares.
 	 */
 	public Square2d[] getSeparatableSquares() {
-		if (this.separatableSquares != null) {
-			return this.separatableSquares.<Square2d> toArray(Square2d.class);
+		if (this.separatableIfNotExistsObjectSquares != null) {
+			return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
 		}
 		Array<Square2d> result = new Array<>();
 		for (Square2d combinedSquare : this.squares) {
@@ -733,8 +733,8 @@ public class CombineSquare2d extends Square2d {
 				result.add(combinedSquare);
 			}
 		}
-		this.separatableSquares = result;
-		return this.separatableSquares.<Square2d> toArray(Square2d.class);
+		this.separatableIfNotExistsObjectSquares = result;
+		return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
 	}
 
 	@Override
