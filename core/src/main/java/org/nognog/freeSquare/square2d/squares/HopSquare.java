@@ -30,7 +30,7 @@ public class HopSquare extends SimpleSquare2d {
 
 			@Override
 			public void tap(InputEvent event, float x, float y, int pointer, int button) {
-				if (HopSquare.this.containsInSquare(x, y)) {
+				if (HopSquare.this.containsPosition(x, y)) {
 					Action upDown = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 					this.target.addAction(upDown);
 				}

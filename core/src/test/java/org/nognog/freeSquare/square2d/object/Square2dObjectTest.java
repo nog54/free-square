@@ -120,7 +120,7 @@ public class Square2dObjectTest {
 			Square2dObject object = EatableObjectType.TOFU.create();
 			square.addSquareObject(object, MathUtils.random(square.getWidth()), MathUtils.random(square.getHeight()));
 
-			boolean expected1 = square.containsInSquare(object.getX(), object.getY());
+			boolean expected1 = square.containsPosition(object.getX(), object.getY());
 			boolean actual1 = object.isLandingOnSquare();
 			assertThat(actual1, is(expected1));
 

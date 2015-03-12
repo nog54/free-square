@@ -1,5 +1,6 @@
 package org.nognog.freeSquare.square2d.action;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
@@ -55,9 +56,21 @@ public class FreeRunningAction extends RepeatAction {
 		return (MoveToNextTargetPositionAction) ((SequenceAction) this.getAction()).getActions().get(0);
 	}
 
-	@Override
-	protected boolean delegate(float delta) {
-		return super.delegate(delta);
+	/**
+	 * reset target position.
+	 */
+	public void resetTargetPosition() {
+		this.getMoveToNextTargetPositionAciton().reset();
+	}
+
+	/**
+	 * @return current target position vector
+	 */
+	public Vector2 getCurrentTargetPosition() {
+		final Vector2 targetPosition = new Vector2();
+		targetPosition.x = this.getMoveToNextTargetPositionAciton().getTargetPositionX();
+		targetPosition.y = this.getMoveToNextTargetPositionAciton().getTargetPositionY();
+		return targetPosition;
 	}
 
 	@Override
@@ -69,4 +82,5 @@ public class FreeRunningAction extends RepeatAction {
 		if (name.endsWith("Action"))name = name.substring(0, name.length() - 6); //$NON-NLS-1$
 		return name;
 	}
+
 }

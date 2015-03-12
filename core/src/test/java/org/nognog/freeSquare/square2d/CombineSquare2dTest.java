@@ -21,8 +21,8 @@ public class CombineSquare2dTest {
 		Json json = PersistManager.getUseJson();
 		String jsonString = json.toJson(combineSquare);
 		CombineSquare2d readObject = json.fromJson(CombineSquare2d.class, jsonString);
-		System.out.println(combineSquare);
-		System.out.println(readObject);
+		// System.out.println(combineSquare);
+		// System.out.println(readObject);
 		assertThat(readObject, is(notNullValue()));
 	}
 
@@ -483,5 +483,51 @@ public class CombineSquare2dTest {
 			boolean actual1 = combineSquare.separate(appendSquare5);
 			assertThat(actual1, is(false));
 		}
+	}
+
+	@Test
+	public final void testGetSeparatableSquares() {
+		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare6 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare7 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare8 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+		SimpleSquare2d appendSquare9 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex4());
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex4());
+		combineSquare.combine(combineSquare.getVertices()[0], appendSquare3, appendSquare3.getVertex4());
+		combineSquare.combine(combineSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex1());
+		combineSquare.combine(combineSquare.getVertices()[1], appendSquare5, appendSquare5.getVertex1());
+		combineSquare.combine(combineSquare.getVertices()[2], appendSquare6, appendSquare6.getVertex2());
+		combineSquare.combine(combineSquare.getVertices()[2], appendSquare7, appendSquare7.getVertex2());
+		combineSquare.combine(combineSquare.getVertices()[5], appendSquare8, appendSquare8.getVertex1());
+		combineSquare.combine(combineSquare.getVertices()[3], appendSquare9, appendSquare9.getVertex3());
+
+		Square2d[] actualSquares1 = combineSquare.getSeparatableSquares();
+		Square2d[] expectedSquares1 = { appendSquare2, appendSquare3, appendSquare4, appendSquare5, appendSquare6, appendSquare7, appendSquare9 };
+		assertThat(actualSquares1.length, is(expectedSquares1.length));
+		for (Square2d expected : expectedSquares1) {
+			if (!Square2dUtils.contains(actualSquares1, expected)) {
+				System.out.println(expected + " is not contained.");
+				fail();
+			}
+		}
+
+		combineSquare.separate(appendSquare9);
+		Square2d[] actualSquares2 = combineSquare.getSeparatableSquares();
+		Square2d[] expectedSquares2 = { appendSquare3, appendSquare4, appendSquare5, appendSquare7, appendSquare8 };
+		assertThat(actualSquares2.length, is(expectedSquares2.length));
+		for (Square2d expected : expectedSquares2) {
+			if (!Square2dUtils.contains(actualSquares2, expected)) {
+				System.out.println(expected + " is not contained.");
+				fail();
+			}
+		}
+
 	}
 }

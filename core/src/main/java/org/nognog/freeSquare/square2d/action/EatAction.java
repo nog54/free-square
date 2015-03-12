@@ -234,4 +234,10 @@ public class EatAction extends Action {
 		this.isRequestedForceFinish = true;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		return sb.append("eat to ").append(this.eatObject).append(" action").toString(); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 }

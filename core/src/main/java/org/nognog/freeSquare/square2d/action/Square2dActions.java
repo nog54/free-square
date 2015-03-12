@@ -1,5 +1,6 @@
 package org.nognog.freeSquare.square2d.action;
 
+import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
@@ -33,7 +34,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static EatAction eat(EatableObject eatObject, int eatAmount, int eatCount) {
-		EatAction action = Actions.action(EatAction.class);
+		final EatAction action = Actions.action(EatAction.class);
 		action.setEatObject(eatObject);
 		action.setEatAmount(eatAmount);
 		action.setEatCount(eatCount);
@@ -57,7 +58,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static MoveToSquareObjectAction moveToSquareObject(Square2dObject targetObject, float speed, float tolerance) {
-		MoveToSquareObjectAction action = Actions.action(MoveToSquareObjectAction.class);
+		final MoveToSquareObjectAction action = Actions.action(MoveToSquareObjectAction.class);
 		action.setTargetObject(targetObject);
 		action.setSpeed(speed);
 		action.setTolerance(tolerance);
@@ -69,7 +70,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static DelayNextStopTimeAction delayNextStopTime(StopTimeGenerator stopTimeGenerator) {
-		DelayNextStopTimeAction action = Actions.action(DelayNextStopTimeAction.class);
+		final DelayNextStopTimeAction action = Actions.action(DelayNextStopTimeAction.class);
 		action.setStopTimeGenerator(stopTimeGenerator);
 		action.restart();
 		return action;
@@ -81,7 +82,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static MoveToNextTargetPositionAction moveToNextTargetPosition(TargetPositionGenerator targetPositionGenerator, float speed) {
-		MoveToNextTargetPositionAction action = Actions.action(MoveToNextTargetPositionAction.class);
+		final MoveToNextTargetPositionAction action = Actions.action(MoveToNextTargetPositionAction.class);
 		action.setTargetPositionGenerator(targetPositionGenerator);
 		action.setSpeed(speed);
 		action.restart();
@@ -95,7 +96,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static MoveToTargetPositionAction moveToTargetPosition(float x, float y, float speed) {
-		MoveToTargetPositionAction action = Actions.action(MoveToTargetPositionAction.class);
+		final MoveToTargetPositionAction action = Actions.action(MoveToTargetPositionAction.class);
 		action.setTargetPositionX(x);
 		action.setTargetPositionY(y);
 		action.setSpeed(speed);
@@ -109,7 +110,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static FreeRunningAction freeRunning(StopTimeGenerator stopTimeGenerator, TargetPositionGenerator targetPositionGenerator, float speed) {
-		FreeRunningAction action = Actions.action(FreeRunningAction.class);
+		final FreeRunningAction action = Actions.action(FreeRunningAction.class);
 		Action moveAction = moveToNextTargetPosition(targetPositionGenerator, speed);
 		Action delayAction = delayNextStopTime(stopTimeGenerator);
 		action.setMoveActionDelayActionSequence(Actions.sequence(moveAction, delayAction));
@@ -121,7 +122,7 @@ public class Square2dActions {
 	 * @return action
 	 */
 	public static ExcludeObjectOtherActionAction excludeObjectOtherAction(Action mainAction) {
-		ExcludeObjectOtherActionAction action = Actions.action(ExcludeObjectOtherActionAction.class);
+		final ExcludeObjectOtherActionAction action = Actions.action(ExcludeObjectOtherActionAction.class);
 		action.setAction(mainAction);
 		return action;
 	}
@@ -133,10 +134,10 @@ public class Square2dActions {
 	 * @return forever rotate action
 	 */
 	public static Action foreverRotate(float degree, float cycleTime, Interpolation interpolation) {
-		Action firstRotateLeft = Actions.rotateBy(degree, cycleTime / 4, interpolation);
-		Action rotateRight = Actions.rotateBy(-degree * 2, cycleTime / 2, interpolation);
-		Action rotateLeft = Actions.rotateBy(degree * 2, cycleTime / 2, interpolation);
-		Action rotateSquence = Actions.sequence(rotateRight, rotateLeft);
+		final Action firstRotateLeft = Actions.rotateBy(degree, cycleTime / 4, interpolation);
+		final Action rotateRight = Actions.rotateBy(-degree * 2, cycleTime / 2, interpolation);
+		final Action rotateLeft = Actions.rotateBy(degree * 2, cycleTime / 2, interpolation);
+		final Action rotateSquence = Actions.sequence(rotateRight, rotateLeft);
 
 		return Actions.sequence(firstRotateLeft, Actions.forever(rotateSquence));
 	}
@@ -148,10 +149,22 @@ public class Square2dActions {
 	 * @return forever up down action
 	 */
 	public static Action foreverUpdown(float upDownAmount, float cycleTime, Interpolation interpolation) {
-		Action up = Actions.moveBy(0, upDownAmount, cycleTime / 2, interpolation);
-		Action down = Actions.moveBy(0, -upDownAmount, cycleTime / 2, interpolation);
+		final Action up = Actions.moveBy(0, upDownAmount, cycleTime / 2, interpolation);
+		final Action down = Actions.moveBy(0, -upDownAmount, cycleTime / 2, interpolation);
 
 		return Actions.forever(Actions.sequence(up, down));
+	}
+
+	/**
+	 * @param eventListener
+	 * @param event
+	 * @return fire event action
+	 */
+	public static FireEventAction fireEventAction(Square2dObject eventListener, UpdateObjectEvent event) {
+		final FireEventAction fireEventAction = Actions.action(FireEventAction.class);
+		fireEventAction.setEventListener(eventListener);
+		fireEventAction.setEvent(event);
+		return fireEventAction;
 	}
 
 }

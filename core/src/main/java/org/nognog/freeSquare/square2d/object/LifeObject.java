@@ -252,7 +252,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 
 	@Override
 	public void act(float delta) {
-		final EatableObject nearestEatableLandingObject = this.getNearestEatableLandingObject();
+		final EatableObject nearestEatableLandingObject = this.getEasyReachableNearestEatableLandingObject();
 		if (nearestEatableLandingObject != null) {
 			if (this.isMovingToTargetObject() && (nearestEatableLandingObject != this.currentEatAction.getEatObject())) {
 				this.changeEatTargetTo(nearestEatableLandingObject);
@@ -267,24 +267,8 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		super.act(delta);
 	}
 
-	private EatableObject getNearestEatableLandingObject() {
-		EatableObject result = null;
-		float resultDistance = 0;
-		for (Square2dObject object : this.square.getObjects()) {
-			if (object instanceof EatableObject && object.isLandingOnSquare()) {
-				if (result == null) {
-					result = (EatableObject) object;
-					resultDistance = this.getDistanceTo(object);
-				}
-				final float objectDistance = this.getDistanceTo(object);
-				if (objectDistance < resultDistance) {
-					result = (EatableObject) object;
-					resultDistance = objectDistance;
-				}
-			}
-		}
-		return result;
-	}
+	
+	abstract protected EatableObject getEasyReachableNearestEatableLandingObject();
 
 	private void setEatAction(EatableObject eatObject) {
 		final boolean wasEnabledFreeRun = this.isEnabledFreeRun();
@@ -312,6 +296,13 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 
 	private boolean isMovingToTargetObject() {
 		return this.currectTryingMoveAndEatAction != null && this.currentEatAction != null && this.setFreeRunModeAction != null;
+	}
+
+	/**
+	 * reset target position of free running.
+	 */
+	public void resetFreeRunningTargetPosition() {
+		this.freeRunningAction.resetTargetPosition();
 	}
 
 	@Override

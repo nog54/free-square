@@ -75,19 +75,11 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	 * @param y
 	 * @return true if (x, y) is contained in Square.
 	 */
-	public boolean containsInSquare(float x, float y) {
+	public boolean containsPosition(float x, float y) {
 		if (this.isPointOfVertex(x, y)) {
 			return true;
 		}
-		Vertex[] vertices = this.getVertices();
-		float[] floatVertices = new float[vertices.length * 2];
-		int i = 0;
-		for (Vertex vertex : vertices) {
-			floatVertices[i++] = vertex.x;
-			floatVertices[i++] = vertex.y;
-		}
-
-		Polygon p = new Polygon(floatVertices);
+		final Polygon p = Square2dUtils.createPolygon(this.getVertices());
 		return p.contains(x, y);
 	}
 
@@ -162,7 +154,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 		return mostLeftVertex;
 	}
-	
+
 	/**
 	 * @return most top vertex
 	 */
@@ -176,7 +168,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 		return mostTopVertex;
 	}
-	
+
 	/**
 	 * @return most bottom vertex
 	 */
@@ -190,7 +182,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 		return mostButtomVertex;
 	}
-	
+
 	/**
 	 * @return stage coordinates vertices
 	 */

@@ -205,7 +205,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return false;
 		}
-		return this.square.containsInSquare(this.getX(), this.getY());
+		return this.square.containsPosition(this.getX(), this.getY());
 	}
 
 	/**

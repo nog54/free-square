@@ -4,6 +4,8 @@ import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.CombineInfo.ReconstructCombineInfo;
 import org.nognog.freeSquare.square2d.CombinePoint.CombinedVertex;
+import org.nognog.freeSquare.square2d.event.UpdateSquareEvent;
+import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
@@ -135,6 +137,8 @@ public class CombineSquare2d extends Square2d {
 		this.rightEndX = base.getRightEndX();
 		this.buttomEndY = base.getButtomEndY();
 		this.topEndY = base.getTopEndY();
+
+		this.setupSeparatableSquaresList();
 	}
 
 	@Override
@@ -247,10 +251,10 @@ public class CombineSquare2d extends Square2d {
 			this.normalizeVertices();
 			this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 			this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
-			this.separatableIfNotExistsObjectSquares = null;
 		} catch (Exception e) {
 			this.combineInfo.removeCombineInfo(targetSquare);
 		}
+		this.setupSeparatableSquaresList();
 		return true;
 	}
 
@@ -425,6 +429,9 @@ public class CombineSquare2d extends Square2d {
 		if (!this.contains(separateTarget)) {
 			return false;
 		}
+		if (this.getLandingSquareObjectsOn(separateTarget).size != 0) {
+			return false;
+		}
 		final Vertex[] rollbackVertices = this.vertices.<Vertex> toArray(Vertex.class);
 		final boolean isSuccessSeparate = this.trySeparate(separateTarget);
 		if (!isSuccessSeparate) {
@@ -435,8 +442,25 @@ public class CombineSquare2d extends Square2d {
 		this.removeNoLongerRequiredCombinePoints(separateTarget);
 		this.removeSquare(separateTarget);
 		this.combineInfo.removeCombineInfo(separateTarget);
-		this.separatableIfNotExistsObjectSquares = null;
+		this.setupSeparatableSquaresList();
+		this.notifyObservers(new UpdateSquareEvent(this));
 		return true;
+	}
+
+	private Array<Square2dObject> getLandingSquareObjectsOn(Square2d square) {
+		if (!this.squares.contains(square, true)) {
+			throw new IllegalArgumentException();
+		}
+		final Array<Square2dObject> result = new Array<>();
+		for (Square2dObject object : this.objects) {
+			if (!(object instanceof LandObject)) {
+				continue;
+			}
+			if (square.containsPosition(object.getX() - square.getX(), object.getY() - square.getY())) {
+				result.add(object);
+			}
+		}
+		return result;
 	}
 
 	private void removeNoLongerRequiredCombinePoints(Square2d separateTarget) {
@@ -569,19 +593,21 @@ public class CombineSquare2d extends Square2d {
 		}
 		final int addDirection = deciedAddDirection(orderedSeparateTargetActualVertices, onlineSeparateTargetVertices);
 		for (int i = 0; i < orderedSeparateTargetActualVertices.size; i++) {
-			int nextInsertVertexIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(0), true) + i * addDirection + orderedSeparateTargetActualVertices.size)
+			final int nextInsertVertexIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(0), true) + i * addDirection + orderedSeparateTargetActualVertices.size)
 					% orderedSeparateTargetActualVertices.size;
 			Vertex nextInsertVertex = orderedSeparateTargetActualVertices.get(nextInsertVertexIndex);
 			this.vertices.insert(insertIndex + i, nextInsertVertex);
 		}
 		if (this.isTwist()) {
 			this.vertices.removeAll(orderedSeparateTargetActualVertices, true);
+
 			for (int i = 0; i < orderedSeparateTargetActualVertices.size; i++) {
-				int nextInsertVertexIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(1), true) + i * (-addDirection) + orderedSeparateTargetActualVertices.size)
+				final int nextInsertVertexIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(onlineSeparateTargetVertices.size - 1), true) + i * (-addDirection) + orderedSeparateTargetActualVertices.size)
 						% orderedSeparateTargetActualVertices.size;
-				Vertex nextInsertVertex = orderedSeparateTargetActualVertices.get(nextInsertVertexIndex);
+				final Vertex nextInsertVertex = orderedSeparateTargetActualVertices.get(nextInsertVertexIndex);
 				this.vertices.insert(insertIndex + i, nextInsertVertex);
 			}
+
 		}
 		this.normalizeVertices();
 		if (this.isTwist()) {
@@ -591,6 +617,9 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private static int deciedAddDirection(Array<Vertex> orderedSeparateTargetActualVertices, Array<Vertex> onlineSeparateTargetVertices) {
+		if (onlineSeparateTargetVertices.size == 1) {
+			return 1;
+		}
 		final int validateIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(0), true) + 1) % orderedSeparateTargetActualVertices.size;
 		if ((orderedSeparateTargetActualVertices.get(validateIndex) == onlineSeparateTargetVertices.get(1))) {
 			return -1;
@@ -599,18 +628,17 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private int getInsertIndexOfBuriedSquareVertices(Array<Vertex> orderedSeparateTargetActualVertices, Array<Vertex> onlineSeparateTargetVertices) {
-		final boolean targetIsHalfBuried = onlineSeparateTargetVertices.size == 2;
+		final boolean targetIsHalfBuried = onlineSeparateTargetVertices.size == 1 || onlineSeparateTargetVertices.size == 2;
 		if (!targetIsHalfBuried) {
 			return -1;
 		}
-		if (!this.getNearestSufficientlyCloseEdgeOf(onlineSeparateTargetVertices.get(0)).equals(this.getNearestSufficientlyCloseEdgeOf(onlineSeparateTargetVertices.get(1)))) {
-			final boolean eitherOnlineVertexIsContained = this.contains(onlineSeparateTargetVertices.get(0)) || this.contains(onlineSeparateTargetVertices.get(1));
-			if (!eitherOnlineVertexIsContained) {
-				return -1;
-			}
 
+		final Edge onlineEdge;
+		if (onlineSeparateTargetVertices.size == 2) {
+			onlineEdge = this.getSameOnlineEdge(onlineSeparateTargetVertices.get(0), onlineSeparateTargetVertices.get(1));
+		} else {
+			onlineEdge = this.getNearestSufficientlyCloseEdgeOf(onlineSeparateTargetVertices.get(0));
 		}
-		final Edge onlineEdge = this.getSameOnlineEdge(onlineSeparateTargetVertices.get(0), onlineSeparateTargetVertices.get(1));
 		if (onlineEdge == null) {
 			return -1;
 		}
@@ -713,6 +741,7 @@ public class CombineSquare2d extends Square2d {
 		if (this.separatableIfNotExistsObjectSquares != null) {
 			return this.separatableIfNotExistsObjectSquares.contains(square, true);
 		}
+
 		final Vertex[] rollbackVertices = this.vertices.<Vertex> toArray(Vertex.class);
 		final boolean isSuccessSeparate = this.trySeparate(square);
 		this.vertices.clear();
@@ -724,17 +753,18 @@ public class CombineSquare2d extends Square2d {
 	 * @return separatable squares.
 	 */
 	public Square2d[] getSeparatableSquares() {
-		if (this.separatableIfNotExistsObjectSquares != null) {
-			return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
-		}
-		Array<Square2d> result = new Array<>();
-		for (Square2d combinedSquare : this.squares) {
+		return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
+	}
+
+	private void setupSeparatableSquaresList() {
+		this.separatableIfNotExistsObjectSquares = null;
+		final Array<Square2d> result = new Array<>();
+		for (Square2d combinedSquare : this.squares.<Square2d> toArray(Square2d.class)) {
 			if (this.isSeparatable(combinedSquare)) {
 				result.add(combinedSquare);
 			}
 		}
 		this.separatableIfNotExistsObjectSquares = result;
-		return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
 	}
 
 	@Override

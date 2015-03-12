@@ -143,4 +143,9 @@ public class MoveToTargetPositionAction extends Action {
 		this.isFinished = false;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		return sb.append("move to (").append(this.getTargetPositionX()).append(", ").append(this.getTargetPositionY()).append(")").toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 }

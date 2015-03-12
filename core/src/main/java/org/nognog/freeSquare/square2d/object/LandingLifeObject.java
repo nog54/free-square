@@ -4,6 +4,7 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
@@ -29,6 +30,8 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 				if (!LandingLifeObject.this.isLandingOnSquare()) {
 					LandingLifeObject.this.goToSquareNearestVertex();
+				} else {
+					LandingLifeObject.this.notify(new UpdateObjectEvent(LandingLifeObject.this));
 				}
 			}
 		});
@@ -48,7 +51,8 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	protected void goToSquareNearestVertex() {
 		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
 		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
-		this.addAction(Square2dActions.excludeObjectOtherAction(moveToNearestSquareVertexAction));
+		final Action notifyUpdateEventAction = Square2dActions.fireEventAction(this, new UpdateObjectEvent());
+		this.addAction(Square2dActions.excludeObjectOtherAction(Actions.sequence(moveToNearestSquareVertexAction, notifyUpdateEventAction)));
 	}
 
 	@Override
@@ -91,5 +95,33 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 			this.setPosition(randomPointOnSquare.x, randomPointOnSquare.y);
 		}
 		super.write(json);
+	}
+
+	@Override
+	protected EatableObject getEasyReachableNearestEatableLandingObject() {
+		EatableObject result = null;
+		float resultDistance = Float.MAX_VALUE;
+		for (Square2dObject object : this.square.getObjects()) {
+			if (object instanceof EatableObject && object.isLandingOnSquare() && this.canGoStraightTo(object)) {
+				final float objectDistance = this.getDistanceTo(object);
+				if (objectDistance < resultDistance) {
+					result = (EatableObject) object;
+					resultDistance = objectDistance;
+				}
+			}
+		}
+		return result;
+	}
+
+	private boolean canGoStraightTo(Square2dObject object) {
+		Vertex[] vertices = this.getSquare().getVertices();
+		for (int i = 0; i < vertices.length; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, this.getX(), this.getY(), object.getX(), object.getY(), null)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

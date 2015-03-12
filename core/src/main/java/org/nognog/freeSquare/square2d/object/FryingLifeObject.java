@@ -32,4 +32,24 @@ public class FryingLifeObject extends LifeObject {
 		final float y = MathUtils.random(0, this.square.getHeight());
 		return new Vector2(x, y);
 	}
+
+	@Override
+	protected EatableObject getEasyReachableNearestEatableLandingObject() {
+		EatableObject result = null;
+		float resultDistance = 0;
+		for (Square2dObject object : this.square.getObjects()) {
+			if (object instanceof EatableObject && object.isLandingOnSquare()) {
+				if (result == null) {
+					result = (EatableObject) object;
+					resultDistance = this.getDistanceTo(object);
+				}
+				final float objectDistance = this.getDistanceTo(object);
+				if (objectDistance < resultDistance) {
+					result = (EatableObject) object;
+					resultDistance = objectDistance;
+				}
+			}
+		}
+		return result;
+	}
 }
