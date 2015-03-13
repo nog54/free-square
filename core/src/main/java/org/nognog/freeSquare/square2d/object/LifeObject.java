@@ -13,6 +13,7 @@ import org.nognog.freeSquare.square2d.action.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
+import org.nognog.freeSquare.square2d.event.RenameObjectRequestEvent;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
@@ -21,6 +22,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
@@ -112,6 +114,12 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 				if (this.isTripleTapped(count)) {
 					LifeObject.this.square.notifyObservers(new CollectObjectRequestEvent(LifeObject.this));
 				}
+			}
+			
+			@Override
+			public boolean longPress(Actor actor, float x, float y) {
+				LifeObject.this.square.notifyObservers(new RenameObjectRequestEvent(LifeObject.this));
+				return true;
 			}
 
 			private boolean isTripleTapped(int count) {

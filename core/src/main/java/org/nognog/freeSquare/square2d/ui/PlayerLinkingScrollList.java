@@ -27,6 +27,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	private static final Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	private final Player player;
+	private final BitmapFont font;
 
 	/**
 	 * @param camera
@@ -38,6 +39,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		this.player = player;
 		this.player.addObserver(this);
 		this.setWidget(this.createList(font));
+		this.font = font;
 		this.setupOverscroll(0, 0, 0);
 		this.setWidth(camera.viewportWidth / 2);
 		this.setHeight(camera.viewportHeight / 2);
@@ -98,8 +100,8 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		});
 	}
 
-	private List<T> createList(BitmapFont font) {
-		ImageIncludedItemList<T> list = new ImageIncludedItemList<T>(createListStyle(font)) {
+	private List<T> createList(BitmapFont bitmapFont) {
+		ImageIncludedItemList<T> list = new ImageIncludedItemList<T>(createListStyle(bitmapFont)) {
 
 			@Override
 			protected Texture getTextureOf(T item) {
@@ -130,6 +132,13 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	@SuppressWarnings("unchecked")
 	public List<T> getList() {
 		return (List<T>) this.getWidget();
+	}
+	
+	/**
+	 * @return font
+	 */
+	public BitmapFont getFont(){
+		return this.font;
 	}
 
 	/**

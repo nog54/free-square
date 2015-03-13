@@ -20,6 +20,7 @@ import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
+import org.nognog.freeSquare.square2d.event.RenameObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.EatableObject;
@@ -37,6 +38,7 @@ import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -209,6 +211,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			private LifeObject addObject;
 
 			@Override
+			protected void selectedItemTapped(final Life tappedItem, int count) {
+				if (count == 2) {
+					FreeSquare.this.inputLifeName(tappedItem);
+				}
+
+			}
+
+			@Override
 			protected void selectedItemPanned(Life pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
@@ -240,7 +250,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					this.addObject = null;
 				}
 			}
-			
+
 		};
 
 		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
@@ -320,6 +330,27 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 */
 	public Square2d getSquare() {
 		return this.square;
+	}
+
+	/**
+	 * @return the playerItemList
+	 */
+	public PlayerItemList getPlayerItemList() {
+		return this.playerItemList;
+	}
+
+	/**
+	 * @return the playersLifeList
+	 */
+	public PlayersLifeList getPlayersLifeList() {
+		return this.playersLifeList;
+	}
+
+	/**
+	 * @return the playersSquareList
+	 */
+	public PlayersSquareList getPlayersSquareList() {
+		return this.playersSquareList;
 	}
 
 	/**
@@ -408,27 +439,27 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showPlayerItemList() {
-		this.show(this.playerItemList);
+		this.show(this.getPlayerItemList());
 	}
 
 	void hidePlayerItemList() {
-		this.hide(this.playerItemList);
+		this.hide(this.getPlayerItemList());
 	}
 
 	void showPlayersLifeList() {
-		this.show(this.playersLifeList);
+		this.show(this.getPlayersLifeList());
 	}
 
 	void hidePlayersLifeList() {
-		this.hide(this.playersLifeList);
+		this.hide(this.getPlayersLifeList());
 	}
 
 	void showPlayersSquareList() {
-		this.show(this.playersSquareList);
+		this.show(this.getPlayersSquareList());
 	}
 
 	void hidePlayersSquareList() {
-		this.hide(this.playersSquareList);
+		this.hide(this.getPlayersSquareList());
 	}
 
 	void showItemList() {
@@ -437,6 +468,36 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void hideItemList() {
 		this.hide(this.itemList);
+	}
+
+	protected void inputLifeName(final Life updateNameLife) {
+		Gdx.input.getTextInput(new TextInputListener() {
+			@Override
+			public void input(String text) {
+				final BitmapFont listFont = FreeSquare.this.getPlayersLifeList().getFont();
+				final float maxTextDrawWidth = FreeSquare.this.getPlayersLifeList().getWidth() - 2 * FreeSquare.this.getPlayersLifeList().getList().getItemHeight();
+				String inputText = text;
+				for (int i = inputText.length(); i > 0; i--) {
+					inputText = inputText.substring(0, i);
+					final float inputTextDrawWidth = listFont.getBounds(inputText).width;
+					if (inputTextDrawWidth <= maxTextDrawWidth) {
+						break;
+					}
+				}
+				for (char c : inputText.toCharArray()) {
+					final String checkCharSequence = String.valueOf(c);
+					if (!FontUtil.ALL_AVAILABLE_CHARACTERS.contains(checkCharSequence)) {
+						inputText = inputText.replace(checkCharSequence, ""); //$NON-NLS-1$
+					}
+				}
+				updateNameLife.setName(inputText);
+			}
+
+			@Override
+			public void canceled() {
+				// nothing
+			}
+		}, Messages.getString("lifeNameInput"), updateNameLife.getName()); //$NON-NLS-1$
 	}
 
 	@Override
@@ -558,6 +619,10 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				this.player.putItem(Square2dObjectItem.getInstance(collectRequestedObject.getType()));
 			}
 			this.square.removeSquareObject(collectRequestedObject);
+		}
+
+		if (event instanceof RenameObjectRequestEvent) {
+			this.inputLifeName(((RenameObjectRequestEvent) event).getRenameRequestObject().getLife());
 		}
 	}
 

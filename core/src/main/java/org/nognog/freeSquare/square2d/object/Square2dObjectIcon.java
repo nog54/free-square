@@ -15,6 +15,7 @@ public class Square2dObjectIcon extends Group {
 			throw new IllegalArgumentException();
 		}
 		this.mainImage = mainIcon;
+		this.addActor(this.mainImage);
 		this.setWidth(mainIcon.getWidth());
 		this.setHeight(mainIcon.getHeight());
 	}

@@ -72,7 +72,7 @@ public abstract class ImageIncludedItemList<T> extends List<T> {
 					drawImageHeight = itemHeight - drawImageInterval;
 					drawImageWidth = drawImageHeight * (textureWidth / textureHeight);
 				}
-
+				
 				final float rightSpace = itemHeight / 8;
 				Color oldColor = batch.getColor();
 				Color itemColor = this.getColorOf(listItem);
