@@ -84,7 +84,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if (this.isSameItemTouch) {
-					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem);
+					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, count);
 					return;
 				}
 				this.list.setSelected(this.lastTouchDownedItem);
@@ -139,7 +139,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		return this.player;
 	}
 
-	protected void selectedItemTapped(T tappedItem) {
+	protected void selectedItemTapped(T tappedItem, int count) {
 		// default is empty.
 	}
 

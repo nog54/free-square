@@ -40,5 +40,5 @@ public class PlayersLifeList extends PlayerLinkingScrollList<Life>{
 	protected Array<Life> getShowListItemsFromPlayer(Player setupPlayer) {
 		return setupPlayer.getLifes();
 	}
-
+	
 }

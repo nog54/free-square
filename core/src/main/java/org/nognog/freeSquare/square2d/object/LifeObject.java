@@ -94,12 +94,12 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
 		this.upDownRoutineAction = createUpDownAction();
-		this.addAction(this.upDownRoutineAction);
+		this.icon.addAction(this.upDownRoutineAction);
 		this.isEnabledUpDownRoutineAction = true;
-		Image frame = new Image(frameTexture);
+		final Image frame = new Image(frameTexture);
 		frame.setWidth(this.getWidth());
 		frame.setHeight(this.getHeight());
-		this.addActor(frame);
+		this.icon.addActor(frame);
 
 		this.addListener(new ActorGestureListener() {
 			@Override
@@ -267,7 +267,6 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		super.act(delta);
 	}
 
-	
 	abstract protected EatableObject getEasyReachableNearestEatableLandingObject();
 
 	private void setEatAction(EatableObject eatObject) {
@@ -315,7 +314,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
 			Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
 			Action hop = Actions.sequence(up, down);
-			this.addAction(hop);
+			this.icon.addAction(hop);
 		}
 	}
 

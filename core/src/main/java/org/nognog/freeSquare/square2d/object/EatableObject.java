@@ -5,6 +5,7 @@ import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -43,9 +44,13 @@ public class EatableObject extends Square2dObject implements LandObject {
 	private void setupEatableType(EatableObjectType type) {
 		this.baseAmount = type.getQuantity();
 		this.amount = this.baseAmount;
-		this.originTextureRegionWidth = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionWidth();
-		this.originTextureRegionHeight = ((TextureRegionDrawable) this.image.getDrawable()).getRegion().getRegionHeight();
+		this.originTextureRegionWidth = this.getIconMainImageTextureRegion().getRegionWidth();
+		this.originTextureRegionHeight = this.getIconMainImageTextureRegion().getRegionHeight();
 		this.originTextureRegionArea = this.originTextureRegionWidth * this.originTextureRegionHeight;
+	}
+
+	private TextureRegion getIconMainImageTextureRegion() {
+		return ((TextureRegionDrawable) this.getIconMainImage().getDrawable()).getRegion();
 	}
 
 	/**
@@ -71,7 +76,7 @@ public class EatableObject extends Square2dObject implements LandObject {
 		final float eatenRatio = eatenAmount / (float) this.baseAmount;
 
 		final int eatenRegionArea = (int) (this.originTextureRegionArea * eatenRatio);
-		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
+		TextureRegion imageTextureRegion = this.getIconMainImageTextureRegion();
 		final int currentTextureRegionWidth = imageTextureRegion.getRegionWidth();
 		final int currentTextureRegionHeight = imageTextureRegion.getRegionHeight();
 
@@ -80,14 +85,14 @@ public class EatableObject extends Square2dObject implements LandObject {
 			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenRegionHeight;
 			imageTextureRegion.setRegionY(imageTextureRegion.getRegionY() + eatenRegionHeight);
 			imageTextureRegion.setRegionHeight(afterEatenTextureRegionHeight);
-			this.image.setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
+			this.getIconMainImage().setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
 		}
 
 		if (direction == Direction.DOWN) {
 			final int eatenRegionHeight = eatenRegionArea / currentTextureRegionWidth;
 			final int afterEatenTextureRegionHeight = currentTextureRegionHeight - eatenRegionHeight;
 			imageTextureRegion.setRegionHeight(afterEatenTextureRegionHeight);
-			this.image.setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
+			this.getIconMainImage().setScaleY(afterEatenTextureRegionHeight / (float) this.originTextureRegionHeight);
 		}
 
 		if (direction == Direction.LEFT) {
@@ -96,15 +101,15 @@ public class EatableObject extends Square2dObject implements LandObject {
 			imageTextureRegion.setRegionX(imageTextureRegion.getRegionX() + eatenRegionWidth);
 			imageTextureRegion.setRegionWidth(afterEatenTextureRegionWidth);
 			float newScaleX = afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth;
-			this.image.setScaleX(newScaleX);
-			this.image.setX((1 - newScaleX) * this.image.getWidth());
+			this.getIconMainImage().setScaleX(newScaleX);
+			this.getIconMainImage().setX((1 - newScaleX) * this.getIconMainImage().getWidth());
 		}
 
 		if (direction == Direction.RIGHT) {
 			final int eatenRegionWidth = eatenRegionArea / currentTextureRegionHeight;
 			final int afterEatenTextureRegionWidth = currentTextureRegionWidth - eatenRegionWidth;
 			imageTextureRegion.setRegionWidth(afterEatenTextureRegionWidth);
-			this.image.setScaleX(afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth);
+			this.getIconMainImage().setScaleX(afterEatenTextureRegionWidth / (float) this.originTextureRegionWidth);
 		}
 		return eatenAmount;
 	}
@@ -114,13 +119,13 @@ public class EatableObject extends Square2dObject implements LandObject {
 	 */
 	public void resurrection() {
 		this.amount = this.baseAmount;
-		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
+		TextureRegion imageTextureRegion = this.getIconMainImageTextureRegion();
 		imageTextureRegion.setRegionX(0);
 		imageTextureRegion.setRegionY(0);
 		imageTextureRegion.setRegionWidth(this.originTextureRegionWidth);
 		imageTextureRegion.setRegionHeight(this.originTextureRegionHeight);
-		this.image.setPosition(0, 0);
-		this.image.setScale(1);
+		this.getIconMainImage().setPosition(0, 0);
+		this.getIconMainImage().setScale(1);
 	}
 
 	/**
@@ -157,14 +162,16 @@ public class EatableObject extends Square2dObject implements LandObject {
 		if (this.getType() != obj.getType()) {
 			return false;
 		}
-		if (this.image.getX() != obj.image.getX() || this.image.getY() != obj.image.getY()) {
+		final Image thisIconMainImage = this.getIconMainImage();
+		final Image objIconMainImage = obj.getIconMainImage();
+		if (thisIconMainImage.getX() != objIconMainImage.getX() || thisIconMainImage.getY() != objIconMainImage.getY()) {
 			return false;
 		}
-		if (this.image.getScaleX() != obj.image.getScaleX() || this.image.getScaleY() != obj.image.getScaleY()) {
+		if (thisIconMainImage.getScaleX() != objIconMainImage.getScaleX() || thisIconMainImage.getScaleY() != objIconMainImage.getScaleY()) {
 			return false;
 		}
-		TextureRegion thisImageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
-		TextureRegion objImageTextureRegion = ((TextureRegionDrawable) obj.image.getDrawable()).getRegion();
+		TextureRegion thisImageTextureRegion = this.getIconMainImageTextureRegion();
+		TextureRegion objImageTextureRegion = obj.getIconMainImageTextureRegion();
 		if (thisImageTextureRegion.getRegionX() != objImageTextureRegion.getRegionX() || thisImageTextureRegion.getRegionY() != objImageTextureRegion.getRegionY()) {
 			return false;
 		}
@@ -179,11 +186,11 @@ public class EatableObject extends Square2dObject implements LandObject {
 	public void write(Json json) {
 		super.write(json);
 		json.writeField(this, "amount"); //$NON-NLS-1$
-		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
-		json.writeValue("imageX", this.image.getX()); //$NON-NLS-1$
-		json.writeValue("imageY", this.image.getY()); //$NON-NLS-1$
-		json.writeValue("imageScaleX", this.image.getScaleX()); //$NON-NLS-1$
-		json.writeValue("imageScaleY", this.image.getScaleY()); //$NON-NLS-1$
+		TextureRegion imageTextureRegion = this.getIconMainImageTextureRegion();
+		json.writeValue("imageX", this.getIconMainImage().getX()); //$NON-NLS-1$
+		json.writeValue("imageY", this.getIconMainImage().getY()); //$NON-NLS-1$
+		json.writeValue("imageScaleX", this.getIconMainImage().getScaleX()); //$NON-NLS-1$
+		json.writeValue("imageScaleY", this.getIconMainImage().getScaleY()); //$NON-NLS-1$
 		json.writeValue("imageTextureRegionRegionX", imageTextureRegion.getRegionX()); //$NON-NLS-1$
 		json.writeValue("imageTextureRegionRegionY", imageTextureRegion.getRegionY()); //$NON-NLS-1$
 		json.writeValue("imageTextureRegionRegionWidth", imageTextureRegion.getRegionWidth()); //$NON-NLS-1$
@@ -194,11 +201,11 @@ public class EatableObject extends Square2dObject implements LandObject {
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
 		json.readField(this, "amount", jsonData); //$NON-NLS-1$
-		TextureRegion imageTextureRegion = ((TextureRegionDrawable) this.image.getDrawable()).getRegion();
-		this.image.setX(json.readValue("imageX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
-		this.image.setY(json.readValue("imageY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
-		this.image.setScaleX(json.readValue("imageScaleX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
-		this.image.setScaleY(json.readValue("imageScaleY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		TextureRegion imageTextureRegion = this.getIconMainImageTextureRegion();
+		this.getIconMainImage().setX(json.readValue("imageX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.getIconMainImage().setY(json.readValue("imageY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.getIconMainImage().setScaleX(json.readValue("imageScaleX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.getIconMainImage().setScaleY(json.readValue("imageScaleY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 		imageTextureRegion.setRegionX(json.readValue("imageTextureRegionRegionX", Integer.class, jsonData).intValue()); //$NON-NLS-1$
 		imageTextureRegion.setRegionY(json.readValue("imageTextureRegionRegionY", Integer.class, jsonData).intValue()); //$NON-NLS-1$
 		imageTextureRegion.setRegionWidth(json.readValue("imageTextureRegionRegionWidth", Integer.class, jsonData).intValue()); //$NON-NLS-1$

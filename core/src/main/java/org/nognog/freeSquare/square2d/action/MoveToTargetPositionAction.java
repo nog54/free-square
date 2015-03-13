@@ -16,7 +16,6 @@ public class MoveToTargetPositionAction extends Action {
 	private float targetPositionX;
 	private float targetPositionY;
 	private float speed;
-	private boolean isFinished = false;
 
 	/**
 	 * 
@@ -47,16 +46,12 @@ public class MoveToTargetPositionAction extends Action {
 
 	@Override
 	public boolean act(float delta) {
-		if (this.isFinished) {
-			return true;
-		}
-		if (this.actor instanceof LandingLifeObject) {
+		if (this.actor instanceof LandingLifeObject && !((LandingLifeObject) this.actor).isLandingOnVertex()) {
 			Vertex[] vertices = ((LandingLifeObject) this.actor).getSquare().getVertices();
 			for (int i = 0; i < vertices.length; i++) {
 				final Vertex v1 = vertices[i];
 				final Vertex v2 = vertices[(i + 1) % vertices.length];
 				if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, this.actor.getX(), this.actor.getY(), this.targetPositionX, this.targetPositionY, null)) {
-					this.isFinished = true;
 					return true;
 				}
 			}
@@ -68,13 +63,11 @@ public class MoveToTargetPositionAction extends Action {
 		final float moveX = r * MathUtils.cos(theta);
 		if (Math.abs(remainingDistanceX) < Math.abs(moveX)) {
 			this.actor.setPosition(this.targetPositionX, this.targetPositionY);
-			this.isFinished = true;
 			return true;
 		}
 		final float moveY = r * MathUtils.sin(theta);
 		if (Math.abs(remainingDistanceY) < Math.abs(moveY)) {
 			this.actor.setPosition(this.targetPositionX, this.targetPositionY);
-			this.isFinished = true;
 			return true;
 		}
 
@@ -122,25 +115,6 @@ public class MoveToTargetPositionAction extends Action {
 	 */
 	public void setSpeed(float speed) {
 		this.speed = speed;
-	}
-
-	/**
-	 * @return true if this action have completed.
-	 */
-	public boolean isFinished() {
-		return this.isFinished;
-	}
-
-	@Override
-	public void reset() {
-		super.reset();
-		this.isFinished = false;
-	}
-
-	@Override
-	public void restart() {
-		super.restart();
-		this.isFinished = false;
 	}
 
 	@Override

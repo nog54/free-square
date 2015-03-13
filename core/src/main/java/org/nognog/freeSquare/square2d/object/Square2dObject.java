@@ -31,7 +31,8 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private float logicalWidth;
 	private float logicalHeight;
 	protected Square2d square;
-	protected Image image;
+	
+	protected Square2dObjectIcon icon;
 
 	private boolean enableAction = true;
 
@@ -113,17 +114,20 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		}
 		this.type = type;
 		final Texture texture = type.getTexture();
-		this.image = new Image(texture);
+		final Image mainIconImage = new Image(texture);
 		this.logicalWidth = type.getLogicalWidth();
-		this.logicalHeight = this.image.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		this.setColor(type.getColor());
+		this.logicalHeight = mainIconImage.getHeight() * (this.getLogicalWidth() / texture.getWidth());
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.getLogicalHeight());
 		this.setOriginX(this.logicalWidth / 2);
 		this.setOriginY(this.logicalHeight / 4);
-		this.image.setWidth(this.logicalWidth);
-		this.image.setHeight(this.getLogicalHeight());
-		this.addActor(this.image);
+		mainIconImage.setWidth(this.logicalWidth);
+		mainIconImage.setHeight(this.logicalHeight);
+		this.icon = new Square2dObjectIcon(mainIconImage);
+		this.icon.setOriginX(this.getOriginX());
+		this.icon.setOriginY(this.getOriginY());
+		this.addActor(this.icon);
+		this.setColor(type.getColor());
 	}
 
 	@Override
@@ -184,6 +188,10 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		return this.square;
 	}
 
+	protected Image getIconMainImage() {
+		return this.icon.getMainImage();
+	}
+	
 	/**
 	 * @return logical width
 	 */
@@ -206,6 +214,13 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 			return false;
 		}
 		return this.square.containsPosition(this.getX(), this.getY());
+	}
+	
+	/**
+	 * @return true if this is landing on vertex
+	 */
+	public boolean isLandingOnVertex(){
+		return this.square.isVertexPosition(this.getX(), this.getY());
 	}
 
 	/**
@@ -268,7 +283,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	@Override
 	public void setColor(Color color) {
 		super.setColor(color);
-		this.image.setColor(color);
+		this.getIconMainImage().setColor(color);
 	}
 
 	@Override

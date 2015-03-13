@@ -76,14 +76,19 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	 * @return true if (x, y) is contained in Square.
 	 */
 	public boolean containsPosition(float x, float y) {
-		if (this.isPointOfVertex(x, y)) {
+		if (this.isVertexPosition(x, y)) {
 			return true;
 		}
 		final Polygon p = Square2dUtils.createPolygon(this.getVertices());
 		return p.contains(x, y);
 	}
 
-	private boolean isPointOfVertex(float x, float y) {
+	/**
+	 * @param x
+	 * @param y
+	 * @return true if (x, y) is vertex position.
+	 */
+	public boolean isVertexPosition(float x, float y) {
 		for (Vertex vertex : this.getVertices()) {
 			if (vertex.equals(x, y)) {
 				return true;

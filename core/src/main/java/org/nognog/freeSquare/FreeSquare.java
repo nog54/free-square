@@ -240,6 +240,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					this.addObject = null;
 				}
 			}
+			
 		};
 
 		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
