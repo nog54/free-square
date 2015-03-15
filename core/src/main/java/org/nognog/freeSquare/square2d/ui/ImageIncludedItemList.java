@@ -55,15 +55,27 @@ public abstract class ImageIncludedItemList<T> extends List<T> {
 				selectedDrawable.draw(batch, x, y + itemY - itemHeight, width, itemHeight);
 				font.setColor(fontColorSelected.r, fontColorSelected.g, fontColorSelected.b, fontColorSelected.a * parentAlpha);
 			}
-			font.draw(batch, listItem.toString(), x + textOffsetX, y + itemY - textOffsetY);
+			final String drawString = listItem.toString();
+			font.draw(batch, drawString, x + textOffsetX, y + itemY - textOffsetY);
 			if (selected) {
 				font.setColor(fontColorUnselected.r, fontColorUnselected.g, fontColorUnselected.b, fontColorUnselected.a * parentAlpha);
 			}
+			this.drawItemImage(batch, font, x, y, itemY, textOffsetX, itemHeight, listItem, drawString);
+			itemY -= itemHeight;
+		}
+	}
+
+	private void drawItemImage(Batch batch, BitmapFont font, float x, float y, float itemY, final float textOffsetX, final float itemHeight, T listItem, final String drawString) {
+		final float rightSpace = itemHeight / 8;
+		final float drawImageInterval = itemHeight * 0.05f;
+		final float imageDrawX = x + textOffsetX + this.getWidth() - itemHeight - rightSpace;
+		final float imageDrawY = y + itemY - itemHeight + drawImageInterval / 2;
+		if (font.getBounds(drawString).width < imageDrawX) {
 			final Texture drawTexture = this.getTextureOf(listItem);
 			if (drawTexture != null) {
 				final float textureWidth = drawTexture.getWidth();
 				final float textureHeight = drawTexture.getHeight();
-				final float drawImageInterval = itemHeight * 0.05f;
+
 				final float drawImageWidth, drawImageHeight;
 				if (textureWidth > textureHeight) {
 					drawImageWidth = itemHeight - drawImageInterval;
@@ -72,15 +84,14 @@ public abstract class ImageIncludedItemList<T> extends List<T> {
 					drawImageHeight = itemHeight - drawImageInterval;
 					drawImageWidth = drawImageHeight * (textureWidth / textureHeight);
 				}
-				
-				final float rightSpace = itemHeight / 8;
+
 				Color oldColor = batch.getColor();
 				Color itemColor = this.getColorOf(listItem);
 				batch.setColor(itemColor.r, itemColor.g, itemColor.b, oldColor.a);
-				batch.draw(drawTexture, x + textOffsetX + this.getWidth() - itemHeight - rightSpace, y + itemY - itemHeight + drawImageInterval / 2, drawImageWidth, drawImageHeight);
+
+				batch.draw(drawTexture, imageDrawX, imageDrawY, drawImageWidth, drawImageHeight);
 				batch.setColor(oldColor);
 			}
-			itemY -= itemHeight;
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.CameraObserver;
+import org.nognog.freeSquare.Settings;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PlayerObserver;
 
@@ -41,7 +42,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		this.setWidget(this.createList(font));
 		this.font = font;
 		this.setupOverscroll(0, 0, 0);
-		this.setWidth(camera.viewportWidth / 2);
+		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
 		this.setHeight(camera.viewportHeight / 2);
 
 		this.getWidget().addListener(new ActorGestureListener() {
@@ -114,7 +115,6 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			}
 
 		};
-		
 		list.setItems(this.getShowListItemsFromPlayer(this.player));
 		list.setSelectedIndex(-1);
 		return list;
@@ -190,7 +190,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x;
+		final float newX = camera.position.x - currentCameraZoom * camera.viewportWidth / 2;
 		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);

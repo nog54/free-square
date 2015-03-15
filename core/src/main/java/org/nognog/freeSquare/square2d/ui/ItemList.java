@@ -1,6 +1,7 @@
 package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.CameraObserver;
+import org.nognog.freeSquare.Settings;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.model.item.Item;
 
@@ -31,7 +32,7 @@ public class ItemList extends ScrollPane implements CameraObserver {
 	public ItemList(Camera camera, Item<?, ?>[] items, BitmapFont font) {
 		super(createList(items, font));
 		this.setupOverscroll(0, 0, 0);
-		this.setWidth(camera.viewportWidth / 2);
+		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
 		this.setHeight(camera.viewportHeight / 2);
 		this.getWidget().addListener(new ActorGestureListener() {
 

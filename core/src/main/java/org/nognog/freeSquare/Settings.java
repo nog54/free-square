@@ -19,6 +19,8 @@ public class Settings {
 	private static float aspectRatio;
 	private static int defaultLogicalCameraWidth;
 	private static int defaultLogicalCameraHeight;
+	
+	private static final float goldenRatio = 1.6180339887f;
 
 	/**
 	 * 
@@ -67,5 +69,12 @@ public class Settings {
 	 */
 	public static int getDefaultLogicalCameraHeight() {
 		return defaultLogicalCameraHeight;
+	}
+	
+	/**
+	 * @return golden ratio
+	 */
+	public static float getGoldenRatio(){
+		return goldenRatio;
 	}
 }

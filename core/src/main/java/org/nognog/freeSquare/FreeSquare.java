@@ -22,6 +22,7 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
@@ -91,26 +92,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.setX(-this.square.getWidth() / 2);
 		this.square.addSquareObserver(this);
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
+		final CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
 
-		SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare5 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare6 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare7 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-		SimpleSquare2d appendSquare8 = Square2dType.GRASSY_SQUARE1_SMALL.create();
-
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[0], appendSquare3, appendSquare3.getVertex4());
-		combineSquare.combine(combineSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[1], appendSquare5, appendSquare5.getVertex1());
-		combineSquare.combine(combineSquare.getVertices()[2], appendSquare6, appendSquare6.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[2], appendSquare7, appendSquare7.getVertex2());
-		combineSquare.combine(combineSquare.getVertices()[5], appendSquare8, appendSquare8.getVertex1());
-		combineSquare.setDrawEdge(true);
 		this.stage.addActor(combineSquare);
 		this.square = combineSquare;
 		this.square.addSquareObserver(this);
@@ -122,13 +105,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 24);
+		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 16);
 		this.initializeWidgets();
 
 	}
 
 	private void initializeWidgets() {
-		this.menu = new Menu(this.font, this.logicalCameraWidth / 6, new FlickInputListener() {
+		this.menu = new Menu(this.font, this.logicalCameraWidth / 5, new FlickInputListener() {
 			@Override
 			public void up() {
 				FreeSquare.this.hideMenu();
@@ -310,7 +293,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 		};
 
-		this.itemList = new ItemList(this.stage.getCamera(), Square2dObjectItem.getAllItems(), this.font) {
+		this.itemList = new ItemList(this.stage.getCamera(), FreeSquare.getAllItems(), this.font) {
 			@Override
 			protected void selectedItemTapped(Item<?, ?> tappedItem) {
 				FreeSquare.this.getPlayer().putItem(tappedItem);
@@ -575,6 +558,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		Date now = new Date();
 		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
 		return diffSecond;
+	}
+
+	private static Item<?, ?>[] getAllItems() {
+		Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.getAllItems();
+		Item<?, ?>[] allSquareItem = Square2dItem.getAllItems();
+		Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItem.length];
+		System.arraycopy(allSquare2dObjectItems, 0, allItems, 0, allSquare2dObjectItems.length);
+		System.arraycopy(allSquareItem, 0, allItems, allSquare2dObjectItems.length, allSquareItem.length);
+		return allItems;
 	}
 
 	/**
