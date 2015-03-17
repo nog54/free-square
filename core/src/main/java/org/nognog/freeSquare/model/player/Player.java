@@ -8,6 +8,7 @@ import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
 import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.square2d.Square2d;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -78,55 +79,95 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 	}
 
 	/**
-	 * @param addedLife
+	 * @param life
 	 */
-	public void addLife(Life addedLife) {
-		if (!this.lifes.contains(addedLife, true)) {
-			this.lifes.add(addedLife);
+	public void addLife(Life life) {
+		if (!this.lifes.contains(life, true)) {
+			this.lifes.add(life);
 			this.notifyPlayerObservers();
 		}
 	}
 
 	/**
-	 * @param removedLife
+	 * @param life
 	 */
-	public void removeLife(Life removedLife) {
-		if (this.lifes.removeValue(removedLife, true)) {
+	public void removeLife(Life life) {
+		if (this.lifes.removeValue(life, true)) {
 			this.notifyPlayerObservers();
 		}
+	}
+
+	/**
+	 * @param oldLife
+	 * @param newLife
+	 */
+	public void replaceLife(Life oldLife, Life newLife) {
+		final int oldLifeIndex = this.lifes.indexOf(oldLife, true);
+		if (oldLifeIndex == -1) {
+			return;
+		}
+		this.lifes.set(oldLifeIndex, newLife);
 	}
 
 	/**
 	 * @return life array
 	 */
-	public Array<Life> getLifes() {
-		return this.lifes;
+	public Life[] getLifes() {
+		return this.lifes.toArray(Life.class);
 	}
 
 	/**
-	 * @param addedSquare
+	 * @param square
 	 */
-	public void addSquare(Square<?> addedSquare) {
-		if (!this.squares.contains(addedSquare, true)) {
-			this.squares.add(addedSquare);
+	public void addSquare(Square<?> square) {
+		if (!this.squares.contains(square, true)) {
+			this.squares.add(square);
 			this.notifyPlayerObservers();
 		}
 	}
 
 	/**
-	 * @param removedSquare
+	 * @param square
 	 */
-	public void removeSquare(Square<?> removedSquare) {
-		if (this.squares.removeValue(removedSquare, true)) {
+	public void removeSquare(Square<?> square) {
+		if (this.squares.removeValue(square, true)) {
 			this.notifyPlayerObservers();
 		}
+	}
+
+	/**
+	 * @param oldSquare
+	 * @param newSquare
+	 */
+	public void replaceSquare(Square2d oldSquare, Square2d newSquare) {
+		final int oldSquareIndex = this.squares.indexOf(oldSquare, true);
+		if (oldSquareIndex == -1) {
+			return;
+		}
+		this.squares.set(oldSquareIndex, newSquare);
 	}
 
 	/**
 	 * @return the squares
 	 */
-	public Array<Square<?>> getSquares() {
-		return this.squares;
+	public Square<?>[] getSquares() {
+		return this.squares.toArray(Square.class);
+	}
+
+	/**
+	 * clear all lifes
+	 */
+	public void clearLifes() {
+		this.lifes.clear();
+		this.notifyPlayerObservers();
+	}
+
+	/**
+	 * clear all squares
+	 */
+	public void clearSquares() {
+		this.squares.clear();
+		this.notifyPlayerObservers();
 	}
 
 	/**
@@ -135,6 +176,14 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 	 */
 	public boolean containsLife(Life searchLife) {
 		return this.lifes.contains(searchLife, true);
+	}
+
+	/**
+	 * @param searchSquare
+	 * @return true if searchSquare is contained
+	 */
+	public boolean containsSquare(Square<?> searchSquare) {
+		return this.squares.contains(searchSquare, true);
 	}
 
 	/**

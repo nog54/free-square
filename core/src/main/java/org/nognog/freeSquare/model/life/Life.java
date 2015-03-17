@@ -1,12 +1,13 @@
 package org.nognog.freeSquare.model.life;
 
+import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2014/08/25
  */
-public class Life implements SelfValidatable {
+public class Life implements SelfValidatable, Nameable {
 	private String name;
 	private Family family;
 	private Status status;
@@ -45,6 +46,7 @@ public class Life implements SelfValidatable {
 	/**
 	 * @return the name
 	 */
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -53,6 +55,7 @@ public class Life implements SelfValidatable {
 	 * @param name
 	 *            the name to set
 	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -93,7 +96,7 @@ public class Life implements SelfValidatable {
 	public String toString() {
 		return this.name;
 	}
-	
+
 	/**
 	 * @return status string
 	 */

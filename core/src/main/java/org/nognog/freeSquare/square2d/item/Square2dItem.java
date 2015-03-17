@@ -57,7 +57,7 @@ public class Square2dItem extends AbstractItem<Square2dItem, Square2dItemType> i
 	/**
 	 * @return square2d object
 	 */
-	public Square2d createSquare2dObject() {
+	public Square2d createSquare2d() {
 		return this.getTypeInItem().getSquare2dType().create();
 	}
 

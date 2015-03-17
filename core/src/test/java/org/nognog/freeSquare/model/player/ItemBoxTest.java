@@ -14,8 +14,6 @@ import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.item.Item;
 
-import com.badlogic.gdx.utils.Array;
-
 @SuppressWarnings({ "javadoc", "static-method", "rawtypes", "unchecked", "boxing" })
 @RunWith(GdxTestRunner.class)
 public class ItemBoxTest {
@@ -23,10 +21,10 @@ public class ItemBoxTest {
 	@Test
 	public final void testToItemArray() {
 		ItemBox box = new ItemBox();
-		Array<?> array1 = box.toItemArray();
+		PossessedItem<?>[] array1 = box.toItemArray();
 		assertThat(array1, is(not(nullValue())));
 
-		Array<?> array2 = box.toItemArray();
+		PossessedItem<?>[] array2 = box.toItemArray();
 		assertThat(array1 == array2, is(false));
 	}
 

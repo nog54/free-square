@@ -35,7 +35,7 @@ public class FlickButtonController extends Group {
 		this.font = font;
 		this.buttonWidthHeight = buttonWidthHeight;
 		this.listener = inputListener;
-		InitializeButtons();
+		this.initializeButtons();
 		this.addActor(this.centerButton);
 		this.addActor(this.upButton);
 		this.addActor(this.downButton);
@@ -43,7 +43,7 @@ public class FlickButtonController extends Group {
 		this.addActor(this.rightButton);
 	}
 
-	private void InitializeButtons() {
+	private void initializeButtons() {
 		this.createButtons();
 		this.addListenerToButton();
 	}
@@ -203,6 +203,48 @@ public class FlickButtonController extends Group {
 	void selectLeftButton() {
 		this.leftButton.setChecked(false);
 		this.listener.left();
+	}
+
+	/**
+	 * @param centerButtonText
+	 */
+	public void setCenterButtonText(String centerButtonText) {
+		this.centerButton.setText(centerButtonText);
+	}
+
+	/**
+	 * @param upButtonText
+	 */
+	public void setUpButtonText(String upButtonText) {
+		this.upButton.setText(upButtonText);
+	}
+
+	/**
+	 * @param downButtonText
+	 */
+	public void setDownButtonText(String downButtonText) {
+		this.downButton.setText(downButtonText);
+	}
+
+	/**
+	 * @param rightButtonText
+	 */
+	public void setRightButtonText(String rightButtonText) {
+		this.rightButton.setText(rightButtonText);
+	}
+
+	/**
+	 * @param leftButtonText
+	 */
+	public void setLeftButtonText(String leftButtonText) {
+		this.leftButton.setText(leftButtonText);
+	}
+	
+	/**
+	 * @return button width (height)
+	 */
+	public float getButtonWidthHeight(){
+		return this.buttonWidthHeight;
 	}
 
 	/**

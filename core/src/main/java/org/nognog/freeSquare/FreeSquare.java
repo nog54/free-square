@@ -2,9 +2,11 @@ package org.nognog.freeSquare;
 
 import java.util.Date;
 
+import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItems;
+import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
@@ -20,7 +22,7 @@ import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
-import org.nognog.freeSquare.square2d.event.RenameObjectRequestEvent;
+import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
@@ -28,11 +30,10 @@ import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
 import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickInputListener;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
-import org.nognog.freeSquare.square2d.ui.PlayerItemList;
+import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
 import org.nognog.freeSquare.util.font.FontUtil;
@@ -44,6 +45,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -71,7 +73,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private Player player;
 	private Date lastRun;
 	private Menu menu;
-	private PlayerItemList playerItemList;
+	private PlayersItemList playersItemList;
 	private PlayersLifeList playersLifeList;
 	private PlayersSquareList playersSquareList;
 	private ItemList itemList;
@@ -83,110 +85,137 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
 		final float timeFromLastRun = setupPersistItems();
-		if (this.player.getSquares().size == 0) {
-			this.square = Square2dType.GRASSY_SQUARE1.create();
-		} else {
-			this.square = (SimpleSquare2d) this.player.getSquares().get(0);
-		}
-
-		this.square.setX(-this.square.getWidth() / 2);
-		this.square.addSquareObserver(this);
+		// this.player.clearSquares();
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		final CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
-
-		this.stage.addActor(combineSquare);
-		this.square = combineSquare;
-		this.square.addSquareObserver(this);
+		final Square2d defaultSquare = getHeadSquare2d(this.player);
+		if (defaultSquare instanceof CombineSquare2d) {
+			((CombineSquare2d) defaultSquare).setDrawEdge(true);
+		}
+		this.setSquare(defaultSquare);
 		this.actLongTime(timeFromLastRun);
-		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
-		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
-
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 16);
+		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 18);
 		this.initializeWidgets();
 
 	}
 
 	private void initializeWidgets() {
-		this.menu = new Menu(this.font, this.logicalCameraWidth / 5, new FlickInputListener() {
+		this.menu = new Menu(this.font, this.logicalCameraWidth / 4, new FlickInputListener() {
 			@Override
 			public void up() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.showPlayersSquareList();
+				FreeSquare.this.setSquare(null);
+				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void right() {
 				FreeSquare.this.hideMenu();
-				FreeSquare.this.showPlayersLifeList();
+				FreeSquare.this.showPlayersSquareList();
 			}
 
 			@Override
 			public void left() {
 				FreeSquare.this.hideMenu();
-				FreeSquare.this.showPlayerItemList();
+				FreeSquare.this.showPlayersLifeList();
 			}
 
 			@Override
 			public void down() {
-				FreeSquare.this.showSquareOnly();
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.showItemList();
 			}
 
 			@Override
 			public void center() {
 				FreeSquare.this.hideMenu();
-				FreeSquare.this.showItemList();
+				FreeSquare.this.showPlayerItemList();
 			}
 		});
+		this.menu.setCenterButtonText(Messages.getString("item")); //$NON-NLS-1$
+		this.menu.setRightButtonText(Messages.getString("square")); //$NON-NLS-1$
+		this.menu.setLeftButtonText(Messages.getString("life")); //$NON-NLS-1$
+		this.menu.setUpButtonText("Close"); //$NON-NLS-1$
+		this.menu.setDownButtonText("all"); //$NON-NLS-1$
 
-		this.playerItemList = new PlayerItemList(this.stage.getCamera(), this.player, this.font) {
-			private Square2dObject addObject;
+		this.playersItemList = new PlayersItemList(this.stage.getCamera(), this.player, this.font) {
+			private Actor pannedObject;
+			private PossessedItem<?> panndedItem;
 
 			@Override
 			protected void selectedItemPanned(PossessedItem<?> pannedItem, float x, float y, float deltaX, float deltaY) {
 				if (pannedItem == null) {
 					return;
 				}
-				if (this.addObject == null) {
+				if (this.pannedObject == null) {
 					Item<?, ?> item = pannedItem.getItem();
-					if (item instanceof Square2dObjectItem) {
-						this.addObject = ((Square2dObjectItem) item).createSquare2dObject();
-						this.addObject.setEnabledAction(false);
-						if (FreeSquare.this.getPlayer().getItemBox().getItemQuantity(item) > 0) {
-							Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-							FreeSquare.this.getSquare().addSquareObject(this.addObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
-							FreeSquare.this.showSquareOnly();
-						}
+					if (item instanceof Square2dObjectItem && FreeSquare.this.getSquare() != null) {
+						Square2dObject pannedSquareObject = ((Square2dObjectItem) item).createSquare2dObject();
+						this.pannedObject = pannedSquareObject;
+						this.panndedItem = pannedItem;
+						this.addSquare2dObjectTemporary(pannedSquareObject, x, y, item);
+						FreeSquare.this.showSquareOnly();
+					} else if (item instanceof Square2dItem) {
+						Square2d pannedSquare = ((Square2dItem) item).createSquare2d();
+						this.pannedObject = pannedSquare;
+						this.panndedItem = pannedItem;
+						this.addSquare2dTemporary(pannedSquare, x, y, item);
+						FreeSquare.this.showSquareOnly();
 					}
 				} else {
 					if (!this.addedObjectisBeingEaten()) {
-						this.addObject.moveBy(deltaX, deltaY);
+						this.pannedObject.moveBy(deltaX, deltaY);
+						if (FreeSquare.this.getSquare() != null) {
+							FreeSquare.this.getSquare().notify(new UpdateObjectEvent());
+						}
 					}
+				}
+			}
+
+			private void addSquare2dObjectTemporary(Square2dObject pannedSquareObject, float x, float y, Item<?, ?> item) {
+				pannedSquareObject.setEnabledAction(false);
+				Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
+				FreeSquare.this.getSquare().addSquareObject(pannedSquareObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
+			}
+
+			private void addSquare2dTemporary(Square2d pannedSquare, float x, float y, Item<?, ?> item) {
+				Vector2 squareCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
+				pannedSquare.setPosition(squareCoodinateXY.x - pannedSquare.getWidth() / 2, squareCoodinateXY.y - pannedSquare.getHeight() / 2);
+				if (FreeSquare.this.getSquare() != null) {
+					FreeSquare.this.getSquare().addActorForce(pannedSquare);
+				} else {
+					FreeSquare.this.getStage().addActor(pannedSquare);
 				}
 			}
 
 			private boolean addedObjectisBeingEaten() {
-				return (this.addObject instanceof EatableObject) && ((EatableObject) this.addObject).isBeingEaten();
+				return (this.pannedObject instanceof EatableObject) && ((EatableObject) this.pannedObject).isBeingEaten();
 			}
 
 			@Override
 			protected void touchUp(float x, float y) {
-				if (this.addObject != null) {
-					if (this.addObject.isLandingOnSquare()) {
-						FreeSquare.this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(this.addObject.getType()));
-						this.addObject.setEnabledAction(true);
-						Square2dEvent event = new AddObjectEvent(this.addObject);
-						event.addExceptObserver(this.addObject);
-						FreeSquare.this.getSquare().notifyObservers(event);
-					} else {
-						FreeSquare.this.getSquare().removeSquareObject(this.addObject);
-					}
-					FreeSquare.this.showPlayerItemList();
-					this.addObject = null;
+				if (this.pannedObject == null || this.panndedItem == null) {
+					this.pannedObject = null;
+					this.panndedItem = null;
+					return;
 				}
+				if (this.pannedObject instanceof Square2dObject) {
+					Square2dObject addObject = (Square2dObject) this.pannedObject;
+					if (FreeSquare.this.putSquareObject(addObject)) {
+						this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(addObject.getType()));
+					}
+				} else if (this.pannedObject instanceof Square2d) {
+					Square2d addSquare = (Square2d) this.pannedObject;
+					if (FreeSquare.this.putSquare2d(addSquare)) {
+						FreeSquare.this.getPlayer().takeOutItem(this.panndedItem.getItem());
+					}
+				}
+				this.getList().setSelectedIndex(-1);
+				FreeSquare.this.showPlayerItemList();
+				this.pannedObject = null;
+				this.panndedItem = null;
 			}
 		};
 
@@ -194,11 +223,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			private LifeObject addObject;
 
 			@Override
-			protected void selectedItemTapped(final Life tappedItem, int count) {
-				if (count == 2) {
-					FreeSquare.this.inputLifeName(tappedItem);
-				}
-
+			protected void selectedItemLongPressed(Life longPressedItem, float x, float y) {
+				FreeSquare.this.inputName(longPressedItem, Messages.getString("lifeNameInput")); //$NON-NLS-1$
 			}
 
 			@Override
@@ -237,29 +263,50 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		};
 
 		this.playersSquareList = new PlayersSquareList(this.stage.getCamera(), this.player, this.font) {
-
 			private Square2d addSquare;
 
 			@Override
+			protected Square<?>[] getShowListItemsFromPlayer(Player setupPlayer) {
+				Array<Square<?>> playersSquares = new Array<>(super.getShowListItemsFromPlayer(setupPlayer));
+				playersSquares.removeValue(FreeSquare.this.getSquare(), true);
+				return playersSquares.toArray(Square.class);
+			}
+
+			@Override
+			protected void selectedItemLongPressed(Square<?> longPressedItem, float x, float y) {
+				FreeSquare.this.inputName(longPressedItem, Messages.getString("squareNameInput")); //$NON-NLS-1$
+			}
+
+			@Override
 			protected void selectedItemPanned(Square<?> pannedItem, float x, float y, float deltaX, float deltaY) {
-				if (pannedItem == null) {
+				if (pannedItem == null || !(pannedItem instanceof Square2d)) {
 					return;
 				}
 				if (this.addSquare == null) {
-					if (pannedItem instanceof Square2d) {
-						this.addSquare = (Square2d) pannedItem;
-						Vector2 squareCoodinateXY = FreeSquare.this.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-						try {
-							FreeSquare.this.getSquare().addActorForce(this.addSquare);
-							this.addSquare.setPosition(squareCoodinateXY.x - this.addSquare.getWidth() / 2, squareCoodinateXY.y - this.addSquare.getHeight() / 2);
-						} catch (IllegalArgumentException e) {
-							this.addSquare = null;
-						}
-						FreeSquare.this.showSquareOnly();
+					this.addSquare = (Square2d) pannedItem;
+					Vector2 squareCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
+					this.addSquare.setPosition(squareCoodinateXY.x - this.addSquare.getWidth() / 2, squareCoodinateXY.y - this.addSquare.getHeight() / 2);
+					if (FreeSquare.this.getSquare() != null) {
+						FreeSquare.this.getSquare().addActorForce(this.addSquare);
+					} else {
+						FreeSquare.this.getStage().addActor(this.addSquare);
 					}
+					FreeSquare.this.showSquareOnly();
+					this.addSquare.toFront();
 				} else {
 					this.addSquare.moveBy(deltaX, deltaY);
-					FreeSquare.this.getSquare().notify(new UpdateObjectEvent());
+					if (FreeSquare.this.getSquare() != null) {
+						FreeSquare.this.getSquare().notify(new UpdateObjectEvent());
+					}
+				}
+			}
+
+			@Override
+			protected void selectedItemTapped(Square<?> tappedItem, int count) {
+				final boolean isDoubleTapped = (count == 2);
+				if (isDoubleTapped && tappedItem instanceof Square2d) {
+					FreeSquare.this.setSquare((Square2d) tappedItem);
+					FreeSquare.this.showSquareOnly();
 				}
 			}
 
@@ -268,26 +315,18 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				if (this.addSquare == null) {
 					return;
 				}
-				FreeSquare.this.getSquare().removeActorForce(this.addSquare);
+				if (FreeSquare.this.getSquare() != null) {
+					FreeSquare.this.getSquare().removeActorForce(this.addSquare);
+				} else {
+					FreeSquare.this.getStage().getRoot().removeActor(this.addSquare);
+				}
+				final boolean existsBaseSquare = FreeSquare.this.getSquare() != null;
+				final boolean successPut = FreeSquare.this.putSquare2d(this.addSquare);
+				final boolean executedCombine = existsBaseSquare && successPut;
+				if (executedCombine) {
+					this.getPlayer().removeSquare(this.addSquare);
+				}
 				FreeSquare.this.showPlayersSquareList();
-				if (!(FreeSquare.this.getSquare() instanceof CombineSquare2d)) {
-					this.addSquare = null;
-					return;
-				}
-				final Vector2[] stageCoordinatesBaseSquareVertices = FreeSquare.this.getSquare().getStageCoordinatesVertices();
-				for (Vertex addSquareVertex : this.addSquare.getVertices()) {
-					final Vector2 stageCoordinatesAddSquareVertex = this.addSquare.localToStageCoordinates(new Vector2(addSquareVertex.x, addSquareVertex.y));
-					for (int i = 0; i < stageCoordinatesBaseSquareVertices.length; i++) {
-						final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
-						final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
-						if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
-							final CombineSquare2d baseSquare = (CombineSquare2d) FreeSquare.this.getSquare();
-							baseSquare.combine(baseSquare.getVertices()[i], this.addSquare, addSquareVertex);
-							this.addSquare = null;
-							return;
-						}
-					}
-				}
 				this.addSquare = null;
 			}
 
@@ -299,6 +338,22 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				FreeSquare.this.getPlayer().putItem(tappedItem);
 			}
 		};
+
+	}
+
+	protected void convertToSquare2d(Square2d convertTarget) {
+		final boolean convertTargetIsThisSquare = (convertTarget == this.square);
+		if (convertTargetIsThisSquare) {
+			this.setSquare(null);
+		}
+		if (!(convertTarget instanceof SimpleSquare2d)) {
+			throw new IllegalArgumentException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
+		}
+		CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
+		this.player.replaceSquare(convertTarget, combineSquare);
+		if (convertTargetIsThisSquare) {
+			this.setSquare(combineSquare);
+		}
 	}
 
 	/**
@@ -316,10 +371,90 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	/**
+	 * @param square
+	 */
+	public void setSquare(Square2d square) {
+		if (this.square != null) {
+			this.enableSquare();
+			this.square.removeSquareObserver(this);
+			this.square.remove();
+		}
+		this.square = square;
+		if (this.square != null) {
+			this.square.setPosition(0, 0);
+			this.stage.addActor(square);
+			this.square.addSquareObserver(this);
+		}
+		this.player.notifyPlayerObservers();
+		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
+		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
+	}
+
+	protected boolean putSquare2d(Square2d addSquare) {
+		if (this.getSquare() == null) {
+			this.getPlayer().addSquare(addSquare);
+			this.setSquare(addSquare);
+		}
+		this.getSquare().removeActorForce(addSquare);
+		final boolean isSuccessCombine = this.combineSquare(addSquare);
+		if (isSuccessCombine) {
+			this.getPlayer().notifyPlayerObservers();
+		}
+		return isSuccessCombine;
+	}
+
+	private boolean combineSquare(Square2d combineSquare) {
+		if (!(this.getSquare() instanceof CombineSquare2d)) {
+			this.convertToSquare2d(FreeSquare.this.getSquare());
+		}
+		final CombineSquare2d baseSquare = (CombineSquare2d) this.getSquare();
+		final Vector2[] stageCoordinatesBaseSquareVertices = FreeSquare.this.getSquare().getStageCoordinatesVertices();
+		for (Vertex addSquareVertex : combineSquare.getVertices()) {
+			final Vector2 stageCoordinatesAddSquareVertex = combineSquare.localToStageCoordinates(new Vector2(addSquareVertex.x, addSquareVertex.y));
+			for (int i = 0; i < stageCoordinatesBaseSquareVertices.length; i++) {
+				final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
+				final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
+				if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
+					baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	protected boolean putSquareObject(Square2dObject putObject) {
+		if (putObject.isLandingOnSquare()) {
+			putObject.setEnabledAction(true);
+			Square2dEvent event = new AddObjectEvent(putObject);
+			event.addExceptObserver(putObject);
+			this.getSquare().notifyObservers(event);
+			return true;
+		}
+		if (this.getSquare() != null) {
+			this.getSquare().removeSquareObject(putObject);
+		}
+		return false;
+	}
+
+	/**
+	 * @param player
+	 * @return square that first appear in array
+	 */
+	public static Square2d getHeadSquare2d(Player player) {
+		for (Square<?> square : player.getSquares()) {
+			if (square instanceof Square2d) {
+				return (Square2d) square;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @return the playerItemList
 	 */
-	public PlayerItemList getPlayerItemList() {
-		return this.playerItemList;
+	public PlayersItemList getPlayerItemList() {
+		return this.playersItemList;
 	}
 
 	/**
@@ -353,22 +488,45 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	/**
 	 * @return lower-left point of camera range
 	 */
-	public Vector2 getCameraRangeLowerLeft() {
+	private Vector2 getCameraRangeLowerLeft() {
+		if (this.square == null) {
+			return new Vector2(0, 0);
+		}
 		return new Vector2(this.square.getLeftEndX(), this.square.getButtomEndY());
 	}
 
 	/**
 	 * @return upper-right point of camera range
 	 */
-	public Vector2 getCameraRangeUpperRight() {
+	private Vector2 getCameraRangeUpperRight() {
+		if (this.square == null) {
+			return new Vector2(0, 0);
+		}
 		return new Vector2(this.square.getRightEndX(), this.square.getTopEndY());
+	}
+
+	/**
+	 * 
+	 */
+	public void adjustCameraPositionIfRangeOver() {
+		OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
+		float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+		float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+
+		float minCameraPositionX = this.getCameraRangeLowerLeft().x + effectiveViewportWidth / 2f;
+		float maxCameraPositionX = this.getCameraRangeUpperRight().x - effectiveViewportWidth / 2f;
+		float minCameraPositionY = this.getCameraRangeLowerLeft().y + effectiveViewportHeight / 2f;
+		float maxCameraPositionY = this.getCameraRangeUpperRight().y - effectiveViewportHeight / 2f;
+
+		camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
+		camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
 	}
 
 	/**
 	 * @return true if showing square
 	 */
 	public boolean isShowingSquare() {
-		return this.square.getTouchable() == Touchable.enabled;
+		return this.square != null && this.square.getTouchable() == Touchable.enabled;
 	}
 
 	void showSquareOnly() {
@@ -381,6 +539,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void enableSquare() {
+		if (this.square == null) {
+			return;
+		}
 		this.square.getColor().a = 1;
 		this.square.setTouchable(Touchable.enabled);
 		this.isLockingCameraMove = false;
@@ -388,6 +549,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void disableSquare() {
+		if (this.square == null) {
+			return;
+		}
 		this.stage.cancelTouchFocus(this.square);
 		this.square.getColor().a = 0.75f;
 		this.square.setTouchable(Touchable.disabled);
@@ -395,7 +559,10 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void showMenu(float x, float y) {
 		this.menu.setPosition(x, y);
-		this.menu.setScale(((OrthographicCamera) this.stage.getCamera()).zoom);
+		final OrthographicCamera camera = (OrthographicCamera) this.stage.getCamera();
+		final float cameraViewingWidth = camera.zoom * camera.viewportWidth;
+		final float goldenRatio = Settings.getGoldenRatio();
+		this.menu.setScale(cameraViewingWidth / (this.menu.getButtonWidthHeight() * 3) * (goldenRatio / (1 + goldenRatio)));
 		this.show(this.menu);
 	}
 
@@ -453,7 +620,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.hide(this.itemList);
 	}
 
-	protected void inputLifeName(final Life updateNameLife) {
+	protected void inputName(final Nameable nameable, String title) {
 		Gdx.input.getTextInput(new TextInputListener() {
 			@Override
 			public void input(String text) {
@@ -473,14 +640,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 						inputText = inputText.replace(checkCharSequence, ""); //$NON-NLS-1$
 					}
 				}
-				updateNameLife.setName(inputText);
+				nameable.setName(inputText);
 			}
 
 			@Override
 			public void canceled() {
 				// nothing
 			}
-		}, Messages.getString("lifeNameInput"), updateNameLife.getName()); //$NON-NLS-1$
+		}, title, nameable.getName());
 	}
 
 	@Override
@@ -534,6 +701,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;
 		}
+		System.out.println(PersistManager.getUseJson().prettyPrint(this.player));
 	}
 
 	private float setupPersistItems() {
@@ -613,8 +781,17 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.square.removeSquareObject(collectRequestedObject);
 		}
 
-		if (event instanceof RenameObjectRequestEvent) {
-			this.inputLifeName(((RenameObjectRequestEvent) event).getRenameRequestObject().getLife());
+		if (event instanceof RenameRequestEvent) {
+			Nameable renameRequestedObject = ((RenameRequestEvent) event).getRenameRequestedObject();
+			final String title;
+			if (renameRequestedObject instanceof Life) {
+				title = Messages.getString("lifeNameInput"); //$NON-NLS-1$
+			} else if (renameRequestedObject instanceof Square) {
+				title = Messages.getString("squareNameInput"); //$NON-NLS-1$
+			} else {
+				title = ""; //$NON-NLS-1$
+			}
+			this.inputName(renameRequestedObject, title);
 		}
 	}
 

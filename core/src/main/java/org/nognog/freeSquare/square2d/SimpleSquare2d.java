@@ -161,16 +161,6 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		return this.type;
 	}
 
-	/**
-	 * @return vertices string
-	 */
-	public String toVerticesString() {
-		StringBuilder sb = new StringBuilder(this.type.getName());
-		sb.append(this.type.vertex1).append("-").append(this.type.vertex2).append("-").append(this.type.vertex3).append("-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				.append(this.type.vertex4);
-		return sb.toString();
-	}
-
 	@Override
 	public void write(Json json) {
 		json.writeField(this, "type"); //$NON-NLS-1$

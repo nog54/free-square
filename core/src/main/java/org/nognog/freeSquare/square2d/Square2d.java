@@ -269,7 +269,6 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 		super.removeActor(object);
 		object.setSquare(null);
-		object.setPosition(0, 0);
 		this.removeSquareObserver(object);
 		this.objects.removeValue(object, true);
 		if (notifyObserver) {
@@ -315,6 +314,36 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		return this.objects;
 	}
 
+	/**
+	 * search all over the stage
+	 * 
+	 * @return all landing object
+	 */
+	public Array<Square2dObject> getAllLandingSquareObjectsOnStage() {
+		Array<Square2dObject> allSquare2dObject = getAllSquare2dObject(this.getStage().getRoot());
+		Array<Square2dObject> result = new Array<>();
+		for (Square2dObject object : allSquare2dObject) {
+			Vector2 stageCoordinateObjectPosition = object.getParent().localToStageCoordinates(new Vector2(object.getX(), object.getY()));
+			Vector2 thisCoordinateObjectPosition = this.stageToLocalCoordinates(stageCoordinateObjectPosition);
+			if (this.containsPosition(thisCoordinateObjectPosition.x, thisCoordinateObjectPosition.y)) {
+				result.add(object);
+			}
+		}
+		return result;
+	}
+
+	private static Array<Square2dObject> getAllSquare2dObject(Actor actor) {
+		Array<Square2dObject> result = new Array<>();
+		if (actor instanceof Square2dObject) {
+			result.add((Square2dObject) actor);
+		} else if (actor instanceof Group) {
+			for (Actor child : ((Group) actor).getChildren()) {
+				result.addAll(getAllSquare2dObject(child));
+			}
+		}
+		return result;
+	}
+
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		if (this.isRequestedDrawOrderUpdate) {
@@ -353,10 +382,6 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		}
 	}
 
-	protected void requestDrawOrderUpdate() {
-		this.isRequestedDrawOrderUpdate = true;
-	}
-
 	@Override
 	public void notifyObservers(Square2dEvent event) {
 		SquareObserver notifyTarget = event.getTargetObserver();
@@ -371,4 +396,22 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			this.observers.get(i).notify(event);
 		}
 	}
+
+	protected void requestDrawOrderUpdate() {
+		this.isRequestedDrawOrderUpdate = true;
+	}
+	
+	/**
+	 * @return vertices string
+	 */
+	public String toVerticesString() {
+		StringBuilder sb = new StringBuilder();
+		Vertex[] vertices = this.getVertices();
+		sb.append(vertices[0]);
+		for (int i = 1; i < vertices.length; i++) {
+			sb.append("-").append(vertices[i]); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
 }

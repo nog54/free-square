@@ -105,8 +105,8 @@ public class ItemList extends ScrollPane implements CameraObserver {
 
 	@Override
 	public void updateCamera(Camera camera) {
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - currentCameraZoom * camera.viewportWidth / 2;
+		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;     				   
+		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
 		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);

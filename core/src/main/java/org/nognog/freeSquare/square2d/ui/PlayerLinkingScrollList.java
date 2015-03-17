@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/17
@@ -156,7 +155,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		// default is empty.
 	}
 
-	protected void selectedItemLongPressed(T pannedItem, float x, float y) {
+	protected void selectedItemLongPressed(T longPressedItem, float x, float y) {
 		// default is empty.
 	}
 
@@ -173,7 +172,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	
 	protected abstract Color getDrawTextureColorOf(T item);
 	
-	protected abstract Array<T> getShowListItemsFromPlayer(Player setupPlayer);
+	protected abstract T[] getShowListItemsFromPlayer(Player setupPlayer);
 
 	
 	
@@ -190,7 +189,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - currentCameraZoom * camera.viewportWidth / 2;
+		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
 		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);

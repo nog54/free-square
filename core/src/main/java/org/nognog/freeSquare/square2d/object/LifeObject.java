@@ -13,7 +13,7 @@ import org.nognog.freeSquare.square2d.action.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
-import org.nognog.freeSquare.square2d.event.RenameObjectRequestEvent;
+import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
@@ -118,7 +118,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
-				LifeObject.this.square.notifyObservers(new RenameObjectRequestEvent(LifeObject.this));
+				LifeObject.this.square.notifyObservers(new RenameRequestEvent(LifeObject.this.getLife()));
 				return true;
 			}
 

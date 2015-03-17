@@ -23,5 +23,4 @@ public class Menu extends FlickButtonController implements CameraObserver {
 	public void updateCamera(Camera camera) {
 		// nothing
 	}
-
 }

@@ -188,6 +188,13 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		return this.square;
 	}
 
+	/**
+	 * @return icon
+	 */
+	public Square2dObjectIcon getIcon(){
+		return this.icon;
+	}
+	
 	protected Image getIconMainImage() {
 		return this.icon.getMainImage();
 	}

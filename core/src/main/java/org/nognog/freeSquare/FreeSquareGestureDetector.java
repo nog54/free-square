@@ -72,7 +72,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				float currentZoom = camera.zoom;
 
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
-				this.adjustCameraPositionIfRangeOver();
+				freeSquare.adjustCameraPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
@@ -90,7 +90,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				float nextZoom = MathUtils.clamp(this.initialScale * ratio, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
-				this.adjustCameraPositionIfRangeOver();
+				freeSquare.adjustCameraPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
@@ -106,6 +106,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 					freeSquare.showSquareOnly();
 					return true;
 				}
+
 				Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
 				freeSquare.showSquareOnly();
 				freeSquare.showMenu(menuPosition.x, menuPosition.y);
@@ -121,20 +122,6 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 					return true;
 				}
 				return false;
-			}
-
-			private void adjustCameraPositionIfRangeOver() {
-				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
-				float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-				float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-
-				float minCameraPositionX = freeSquare.getCameraRangeLowerLeft().x + effectiveViewportWidth / 2f;
-				float maxCameraPositionX = freeSquare.getCameraRangeUpperRight().x - effectiveViewportWidth / 2f;
-				float minCameraPositionY = freeSquare.getCameraRangeLowerLeft().y + effectiveViewportHeight / 2f;
-				float maxCameraPositionY = freeSquare.getCameraRangeUpperRight().y - effectiveViewportHeight / 2f;
-
-				camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
-				camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
 			}
 		};
 		return listener;

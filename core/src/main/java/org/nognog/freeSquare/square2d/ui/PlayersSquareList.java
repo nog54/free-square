@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/02/22
@@ -38,7 +37,7 @@ public class PlayersSquareList extends PlayerLinkingScrollList<Square<?>> {
 	}
 
 	@Override
-	protected Array<Square<?>> getShowListItemsFromPlayer(Player setupPlayer) {
+	protected Square<?>[] getShowListItemsFromPlayer(Player setupPlayer) {
 		return setupPlayer.getSquares();
 	}
 

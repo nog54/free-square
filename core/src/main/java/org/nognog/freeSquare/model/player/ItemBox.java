@@ -28,8 +28,8 @@ public class ItemBox implements SelfValidatable{
 	/**
 	 * @return new possessedItem array
 	 */
-	public Array<PossessedItem<?>> toItemArray() {
-		return new Array<>(this.possessedItems);
+	public PossessedItem<?>[] toItemArray() {
+		return this.possessedItems.toArray(PossessedItem.class);
 	}
 
 	/**

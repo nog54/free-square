@@ -32,8 +32,11 @@ public class CombineSquare2d extends Square2d {
 			@SuppressWarnings({ "hiding", "rawtypes", "synthetic-access" })
 			public void write(Json json, CombineSquare2d object, Class knownType) {
 				json.writeObjectStart();
+				json.writeType(CombineSquare2d.class);
 				json.writeValue("squares", object.squares); //$NON-NLS-1$
 				json.writeValue("reconstructCombineInfo", object.combineInfo.toReconstructCombineInfo()); //$NON-NLS-1$
+				json.writeValue("objects", object.objects); //$NON-NLS-1$
+				json.writeValue("name", object.getName()); //$NON-NLS-1$
 				json.writeObjectEnd();
 			}
 
@@ -60,6 +63,12 @@ public class CombineSquare2d extends Square2d {
 				} catch (IllegalStateException e) {
 					return null;
 				}
+				Array<Square2dObject> readObjects = json.readValue(Array.class, jsonData.get("objects")); //$NON-NLS-1$
+				for (Square2dObject object : readObjects) {
+					combineSquare.addSquareObject(object, object.getX(), object.getY(), false);
+				}
+				String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+				combineSquare.setName(name);
 				return combineSquare;
 			}
 
@@ -109,8 +118,8 @@ public class CombineSquare2d extends Square2d {
 	private Array<Square2d> squares;
 	private Array<Vertex> vertices;
 	private ObjectMap<Vertex, CombinePoint> combinePoints;
-	private float leftEndX, rightEndX;
-	private float buttomEndY, topEndY;
+	private float baseLeftEndX, baseRightEndX;
+	private float baseButtomEndY, baseTopEndY;
 
 	private CombineInfo combineInfo;
 
@@ -124,6 +133,7 @@ public class CombineSquare2d extends Square2d {
 	public CombineSquare2d(Square2d base) {
 		this.base = base;
 		this.squares = new Array<>();
+		this.setPosition(base.getX(), base.getY());
 		this.addSquare(base, 0, 0);
 		this.vertices = new Array<>();
 		this.combinePoints = new ObjectMap<>();
@@ -132,12 +142,15 @@ public class CombineSquare2d extends Square2d {
 			this.vertices.add(vertex);
 			this.combinePoints.put(vertex, new CombinePoint(vertex, base, baseVertex));
 		}
+		this.setName(base.getName());
 		this.combineInfo = new CombineInfo();
-		this.leftEndX = base.getLeftEndX();
-		this.rightEndX = base.getRightEndX();
-		this.buttomEndY = base.getButtomEndY();
-		this.topEndY = base.getTopEndY();
-
+		this.baseLeftEndX = base.getLeftEndX();
+		this.baseRightEndX = base.getRightEndX();
+		this.baseButtomEndY = base.getButtomEndY();
+		this.baseTopEndY = base.getTopEndY();
+		for (Square2dObject object : base.getObjects()) {
+			this.addSquareObject(object, object.getX(), object.getY(), false);
+		}
 		this.setupSeparatableSquaresList();
 	}
 
@@ -176,63 +189,62 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public float getLeftEndX() {
-		return this.leftEndX;
+		return this.baseLeftEndX + this.getX();
 	}
 
 	@Override
 	public float getRightEndX() {
-		return this.rightEndX;
+		return this.baseRightEndX + this.getX();
 	}
 
 	@Override
 	public float getButtomEndY() {
-		return this.buttomEndY;
+		return this.baseButtomEndY + this.getY();
 	}
 
 	@Override
 	public float getTopEndY() {
-		return this.topEndY;
+		return this.baseTopEndY + this.getY();
 	}
 
 	private void recalculateLeftEndX() {
-		float result = Float.MAX_VALUE;
+		float childSquareMaxMinEndX = Float.MAX_VALUE;
 		for (Square2d square : this.squares) {
-			final float squareLeftEndX = square.getLeftEndX();
-			if (result > squareLeftEndX) {
-				result = squareLeftEndX;
+			if (childSquareMaxMinEndX > square.getLeftEndX()) {
+				childSquareMaxMinEndX = square.getLeftEndX();
 			}
 		}
-		this.leftEndX = result;
+		this.baseLeftEndX = childSquareMaxMinEndX;
 	}
 
 	private void recalculateRightEndX() {
-		float result = -Float.MAX_VALUE;
+		float childSquareMaxRightEndX = -Float.MAX_VALUE;
 		for (Square2d square : this.squares) {
-			if (result < square.getRightEndX()) {
-				result = square.getRightEndX();
+			if (childSquareMaxRightEndX < square.getRightEndX()) {
+				childSquareMaxRightEndX = square.getRightEndX();
 			}
 		}
-		this.rightEndX = result;
+		this.baseRightEndX = childSquareMaxRightEndX;
 	}
 
 	private void recalculateButtomEndY() {
-		float result = Float.MAX_VALUE;
+		float childSquareMinButtomEndY = Float.MAX_VALUE;
 		for (Square2d square : this.squares) {
-			if (result > square.getButtomEndY()) {
-				result = square.getButtomEndY();
+			if (childSquareMinButtomEndY > square.getButtomEndY()) {
+				childSquareMinButtomEndY = square.getButtomEndY();
 			}
 		}
-		this.buttomEndY = result;
+		this.baseButtomEndY = childSquareMinButtomEndY;
 	}
 
 	private void recalculateTopEndY() {
-		float result = -Float.MAX_VALUE;
+		float childSquareMaxTopEndY = -Float.MAX_VALUE;
 		for (Square2d square : this.squares) {
-			if (result < square.getTopEndY()) {
-				result = square.getTopEndY();
+			if (childSquareMaxTopEndY < square.getTopEndY()) {
+				childSquareMaxTopEndY = square.getTopEndY();
 			}
 		}
-		this.topEndY = result;
+		this.baseTopEndY = childSquareMaxTopEndY;
 	}
 
 	/**
@@ -374,13 +386,15 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private void addSquare(Square2d square, float x, float y) {
+		final float squarePositionDiffX = x - this.getX();
+		final float squarePositionDiffY = y - this.getY();
 		square.setPosition(x, y);
-		for (Square2dObject object : square.objects) {
-			square.removeSquareObject(object, false);
-			this.addSquareObject(object, x + object.getX(), y + object.getY(), false);
-		}
 		this.squares.add(square);
 		this.addActorForce(square);
+		for (Square2dObject object : square.objects) {
+			square.removeSquareObject(object, false);
+			this.addSquareObject(object, object.getX() + squarePositionDiffX, object.getY() + squarePositionDiffY, false);
+		}
 		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
 		this.recalculateBorder();
 		this.requestDrawOrderUpdate();
@@ -808,11 +822,9 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(this.vertices.get(0));
-		for (int i = 1; i < this.vertices.size; i++) {
-			sb.append("-").append(this.vertices.get(i)); //$NON-NLS-1$
-		}
-		return sb.toString();
+		//return this.toVerticesString();
+		return this.getName();
 	}
+
+
 }
