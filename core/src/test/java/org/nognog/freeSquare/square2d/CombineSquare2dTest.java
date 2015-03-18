@@ -9,8 +9,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 @SuppressWarnings("all")
@@ -191,6 +195,42 @@ public class CombineSquare2dTest {
 			assertThat(actual3, is(expected3));
 			this.testReadWrite(combineSquare);
 		}
+
+		{ // combine combineSquare
+			CombineSquare2d combineSquare1 = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
+			CombineSquare2d combineSquare2 = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
+			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			combineSquare2.combine(combineSquare2.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
+			combineSquare2.addSquareObject(LifeObjectType.RIKI.create());
+			combineSquare2.addSquareObject(EatableObjectType.TOFU.create());
+
+			boolean actual1 = combineSquare1.combine(combineSquare1.getVertices()[0], combineSquare2, combineSquare2.getVertices()[0]);
+			assertThat(actual1, is(true));
+			assertThat(((Array<Square2dObject>) combineSquare1.getObjects()).size, is(2));
+			
+		  // create same value square with SimpleSquare2d
+			CombineSquare2d compareSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
+			SimpleSquare2d appendSquare3 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			SimpleSquare2d appendSquare4 = Square2dType.GRASSY_SQUARE1_SMALL.create();
+			compareSquare.combine(compareSquare.getVertices()[0], appendSquare3, appendSquare3.getVertex4());
+			compareSquare.combine(compareSquare.getVertices()[1], appendSquare4, appendSquare4.getVertex1());
+			
+			assertThat(combineSquare1.getSquares().length, is(compareSquare.getSquares().length - 1));
+			assertThat(combineSquare1.getVertices().length, is(compareSquare.getVertices().length));
+			for(Vertex actualVertex : combineSquare1.getVertices()){
+				boolean existsActualVertex = false;
+				for(Vertex expectedVertex : compareSquare.getVertices()){
+					if(actualVertex.equals(expectedVertex)){
+						existsActualVertex = true;
+						break;
+					}
+				}
+				if(existsActualVertex == false){
+					fail();
+				}
+			}
+		}
+
 	}
 
 	@Test

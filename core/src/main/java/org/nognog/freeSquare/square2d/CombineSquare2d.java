@@ -1,5 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
+import java.util.Arrays;
+
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.CombineInfo.ReconstructCombineInfo;
@@ -25,93 +27,7 @@ import com.badlogic.gdx.utils.ObjectMap;
  */
 public class CombineSquare2d extends Square2d {
 	static {
-		Json json = PersistManager.getUseJson();
-		json.setSerializer(CombineSquare2d.class, new Json.Serializer<CombineSquare2d>() {
-
-			@Override
-			@SuppressWarnings({ "hiding", "rawtypes", "synthetic-access" })
-			public void write(Json json, CombineSquare2d object, Class knownType) {
-				json.writeObjectStart();
-				json.writeType(CombineSquare2d.class);
-				json.writeValue("squares", object.squares); //$NON-NLS-1$
-				json.writeValue("reconstructCombineInfo", object.combineInfo.toReconstructCombineInfo()); //$NON-NLS-1$
-				json.writeValue("objects", object.objects); //$NON-NLS-1$
-				json.writeValue("name", object.getName()); //$NON-NLS-1$
-				json.writeObjectEnd();
-			}
-
-			@Override
-			@SuppressWarnings({ "hiding", "rawtypes", "unchecked" })
-			public CombineSquare2d read(Json json, JsonValue jsonData, Class type) {
-				final Array<Square2d> beCombinedSquares = json.readValue("squares", Array.class, Square2d.class, jsonData); //$NON-NLS-1$
-				final ReconstructCombineInfo reconstructConbineInfo = json.readValue("reconstructCombineInfo", ReconstructCombineInfo.class, jsonData); //$NON-NLS-1$
-				if (beCombinedSquares.size < 1) {
-					return null;
-				}
-				final Array<Vertex> combineVertices1 = reconstructConbineInfo.getVertices1();
-				final Array<Vertex> combineVertices2 = reconstructConbineInfo.getVertices2();
-				if (combineVertices1.size != combineVertices2.size) {
-					return null;
-				}
-				if (combineVertices1.size != (beCombinedSquares.size - 1)) {
-					return null;
-				}
-				final CombineSquare2d combineSquare = new CombineSquare2d(beCombinedSquares.get(0));
-				beCombinedSquares.removeIndex(0);
-				try {
-					this.appendSquares(combineSquare, beCombinedSquares, combineVertices1, combineVertices2);
-				} catch (IllegalStateException e) {
-					return null;
-				}
-				Array<Square2dObject> readObjects = json.readValue(Array.class, jsonData.get("objects")); //$NON-NLS-1$
-				for (Square2dObject object : readObjects) {
-					combineSquare.addSquareObject(object, object.getX(), object.getY(), false);
-				}
-				String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
-				combineSquare.setName(name);
-				return combineSquare;
-			}
-
-			@SuppressWarnings("synthetic-access")
-			private void appendSquares(final CombineSquare2d combineSquare, final Array<Square2d> beCombinedSquares, final Array<Vertex> combineVertices1, final Array<Vertex> combineVertices2) {
-				for (int i = 0; i < beCombinedSquares.size; i++) {
-					final Square2d beCombineSquare = beCombinedSquares.get(i);
-					final Vertex combineVertex1 = CombineSquare2dUtils.getSameValueVertex(combineVertices1.get(i), combineSquare.getVertices());
-					final Vertex combineVertex2 = CombineSquare2dUtils.getSameValueVertex(combineVertices2.get(i), beCombineSquare.getVertices());
-					final boolean isCombineSuccess = combineSquare.combine(combineVertex1, beCombineSquare, combineVertex2);
-					if (isCombineSuccess) {
-						beCombinedSquares.removeValue(beCombineSquare, true);
-						combineVertices1.removeIndex(i);
-						combineVertices2.removeIndex(i);
-						i--;
-					} else {
-						break;
-					}
-				}
-				while (beCombinedSquares.size != 0) {
-					boolean isCombined = false;
-					for (int i = 0; i < beCombinedSquares.size; i++) {
-						final Square2d beCombinedSquare = beCombinedSquares.get(i);
-						for (Vertex beCombinedSquareVertex : beCombinedSquare.getVertices()) {
-							final Vertex afterBeCombinedSquareVertex = createAfterCombineTargetVertex(beCombinedSquareVertex, combineVertices1.get(i), combineVertices2.get(i));
-							final Vertex sufficientlyCloseVertex = CombineSquare2dUtils.getSufficientlyCloseVertex(afterBeCombinedSquareVertex, combineSquare.getVertices());
-							final boolean isCombineSuccess = combineSquare.combine(sufficientlyCloseVertex, beCombinedSquare, beCombinedSquareVertex);
-							if (isCombineSuccess) {
-								beCombinedSquares.removeValue(beCombinedSquare, true);
-								combineVertices1.removeIndex(i);
-								combineVertices2.removeIndex(i);
-								i--;
-								isCombined = true;
-								break;
-							}
-						}
-					}
-					if (isCombined == false) {
-						throw new IllegalStateException();
-					}
-				}
-			}
-		});
+		CombineSquare2d.CombineSquare2dSetUpper.setup();
 	}
 
 	private Square2d base;
@@ -123,7 +39,8 @@ public class CombineSquare2d extends Square2d {
 
 	private CombineInfo combineInfo;
 
-	private Array<Square2d> separatableIfNotExistsObjectSquares;
+	private transient Array<Square2d> separatableIfNotExistsObjectSquares;
+	private transient Array<SimpleSquare2d> allChildSimpleSquare2d;
 
 	private boolean drawEdge;
 
@@ -157,6 +74,13 @@ public class CombineSquare2d extends Square2d {
 	@Override
 	public Vertex[] getVertices() {
 		return this.vertices.<Vertex> toArray(Vertex.class);
+	}
+
+	/**
+	 * @return squares
+	 */
+	public Square2d[] getSquares() {
+		return this.squares.<Square2d> toArray(Square2d.class);
 	}
 
 	/**
@@ -258,14 +182,10 @@ public class CombineSquare2d extends Square2d {
 			return false;
 		}
 		this.combineInfo.addCombineInfo(this, thisCombineVertex, targetSquare, targetsCombineVertex);
-		try {
-			Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquare, targetsCombineVertex);
-			this.normalizeVertices();
-			this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
-			this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
-		} catch (Exception e) {
-			this.combineInfo.removeCombineInfo(targetSquare);
-		}
+		Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquare, targetsCombineVertex);
+		this.normalizeVertices();
+		this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
+		this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
 		this.setupSeparatableSquaresList();
 		return true;
 	}
@@ -391,26 +311,52 @@ public class CombineSquare2d extends Square2d {
 		square.setPosition(x, y);
 		this.squares.add(square);
 		this.addActorForce(square);
-		for (Square2dObject object : square.objects) {
+		for (Square2dObject object : square.getObjects()) {
 			square.removeSquareObject(object, false);
 			this.addSquareObject(object, object.getX() + squarePositionDiffX, object.getY() + squarePositionDiffY, false);
 		}
 		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
 		this.recalculateBorder();
 		this.requestDrawOrderUpdate();
+		this.resetAllSimpleSquare2d();
 	}
 
 	private boolean removeSquare(Square2d square) {
 		if (this.squares.removeValue(square, true) == false) {
 			return false;
 		}
-		if (square == this.base) {
-			this.base = null;
-		}
 		this.removeActorForce(square);
 		this.requestDrawOrderUpdate();
 		this.recalculateBorder();
+		this.resetAllSimpleSquare2d();
 		return true;
+	}
+
+	@Override
+	public void addActorForce(Actor actor) {
+		super.addActorForce(actor);
+		if (actor instanceof Square2d) {
+			this.resetAllSimpleSquare2d();
+		}
+	}
+
+	@Override
+	public void removeActorForce(Actor actor) {
+		super.removeActorForce(actor);
+		if (actor instanceof Square2d) {
+			this.resetAllSimpleSquare2d();
+		}
+	}
+
+	private void resetAllSimpleSquare2d() {
+		this.allChildSimpleSquare2d = new Array<>();
+		for (Actor child : this.getChildren()) {
+			if (child instanceof SimpleSquare2d) {
+				this.allChildSimpleSquare2d.add((SimpleSquare2d) child);
+			} else if (child instanceof CombineSquare2d) {
+				this.allChildSimpleSquare2d.addAll(((CombineSquare2d) child).allChildSimpleSquare2d);
+			}
+		}
 	}
 
 	/**
@@ -783,23 +729,60 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		super.draw(batch, parentAlpha);
-		if (this.drawEdge) {
-			batch.end();
-			ShapeRenderer shapeRenderer = new ShapeRenderer();
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(Color.BLUE);
-			shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-			shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-			for (int i = 0; i < this.vertices.size; i++) {
-				Vertex vertex1 = this.vertices.get(i);
-				Vertex vertex2 = this.vertices.get((i + 1) % this.vertices.size);
-				shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
-			}
-			shapeRenderer.end();
-			shapeRenderer.dispose();
-			batch.begin();
+		if (this.getParent() != this.getStage().getRoot()) {
+			return;
 		}
+		final boolean oldVisible = this.isVisible();
+		this.setVisible(false);
+		super.draw(batch, parentAlpha);
+		this.setVisible(oldVisible);
+		
+		this.drawChildSimpleSquares(batch, parentAlpha);
+		this.drawSquare2dObjects(batch, parentAlpha);
+
+		if (this.drawEdge) {
+			this.drawEdge(batch);
+		}
+	}
+
+	private void drawChildSimpleSquares(Batch batch, float parentAlpha) {
+		SimpleSquare2d[] simpleSquares = this.allChildSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
+		Arrays.sort(simpleSquares, actorComparator);
+		for (SimpleSquare2d square : simpleSquares) {
+			final float oldX = square.getX();
+			final float oldY = square.getY();
+			final Vector2 stageCoordinateSquarePosition = square.getStageCoordinate();
+			square.setX(stageCoordinateSquarePosition.x);
+			square.setY(stageCoordinateSquarePosition.y);
+			square.draw(batch, parentAlpha);
+			square.setX(oldX);
+			square.setY(oldY);
+		}
+	}
+
+	private void drawSquare2dObjects(Batch batch, float parentAlpha) {
+		for (Actor actor : this.getChildren()) {
+			if (actor instanceof Square2dObject) {
+				actor.draw(batch, parentAlpha);
+			}
+		}
+	}
+
+	private void drawEdge(Batch batch) {
+		batch.end();
+		ShapeRenderer shapeRenderer = new ShapeRenderer();
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(Color.BLUE);
+		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+		for (int i = 0; i < this.vertices.size; i++) {
+			Vertex vertex1 = this.vertices.get(i);
+			Vertex vertex2 = this.vertices.get((i + 1) % this.vertices.size);
+			shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
+		}
+		shapeRenderer.end();
+		shapeRenderer.dispose();
+		batch.begin();
 	}
 
 	@Override
@@ -822,9 +805,100 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public String toString() {
-		//return this.toVerticesString();
+		// return this.toVerticesString();
 		return this.getName();
 	}
 
+	private static class CombineSquare2dSetUpper {
+		static void setup() {
+			Json json = PersistManager.getUseJson();
+			json.setSerializer(CombineSquare2d.class, new Json.Serializer<CombineSquare2d>() {
+
+				@Override
+				@SuppressWarnings({ "hiding", "rawtypes", "synthetic-access" })
+				public void write(Json json, CombineSquare2d object, Class knownType) {
+					json.writeObjectStart();
+					json.writeType(CombineSquare2d.class);
+					json.writeValue("squares", object.squares); //$NON-NLS-1$
+					json.writeValue("reconstructCombineInfo", object.combineInfo.toReconstructCombineInfo()); //$NON-NLS-1$
+					json.writeValue("objects", object.objects); //$NON-NLS-1$
+					json.writeValue("name", object.getName()); //$NON-NLS-1$
+					json.writeObjectEnd();
+				}
+
+				@Override
+				@SuppressWarnings({ "hiding", "rawtypes", "unchecked" })
+				public CombineSquare2d read(Json json, JsonValue jsonData, Class type) {
+					final Array<Square2d> combinedSquares = json.readValue("squares", Array.class, Square2d.class, jsonData); //$NON-NLS-1$
+					final ReconstructCombineInfo reconstructConbineInfo = json.readValue("reconstructCombineInfo", ReconstructCombineInfo.class, jsonData); //$NON-NLS-1$
+					if (combinedSquares.size < 1) {
+						return null;
+					}
+					final Array<Vertex> combineVertices1 = reconstructConbineInfo.getVertices1();
+					final Array<Vertex> combineVertices2 = reconstructConbineInfo.getVertices2();
+					if (combineVertices1.size != combineVertices2.size) {
+						return null;
+					}
+					if (combineVertices1.size != (combinedSquares.size - 1)) {
+						return null;
+					}
+					final CombineSquare2d baseSquare = new CombineSquare2d(combinedSquares.get(0));
+					combinedSquares.removeIndex(0);
+					try {
+						this.appendSquares(baseSquare, combinedSquares, combineVertices1, combineVertices2);
+					} catch (IllegalStateException e) {
+						return null;
+					}
+					Array<Square2dObject> readObjects = json.readValue(Array.class, jsonData.get("objects")); //$NON-NLS-1$
+					for (Square2dObject object : readObjects) {
+						baseSquare.addSquareObject(object, object.getX(), object.getY(), false);
+					}
+					String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+					baseSquare.setName(name);
+					return baseSquare;
+				}
+
+				@SuppressWarnings("synthetic-access")
+				private void appendSquares(final CombineSquare2d baseSquare, final Array<Square2d> combineSquares, final Array<Vertex> combineVertices1, final Array<Vertex> combineVertices2) {
+					for (int i = 0; i < combineSquares.size; i++) {
+						final Square2d beCombineSquare = combineSquares.get(i);
+						final Vertex combineVertex1 = CombineSquare2dUtils.getSameValueVertex(combineVertices1.get(i), baseSquare.getVertices());
+						final Vertex combineVertex2 = CombineSquare2dUtils.getSameValueVertex(combineVertices2.get(i), beCombineSquare.getVertices());
+						final boolean isCombineSuccess = baseSquare.combine(combineVertex1, beCombineSquare, combineVertex2);
+						if (isCombineSuccess) {
+							combineSquares.removeValue(beCombineSquare, true);
+							combineVertices1.removeIndex(i);
+							combineVertices2.removeIndex(i);
+							i--;
+						} else {
+							break;
+						}
+					}
+					while (combineSquares.size != 0) {
+						boolean isCombined = false;
+						for (int i = 0; i < combineSquares.size; i++) {
+							final Square2d beCombinedSquare = combineSquares.get(i);
+							for (Vertex beCombinedSquareVertex : beCombinedSquare.getVertices()) {
+								final Vertex afterBeCombinedSquareVertex = createAfterCombineTargetVertex(beCombinedSquareVertex, combineVertices1.get(i), combineVertices2.get(i));
+								final Vertex sufficientlyCloseVertex = CombineSquare2dUtils.getSufficientlyCloseVertex(afterBeCombinedSquareVertex, baseSquare.getVertices());
+								final boolean isCombineSuccess = baseSquare.combine(sufficientlyCloseVertex, beCombinedSquare, beCombinedSquareVertex);
+								if (isCombineSuccess) {
+									combineSquares.removeValue(beCombinedSquare, true);
+									combineVertices1.removeIndex(i);
+									combineVertices2.removeIndex(i);
+									i--;
+									isCombined = true;
+									break;
+								}
+							}
+						}
+						if (isCombined == false) {
+							throw new IllegalStateException();
+						}
+					}
+				}
+			});
+		}
+	}
 
 }

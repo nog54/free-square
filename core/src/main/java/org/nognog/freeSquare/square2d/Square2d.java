@@ -26,7 +26,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 
 	private boolean isRequestedDrawOrderUpdate = false;
 
-	private static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
+	protected static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
 
 		@Override
 		public int compare(Actor actor1, Actor actor2) {
@@ -42,8 +42,8 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			if (actor1 instanceof Square2d && actor2 instanceof Square2d) {
 				final Square2d square1 = (Square2d) actor1;
 				final Square2d square2 = (Square2d) actor2;
-				final float square1BottomVertexY = square1.getY() + square1.getMostBottomVertex().y;
-				final float square2ButtomVertexY = square2.getY() + square2.getMostBottomVertex().y;
+				final float square1BottomVertexY = square1.getStageCoordinate().y + square1.getMostBottomVertex().y;
+				final float square2ButtomVertexY = square2.getStageCoordinate().y + square2.getMostBottomVertex().y;
 				if (square1BottomVertexY < square2ButtomVertexY) {
 					return 1;
 				} else if (square1BottomVertexY > square2ButtomVertexY) {
@@ -188,6 +188,10 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 		return mostButtomVertex;
 	}
 
+	protected Vector2 getStageCoordinate() {
+		return this.localToStageCoordinates(new Vector2(0, 0));
+	}
+
 	/**
 	 * @return stage coordinates vertices
 	 */
@@ -311,7 +315,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 
 	@Override
 	public Iterable<Square2dObject> getObjects() {
-		return this.objects;
+		return new Array<>(this.objects);
 	}
 
 	/**
@@ -400,7 +404,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	protected void requestDrawOrderUpdate() {
 		this.isRequestedDrawOrderUpdate = true;
 	}
-	
+
 	/**
 	 * @return vertices string
 	 */
