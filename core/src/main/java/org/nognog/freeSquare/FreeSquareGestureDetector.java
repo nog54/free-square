@@ -98,18 +98,17 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 
 			@Override
 			public boolean tap(float x, float y, int count, int button) {
-				if(this.lastTouchDownActor != null){
+				if (this.lastTouchDownActor != null) {
 					return false;
 				}
 
-				if (!freeSquare.isShowingSquare()) {
-					freeSquare.showSquareOnly();
-					return true;
-				}
-
-				Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
+				final int beforeStageChildrenCount = freeSquare.getStage().getRoot().getChildren().size;
 				freeSquare.showSquareOnly();
-				freeSquare.showMenu(menuPosition.x, menuPosition.y);
+				final int afterStageChildrenCount = freeSquare.getStage().getRoot().getChildren().size;
+				if (beforeStageChildrenCount == afterStageChildrenCount) {
+					Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
+					freeSquare.showMenu(menuPosition.x, menuPosition.y);
+				}
 				return true;
 			}
 
