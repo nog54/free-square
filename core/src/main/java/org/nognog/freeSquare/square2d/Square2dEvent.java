@@ -1,5 +1,6 @@
 package org.nognog.freeSquare.square2d;
 
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObserver;
 
 import com.badlogic.gdx.utils.Array;
@@ -7,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/01/25
  */
-public class Square2dEvent {
+public class Square2dEvent implements SquareEvent{
 
 	private final SquareObserver targetObserver;
 	private Array<SquareObserver> exceptObservers;
@@ -28,7 +29,7 @@ public class Square2dEvent {
 	}
 
 	/**
-	 * @return object that related this event
+	 * @return target observer
 	 */
 	public SquareObserver getTargetObserver() {
 		return this.targetObserver;

@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.RemoveObjectEvent;
@@ -391,24 +392,28 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	}
 
 	@Override
-	public void notify(Square2dEvent event) {
+	public void notify(SquareEvent event) {
 		if (event instanceof UpdateObjectEvent) {
 			this.requestDrawOrderUpdate();
 		}
 	}
 
 	@Override
-	public void notifyObservers(Square2dEvent event) {
-		SquareObserver notifyTarget = event.getTargetObserver();
+	public void notifyObservers(SquareEvent event) {
+		if(!(event instanceof Square2dEvent)){
+			return;
+		}
+		Square2dEvent square2dEvent = (Square2dEvent)event;
+		SquareObserver notifyTarget = square2dEvent.getTargetObserver();
 		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
-			notifyTarget.notify(event);
+			notifyTarget.notify(square2dEvent);
 			return;
 		}
 		for (int i = 0; i < this.observers.size; i++) {
-			if (event.getExceptObservers().contains(this.observers.get(i), true)) {
+			if (square2dEvent.getExceptObservers().contains(this.observers.get(i), true)) {
 				continue;
 			}
-			this.observers.get(i).notify(event);
+			this.observers.get(i).notify(square2dEvent);
 		}
 	}
 

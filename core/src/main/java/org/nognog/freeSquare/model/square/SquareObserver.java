@@ -1,6 +1,5 @@
 package org.nognog.freeSquare.model.square;
 
-import org.nognog.freeSquare.square2d.Square2dEvent;
 
 /**
  * @author goshi
@@ -11,5 +10,5 @@ public interface SquareObserver {
 	 * update square
 	 * @param event 
 	 */
-	void notify(Square2dEvent event);
+	void notify(SquareEvent event);
 }

@@ -1,7 +1,6 @@
 package org.nognog.freeSquare.model.square;
 
 import org.nognog.freeSquare.model.Nameable;
-import org.nognog.freeSquare.square2d.Square2dEvent;
 
 /**
  * @author goshi 2014/12/17
@@ -39,11 +38,11 @@ public interface Square<T extends SquareObject<?>> extends Nameable{
 	/**
 	 * @param event
 	 */
-	void notifyObservers(Square2dEvent event);
+	void notifyObservers(SquareEvent event);
 
 	/**
 	 * @param event
 	 */
-	void notify(Square2dEvent event);
+	void notify(SquareEvent event);
 
 }

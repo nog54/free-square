@@ -1,10 +1,10 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
@@ -294,7 +294,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	@Override
-	public void notify(Square2dEvent event) {
+	public void notify(SquareEvent event) {
 		// overridden by sub class
 	}
 

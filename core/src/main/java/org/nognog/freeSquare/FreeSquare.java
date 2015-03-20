@@ -12,6 +12,7 @@ import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
 import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
@@ -760,7 +761,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	@Override
-	public void notify(Square2dEvent event) {
+	public void notify(SquareEvent event) {
 		if (event instanceof CollectObjectRequestEvent) {
 			Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
 			if (collectRequestedObject instanceof LifeObject) {

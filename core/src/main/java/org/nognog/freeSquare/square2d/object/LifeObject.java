@@ -2,9 +2,9 @@ package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.life.Life;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.action.EatAction;
 import org.nognog.freeSquare.square2d.action.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
@@ -313,7 +313,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	}
 
 	@Override
-	public void notify(Square2dEvent event) {
+	public void notify(SquareEvent event) {
 		super.notify(event);
 		if (event instanceof EatObjectEvent && ((EatObjectEvent) event).getEater() == this) {
 			this.freeRunningAction.setMoveSpeed(LifeObject.toMoveSpeed(this));
