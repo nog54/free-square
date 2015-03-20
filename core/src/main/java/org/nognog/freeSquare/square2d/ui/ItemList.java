@@ -2,7 +2,7 @@ package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.Settings;
-import org.nognog.freeSquare.model.item.DrawableItem;
+import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.item.Item;
 
 import com.badlogic.gdx.graphics.Camera;
@@ -72,16 +72,16 @@ public class ItemList extends ScrollPane implements CameraObserver {
 
 			@Override
 			protected Texture getTextureOf(Item<?, ?> item) {
-				if (item instanceof DrawableItem) {
-					return ((DrawableItem) item).getTexture();
+				if (item instanceof SimpleDrawable) {
+					return ((SimpleDrawable) item).getSimpleTexture();
 				}
 				return null;
 			}
 
 			@Override
 			protected Color getColorOf(Item<?, ?> item) {
-				if (item instanceof DrawableItem) {
-					return ((DrawableItem) item).getColor();
+				if (item instanceof SimpleDrawable) {
+					return ((SimpleDrawable) item).getColor();
 				}
 				return null;
 			}

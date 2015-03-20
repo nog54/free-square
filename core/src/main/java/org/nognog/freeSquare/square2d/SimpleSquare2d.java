@@ -3,6 +3,7 @@ package org.nognog.freeSquare.square2d;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -82,22 +83,22 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 
 	@Override
 	public float getLeftEndX() {
-		return this.getX();
+		return this.getStageCoordinate().x;
 	}
 
 	@Override
 	public float getRightEndX() {
-		return this.getX() + this.squareImage.getWidth();
+		return this.getLeftEndX() + this.squareImage.getWidth();
 	}
 
 	@Override
-	public float getButtomEndY() {
-		return this.getY();
+	public float getBottomEndY() {
+		return this.getStageCoordinate().y;
 	}
 
 	@Override
 	public float getTopEndY() {
-		return this.getY() + this.squareImage.getHeight();
+		return this.getBottomEndY() + this.squareImage.getHeight();
 	}
 
 	/**
@@ -152,6 +153,11 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 	 */
 	public Vertex getVertex4() {
 		return this.type.vertex4;
+	}
+	
+	@Override
+	public Texture getSimpleTexture() {
+		return this.type.getTexture();
 	}
 
 	/**

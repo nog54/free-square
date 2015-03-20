@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.model.item.DrawableItem;
+import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
@@ -27,8 +27,8 @@ public class PlayersItemList extends PlayerLinkingScrollList<PossessedItem<?>> {
 	@Override
 	protected Texture getDrawTextureOf(PossessedItem<?> possessedItem) {
 		Item<?, ?> item = possessedItem.getItem();
-		if (item instanceof DrawableItem) {
-			return ((DrawableItem) item).getTexture();
+		if (item instanceof SimpleDrawable) {
+			return ((SimpleDrawable) item).getSimpleTexture();
 		}
 		return null;
 	}
@@ -36,8 +36,8 @@ public class PlayersItemList extends PlayerLinkingScrollList<PossessedItem<?>> {
 	@Override
 	protected Color getDrawTextureColorOf(PossessedItem<?> possessedItem) {
 		Item<?, ?> item = possessedItem.getItem();
-		if (item instanceof DrawableItem) {
-			return ((DrawableItem) item).getColor();
+		if (item instanceof SimpleDrawable) {
+			return ((SimpleDrawable) item).getColor();
 		}
 		return null;
 	}

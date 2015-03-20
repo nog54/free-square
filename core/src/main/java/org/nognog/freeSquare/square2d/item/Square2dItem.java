@@ -50,7 +50,7 @@ public class Square2dItem extends AbstractItem<Square2dItem, Square2dItemType> i
 	}
 
 	@Override
-	public Texture getTexture() {
+	public Texture getSimpleTexture() {
 		return this.getTypeInItem().getSquare2dType().getTexture();
 	}
 

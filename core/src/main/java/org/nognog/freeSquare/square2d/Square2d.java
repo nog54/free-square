@@ -2,6 +2,7 @@ package org.nognog.freeSquare.square2d;
 
 import java.util.Comparator;
 
+import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
@@ -19,7 +20,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/02/15
  */
-public abstract class Square2d extends Group implements Square<Square2dObject> {
+public abstract class Square2d extends Group implements Square<Square2dObject>, SimpleDrawable {
 
 	protected Array<SquareObserver> observers = new Array<>();
 	protected Array<Square2dObject> objects = new Array<>();
@@ -42,11 +43,18 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 			if (actor1 instanceof Square2d && actor2 instanceof Square2d) {
 				final Square2d square1 = (Square2d) actor1;
 				final Square2d square2 = (Square2d) actor2;
-				final float square1BottomVertexY = square1.getStageCoordinate().y + square1.getMostBottomVertex().y;
-				final float square2ButtomVertexY = square2.getStageCoordinate().y + square2.getMostBottomVertex().y;
-				if (square1BottomVertexY < square2ButtomVertexY) {
+				final Vector2 square1StageCoordinatePosition = square1.getStageCoordinate();
+				final float square1BottomVertexY = square1StageCoordinatePosition.y + square1.getMostBottomVertex().y;
+				final float square1TopVertexY = square1StageCoordinatePosition.y + square1.getMostTopVertex().y;
+				final float square1MiddleY = (square1BottomVertexY + square1TopVertexY) / 2;
+
+				final Vector2 square2StageCooridnatePosition = square2.getStageCoordinate();
+				final float square2BottomVertexY = square2StageCooridnatePosition.y + square2.getMostBottomVertex().y;
+				final float square2TopVertexY = square2StageCooridnatePosition.y + square2.getMostTopVertex().y;
+				final float square2MiddleY = (square2BottomVertexY + square2TopVertexY) / 2;
+				if (square1MiddleY < square2MiddleY) {
 					return 1;
-				} else if (square1BottomVertexY > square2ButtomVertexY) {
+				} else if (square1MiddleY > square2MiddleY) {
 					return -1;
 				}
 				return 0;
@@ -104,7 +112,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 
 	@Override
 	public final float getHeight() {
-		return this.getTopEndY() - this.getButtomEndY();
+		return this.getTopEndY() - this.getBottomEndY();
 	}
 
 	/**
@@ -125,7 +133,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	/**
 	 * @return y of buttom end
 	 */
-	public abstract float getButtomEndY();
+	public abstract float getBottomEndY();
 
 	/**
 	 * @return y of top end
@@ -179,16 +187,19 @@ public abstract class Square2d extends Group implements Square<Square2dObject> {
 	 */
 	public Vertex getMostBottomVertex() {
 		Vertex[] vertices = this.getVertices();
-		Vertex mostButtomVertex = vertices[0];
+		Vertex mostBottomVertex = vertices[0];
 		for (int i = 1; i < vertices.length; i++) {
-			if (mostButtomVertex.y > vertices[i].y) {
-				mostButtomVertex = vertices[i];
+			if (mostBottomVertex.y > vertices[i].y) {
+				mostBottomVertex = vertices[i];
 			}
 		}
-		return mostButtomVertex;
+		return mostBottomVertex;
 	}
 
-	protected Vector2 getStageCoordinate() {
+	/**
+	 * @return stage coorinate position
+	 */
+	public Vector2 getStageCoordinate() {
 		return this.localToStageCoordinates(new Vector2(0, 0));
 	}
 

@@ -191,5 +191,39 @@ public class SimpleSquare2dTest {
 		verify(observer2, times(2)).notify(event);
 		verify(observer3, times(3)).notify(event);
 	}
+	
+	@Test
+	public final void testGetBorder(){
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		float actual1 = square.getLeftEndX();
+		float actual2 = square.getRightEndX();
+		float actual3 = square.getBottomEndY();
+		float actual4 = square.getTopEndY();
+		float expected1 = 0f;
+		float expected2 = square.getSquareImage().getWidth();
+		float expected3 = 0f;
+		float expected4 = square.getSquareImage().getHeight();
+		assertThat(actual1, is(expected1));
+		assertThat(actual2, is(expected2));
+		assertThat(actual3, is(expected3));
+		assertThat(actual4, is(expected4));
+		
+		final float x = 1.41421f;
+		final float y = 2.23606f;
+		square.setPosition(x, y);
+		
+		float actual5 = square.getLeftEndX();
+		float actual6 = square.getRightEndX();
+		float actual7 = square.getBottomEndY();
+		float actual8 = square.getTopEndY();
+		float expected5 = x;
+		float expected6 = x + square.getSquareImage().getWidth();
+		float expected7 = y;
+		float expected8 = y + square.getSquareImage().getHeight();
+		assertThat(actual5, is(expected5));
+		assertThat(actual6, is(expected6));
+		assertThat(actual7, is(expected7));
+		assertThat(actual8, is(expected8));
+	}
 
 }

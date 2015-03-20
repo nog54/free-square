@@ -2,7 +2,7 @@ package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
-import org.nognog.freeSquare.square2d.SimpleSquare2d;
+import org.nognog.freeSquare.square2d.Square2d;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -25,8 +25,8 @@ public class PlayersSquareList extends PlayerLinkingScrollList<Square<?>> {
 
 	@Override
 	protected Texture getDrawTextureOf(Square<?> item) {
-		if (item instanceof SimpleSquare2d) {
-			return ((SimpleSquare2d) item).getSquare2dType().getTexture();
+		if (item instanceof Square2d) {
+			return ((Square2d) item).getSimpleTexture();
 		}
 		return null;
 	}

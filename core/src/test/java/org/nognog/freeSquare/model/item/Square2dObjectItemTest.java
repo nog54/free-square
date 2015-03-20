@@ -61,7 +61,7 @@ public class Square2dObjectItemTest {
 		for (Square2dObjectType type : EatableObjectType.values()) {
 			Square2dObjectItem item = Square2dObjectItem.getInstance(type);
 			final Texture expected = type.getTexture();
-			final Texture actual = item.getTexture();
+			final Texture actual = item.getSimpleTexture();
 			assertThat(actual, is(expected));
 		}
 	}

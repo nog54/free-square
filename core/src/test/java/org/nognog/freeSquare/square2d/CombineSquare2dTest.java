@@ -25,8 +25,6 @@ public class CombineSquare2dTest {
 		Json json = PersistManager.getUseJson();
 		String jsonString = json.toJson(combineSquare);
 		CombineSquare2d readObject = json.fromJson(CombineSquare2d.class, jsonString);
-		// System.out.println(combineSquare);
-		// System.out.println(readObject);
 		assertThat(readObject, is(notNullValue()));
 	}
 
@@ -36,7 +34,7 @@ public class CombineSquare2dTest {
 		CombineSquare2d combineSquare = new CombineSquare2d(base);
 		float actual1 = combineSquare.getLeftEndX();
 		float actual2 = combineSquare.getRightEndX();
-		float actual3 = combineSquare.getButtomEndY();
+		float actual3 = combineSquare.getBottomEndY();
 		float actual4 = combineSquare.getTopEndY();
 		float expected1 = 0f;
 		float expected2 = base.getSquareImage().getWidth();
@@ -52,7 +50,7 @@ public class CombineSquare2dTest {
 		combineSquare.combine(appendVertex1, appendSquare1, appendSquare1.getVertex1());
 		float actual5 = combineSquare.getLeftEndX();
 		float actual6 = combineSquare.getRightEndX();
-		float actual7 = combineSquare.getButtomEndY();
+		float actual7 = combineSquare.getBottomEndY();
 		float actual8 = combineSquare.getTopEndY();
 		float expected5 = 0f;
 		float expected6 = appendSquare1.getSquareImage().getWidth() + appendVertex1.x - appendSquare1.getVertex1().x;
@@ -69,7 +67,7 @@ public class CombineSquare2dTest {
 		combineSquare.combine(combineSquare.getVertices()[0], appendSquare2, appendSquare2.getVertex2());
 		float actual9 = combineSquare.getLeftEndX();
 		float actual10 = combineSquare.getRightEndX();
-		float actual11 = combineSquare.getButtomEndY();
+		float actual11 = combineSquare.getBottomEndY();
 		float actual12 = combineSquare.getTopEndY();
 		float expected9 = appendVertex2.x - appendSquare2.getVertex2().x;
 		float expected10 = expected6;
@@ -90,7 +88,7 @@ public class CombineSquare2dTest {
 		}
 		float actual13 = combineSquare.getLeftEndX();
 		float actual14 = combineSquare.getRightEndX();
-		float actual15 = combineSquare.getButtomEndY();
+		float actual15 = combineSquare.getBottomEndY();
 		float actual16 = combineSquare.getTopEndY();
 		float expected13 = expected9 * (combineToLeftCount + 1);
 		float expected14 = expected10;
@@ -100,6 +98,22 @@ public class CombineSquare2dTest {
 		assertThat(actual14, is(expected14));
 		assertThat(actual15, is(expected15));
 		assertThat(actual16, is(expected16));
+		
+		final float x = 0.3048f;
+		final float y = 9.1440183f;
+		combineSquare.setPosition(x, y);
+		float actual17 = combineSquare.getLeftEndX();
+		float actual18 = combineSquare.getRightEndX();
+		float actual19 = combineSquare.getBottomEndY();
+		float actual20 = combineSquare.getTopEndY();
+		float expected17 = expected13 + x;
+		float expected18 = expected14 + x;
+		float expected19 = expected15 + y;
+		float expected20 = expected16 + y;
+		assertThat(actual17, is(expected17));
+		assertThat(actual18, is(expected18));
+		assertThat(actual19, is(expected19));
+		assertThat(actual20, is(expected20));
 		this.testReadWrite(combineSquare);
 	}
 

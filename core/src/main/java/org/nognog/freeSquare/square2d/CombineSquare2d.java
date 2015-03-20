@@ -1,6 +1,11 @@
 package org.nognog.freeSquare.square2d;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.model.square.SquareObserver;
@@ -11,6 +16,9 @@ import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -34,15 +42,19 @@ public class CombineSquare2d extends Square2d {
 	private Array<Square2d> squares;
 	private Array<Vertex> vertices;
 	private ObjectMap<Vertex, CombinePoint> combinePoints;
-	private float baseLeftEndX, baseRightEndX;
-	private float baseButtomEndY, baseTopEndY;
+	private float leftEndX, rightEndX;
+	private float buttomEndY, topEndY;
 
 	private CombineInfo combineInfo;
 
 	private transient Array<Square2d> separatableIfNotExistsObjectSquares;
 	private transient Array<SimpleSquare2d> allChildSimpleSquare2d;
+	private transient Texture simpleTexture;
 
 	private boolean drawEdge;
+
+	private final ExecutorService createSimpleTextureBaseThreadPool = Executors.newFixedThreadPool(1);
+	private Future<Pixmap> simpleTextureBaseFuture;
 
 	/**
 	 * @param base
@@ -61,10 +73,7 @@ public class CombineSquare2d extends Square2d {
 		}
 		this.setName(base.getName());
 		this.combineInfo = new CombineInfo();
-		this.baseLeftEndX = base.getLeftEndX();
-		this.baseRightEndX = base.getRightEndX();
-		this.baseButtomEndY = base.getButtomEndY();
-		this.baseTopEndY = base.getTopEndY();
+		this.calculateBorder();
 		for (Square2dObject object : base.getObjects()) {
 			this.addSquareObject(object, object.getX(), object.getY(), false);
 		}
@@ -81,6 +90,12 @@ public class CombineSquare2d extends Square2d {
 	 */
 	public Square2d[] getSquares() {
 		return this.squares.<Square2d> toArray(Square2d.class);
+	}
+	
+	@Override
+	protected void positionChanged() {
+		super.positionChanged();
+		this.calculateBorder();
 	}
 
 	/**
@@ -113,22 +128,22 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public float getLeftEndX() {
-		return this.baseLeftEndX + this.getX();
+		return this.leftEndX;
 	}
 
 	@Override
 	public float getRightEndX() {
-		return this.baseRightEndX + this.getX();
+		return this.rightEndX;
 	}
 
 	@Override
-	public float getButtomEndY() {
-		return this.baseButtomEndY + this.getY();
+	public float getBottomEndY() {
+		return this.buttomEndY;
 	}
 
 	@Override
 	public float getTopEndY() {
-		return this.baseTopEndY + this.getY();
+		return this.topEndY;
 	}
 
 	private void recalculateLeftEndX() {
@@ -138,7 +153,7 @@ public class CombineSquare2d extends Square2d {
 				childSquareMaxMinEndX = square.getLeftEndX();
 			}
 		}
-		this.baseLeftEndX = childSquareMaxMinEndX;
+		this.leftEndX = childSquareMaxMinEndX;
 	}
 
 	private void recalculateRightEndX() {
@@ -148,17 +163,17 @@ public class CombineSquare2d extends Square2d {
 				childSquareMaxRightEndX = square.getRightEndX();
 			}
 		}
-		this.baseRightEndX = childSquareMaxRightEndX;
+		this.rightEndX = childSquareMaxRightEndX;
 	}
 
 	private void recalculateButtomEndY() {
 		float childSquareMinButtomEndY = Float.MAX_VALUE;
 		for (Square2d square : this.squares) {
-			if (childSquareMinButtomEndY > square.getButtomEndY()) {
-				childSquareMinButtomEndY = square.getButtomEndY();
+			if (childSquareMinButtomEndY > square.getBottomEndY()) {
+				childSquareMinButtomEndY = square.getBottomEndY();
 			}
 		}
-		this.baseButtomEndY = childSquareMinButtomEndY;
+		this.buttomEndY = childSquareMinButtomEndY;
 	}
 
 	private void recalculateTopEndY() {
@@ -168,7 +183,22 @@ public class CombineSquare2d extends Square2d {
 				childSquareMaxTopEndY = square.getTopEndY();
 			}
 		}
-		this.baseTopEndY = childSquareMaxTopEndY;
+		this.topEndY = childSquareMaxTopEndY;
+	}
+
+	@Override
+	public Texture getSimpleTexture() {
+		if (this.simpleTexture == null) {
+			if (this.simpleTextureBaseFuture != null && this.simpleTextureBaseFuture.isDone()) {
+				try {
+					this.simpleTexture = new Texture(this.simpleTextureBaseFuture.get());
+					this.simpleTextureBaseFuture = null;
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return this.simpleTexture;
 	}
 
 	/**
@@ -236,7 +266,7 @@ public class CombineSquare2d extends Square2d {
 		return newCombinePoints;
 	}
 
-	private void recalculateBorder() {
+	private void calculateBorder() {
 		this.recalculateLeftEndX();
 		this.recalculateRightEndX();
 		this.recalculateButtomEndY();
@@ -316,7 +346,7 @@ public class CombineSquare2d extends Square2d {
 			this.addSquareObject(object, object.getX() + squarePositionDiffX, object.getY() + squarePositionDiffY, false);
 		}
 		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
-		this.recalculateBorder();
+		this.calculateBorder();
 		this.requestDrawOrderUpdate();
 		this.resetAllSimpleSquare2d();
 	}
@@ -327,7 +357,7 @@ public class CombineSquare2d extends Square2d {
 		}
 		this.removeActorForce(square);
 		this.requestDrawOrderUpdate();
-		this.recalculateBorder();
+		this.calculateBorder();
 		this.resetAllSimpleSquare2d();
 		return true;
 	}
@@ -357,6 +387,58 @@ public class CombineSquare2d extends Square2d {
 				this.allChildSimpleSquare2d.addAll(((CombineSquare2d) child).allChildSimpleSquare2d);
 			}
 		}
+		if (this.simpleTexture != null) {
+			this.simpleTexture.dispose();
+		}
+		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
+			this.simpleTextureBaseFuture.cancel(true);
+		}
+		this.simpleTexture = null;
+		this.simpleTextureBaseFuture = null;
+
+		this.startCreateSimpleTextureBaseThreadIfNotStart();
+	}
+
+	private void startCreateSimpleTextureBaseThreadIfNotStart() {
+		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
+			return;
+		}
+
+		this.simpleTextureBaseFuture = this.createSimpleTextureBaseThreadPool.submit(new Callable<Pixmap>() {
+			@Override
+			public Pixmap call() {
+				final CombineSquare2d target = CombineSquare2d.this;
+
+				final Pixmap pixmap = new Pixmap((int) (target.getWidth()), (int) (target.getHeight()), Pixmap.Format.RGBA8888);
+				SimpleSquare2d[] simpleSquares = getOrderedSimpleSquare2dArray();
+				for (SimpleSquare2d square : simpleSquares) {
+					if (Thread.currentThread().isInterrupted()) {
+						pixmap.dispose();
+						return null;
+					}
+
+					final TextureData textureData = square.getSquare2dType().getTexture().getTextureData();
+					if (!textureData.isPrepared()) {
+						textureData.prepare();
+					}
+					final Pixmap squarePixmap = textureData.consumePixmap();
+
+					final Vector2 stageCoordinateSquarePosition = square.getStageCoordinate();
+					final int x = (int) (stageCoordinateSquarePosition.x - target.getLeftEndX());
+					final int y = pixmap.getHeight() - (int) (stageCoordinateSquarePosition.y - target.getBottomEndY() + square.getHeight());
+
+					pixmap.drawPixmap(squarePixmap, 0, 0, squarePixmap.getWidth(), squarePixmap.getHeight(), x, y, (int) square.getWidth(), (int) square.getHeight());
+				}
+				return pixmap;
+			}
+
+		});
+	}
+
+	SimpleSquare2d[] getOrderedSimpleSquare2dArray() {
+		final SimpleSquare2d[] simpleSquares = this.allChildSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
+		Arrays.sort(simpleSquares, actorComparator);
+		return simpleSquares;
 	}
 
 	/**
@@ -734,11 +816,12 @@ public class CombineSquare2d extends Square2d {
 		}
 		final boolean oldVisible = this.isVisible();
 		this.setVisible(false);
-		super.draw(batch, parentAlpha);
+		final float alpha = parentAlpha * this.getColor().a * this.getColor().a;
+		super.draw(batch, alpha);
 		this.setVisible(oldVisible);
-		
-		this.drawChildSimpleSquares(batch, parentAlpha);
-		this.drawSquare2dObjects(batch, parentAlpha);
+
+		this.drawChildSimpleSquares(batch, alpha);
+		this.drawSquare2dObjects(batch, alpha);
 
 		if (this.drawEdge) {
 			this.drawEdge(batch);
@@ -746,8 +829,7 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private void drawChildSimpleSquares(Batch batch, float parentAlpha) {
-		SimpleSquare2d[] simpleSquares = this.allChildSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
-		Arrays.sort(simpleSquares, actorComparator);
+		SimpleSquare2d[] simpleSquares = getOrderedSimpleSquare2dArray();
 		for (SimpleSquare2d square : simpleSquares) {
 			final float oldX = square.getX();
 			final float oldY = square.getY();
@@ -775,9 +857,10 @@ public class CombineSquare2d extends Square2d {
 		shapeRenderer.setColor(Color.BLUE);
 		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
 		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-		for (int i = 0; i < this.vertices.size; i++) {
-			Vertex vertex1 = this.vertices.get(i);
-			Vertex vertex2 = this.vertices.get((i + 1) % this.vertices.size);
+		Vector2[] stageCoordinateVertices = this.getStageCoordinatesVertices();
+		for (int i = 0; i < stageCoordinateVertices.length; i++) {
+			Vector2 vertex1 = stageCoordinateVertices[i];
+			Vector2 vertex2 = stageCoordinateVertices[(i + 1) % stageCoordinateVertices.length];
 			shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
 		}
 		shapeRenderer.end();
