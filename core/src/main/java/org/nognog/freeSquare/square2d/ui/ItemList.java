@@ -20,8 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  * @author goshi 2015/01/17
  */
 public class ItemList extends ScrollPane implements CameraObserver {
-	private static Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
-	private static Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	/**
@@ -93,8 +91,8 @@ public class ItemList extends ScrollPane implements CameraObserver {
 	}
 
 	private static ListStyle createListStyle(BitmapFont font) {
-		final ListStyle style = new ListStyle(font, emerald, nephritis, UiUtils.createPlaneTextureRegionDrawable(256, 128, Color.WHITE));
-		style.background = UiUtils.createPlaneTextureRegionDrawable(256, 128, clearBlack);
+		final ListStyle style = new ListStyle(font, ColorUtils.emerald, ColorUtils.nephritis, UiUtils.getPlaneTextureRegionDrawable(256, 128, Color.WHITE));
+		style.background = UiUtils.getPlaneTextureRegionDrawable(256, 128, clearBlack);
 		return style;
 	}
 

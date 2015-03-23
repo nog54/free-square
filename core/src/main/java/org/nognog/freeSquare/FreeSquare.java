@@ -31,9 +31,10 @@ import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickInputListener;
+import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
+import org.nognog.freeSquare.square2d.ui.MultiLevelFlickButtonController;
 import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
@@ -86,7 +87,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
 		final float timeFromLastRun = setupPersistItems();
-		//this.player.clearSquares();
+		// this.player.clearSquares();
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		this.setSquare(null);
 		this.actLongTime(timeFromLastRun);
@@ -100,11 +101,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void initializeWidgets() {
-		this.menu = new Menu(this.font, this.logicalCameraWidth / 4, new FlickInputListener() {
+		this.menu = new Menu(this.font, this.logicalCameraWidth / 4);
+		this.menu.addFlickButtonController(new MultiLevelFlickButtonController.MultiLevelFlickButtonInputListener() {
 			@Override
 			public void up() {
-				FreeSquare.this.setSquare(null);
-				FreeSquare.this.showSquareOnly();
+				FreeSquare.this.hideMenu();
+				FreeSquare.this.showPlayerItemList();
 			}
 
 			@Override
@@ -125,17 +127,30 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				FreeSquare.this.showItemList();
 			}
 
+		}, Messages.getString("item"), "リスト", Messages.getString("square"), Messages.getString("life")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		this.menu.addFlickButtonController(new MultiLevelFlickButtonController.MultiLevelFlickButtonInputListener() {
 			@Override
-			public void center() {
-				FreeSquare.this.hideMenu();
-				FreeSquare.this.showPlayerItemList();
+			public void up() {
+				FreeSquare.this.setSquare(null);
+				FreeSquare.this.showSquareOnly();
 			}
-		});
-		this.menu.setCenterButtonText(Messages.getString("item")); //$NON-NLS-1$
-		this.menu.setRightButtonText(Messages.getString("square")); //$NON-NLS-1$
-		this.menu.setLeftButtonText(Messages.getString("life")); //$NON-NLS-1$
-		this.menu.setUpButtonText("Close"); //$NON-NLS-1$
-		this.menu.setDownButtonText("all"); //$NON-NLS-1$
+
+			@Override
+			public void right() {
+				FreeSquare.this.showSquareOnly();
+			}
+
+			@Override
+			public void left() {
+				FreeSquare.this.showSquareOnly();
+			}
+
+			@Override
+			public void down() {
+				// TODO
+			}
+
+		}, Messages.getString("clear"), Messages.getString("separate"), "/", "/", ColorUtils.peterRiver, ColorUtils.belizeHole); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		this.playersItemList = new PlayersItemList(this.stage.getCamera(), this.player, this.font) {
 			private Actor pannedObject;
@@ -375,8 +390,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
-			if(this.square instanceof CombineSquare2d){
-				//((CombineSquare2d) this.square).setDrawEdge(true);
+			if (this.square instanceof CombineSquare2d) {
+				// ((CombineSquare2d) this.square).setDrawEdge(true);
 			}
 		}
 		this.player.notifyPlayerObservers();
@@ -516,7 +531,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
 		camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
 	}
-	
+
 	void showSquareOnly() {
 		this.hideMenu();
 		this.hidePlayerItemList();
@@ -551,6 +566,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final float cameraViewingWidth = camera.zoom * camera.viewportWidth;
 		final float goldenRatio = Settings.getGoldenRatio();
 		this.menu.setScale(cameraViewingWidth / (this.menu.getButtonWidthHeight() * 3) * (goldenRatio / (1 + goldenRatio)));
+		this.menu.showFirstLevel();
 		this.show(this.menu);
 	}
 

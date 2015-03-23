@@ -8,15 +8,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 /**
  * @author goshi 2015/01/24
  */
-public class Menu extends FlickButtonController implements CameraObserver {
+public class Menu extends MultiLevelFlickButtonController implements CameraObserver {
 
 	/**
 	 * @param font
 	 * @param buttonWidthHeight
 	 * @param inputListener
 	 */
-	public Menu(BitmapFont font, float buttonWidthHeight, FlickInputListener inputListener) {
-		super(font, buttonWidthHeight, inputListener);
+	public Menu(BitmapFont font, float buttonWidthHeight) {
+		super(font, buttonWidthHeight);
 	}
 
 	@Override

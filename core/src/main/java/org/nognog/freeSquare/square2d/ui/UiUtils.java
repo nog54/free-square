@@ -17,7 +17,7 @@ public class UiUtils {
 	 * @param color
 	 * @return plane texture region
 	 */
-	public static TextureRegionDrawable createPlaneTextureRegionDrawable(int width, int height, Color color) {
+	public static TextureRegionDrawable getPlaneTextureRegionDrawable(int width, int height, Color color) {
 		Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
 		pixmap.setColor(color);
 		pixmap.fill();

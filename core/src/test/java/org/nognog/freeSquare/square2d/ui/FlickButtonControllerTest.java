@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.square2d.ui.FlickButtonController;
-import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickInputListener;
+import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickButtonInputListener;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -23,7 +23,7 @@ public class FlickButtonControllerTest {
 	
 	private BitmapFont font;
 	private float buttonWidthHeight;
-	private FlickInputListener listener;
+	private FlickButtonInputListener listener;
 	int centerCounter, rightCounter, upCounter, leftCounter, downCounter;
 	private String centerMessage = "center"; //$NON-NLS-1$
 	private String rightMessage = "right"; //$NON-NLS-1$
@@ -38,7 +38,7 @@ public class FlickButtonControllerTest {
 	public void setup() {
 		this.font = FontUtil.createMPlusFont(42);
 		this.buttonWidthHeight = 64;
-		this.listener = mock(FlickInputListener.class);
+		this.listener = mock(FlickButtonInputListener.class);
 		doThrow(new RuntimeException(this.centerMessage)).when(this.listener).center();
 		doThrow(new RuntimeException(this.rightMessage)).when(this.listener).right();
 		doThrow(new RuntimeException(this.upMessage)).when(this.listener).up();
