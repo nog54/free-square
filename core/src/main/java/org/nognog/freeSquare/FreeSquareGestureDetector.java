@@ -57,7 +57,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 			}
 
 			private boolean isLastTouchBackGround() {
-				return this.lastTouchDownActor == null || this.lastTouchDownActor.getParent() instanceof Square2d;
+				return this.lastTouchDownActor == null || this.lastTouchDownActor instanceof Square2d;
 			}
 
 			@Override
@@ -99,6 +99,10 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 			@Override
 			public boolean tap(float x, float y, int count, int button) {
 				if (this.lastTouchDownActor != null) {
+					if (freeSquare.isSeparateSquareMode() && this.lastTouchDownActor instanceof Square2d) {
+						freeSquare.separateSquare((Square2d) this.lastTouchDownActor);
+						return true;
+					}
 					return false;
 				}
 

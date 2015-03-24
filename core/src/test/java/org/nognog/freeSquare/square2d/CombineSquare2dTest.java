@@ -194,8 +194,7 @@ public class CombineSquare2dTest {
 			assertThat(containsAppendSquareVertex4Counter, is(1));
 		}
 		{
-			SimpleSquare2d base = Square2dType.GRASSY_SQUARE1.create();
-			CombineSquare2d combineSquare = new CombineSquare2d(base);
+			CombineSquare2d combineSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			SimpleSquare2d appendSquare2 = Square2dType.GRASSY_SQUARE1_LARGE.create();
 			boolean actual1 = combineSquare.combine(combineSquare.getVertices()[0], appendSquare1, appendSquare1.getVertex2());

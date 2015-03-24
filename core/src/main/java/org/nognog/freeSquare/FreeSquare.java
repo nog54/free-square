@@ -68,6 +68,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private boolean isLockingCameraZoom;
 	private boolean isLockingCameraMove;
 
+	private boolean isSeparateSquareMode;
+
 	private Array<CameraObserver> cameraObservers;
 
 	private BitmapFont font;
@@ -87,7 +89,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 
 		final float timeFromLastRun = setupPersistItems();
-		// this.player.clearSquares();
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		this.setSquare(null);
 		this.actLongTime(timeFromLastRun);
@@ -95,7 +96,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.font = FontUtil.createMPlusFont(this.logicalCameraWidth / 18);
+		final int fontSize = this.logicalCameraWidth / 18;
+		this.font = FontUtil.createMPlusFont(fontSize);
 		this.initializeWidgets();
 
 	}
@@ -147,7 +149,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void down() {
-				// TODO
+				FreeSquare.this.showSquareOnly();
+				FreeSquare.this.setSeparateSquareMode(true);
 			}
 
 		}, Messages.getString("clear"), Messages.getString("separate"), "/", "/", ColorUtils.peterRiver, ColorUtils.belizeHole); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -384,14 +387,16 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.enableSquare();
 			this.square.removeSquareObserver(this);
 			this.square.remove();
+			this.square.setDrawEdge(false);
 		}
 		this.square = square;
 		if (this.square != null) {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
+			this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
-				// ((CombineSquare2d) this.square).setDrawEdge(true);
+				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}
 		}
 		this.player.notifyPlayerObservers();
@@ -425,12 +430,24 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
 				final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
 				if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
-					baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
-					return true;
+					return baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param separateSquare
+	 */
+	public void separateSquare(Square2d separateSquare) {
+		if (this.square instanceof CombineSquare2d) {
+			Square2d containsSeparateSquareSquare = ((CombineSquare2d) this.square).getSquareThatContains(separateSquare);
+			final boolean isSuccessSeparate = ((CombineSquare2d) this.square).separate(containsSeparateSquareSquare);
+			if (isSuccessSeparate) {
+				this.player.addSquare(containsSeparateSquareSquare);
+			}
+		}
 	}
 
 	protected boolean putSquareObject(Square2dObject putObject) {
@@ -486,6 +503,23 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 */
 	public boolean isLockingCameraZoom() {
 		return this.isLockingCameraZoom;
+	}
+
+	/**
+	 * @return true if separate mode
+	 */
+	public boolean isSeparateSquareMode() {
+		return this.isSeparateSquareMode;
+	}
+
+	/**
+	 * @param enable
+	 */
+	public void setSeparateSquareMode(boolean enable) {
+		this.isSeparateSquareMode = enable;
+		if (this.square instanceof CombineSquare2d) {
+			((CombineSquare2d) this.square).setHighlightSeparatableSquare(enable);
+		}
 	}
 
 	/**
@@ -549,6 +583,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.square.setTouchable(Touchable.enabled);
 		this.isLockingCameraMove = false;
 		this.isLockingCameraZoom = false;
+		this.setSeparateSquareMode(false);
 	}
 
 	private void disableSquare() {
@@ -719,11 +754,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
 		this.player = PersistItems.PLAYER.load();
-		if (this.player == null) {
-			System.out.println("new player"); //$NON-NLS-1$
-			this.player = new Player("goshi"); //$NON-NLS-1$
-			PersistItems.PLAYER.save(this.player);
-		}
+//		if (this.player == null) {
+//			System.out.println("new player"); //$NON-NLS-1$
+//			this.player = new Player("goshi"); //$NON-NLS-1$
+//			PersistItems.PLAYER.save(this.player);
+//		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$
@@ -801,5 +836,4 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.inputName(renameRequestedObject, title);
 		}
 	}
-
 }

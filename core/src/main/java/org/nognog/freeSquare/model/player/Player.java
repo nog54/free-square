@@ -9,6 +9,7 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.exception.CombineSquare2dReadFailureException;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -252,7 +253,20 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
 				continue;
 			}
-			json.readField(this, field.getName(), jsonData);
+			if (field.getName() == "squares") { //$NON-NLS-1$
+				this.squares = new Array<>();
+				JsonValue squaresData = jsonData.get("squares"); //$NON-NLS-1$
+				for (JsonValue squareData = squaresData.child; squareData != null; squareData = squareData.next) {
+					try {
+						Square2d readSquare = json.readValue(Square2d.class, squareData);
+						this.squares.add(readSquare);
+					} catch (CombineSquare2dReadFailureException e) {
+						this.squares.addAll(e.getContainedSquares());
+					}
+				}
+			} else {
+				json.readField(this, field.getName(), jsonData);
+			}
 		}
 		this.itemBox.addObserver(this);
 	}

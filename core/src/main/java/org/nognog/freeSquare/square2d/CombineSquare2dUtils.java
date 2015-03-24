@@ -12,6 +12,10 @@ public class CombineSquare2dUtils {
 	 * threshold of regard as sufficiently close.
 	 */
 	public static final float regardAsSufficientlyCloseThreshold = 5;
+	/**
+	 * threshold of regard as sufficiently same radian.
+	 */
+	public static final float regardAsSufficientlySameRadianThreashold = (float) (Math.PI / 135); // 1.5deg
 
 	private CombineSquare2dUtils() {
 	}
@@ -73,11 +77,12 @@ public class CombineSquare2dUtils {
 		boolean changed;
 		do {
 			changed = false;
-			for (Vertex vertex : vertices) {
-				Vertex[] currentVerticesArray = vertices.toArray(Vertex.class);
-				if (hasSameAreaEvenIfRemoveVertices(currentVerticesArray, vertex)) {
+			final Vertex[] currentVerticesArray = vertices.toArray(Vertex.class);
+			for (Vertex vertex : currentVerticesArray) {
+				if (hasEqualityAreaEvenIfRemoveVertices(currentVerticesArray, vertex)) {
 					vertices.removeValue(vertex, true);
 					changed = true;
+					break;
 				}
 			}
 		} while (changed);
@@ -88,16 +93,29 @@ public class CombineSquare2dUtils {
 	 * @param removeVertices
 	 * @return true if change of square area is sufficiently small.
 	 */
-	public static boolean hasSameAreaEvenIfRemoveVertices(Vertex[] vertices, Vertex... removeVertices) {
-		float beforeArea = Math.abs(Square2dUtils.createPolygon(vertices).area());
-		float afterArea = Math.abs(Square2dUtils.createPolygon(vertices, removeVertices).area());
-		return isSufficientlySameArea(beforeArea, afterArea);
+	public static boolean hasEqualityAreaEvenIfRemoveVertices(Vertex[] vertices, Vertex removeVertices) {
+		Edge edge1 = null, edge2 = null;
+		for (int i = 0; i < vertices.length; i++) {
+			if (vertices[i] == removeVertices) {
+				edge1 = new Edge(vertices[(i - 1 + vertices.length) % vertices.length], vertices[i]);
+				edge2 = new Edge(vertices[i], vertices[(i + 1) % vertices.length]);
+				break;
+			}
+		}
+		if (edge1 == null || edge2 == null) {
+			return false;
+		}
+		final float theta1 = edge1.getTheta();
+		final float theta2 = edge2.getTheta();
+		if(theta1 == 0 || theta2 == 0){
+			return true;
+		}
+		return isSufficientlySameSlope(theta1, theta2);
 	}
 
-	private static boolean isSufficientlySameArea(float area1, float area2) {
-		float relativeError = Math.abs((area2 - area1) / area1);
-		final float permissibleRelativeError = 1 / 100f;
-		return relativeError < permissibleRelativeError;
+	private static boolean isSufficientlySameSlope(float theta1, float theta2) {
+		float absoluteErrorRadian = Math.abs(theta1 - theta2);
+		return absoluteErrorRadian < regardAsSufficientlySameRadianThreashold;
 	}
 
 	/**
@@ -106,17 +124,11 @@ public class CombineSquare2dUtils {
 	 * @return unchange area insert index. if not exists, return -1.
 	 */
 	public static int getUnchangeSquareAreaIndexEvenIfInsert(Vertex[] vertices, Vertex insertVertex) {
-		final float baseArea = Square2dUtils.createPolygon(vertices).area();
-		for (int insertIndex = 0; insertIndex <= vertices.length; insertIndex++) {
-			final Vertex[] afterInsertVertices = new Vertex[vertices.length + 1];
-
-			System.arraycopy(vertices, 0, afterInsertVertices, 0, insertIndex);
-			afterInsertVertices[insertIndex] = insertVertex;
-			System.arraycopy(vertices, insertIndex, afterInsertVertices, insertIndex + 1, vertices.length - insertIndex);
-
-			final float afterInsertArea = Square2dUtils.createPolygon(afterInsertVertices).area();
-			if (isSufficientlySameArea(baseArea, afterInsertArea)) {
-				return insertIndex;
+		for (int i = 1; i <= vertices.length; i++) {
+			Edge edge1 = new Edge(insertVertex, vertices[i % vertices.length]);
+			Edge edge2 = new Edge(vertices[i - 1], insertVertex);
+			if(isSufficientlySameSlope(edge1.getTheta(), edge2.getTheta())){
+				return i % vertices.length;
 			}
 		}
 		return -1;
@@ -194,7 +206,7 @@ public class CombineSquare2dUtils {
 	}
 
 	/**
-	 * @param findVertex 
+	 * @param findVertex
 	 * @param vertices
 	 * @return same value vertex
 	 */
@@ -206,4 +218,16 @@ public class CombineSquare2dUtils {
 		}
 		return null;
 	}
+
+	/**
+	 * @param square
+	 * @return root square2d
+	 */
+	public static Square2d getRootSquare(Square2d square) {
+		if (square.getParent() instanceof Square2d) {
+			return getRootSquare((Square2d) square.getParent());
+		}
+		return square;
+	}
+
 }

@@ -57,33 +57,35 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 			throw new RuntimeException("type is already setted"); //$NON-NLS-1$
 		}
 		this.type = type;
-		this.squareImage = this.createSquareImage(type);
+		this.squareImage = createSquareImage(type);
 		super.addActorForce(this.squareImage);
 		this.setName(type.getName());
 	}
 
-	private Image createSquareImage(Square2dType createSquareType) {
-		Image image = new Image(createSquareType.getTexture()) {
-			@Override
-			public Actor hit(float x, float y, boolean touchable) {
-				if (touchable && this.getTouchable() != Touchable.enabled)
-					return null;
-				if (SimpleSquare2d.this.containsPosition(x + this.getX(), y + this.getY())) {
-					return this;
-				}
-				return null;
-			}
-		};
+	private static Image createSquareImage(Square2dType createSquareType) {
+		Image image = new Image(createSquareType.getTexture());
 		image.setWidth(createSquareType.getSize().getWidth());
 		image.setHeight(image.getHeight() * (createSquareType.getSize().getWidth() / createSquareType.getTexture().getWidth()));
 		image.setY(createSquareType.getSquarePositionOffsetY());
 		image.setName(createSquareType.getName());
+		image.setTouchable(Touchable.disabled);
 		return image;
 	}
+	
+	@Override
+	public Actor hit(float x, float y, boolean touchable) {
+		if (touchable && this.getTouchable() != Touchable.enabled)
+			return null;
+		if (this.containsPosition(x, y)) {
+			return this;
+		}
+		return null;
+	}
+
 
 	@Override
 	public float getLeftEndX() {
-		return this.getStageCoordinate().x;
+		return this.getStageCoordinates().x;
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 
 	@Override
 	public float getBottomEndY() {
-		return this.getStageCoordinate().y;
+		return this.getStageCoordinates().y;
 	}
 
 	@Override

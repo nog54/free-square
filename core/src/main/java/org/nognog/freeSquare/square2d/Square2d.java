@@ -11,7 +11,10 @@ import org.nognog.freeSquare.square2d.event.RemoveObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,7 +29,13 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	protected Array<SquareObserver> observers = new Array<>();
 	protected Array<Square2dObject> objects = new Array<>();
 
-	private boolean isRequestedDrawOrderUpdate = false;
+	protected boolean drawEdge;
+
+	protected boolean isRequestedDrawOrderUpdate = false;
+
+	// cache
+	private transient Vector2 stageCoordinatesPosition;
+	private transient Vector2[] stageCoordinatesVertices;
 
 	protected static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
 
@@ -44,12 +53,12 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			if (actor1 instanceof Square2d && actor2 instanceof Square2d) {
 				final Square2d square1 = (Square2d) actor1;
 				final Square2d square2 = (Square2d) actor2;
-				final Vector2 square1StageCoordinatePosition = square1.getStageCoordinate();
+				final Vector2 square1StageCoordinatePosition = square1.getStageCoordinates();
 				final float square1BottomVertexY = square1StageCoordinatePosition.y + square1.getMostBottomVertex().y;
 				final float square1TopVertexY = square1StageCoordinatePosition.y + square1.getMostTopVertex().y;
 				final float square1MiddleY = (square1BottomVertexY + square1TopVertexY) / 2;
 
-				final Vector2 square2StageCooridnatePosition = square2.getStageCoordinate();
+				final Vector2 square2StageCooridnatePosition = square2.getStageCoordinates();
 				final float square2BottomVertexY = square2StageCooridnatePosition.y + square2.getMostBottomVertex().y;
 				final float square2TopVertexY = square2StageCooridnatePosition.y + square2.getMostTopVertex().y;
 				final float square2MiddleY = (square2BottomVertexY + square2TopVertexY) / 2;
@@ -197,23 +206,52 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		return mostBottomVertex;
 	}
 
-	/**
-	 * @return stage coorinate position
-	 */
-	public Vector2 getStageCoordinate() {
-		return this.localToStageCoordinates(new Vector2(0, 0));
+	@Override
+	protected void positionChanged() {
+		super.positionChanged();
+		this.stageCoordinatesPosition = null;
+		this.stageCoordinatesVertices = null;
+	}
+	
+	@Override
+	protected void childrenChanged() {
+		super.childrenChanged();
+		this.stageCoordinatesPosition = null;
+		this.stageCoordinatesVertices = null;
 	}
 
-	/**
-	 * @return stage coordinates vertices
-	 */
-	public Vector2[] getStageCoordinatesVertices() {
+	private void updateStageCoordinates() {
+		this.stageCoordinatesPosition = this.localToStageCoordinates(new Vector2(0, 0));
+		this.stageCoordinatesVertices = this.createStageCoordinateVertices();
+	}
+
+	private Vector2[] createStageCoordinateVertices() {
 		Vertex[] vertices = this.getVertices();
 		Vector2[] result = new Vector2[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
 			result[i] = this.localToStageCoordinates(new Vector2(vertices[i].x, vertices[i].y));
 		}
 		return result;
+	}
+
+	/**
+	 * @return stage coorinate position
+	 */
+	public Vector2 getStageCoordinates() {
+		if (this.stageCoordinatesPosition == null) {
+			this.updateStageCoordinates();
+		}
+		return this.stageCoordinatesPosition;
+	}
+
+	/**
+	 * @return stage coordinates vertices
+	 */
+	public Vector2[] getStageCoordinatesVertices() {
+		if (this.stageCoordinatesVertices == null) {
+			this.updateStageCoordinates();
+		}
+		return this.stageCoordinatesVertices;
 	}
 
 	/**
@@ -367,6 +405,36 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			this.isRequestedDrawOrderUpdate = false;
 		}
 		super.draw(batch, parentAlpha);
+
+		if (this.drawEdge) {
+			this.drawEdge(batch);
+		}
+	}
+
+	/**
+	 * @param enable
+	 */
+	public void setDrawEdge(boolean enable) {
+		this.drawEdge = enable;
+	}
+
+	protected void drawEdge(Batch batch) {
+		batch.end();
+		ShapeRenderer shapeRenderer = new ShapeRenderer();
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(Color.BLUE);
+		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+
+		final Vector2[] verticesPosition = this.getStageCoordinatesVertices();
+		for (int i = 0; i < verticesPosition.length; i++) {
+			Vector2 vertex1 = verticesPosition[i];
+			Vector2 vertex2 = verticesPosition[(i + 1) % verticesPosition.length];
+			shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
+		}
+		shapeRenderer.end();
+		shapeRenderer.dispose();
+		batch.begin();
 	}
 
 	@Override
@@ -400,10 +468,10 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	@Override
 	public void notifyObservers(SquareEvent event) {
-		if(!(event instanceof Square2dEvent)){
+		if (!(event instanceof Square2dEvent)) {
 			return;
 		}
-		Square2dEvent square2dEvent = (Square2dEvent)event;
+		Square2dEvent square2dEvent = (Square2dEvent) event;
 		SquareObserver notifyTarget = square2dEvent.getTargetObserver();
 		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
 			notifyTarget.notify(square2dEvent);

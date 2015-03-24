@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
  * @author goshi 2015/01/24
  */
 public class Menu extends MultiLevelFlickButtonController implements CameraObserver {
-
+	
 	/**
 	 * @param font
 	 * @param buttonWidthHeight
