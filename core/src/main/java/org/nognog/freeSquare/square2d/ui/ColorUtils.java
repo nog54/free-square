@@ -13,4 +13,6 @@ public class ColorUtils {
 	public static final Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
 	public static final Color peterRiver = Color.valueOf("3498db"); //$NON-NLS-1$
 	public static final Color belizeHole = Color.valueOf("2980b9"); //$NON-NLS-1$
+	public static final Color carrot = Color.valueOf("e67e22"); //$NON-NLS-1$
+	public static final Color pampkin = Color.valueOf("d35400"); //$NON-NLS-1$
 }

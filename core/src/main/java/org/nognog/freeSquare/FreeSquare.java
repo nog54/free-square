@@ -34,6 +34,7 @@ import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
+import org.nognog.freeSquare.square2d.ui.ModePresenter;
 import org.nognog.freeSquare.square2d.ui.MultiLevelFlickButtonController;
 import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
@@ -81,6 +82,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	private PlayersLifeList playersLifeList;
 	private PlayersSquareList playersSquareList;
 	private ItemList itemList;
+	private ModePresenter modePresenter;
 
 	@Override
 	public void create() {
@@ -348,6 +350,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		};
 
+		this.modePresenter = new ModePresenter(this.stage.getCamera(), this.font) {
+			@Override
+			public void tapped() {
+				FreeSquare.this.showSquareOnly();
+			}
+		};
 	}
 
 	protected void convertToSquare2d(Square2d convertTarget) {
@@ -519,6 +527,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.isSeparateSquareMode = enable;
 		if (this.square instanceof CombineSquare2d) {
 			((CombineSquare2d) this.square).setHighlightSeparatableSquare(enable);
+			if (enable) {
+				this.showModePresenter(Messages.getString("separate", "mode")); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				this.hideModePresenter();
+			}
 		}
 	}
 
@@ -572,6 +585,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.hidePlayersLifeList();
 		this.hidePlayersSquareList();
 		this.hideItemList();
+		this.hideModePresenter();
 		this.enableSquare();
 	}
 
@@ -628,27 +642,27 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showPlayerItemList() {
-		this.show(this.getPlayerItemList());
+		this.show(this.playersItemList);
 	}
 
 	void hidePlayerItemList() {
-		this.hide(this.getPlayerItemList());
+		this.hide(this.playersItemList);
 	}
 
 	void showPlayersLifeList() {
-		this.show(this.getPlayersLifeList());
+		this.show(this.playersLifeList);
 	}
 
 	void hidePlayersLifeList() {
-		this.hide(this.getPlayersLifeList());
+		this.hide(this.playersLifeList);
 	}
 
 	void showPlayersSquareList() {
-		this.show(this.getPlayersSquareList());
+		this.show(this.playersSquareList);
 	}
 
 	void hidePlayersSquareList() {
-		this.hide(this.getPlayersSquareList());
+		this.hide(this.playersSquareList);
 	}
 
 	void showItemList() {
@@ -657,6 +671,18 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	void hideItemList() {
 		this.hide(this.itemList);
+	}
+
+	void showModePresenter(String text) {
+		this.stage.getRoot().addActor(this.modePresenter);
+		this.addCameraObserver(this.modePresenter);
+		this.modePresenter.setText(text);
+		this.modePresenter.updateCamera(this.stage.getCamera());
+	}
+
+	void hideModePresenter() {
+		this.stage.getRoot().removeActor(this.modePresenter);
+		this.removeCameraObserver(this.modePresenter);
 	}
 
 	protected void inputName(final Nameable nameable, String title) {
@@ -754,11 +780,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
 		this.player = PersistItems.PLAYER.load();
-//		if (this.player == null) {
-//			System.out.println("new player"); //$NON-NLS-1$
-//			this.player = new Player("goshi"); //$NON-NLS-1$
-//			PersistItems.PLAYER.save(this.player);
-//		}
+		// if (this.player == null) {
+		//			System.out.println("new player"); //$NON-NLS-1$
+		//			this.player = new Player("goshi"); //$NON-NLS-1$
+		// PersistItems.PLAYER.save(this.player);
+		// }
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$
