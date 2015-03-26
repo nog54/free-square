@@ -1,5 +1,8 @@
 package org.nognog.freeSquare.square2d.action;
 
+import org.nognog.freeSquare.FreeSquare;
+import org.nognog.freeSquare.square2d.Direction;
+import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
@@ -165,6 +168,20 @@ public class Square2dActions {
 		fireEventAction.setEventListener(eventListener);
 		fireEventAction.setEvent(event);
 		return fireEventAction;
+	}
+
+	/**
+	 * @param freeSquare
+	 * @param setSquare
+	 * @param direction
+	 * @return change square action
+	 */
+	public static Action changeSquare(FreeSquare freeSquare, Square2d setSquare, Direction direction) {
+		final ChangeSquareAction changeSquareAction = Actions.action(ChangeSquareAction.class);
+		changeSquareAction.setFreeSquare(freeSquare);
+		changeSquareAction.setSquare(setSquare);
+		changeSquareAction.setDirection(direction);
+		return changeSquareAction;
 	}
 
 }

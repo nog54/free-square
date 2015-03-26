@@ -16,11 +16,13 @@ import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
+import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
@@ -135,7 +137,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.menu.addFlickButtonController(new MultiLevelFlickButtonController.MultiLevelFlickButtonInputListener() {
 			@Override
 			public void up() {
-				FreeSquare.this.setSquare(null);
+				FreeSquare.this.setSquareWithAction(null);
 				FreeSquare.this.showSquareOnly();
 			}
 
@@ -316,7 +318,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			protected void selectedItemTapped(Square<?> tappedItem, int count) {
 				final boolean isDoubleTapped = (count == 2);
 				if (isDoubleTapped && tappedItem instanceof Square2d) {
-					FreeSquare.this.setSquare((Square2d) tappedItem);
+					FreeSquare.this.setSquareWithAction((Square2d) tappedItem);
 					FreeSquare.this.showSquareOnly();
 				}
 			}
@@ -358,19 +360,23 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		};
 	}
 
-	protected void convertToSquare2d(Square2d convertTarget) {
-		final boolean convertTargetIsThisSquare = (convertTarget == this.square);
-		if (convertTargetIsThisSquare) {
-			this.setSquare(null);
+	protected void convertThisSquareToCombineSquare2d() {
+		if (this.square instanceof CombineSquare2d || this.square == null) {
+			return;
 		}
-		if (!(convertTarget instanceof SimpleSquare2d)) {
+
+		if (!(this.square instanceof SimpleSquare2d)) {
 			throw new IllegalArgumentException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
 		}
+		Square2d convertTarget = this.square;
+		final float cameraX = this.getStage().getCamera().position.x;
+		final float cameraY = this.getStage().getCamera().position.y;
+		this.setSquare(null);
 		CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
 		this.player.replaceSquare(convertTarget, combineSquare);
-		if (convertTargetIsThisSquare) {
-			this.setSquare(combineSquare);
-		}
+		this.setSquare(combineSquare);
+		this.getStage().getCamera().position.x = cameraX;
+		this.getStage().getCamera().position.y = cameraY;
 	}
 
 	/**
@@ -385,6 +391,22 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 */
 	public Square2d getSquare() {
 		return this.square;
+	}
+
+	/**
+	 * @param setSquare
+	 * @param direction
+	 */
+	public void setSquareWithAction(Square2d setSquare) {
+		this.setSquareWithAction(setSquare, Direction.LEFT);
+	}
+
+	/**
+	 * @param setSquare
+	 * @param direction
+	 */
+	public void setSquareWithAction(Square2d setSquare, Direction direction) {
+		this.stage.addAction(Square2dActions.changeSquare(this, setSquare, direction));
 	}
 
 	/**
@@ -412,14 +434,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
 	}
 
-	protected boolean putSquare2d(Square2d addSquare) {
+	protected boolean putSquare2d(Square2d putSquare) {
 		if (this.getSquare() == null) {
-			this.getPlayer().addSquare(addSquare);
-			this.setSquare(addSquare);
+			this.getPlayer().addSquare(putSquare);
+			this.setSquare(putSquare);
 			return true;
 		}
-		this.getSquare().removeActorForce(addSquare);
-		final boolean isSuccessCombine = this.combineSquare(addSquare);
+		this.getSquare().removeActorForce(putSquare);
+		final boolean isSuccessCombine = this.combineSquare(putSquare);
 		if (isSuccessCombine) {
 			this.getPlayer().notifyPlayerObservers();
 		}
@@ -428,7 +450,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	private boolean combineSquare(Square2d combineSquare) {
 		if (!(this.getSquare() instanceof CombineSquare2d)) {
-			this.convertToSquare2d(FreeSquare.this.getSquare());
+			this.convertThisSquareToCombineSquare2d();
 		}
 		final CombineSquare2d baseSquare = (CombineSquare2d) this.getSquare();
 		final Vector2[] stageCoordinatesBaseSquareVertices = FreeSquare.this.getSquare().getStageCoordinatesVertices();
@@ -737,7 +759,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void drawStage() {
-		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1);
+		Gdx.gl.glClearColor(0.2f, 1f, 1f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		this.stage.draw();
 	}

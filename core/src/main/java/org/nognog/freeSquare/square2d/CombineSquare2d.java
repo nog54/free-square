@@ -196,7 +196,8 @@ public class CombineSquare2d extends Square2d {
 					this.simpleTexture = new Texture(this.simpleTextureBaseFuture.get());
 					this.simpleTextureBaseFuture = null;
 				} catch (InterruptedException | ExecutionException e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
+					return null;
 				}
 			}
 		}
@@ -383,6 +384,10 @@ public class CombineSquare2d extends Square2d {
 			}
 		}
 		if (this.simpleTexture != null) {
+			if (!this.simpleTexture.getTextureData().isPrepared()) {
+				this.simpleTexture.getTextureData().prepare();
+			}
+			this.simpleTexture.getTextureData().consumePixmap().dispose();
 			this.simpleTexture.dispose();
 		}
 		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {

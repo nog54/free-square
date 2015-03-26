@@ -115,6 +115,20 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		return false;
 	}
 
+	/**
+	 * @return x of center point
+	 */
+	public float getCenterX() {
+		return (this.getRightEndX() + this.getLeftEndX()) / 2;
+	}
+
+	/**
+	 * @return y of center point
+	 */
+	public float getCenterY() {
+		return (this.getTopEndY() + this.getBottomEndY()) / 2;
+	}
+
 	@Override
 	public final float getWidth() {
 		return this.getRightEndX() - this.getLeftEndX();
@@ -212,7 +226,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		this.stageCoordinatesPosition = null;
 		this.stageCoordinatesVertices = null;
 	}
-	
+
 	@Override
 	protected void childrenChanged() {
 		super.childrenChanged();
