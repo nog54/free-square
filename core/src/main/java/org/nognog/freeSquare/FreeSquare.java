@@ -200,8 +200,10 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 
 			private void addSquare2dTemporary(Square2d pannedSquare, float x, float y, Item<?, ?> item) {
-				Vector2 squareCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
-				pannedSquare.setPosition(squareCoodinateXY.x - pannedSquare.getWidth() / 2, squareCoodinateXY.y - pannedSquare.getHeight() / 2);
+				final Vector2 stageCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
+				final float squareX = stageCoodinateXY.x - (pannedSquare.getMostLeftVertex().x + pannedSquare.getMostRightVertex().x) / 2;
+				final float squareY = stageCoodinateXY.y - (pannedSquare.getMostTopVertex().y + pannedSquare.getMostBottomVertex().y) / 2;
+				pannedSquare.setPosition(squareX, squareY);
 				if (FreeSquare.this.getSquare() != null) {
 					FreeSquare.this.getSquare().addActorForce(pannedSquare);
 				} else {
@@ -303,8 +305,10 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				}
 				if (this.addSquare == null) {
 					this.addSquare = (Square2d) pannedItem;
-					Vector2 squareCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
-					this.addSquare.setPosition(squareCoodinateXY.x - this.addSquare.getWidth() / 2, squareCoodinateXY.y - this.addSquare.getHeight() / 2);
+					Vector2 stageCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
+					final float squareX = stageCoodinateXY.x - (this.addSquare.getMostLeftVertex().x + this.addSquare.getMostRightVertex().x) / 2;
+					final float squareY = stageCoodinateXY.y - (this.addSquare.getMostTopVertex().y + this.addSquare.getMostBottomVertex().y) / 2;
+					this.addSquare.setPosition(squareX, squareY);
 					FreeSquare.this.getSquare().addActorForce(this.addSquare);
 					FreeSquare.this.showSquareOnly();
 					this.addSquare.toFront();
@@ -430,8 +434,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			}
 		}
 		this.player.notifyPlayerObservers();
-		this.stage.getCamera().position.x = (this.getCameraRangeLowerLeft().x + this.getCameraRangeUpperRight().x) / 2;
-		this.stage.getCamera().position.y = (this.getCameraRangeLowerLeft().y + this.getCameraRangeUpperRight().y) / 2;
+		this.stage.getCamera().position.x = (this.getVisibleRangeLowerLeft().x + this.getVisibleRangeUpperRight().x) / 2;
+		this.stage.getCamera().position.y = (this.getVisibleRangeLowerLeft().y + this.getVisibleRangeUpperRight().y) / 2;
 	}
 
 	protected boolean putSquare2d(Square2d putSquare) {
@@ -567,38 +571,46 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	/**
 	 * @return lower-left point of camera range
 	 */
-	private Vector2 getCameraRangeLowerLeft() {
+	private Vector2 getVisibleRangeLowerLeft() {
 		if (this.square == null) {
 			return new Vector2(0, 0);
 		}
-		return new Vector2(this.square.getLeftEndX(), this.square.getBottomEndY());
+		return new Vector2(this.square.getLeftEndX() - this.square.getWidth() / 2, this.square.getBottomEndY() - this.square.getWidth() / 2);
 	}
 
 	/**
 	 * @return upper-right point of camera range
 	 */
-	private Vector2 getCameraRangeUpperRight() {
+	private Vector2 getVisibleRangeUpperRight() {
 		if (this.square == null) {
 			return new Vector2(0, 0);
 		}
-		return new Vector2(this.square.getRightEndX(), this.square.getTopEndY());
+		return new Vector2(this.square.getRightEndX() + this.square.getWidth() / 2, this.square.getTopEndY() + this.square.getWidth() / 2);
 	}
 
 	/**
 	 * 
 	 */
-	public void adjustCameraPositionIfRangeOver() {
-		OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
-		float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-		float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+	public void adjustCameraZoomAndPositionIfRangeOver() {
+		if (this.square == null) {
+			return;
+		}
+		final OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
+		final float minZoom = 1f;
+		final float fitSquareWidthZoom = this.square.getWidth() / camera.viewportWidth;
+		final float fitSquareHeightZoom = this.square.getHeight() / camera.viewportHeight;
+		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
+		camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
 
-		float minCameraPositionX = this.getCameraRangeLowerLeft().x + effectiveViewportWidth / 2f;
-		float maxCameraPositionX = this.getCameraRangeUpperRight().x - effectiveViewportWidth / 2f;
-		float minCameraPositionY = this.getCameraRangeLowerLeft().y + effectiveViewportHeight / 2f;
-		float maxCameraPositionY = this.getCameraRangeUpperRight().y - effectiveViewportHeight / 2f;
-
+		final float viewingWidth = camera.viewportWidth * camera.zoom;
+		final float viewingHeight = camera.viewportHeight * camera.zoom;
+		final float minCameraPositionX = this.getVisibleRangeLowerLeft().x + viewingWidth / 2f;
+		final float maxCameraPositionX = this.getVisibleRangeUpperRight().x - viewingWidth / 2f;
+		final float minCameraPositionY = this.getVisibleRangeLowerLeft().y + viewingHeight / 2f;
+		final float maxCameraPositionY = this.getVisibleRangeUpperRight().y - viewingHeight / 2f;
 		camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
 		camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
+
 	}
 
 	void showSquareOnly() {
@@ -632,6 +644,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	void showMenu(float x, float y) {
+		if (this.stage.getRoot().isTouchable() == false) {
+			return;
+		}
 		this.menu.setPosition(x, y);
 		final OrthographicCamera camera = (OrthographicCamera) this.stage.getCamera();
 		final float cameraViewingWidth = camera.zoom * camera.viewportWidth;
@@ -647,6 +662,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	}
 
 	private void show(Actor actor) {
+		if (this.stage.getRoot().isTouchable() == false) {
+			return;
+		}
 		this.stage.getRoot().addActor(actor);
 		if (actor instanceof CameraObserver) {
 			this.addCameraObserver((CameraObserver) actor);

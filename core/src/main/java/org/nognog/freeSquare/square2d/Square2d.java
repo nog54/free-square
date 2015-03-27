@@ -196,7 +196,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 * @return most top vertex
 	 */
 	public Vertex getMostTopVertex() {
-		Vertex[] vertices = this.getVertices();
+		final Vertex[] vertices = this.getVertices();
 		Vertex mostTopVertex = vertices[0];
 		for (int i = 1; i < vertices.length; i++) {
 			if (mostTopVertex.y < vertices[i].y) {
@@ -210,7 +210,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 * @return most bottom vertex
 	 */
 	public Vertex getMostBottomVertex() {
-		Vertex[] vertices = this.getVertices();
+		final Vertex[] vertices = this.getVertices();
 		Vertex mostBottomVertex = vertices[0];
 		for (int i = 1; i < vertices.length; i++) {
 			if (mostBottomVertex.y > vertices[i].y) {

@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -16,8 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  */
 public class FreeSquareGestureDetector extends InputMultiplexer {
 
-	private static final float MAX_CAMERA_ZOOM = Float.MAX_VALUE;
-	private static final float MIN_CAMERA_ZOOM = 0.5f;
 
 	boolean isLastLongPressed;
 
@@ -62,6 +59,9 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 
 			@Override
 			public boolean pan(float x, float y, float deltaX, float deltaY) {
+				if(freeSquare.getSquare() == null){
+					return false;
+				}
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
@@ -72,7 +72,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				float currentZoom = camera.zoom;
 
 				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
-				freeSquare.adjustCameraPositionIfRangeOver();
+				freeSquare.adjustCameraZoomAndPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
@@ -86,11 +86,11 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				if (freeSquare.isLockingCameraZoom()) {
 					return false;
 				}
-				float ratio = initialDistance / distance;
-				float nextZoom = MathUtils.clamp(this.initialScale * ratio, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
-				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
+				final float ratio = initialDistance / distance;
+				final float nextZoom = this.initialScale * ratio;
+				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
-				freeSquare.adjustCameraPositionIfRangeOver();
+				freeSquare.adjustCameraZoomAndPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
