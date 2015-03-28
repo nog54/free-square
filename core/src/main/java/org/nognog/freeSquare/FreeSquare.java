@@ -91,7 +91,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.cameraObservers = new Array<>();
 		this.logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
-
 		final float timeFromLastRun = setupPersistItems();
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		this.setSquare(null);
@@ -143,11 +142,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void right() {
+				FreeSquare.this.getPlayer().clearSquares();
 				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void left() {
+				FreeSquare.this.getStage().setDebugAll(!FreeSquare.this.getStage().getRoot().getDebug());
 				FreeSquare.this.showSquareOnly();
 			}
 
@@ -157,7 +158,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				FreeSquare.this.setSeparateSquareMode(true);
 			}
 
-		}, Messages.getString("clear"), Messages.getString("separate"), "/", "/", ColorUtils.peterRiver, ColorUtils.belizeHole); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}, Messages.getString("clear"), Messages.getString("separate"), "clear square", "/", ColorUtils.peterRiver, ColorUtils.belizeHole); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		this.playersItemList = new PlayersItemList(this.stage.getCamera(), this.player, this.font) {
 			private Actor pannedObject;
@@ -229,14 +230,29 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					}
 				} else if (this.pannedObject instanceof Square2d) {
 					Square2d addSquare = (Square2d) this.pannedObject;
-					if (FreeSquare.this.putSquare2d(addSquare)) {
-						FreeSquare.this.getPlayer().takeOutItem(this.panndedItem.getItem());
-					}
+					this.putSquareAndTakeOutItemIfSuccess(addSquare, this.panndedItem.getItem());
 				}
 				this.getList().setSelectedIndex(-1);
 				FreeSquare.this.showPlayerItemList();
 				this.pannedObject = null;
 				this.panndedItem = null;
+			}
+
+			private void putSquareAndTakeOutItemIfSuccess(Square2d addSquare, Item<?, ?> item) {
+				if (FreeSquare.this.putSquare2d(addSquare)) {
+					FreeSquare.this.getPlayer().takeOutItem(item);
+				}
+			}
+
+			@Override
+			protected void selectedItemTapped(PossessedItem<?> tappedItem, int count) {
+				final boolean isDoubleTapped = (count == 2);
+				if (isDoubleTapped) {
+					if (tappedItem.getItem() instanceof Square2dItem) {
+						Square2d putSquare = ((Square2dItem) tappedItem.getItem()).createSquare2d();
+						this.putSquareAndTakeOutItemIfSuccess(putSquare, tappedItem.getItem());
+					}
+				}
 			}
 		};
 
@@ -309,6 +325,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					final float squareX = stageCoodinateXY.x - (this.addSquare.getMostLeftVertex().x + this.addSquare.getMostRightVertex().x) / 2;
 					final float squareY = stageCoodinateXY.y - (this.addSquare.getMostTopVertex().y + this.addSquare.getMostBottomVertex().y) / 2;
 					this.addSquare.setPosition(squareX, squareY);
+					if (!(FreeSquare.this.getSquare() instanceof CombineSquare2d)) {
+						FreeSquare.this.convertThisSquareToCombineSquare2d();
+					}
 					FreeSquare.this.getSquare().addActorForce(this.addSquare);
 					FreeSquare.this.showSquareOnly();
 					this.addSquare.toFront();
@@ -595,11 +614,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		if (this.square == null) {
 			return;
 		}
+		final float minZoom = this.getMinZoom();
+		final float maxZoom = this.getMaxZoom();
 		final OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
-		final float minZoom = 1f;
-		final float fitSquareWidthZoom = this.square.getWidth() / camera.viewportWidth;
-		final float fitSquareHeightZoom = this.square.getHeight() / camera.viewportHeight;
-		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
 		camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
 
 		final float viewingWidth = camera.viewportWidth * camera.zoom;
@@ -611,6 +628,28 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
 		camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
 
+	}
+
+	/**
+	 * @return min zoom
+	 */
+	@SuppressWarnings("static-method")
+	public float getMinZoom() {
+		return 1f;
+	}
+
+	/**
+	 * @return max zoom
+	 */
+	public float getMaxZoom() {
+		if (this.square == null) {
+			return 1f;
+		}
+		final OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
+		final float fitSquareWidthZoom = this.square.getWidth() / camera.viewportWidth;
+		final float fitSquareHeightZoom = this.square.getHeight() / camera.viewportHeight;
+		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
+		return maxZoom;
 	}
 
 	void showSquareOnly() {
@@ -820,11 +859,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
 		this.player = PersistItems.PLAYER.load();
-		// if (this.player == null) {
-		//			System.out.println("new player"); //$NON-NLS-1$
-		//			this.player = new Player("goshi"); //$NON-NLS-1$
-		// PersistItems.PLAYER.save(this.player);
-		// }
+		if (this.player == null) {
+			System.out.println("new player"); //$NON-NLS-1$
+			this.player = new Player("goshi"); //$NON-NLS-1$
+			PersistItems.PLAYER.save(this.player);
+		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$

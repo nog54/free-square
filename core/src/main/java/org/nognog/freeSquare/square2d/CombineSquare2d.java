@@ -46,7 +46,7 @@ public class CombineSquare2d extends Square2d {
 
 	private boolean highlightSeparatableSquare;
 
-	private final ExecutorService createSimpleTextureBaseThreadPool = Executors.newFixedThreadPool(1);
+	private static final ExecutorService createSimpleTextureBaseThreadPool = Executors.newFixedThreadPool(1);
 	private Future<Pixmap> simpleTextureBaseFuture;
 
 	// cache
@@ -63,6 +63,7 @@ public class CombineSquare2d extends Square2d {
 		this.squares = new Array<>();
 		this.setPosition(base.getX(), base.getY());
 		this.addSquare(base, 0, 0);
+		this.startCreateSimpleTextureBaseThreadIfNotStart();
 		this.vertices = new Array<>();
 		this.combinePoints = new ObjectMap<>();
 		for (Vertex baseVertex : base.getVertices()) {
@@ -193,8 +194,12 @@ public class CombineSquare2d extends Square2d {
 		if (this.simpleTexture == null) {
 			if (this.simpleTextureBaseFuture != null && this.simpleTextureBaseFuture.isDone()) {
 				try {
-					this.simpleTexture = new Texture(this.simpleTextureBaseFuture.get());
+					final Pixmap pixmap = this.simpleTextureBaseFuture.get();
 					this.simpleTextureBaseFuture = null;
+					if (pixmap == null) {
+						return null;
+					}
+					this.simpleTexture = new Texture(pixmap);
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 					return null;
@@ -218,6 +223,7 @@ public class CombineSquare2d extends Square2d {
 		Array<CombinePoint> combinedPoints = this.combineVertices(thisCombineVertex, targetSquare, targetsCombineVertex);
 		this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 		this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
+		this.startCreateSimpleTextureBaseThreadIfNotStart();
 		this.setupSeparatableSquaresList();
 		return true;
 	}
@@ -395,43 +401,49 @@ public class CombineSquare2d extends Square2d {
 		}
 		this.simpleTexture = null;
 		this.simpleTextureBaseFuture = null;
-
-		this.startCreateSimpleTextureBaseThreadIfNotStart();
 	}
 
 	private void startCreateSimpleTextureBaseThreadIfNotStart() {
 		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
 			return;
 		}
-
-		this.simpleTextureBaseFuture = this.createSimpleTextureBaseThreadPool.submit(new Callable<Pixmap>() {
+		this.simpleTextureBaseFuture = createSimpleTextureBaseThreadPool.submit(new Callable<Pixmap>() {
 			@Override
 			public Pixmap call() {
 				final CombineSquare2d target = CombineSquare2d.this;
+				final int pixmapWidthHeight = 64;
 
-				final Pixmap pixmap = new Pixmap((int) (target.getWidth()), (int) (target.getHeight()), Pixmap.Format.RGBA8888);
-				SimpleSquare2d[] simpleSquares = getOrderedSimpleSquare2dArray();
-				for (SimpleSquare2d square : simpleSquares) {
+				final Pixmap result = new Pixmap(pixmapWidthHeight, pixmapWidthHeight, Pixmap.Format.RGBA8888);
+				final float largerEdge = Math.max(target.getWidth(), target.getHeight());
+				final float reductionRatio = pixmapWidthHeight / largerEdge;
+
+				final SimpleSquare2d[] childSquares = getOrderedSimpleSquare2dArray();
+				for (SimpleSquare2d childSquare : childSquares) {
 					if (Thread.currentThread().isInterrupted()) {
-						pixmap.dispose();
+						result.dispose();
 						return null;
 					}
-
-					final TextureData textureData = square.getSquare2dType().getTexture().getTextureData();
+					final TextureData textureData = childSquare.getSquare2dType().getTexture().getTextureData();
 					if (!textureData.isPrepared()) {
 						textureData.prepare();
 					}
-					final Pixmap squarePixmap = textureData.consumePixmap();
-
-					final Vector2 stageCoordinateSquarePosition = square.getStageCoordinates();
-					final int x = (int) (stageCoordinateSquarePosition.x - target.getLeftEndX());
-					final int y = pixmap.getHeight() - (int) (stageCoordinateSquarePosition.y - target.getBottomEndY() + square.getHeight());
-
-					pixmap.drawPixmap(squarePixmap, 0, 0, squarePixmap.getWidth(), squarePixmap.getHeight(), x, y, (int) square.getWidth(), (int) square.getHeight());
+					final Pixmap childPixmap = textureData.consumePixmap();
+					final int startX = (int) ((childSquare.getLeftEndX() - target.getLeftEndX() + (largerEdge - target.getWidth()) / 2) * reductionRatio);
+					final int endX = (int) ((childSquare.getRightEndX() - target.getLeftEndX() + (largerEdge - target.getWidth()) / 2) * reductionRatio);
+					final int startY = (int) ((childSquare.getBottomEndY() - target.getBottomEndY() + (largerEdge - target.getHeight()) / 2) * reductionRatio);
+					final int endY = (int) ((childSquare.getTopEndY() - target.getBottomEndY() + (largerEdge - target.getHeight()) / 2) * reductionRatio);
+					for (int x = startX; x <= endX; x++) {
+						for (int y = startY; y < endY; y++) {
+							final int resultX = x;
+							final int resultY = pixmapWidthHeight - y;
+							final int drawPixel = childPixmap.getPixel((x - startX) * childPixmap.getWidth() / (endX - startX), childPixmap.getHeight() - (y - startY) * childPixmap.getHeight()
+									/ (endY - startY));
+							result.drawPixel(resultX, resultY, drawPixel);
+						}
+					}
 				}
-				return pixmap;
+				return result;
 			}
-
 		});
 	}
 
@@ -503,6 +515,7 @@ public class CombineSquare2d extends Square2d {
 		}
 		this.removeNoLongerRequiredCombinePoints(separateTarget);
 		this.removeSquare(separateTarget);
+		this.startCreateSimpleTextureBaseThreadIfNotStart();
 		this.combineInfo.removeCombineInfo(separateTarget);
 		this.setupSeparatableSquaresList();
 		this.notifyObservers(new UpdateSquareEvent(this));

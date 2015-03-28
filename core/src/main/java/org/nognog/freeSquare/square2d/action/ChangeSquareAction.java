@@ -23,7 +23,7 @@ public class ChangeSquareAction extends Action {
 
 	private ChangeSquareActionPhase phase;
 
-	private static final float moveSpeed = 5000;
+	private static final float moveSpeed = 10000;
 
 	/**
 	 * 
@@ -93,10 +93,12 @@ public class ChangeSquareAction extends Action {
 
 		this.moveCamera(delta, this.direction);
 		final OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
-		final boolean slideOutEnd = (camera.position.x + camera.viewportWidth / 2 < this.freeSquare.getSquare().getLeftEndX())
-				|| (camera.position.x - camera.viewportWidth / 2 > this.freeSquare.getSquare().getRightEndX())
-				|| (camera.position.y + camera.viewportHeight / 2 < this.freeSquare.getSquare().getBottomEndY())
-				|| (camera.position.y - camera.viewportHeight / 2 > this.freeSquare.getSquare().getTopEndY());
+		final float viewingWidth = camera.viewportWidth * camera.zoom;
+		final float viewingHeight = camera.viewportHeight * camera.zoom;
+		final boolean slideOutEnd = (camera.position.x + viewingWidth / 2 < this.freeSquare.getSquare().getLeftEndX())
+				|| (camera.position.x - viewingWidth / 2 > this.freeSquare.getSquare().getRightEndX())
+				|| (camera.position.y + viewingHeight / 2 < this.freeSquare.getSquare().getBottomEndY())
+				|| (camera.position.y - viewingHeight / 2 > this.freeSquare.getSquare().getTopEndY());
 		if (slideOutEnd) {
 			this.phase = SET_SQUARE;
 		}
