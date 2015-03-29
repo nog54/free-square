@@ -8,6 +8,7 @@ import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSqu
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -21,9 +22,12 @@ public class ChangeSquareAction extends Action {
 	private Square2d square;
 	private Direction direction;
 
+	private float zoomInTargetValue;
+
 	private ChangeSquareActionPhase phase;
 
-	private static final float moveSpeed = 10000;
+	private static final float zoomSpeed = 10; // [zoomAmount / sec]
+	private static final float slideSpeed = 10000; // [logicalWidth / sec]
 
 	/**
 	 * 
@@ -53,6 +57,10 @@ public class ChangeSquareAction extends Action {
 			this.performStartPhase();
 			return false;
 		}
+		if (this.phase == ZOOM_OUT) {
+			this.performZoomOut(delta);
+			return false;
+		}
 		if (this.phase == SLIDE_OUT) {
 			this.performSlideOut(delta);
 			return false;
@@ -63,6 +71,10 @@ public class ChangeSquareAction extends Action {
 		}
 		if (this.phase == SLIDE_IN) {
 			this.performSlideIn(delta);
+			return false;
+		}
+		if (this.phase == ZOOM_IN) {
+			this.performZoomIn(delta);
 			return false;
 		}
 		if (this.phase == END) {
@@ -81,8 +93,17 @@ public class ChangeSquareAction extends Action {
 			}
 		}
 		stageRoot.setTouchable(Touchable.disabled);
-		this.phase = SLIDE_OUT;
+		this.zoomInTargetValue = ((OrthographicCamera) this.freeSquare.getStage().getCamera()).zoom;
+		this.phase = ZOOM_OUT;
 		return;
+	}
+
+	private void performZoomOut(float delta) {
+		OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		camera.zoom = MathUtils.clamp(camera.zoom + delta * zoomSpeed, this.freeSquare.getMinZoom(), this.freeSquare.getMaxZoom());
+		if (camera.zoom == this.freeSquare.getMaxZoom()) {
+			this.phase = SLIDE_OUT;
+		}
 	}
 
 	private void performSlideOut(float delta) {
@@ -96,8 +117,7 @@ public class ChangeSquareAction extends Action {
 		final float viewingWidth = camera.viewportWidth * camera.zoom;
 		final float viewingHeight = camera.viewportHeight * camera.zoom;
 		final boolean slideOutEnd = (camera.position.x + viewingWidth / 2 < this.freeSquare.getSquare().getLeftEndX())
-				|| (camera.position.x - viewingWidth / 2 > this.freeSquare.getSquare().getRightEndX())
-				|| (camera.position.y + viewingHeight / 2 < this.freeSquare.getSquare().getBottomEndY())
+				|| (camera.position.x - viewingWidth / 2 > this.freeSquare.getSquare().getRightEndX()) || (camera.position.y + viewingHeight / 2 < this.freeSquare.getSquare().getBottomEndY())
 				|| (camera.position.y - viewingHeight / 2 > this.freeSquare.getSquare().getTopEndY());
 		if (slideOutEnd) {
 			this.phase = SET_SQUARE;
@@ -126,6 +146,7 @@ public class ChangeSquareAction extends Action {
 			camera.position.x = this.square.getRightEndX() + camera.viewportWidth;
 			camera.position.y = this.square.getCenterY();
 		}
+		this.zoomInTargetValue = MathUtils.clamp(this.zoomInTargetValue, this.freeSquare.getMinZoom(), this.freeSquare.getMaxZoom());
 		this.phase = SLIDE_IN;
 	}
 
@@ -138,6 +159,15 @@ public class ChangeSquareAction extends Action {
 		if (slideInEnd) {
 			camera.position.x = this.square.getCenterX();
 			camera.position.y = this.square.getCenterY();
+			this.phase = ZOOM_IN;
+		}
+	}
+
+	private void performZoomIn(float delta) {
+		OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		camera.zoom -= delta * zoomSpeed;
+		if (camera.zoom < this.zoomInTargetValue) {
+			camera.zoom = this.zoomInTargetValue;
 			this.phase = END;
 		}
 	}
@@ -155,20 +185,20 @@ public class ChangeSquareAction extends Action {
 
 	private static float getMoveX(Direction direction) {
 		if (direction == Direction.LEFT) {
-			return -moveSpeed;
+			return -slideSpeed;
 		}
 		if (direction == Direction.RIGHT) {
-			return moveSpeed;
+			return slideSpeed;
 		}
 		return 0;
 	}
 
 	private static float getMoveY(Direction direction) {
 		if (direction == Direction.DOWN) {
-			return -moveSpeed;
+			return -slideSpeed;
 		}
 		if (direction == Direction.UP) {
-			return moveSpeed;
+			return slideSpeed;
 		}
 		return 0;
 	}
@@ -230,6 +260,6 @@ public class ChangeSquareAction extends Action {
 	}
 
 	enum ChangeSquareActionPhase {
-		START, SLIDE_OUT, SET_SQUARE, SLIDE_IN, END
+		START, ZOOM_OUT, SLIDE_OUT, SET_SQUARE, SLIDE_IN, ZOOM_IN, END
 	}
 }
