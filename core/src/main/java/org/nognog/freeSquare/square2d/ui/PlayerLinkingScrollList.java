@@ -16,16 +16,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
+import com.badlogic.gdx.utils.TimeUtils;
 
 /**
  * @author goshi 2015/01/17
- * @param <T> 
+ * @param <T>
  */
 public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver, CameraObserver {
 	private static final Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	private final Player player;
 	private final BitmapFont font;
+
+	private static final float tapCountInterval = 0.6f; // [s]
 
 	/**
 	 * @param camera
@@ -42,12 +45,15 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
 		this.setHeight(camera.viewportHeight / 2);
 
-		this.getWidget().addListener(new ActorGestureListener() {
+		final ActorGestureListener listener = new ActorGestureListener() {
 
 			private List<T> list = PlayerLinkingScrollList.this.getList();
 			private T lastTouchDownedItem;
 			private T lastSelectedItem;
 			private boolean isSameItemTouch;
+
+			private long lastTapTime;
+			private int sameItemTapCount = 0;
 
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -83,10 +89,18 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
+				final long currentTapTime = TimeUtils.millis();
+				final boolean isSuccessiveTap = (currentTapTime - this.lastTapTime) / 1000f < tapCountInterval;
+				this.lastTapTime = currentTapTime;
 				if (this.isSameItemTouch) {
-					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, count);
+					if (!isSuccessiveTap) {
+						this.sameItemTapCount = 0;
+					}
+					this.sameItemTapCount++;
+					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, this.sameItemTapCount);
 					return;
 				}
+				this.sameItemTapCount = 0;
 				this.list.setSelected(this.lastTouchDownedItem);
 				this.lastSelectedItem = this.lastTouchDownedItem;
 			}
@@ -95,7 +109,9 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 				PlayerLinkingScrollList.this.touchUp(x, y);
 			}
-		});
+		};
+		listener.getGestureDetector().setTapCountInterval(tapCountInterval);
+		this.getWidget().addListener(listener);
 	}
 
 	private List<T> createList(BitmapFont bitmapFont) {
@@ -130,11 +146,11 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	public List<T> getList() {
 		return (List<T>) this.getWidget();
 	}
-	
+
 	/**
 	 * @return font
 	 */
-	public BitmapFont getFont(){
+	public BitmapFont getFont() {
 		return this.font;
 	}
 
@@ -160,20 +176,18 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	protected void touchUp(float x, float y) {
 		// default is empty.
 	}
-	
+
 	@Override
 	public void updatePlayer() {
 		this.getList().setItems(this.getShowListItemsFromPlayer(this.player));
 	}
-	
+
 	protected abstract Texture getDrawTextureOf(T item);
-	
+
 	protected abstract Color getDrawTextureColorOf(T item);
-	
+
 	protected abstract T[] getShowListItemsFromPlayer(Player setupPlayer);
 
-	
-	
 	/**
 	 * dispose
 	 */
