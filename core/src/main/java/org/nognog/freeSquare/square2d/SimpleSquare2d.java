@@ -60,6 +60,9 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		this.squareImage = createSquareImage(type);
 		super.addActorForce(this.squareImage);
 		this.setName(type.getName());
+		final float originX = (this.getMostLeftVertex().x + this.getMostRightVertex().x) / 2;
+		final float originY = (this.getMostBottomVertex().y + this.getMostTopVertex().y) / 2;
+		this.setOrigin(originX, originY);
 	}
 
 	private static Image createSquareImage(Square2dType createSquareType) {

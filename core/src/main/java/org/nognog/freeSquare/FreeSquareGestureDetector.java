@@ -105,11 +105,10 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 					}
 					return false;
 				}
-
-				final int beforeStageChildrenCount = freeSquare.getStage().getRoot().getChildren().size;
+				final int beforeShowingUICount = freeSquare.getViewableUICount();
 				freeSquare.showSquareOnly();
-				final int afterStageChildrenCount = freeSquare.getStage().getRoot().getChildren().size;
-				if (beforeStageChildrenCount == afterStageChildrenCount) {
+				final int afterShowingUICount = freeSquare.getViewableUICount();
+				if (beforeShowingUICount == afterShowingUICount) {
 					Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
 					freeSquare.showMenu(menuPosition.x, menuPosition.y);
 				}

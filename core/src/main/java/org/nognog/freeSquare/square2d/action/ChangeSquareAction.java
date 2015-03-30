@@ -93,7 +93,11 @@ public class ChangeSquareAction extends Action {
 			}
 		}
 		stageRoot.setTouchable(Touchable.disabled);
-		this.zoomInTargetValue = ((OrthographicCamera) this.freeSquare.getStage().getCamera()).zoom;
+		if (this.freeSquare.getSquare() == null) {
+			this.zoomInTargetValue = 1;
+		} else {
+			this.zoomInTargetValue = ((OrthographicCamera) this.freeSquare.getStage().getCamera()).zoom;
+		}
 		this.phase = ZOOM_OUT;
 		return;
 	}
@@ -125,8 +129,12 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performSetSquare() {
+		boolean beforeSquareIsNull = this.freeSquare.getSquare() == null;
 		this.freeSquare.setSquare(this.square);
-		final Camera camera = this.freeSquare.getStage().getCamera();
+		final OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		if(beforeSquareIsNull){
+			camera.zoom = this.freeSquare.getMaxZoom();
+		}
 		if (this.square == null) {
 			camera.position.x = 0;
 			camera.position.y = 0;

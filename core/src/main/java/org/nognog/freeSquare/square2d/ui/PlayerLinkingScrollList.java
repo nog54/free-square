@@ -69,7 +69,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 				} else {
 					this.list.setSelected(this.lastSelectedItem);
 				}
-			}
+			}			
 
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {

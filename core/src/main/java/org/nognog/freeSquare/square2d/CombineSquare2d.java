@@ -276,6 +276,11 @@ public class CombineSquare2d extends Square2d {
 		this.calculateRightEndX();
 		this.calculateButtomEndY();
 		this.calculateTopEndY();
+		if (this.vertices != null && this.vertices.size != 0) {
+			final float originX = (this.getMostLeftVertex().x + this.getMostRightVertex().x) / 2;
+			final float originY = (this.getMostBottomVertex().y + this.getMostTopVertex().y) / 2;
+			this.setOrigin(originX, originY);
+		}
 	}
 
 	private boolean isValidEvenIfCombinedWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetCombineVertex) {
