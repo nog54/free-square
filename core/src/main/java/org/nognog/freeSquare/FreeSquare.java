@@ -26,7 +26,7 @@ import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.EatableObject;
@@ -188,7 +188,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					if (!this.addedObjectisBeingEaten()) {
 						this.pannedObject.moveBy(deltaX, deltaY);
 						if (FreeSquare.this.getSquare() != null) {
-							FreeSquare.this.getSquare().notify(new UpdateObjectEvent());
+							FreeSquare.this.getSquare().notify(new UpdateSquareObjectEvent());
 						}
 					}
 				}
@@ -333,7 +333,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 					this.addSquare.toFront();
 				} else {
 					this.addSquare.moveBy(deltaX, deltaY);
-					FreeSquare.this.getSquare().notify(new UpdateObjectEvent());
+					FreeSquare.this.getSquare().notify(new UpdateSquareObjectEvent());
 				}
 			}
 

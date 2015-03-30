@@ -5,7 +5,7 @@ import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
@@ -32,7 +32,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 				if (!LandingLifeObject.this.isLandingOnSquare()) {
 					LandingLifeObject.this.goToSquareNearestVertex();
 				} else {
-					LandingLifeObject.this.notify(new UpdateObjectEvent(LandingLifeObject.this));
+					LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
 				}
 			}
 		});
@@ -52,7 +52,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	protected void goToSquareNearestVertex() {
 		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
 		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
-		final Action notifyUpdateEventAction = Square2dActions.fireEventAction(this, new UpdateObjectEvent(this));
+		final Action notifyUpdateEventAction = Square2dActions.fireEventAction(this, new UpdateSquareObjectEvent(this));
 		this.addAction(Square2dActions.excludeObjectOtherAction(Actions.sequence(moveToNearestSquareVertexAction, notifyUpdateEventAction)));
 	}
 
@@ -134,7 +134,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 
 	@Override
 	public void notify(SquareEvent event) {
-		if (event instanceof UpdateObjectEvent && ((UpdateObjectEvent) event).getUpdatedObject() == this) {
+		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
 			this.resetFreeRunningTargetPosition();
 		}
 		super.notify(event);

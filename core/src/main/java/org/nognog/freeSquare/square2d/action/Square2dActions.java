@@ -3,7 +3,7 @@ package org.nognog.freeSquare.square2d.action;
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
@@ -163,7 +163,7 @@ public class Square2dActions {
 	 * @param event
 	 * @return fire event action
 	 */
-	public static FireEventAction fireEventAction(Square2dObject eventListener, UpdateObjectEvent event) {
+	public static FireEventAction fireEventAction(Square2dObject eventListener, UpdateSquareObjectEvent event) {
 		final FireEventAction fireEventAction = Actions.action(FireEventAction.class);
 		fireEventAction.setEventListener(eventListener);
 		fireEventAction.setEvent(event);

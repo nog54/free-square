@@ -7,27 +7,27 @@ import org.nognog.freeSquare.square2d.object.Square2dObject;
 /**
  * @author goshi 2015/02/02
  */
-public class UpdateObjectEvent extends Square2dEvent {
+public class UpdateSquareObjectEvent extends Square2dEvent {
 	private final Square2dObject updatedSquare;
 
 	/**
 	 * 
 	 */
-	public UpdateObjectEvent() {
+	public UpdateSquareObjectEvent() {
 		this(null, null);
 	}
 
 	/**
 	 * @param updatedSquare
 	 */
-	public UpdateObjectEvent(Square2dObject updatedSquare) {
+	public UpdateSquareObjectEvent(Square2dObject updatedSquare) {
 		this(updatedSquare, null);
 	}
 
 	/**
 	 * @param target
 	 */
-	public UpdateObjectEvent(SquareObserver target) {
+	public UpdateSquareObjectEvent(SquareObserver target) {
 		this(null, target);
 	}
 
@@ -35,7 +35,7 @@ public class UpdateObjectEvent extends Square2dEvent {
 	 * @param updatedSquare
 	 * @param target
 	 */
-	public UpdateObjectEvent(Square2dObject updatedSquare, SquareObserver target) {
+	public UpdateSquareObjectEvent(Square2dObject updatedSquare, SquareObserver target) {
 		super(target);
 		this.updatedSquare = updatedSquare;
 	}

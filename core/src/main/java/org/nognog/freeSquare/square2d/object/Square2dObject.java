@@ -6,7 +6,7 @@ import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
@@ -269,7 +269,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		super.act(delta);
 		final float yAfterAct = this.getY();
 		if (yBeforeAct != yAfterAct) {
-			this.square.notify(new UpdateObjectEvent(this));
+			this.square.notify(new UpdateSquareObjectEvent(this));
 		}
 	}
 

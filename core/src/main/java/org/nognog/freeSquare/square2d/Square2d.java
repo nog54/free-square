@@ -8,7 +8,7 @@ import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObserver;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.RemoveObjectEvent;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
@@ -475,7 +475,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	@Override
 	public void notify(SquareEvent event) {
-		if (event instanceof UpdateObjectEvent) {
+		if (event instanceof UpdateSquareObjectEvent) {
 			this.requestDrawOrderUpdate();
 		}
 	}

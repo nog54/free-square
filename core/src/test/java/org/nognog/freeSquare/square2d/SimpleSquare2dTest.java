@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.square.SquareObserver;
-import org.nognog.freeSquare.square2d.event.UpdateObjectEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
@@ -68,7 +68,7 @@ public class SimpleSquare2dTest {
 		final int actual1 = square.getSquareImage().getZIndex();
 		assertThat(actual1, is(expected1));
 
-		square.notify(new UpdateObjectEvent());
+		square.notify(new UpdateSquareObjectEvent());
 		square.draw(batch, 0);
 
 		final int expected2 = 0;
