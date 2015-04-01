@@ -1,13 +1,9 @@
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.CameraObserver;
-import org.nognog.freeSquare.Settings;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PlayerObserver;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,28 +18,28 @@ import com.badlogic.gdx.utils.TimeUtils;
  * @author goshi 2015/01/17
  * @param <T>
  */
-public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver, CameraObserver {
+public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver{
 	private static final Color clearBlack = new Color(0, 0, 0, 0.75f);
 
-	private final Player player;
+	private Player player;
 	private final BitmapFont font;
 
 	private static final float tapCountInterval = 0.6f; // [s]
 
 	/**
-	 * @param camera
+	 * @param width 
+	 * @param height 
 	 * @param player
 	 * @param font
 	 */
-	public PlayerLinkingScrollList(Camera camera, Player player, BitmapFont font) {
+	public PlayerLinkingScrollList(float width, float height, Player player, BitmapFont font) {
 		super(null);
-		this.player = player;
-		this.player.addObserver(this);
+		this.setPlayer(player);
 		this.setWidget(this.createList(font));
 		this.font = font;
 		this.setupOverscroll(0, 0, 0);
-		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
-		this.setHeight(camera.viewportHeight / 2);
+		this.setWidth(width);
+		this.setHeight(height);
 
 		final ActorGestureListener listener = new ActorGestureListener() {
 
@@ -69,7 +65,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 				} else {
 					this.list.setSelected(this.lastSelectedItem);
 				}
-			}			
+			}
 
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
@@ -128,7 +124,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			}
 
 		};
-		list.setItems(this.getShowListItemsFromPlayer(this.player));
+		list.setItems(this.getShowListItemsFromPlayer(this.getPlayer()));
 		list.setSelectedIndex(-1);
 		return list;
 	}
@@ -161,6 +157,18 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 		return this.player;
 	}
 
+	/**
+	 * @param player
+	 *            the player to set
+	 */
+	public void setPlayer(Player player) {
+		if(this.player != null){
+			this.player.removeObserver(this);
+		}
+		this.player = player;
+		this.player.addObserver(this);
+	}
+
 	protected void selectedItemTapped(T tappedItem, int count) {
 		// default is empty.
 	}
@@ -179,7 +187,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 	@Override
 	public void updatePlayer() {
-		this.getList().setItems(this.getShowListItemsFromPlayer(this.player));
+		this.getList().setItems(this.getShowListItemsFromPlayer(this.getPlayer()));
 	}
 
 	protected abstract Texture getDrawTextureOf(T item);
@@ -196,15 +204,6 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			this.player.removeObserver(this);
 		}
 		this.setWidget(null);
-	}
-
-	@Override
-	public void updateCamera(Camera camera) {
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
-		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
-		this.setPosition(newX, newY);
-		this.setScale(currentCameraZoom);
 	}
 
 }

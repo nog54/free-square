@@ -37,6 +37,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	private transient Vector2 stageCoordinatesPosition;
 	private transient Vector2[] stageCoordinatesVertices;
 
+	private static final ShapeRenderer shapeRenderer = new ShapeRenderer();
 	protected static final Comparator<Actor> actorComparator = new Comparator<Actor>() {
 
 		@Override
@@ -434,20 +435,20 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	protected void drawEdge(Batch batch) {
 		batch.end();
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
-		shapeRenderer.begin(ShapeType.Line);
-		shapeRenderer.setColor(Color.BLUE);
-		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+		synchronized (shapeRenderer) {
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(Color.BLUE);
+			shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
+			shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 
-		final Vector2[] verticesPosition = this.getStageCoordinatesVertices();
-		for (int i = 0; i < verticesPosition.length; i++) {
-			Vector2 vertex1 = verticesPosition[i];
-			Vector2 vertex2 = verticesPosition[(i + 1) % verticesPosition.length];
-			shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
+			final Vector2[] verticesPosition = this.getStageCoordinatesVertices();
+			for (int i = 0; i < verticesPosition.length; i++) {
+				Vector2 vertex1 = verticesPosition[i];
+				Vector2 vertex2 = verticesPosition[(i + 1) % verticesPosition.length];
+				shapeRenderer.line(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
+			}
+			shapeRenderer.end();
 		}
-		shapeRenderer.end();
-		shapeRenderer.dispose();
 		batch.begin();
 	}
 
@@ -514,6 +515,13 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			sb.append("-").append(vertices[i]); //$NON-NLS-1$
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 * dispose
+	 */
+	public static void dispose(){
+		shapeRenderer.dispose();
 	}
 
 }
