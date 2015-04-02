@@ -89,23 +89,23 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			return;
 		}
 	}
-	
+
 	@Override
 	protected boolean isMovableFetchingActor() {
 		return !this.fetchingActorIsBeingEaten();
 	}
-	
+
 	private boolean fetchingActorIsBeingEaten() {
 		return (this.fetchingActor instanceof EatableObject) && ((EatableObject) this.fetchingActor).isBeingEaten();
 	}
-	
+
 	@Override
 	protected void fetchingActorMoved() {
 		if (this.fetchingActor instanceof Square2dObject && this.freeSquare.getSquare() != null) {
 			this.freeSquare.getSquare().notify(new UpdateSquareObjectEvent());
 		}
 	}
-	
+
 	@Override
 	protected void cameraMoved() {
 		final float oldX = this.freeSquare.getStage().getCamera().position.x;
@@ -116,7 +116,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 		this.fetchingActor.moveBy(afterX - oldX, afterY - oldY);
 		this.freeSquare.notifyCameraObservers();
 	}
-	
+
 	@Override
 	protected void putFetchingActor(Actor putTargetFetchingActor) {
 		if (putTargetFetchingActor instanceof Square2dObject) {
@@ -159,11 +159,15 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 
 	@Override
 	protected void selectedItemTapped(PossessedItem<?> tappedItem, int count) {
+		if (this.freeSquare.getSquare() != null) {
+			return;
+		}
 		final boolean isDoubleTapped = (count == 2);
 		if (isDoubleTapped) {
 			if (tappedItem.getItem() instanceof Square2dItem) {
 				Square2d putSquare = ((Square2dItem) tappedItem.getItem()).createSquare2d();
 				this.putSquareAndTakeOutItemIfSuccess(putSquare, tappedItem.getItem());
+				this.freeSquare.showSquareOnly();
 			}
 		}
 	}

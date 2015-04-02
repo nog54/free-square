@@ -22,7 +22,7 @@ public interface Square<T extends SquareObject<?>> extends Nameable{
 	/**
 	 * @return square objects
 	 */
-	Iterable<T> getObjects();
+	T[] getObjects();
 
 	/**
 	 * @param observer

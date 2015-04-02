@@ -20,7 +20,7 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 	protected final TextButton presentTextButton;
 
 	/**
-	 * @param camera 
+	 * @param camera
 	 * @param font
 	 */
 	public ModePresenter(Camera camera, BitmapFont font) {
@@ -31,7 +31,7 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 		TextButtonStyle buttonStyle = new TextButtonStyle(upTexture, downTexture, downTexture, font);
 		this.presentTextButton = new TextButton("mode presenter", buttonStyle); //$NON-NLS-1$
 		this.presentTextButton.setSize(width, height);
-		this.presentTextButton.addListener(new ClickListener(){
+		this.presentTextButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				ModePresenter.this.tapped();
@@ -41,11 +41,11 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 		this.addActor(this.presentTextButton);
 		this.setSize(width, height);
 	}
-	
+
 	/**
 	 * @param text
 	 */
-	public void setText(String text){
+	public void setText(String text) {
 		this.presentTextButton.setText(text);
 	}
 
@@ -58,7 +58,7 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
 		final float newX = camera.position.x - currentCameraZoom * (camera.viewportWidth / 2);
-		final float newY = camera.position.y + currentCameraZoom * (camera.viewportHeight / 2) - this.getHeight();
+		final float newY = camera.position.y + currentCameraZoom * (camera.viewportHeight / 2 - this.getHeight());
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}

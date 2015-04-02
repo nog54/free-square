@@ -379,8 +379,8 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	}
 
 	@Override
-	public Iterable<Square2dObject> getObjects() {
-		return new Array<>(this.objects);
+	public Square2dObject[] getObjects() {
+		return this.objects.<Square2dObject> toArray(Square2dObject.class);
 	}
 
 	/**
@@ -516,11 +516,11 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * dispose
 	 */
-	public static void dispose(){
+	public static void dispose() {
 		shapeRenderer.dispose();
 	}
 

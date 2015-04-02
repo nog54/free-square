@@ -51,7 +51,8 @@ public class CombineSquare2d extends Square2d {
 
 	// cache
 	private transient Array<Square2d> separatableIfNotExistsObjectSquares;
-	private transient Array<SimpleSquare2d> allChildSimpleSquare2d;
+	private transient Array<SimpleSquare2d> allCombiningSimpleSquare2d;
+	private transient Array<Square2d> allNotCombiningSquare2d;
 	private transient Array<SimpleSquare2d> allSeparableChildSimpleSquare2d;
 	private transient Texture simpleTexture;
 
@@ -373,7 +374,7 @@ public class CombineSquare2d extends Square2d {
 	public void addActorForce(Actor actor) {
 		super.addActorForce(actor);
 		if (actor instanceof Square2d) {
-			this.resetAllSimpleSquare2d();
+			this.resetAllCombiningSimpleSquare2d();
 		}
 	}
 
@@ -381,19 +382,26 @@ public class CombineSquare2d extends Square2d {
 	public void removeActorForce(Actor actor) {
 		super.removeActorForce(actor);
 		if (actor instanceof Square2d) {
-			this.resetAllSimpleSquare2d();
+			this.resetAllCombiningSimpleSquare2d();
 		}
 	}
 
-	private void resetAllSimpleSquare2d() {
-		this.allChildSimpleSquare2d = new Array<>();
-		for (Actor child : this.getChildren()) {
-			if (child instanceof SimpleSquare2d) {
-				this.allChildSimpleSquare2d.add((SimpleSquare2d) child);
-			} else if (child instanceof CombineSquare2d) {
-				this.allChildSimpleSquare2d.addAll(((CombineSquare2d) child).allChildSimpleSquare2d);
+	private void resetAllCombiningSimpleSquare2d() {
+		this.allCombiningSimpleSquare2d = new Array<>();
+		for (Square2d square : this.squares) {
+			if (square instanceof SimpleSquare2d) {
+				this.allCombiningSimpleSquare2d.add((SimpleSquare2d) square);
+			} else if (square instanceof CombineSquare2d) {
+				this.allCombiningSimpleSquare2d.addAll(((CombineSquare2d) square).allCombiningSimpleSquare2d);
 			}
 		}
+		this.allNotCombiningSquare2d = new Array<>();
+		for (Actor child : this.getChildren()) {
+			if (child instanceof Square2d && !this.squares.contains((Square2d) child, true)) {
+				this.allNotCombiningSquare2d.add((Square2d) child);
+			}
+		}
+
 		if (this.simpleTexture != null) {
 			if (!this.simpleTexture.getTextureData().isPrepared()) {
 				this.simpleTexture.getTextureData().prepare();
@@ -452,8 +460,11 @@ public class CombineSquare2d extends Square2d {
 		});
 	}
 
-	SimpleSquare2d[] getOrderedSimpleSquare2dArray() {
-		final SimpleSquare2d[] simpleSquares = this.allChildSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
+	/**
+	 * @return all simple square2d
+	 */
+	public SimpleSquare2d[] getOrderedSimpleSquare2dArray() {
+		final SimpleSquare2d[] simpleSquares = this.allCombiningSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
 		Arrays.sort(simpleSquares, actorComparator);
 		return simpleSquares;
 	}
@@ -848,7 +859,7 @@ public class CombineSquare2d extends Square2d {
 
 		this.allSeparableChildSimpleSquare2d = new Array<>();
 		for (Square2d separatableSquare : this.separatableIfNotExistsObjectSquares) {
-			for (SimpleSquare2d childSimpleSquare : this.allChildSimpleSquare2d) {
+			for (SimpleSquare2d childSimpleSquare : this.allCombiningSimpleSquare2d) {
 				if (separatableSquare == childSimpleSquare || (separatableSquare instanceof CombineSquare2d) && ((CombineSquare2d) separatableSquare).contains(childSimpleSquare)) {
 					this.allSeparableChildSimpleSquare2d.add(childSimpleSquare);
 				}
@@ -858,25 +869,23 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (this.getParent() != this.getStage().getRoot()) {
-			return;
-		}
 		if (this.isRequestedDrawOrderUpdate) {
 			this.getChildren().sort(actorComparator);
 			this.isRequestedDrawOrderUpdate = false;
 		}
 
 		final float alpha = parentAlpha * this.getColor().a;
-		this.drawChildSquares(batch, alpha);
+		this.drawNotCombiningNotFrontSquare(batch, alpha);
+		this.drawAllCombiningSimpleSquares(batch, alpha);
 		this.drawSquare2dObjects(batch, alpha);
-
+		this.drawNotCombiningFrontSquare(batch, alpha);
 		if (this.drawEdge) {
 			this.drawEdge(batch);
 		}
 	}
 
-	private void drawChildSquares(Batch batch, float parentAlpha) {
-		final SimpleSquare2d[] simpleSquares = getOrderedSimpleSquare2dArray();
+	private void drawAllCombiningSimpleSquares(Batch batch, float parentAlpha) {
+		final SimpleSquare2d[] simpleSquares = this.getOrderedSimpleSquare2dArray();
 		for (SimpleSquare2d square : simpleSquares) {
 			final float oldX = square.getX();
 			final float oldY = square.getY();
@@ -901,11 +910,70 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private void drawSquare2dObjects(Batch batch, float parentAlpha) {
-		for (Actor actor : this.getChildren()) {
-			if (actor instanceof Square2dObject) {
-				actor.draw(batch, parentAlpha);
+		if (this.getX() == 0 && this.getY() == 0) {
+			for (Square2dObject object : this.getObjects()) {
+				object.draw(batch, parentAlpha);
+			}
+		} else {
+			for (Square2dObject object : this.getObjects()) {
+				object.moveBy(this.getX(), this.getY()); // Caution!
+															// positionChanged
+															// is invoked
+				object.draw(batch, parentAlpha);
+				object.moveBy(-this.getX(), -this.getY());
 			}
 		}
+		// TODO check why following is wrong
+		// this.drawAsThisChild(batch, parentAlpha, new
+		// Array<>(this.getObjects()));
+	}
+
+	private void drawNotCombiningNotFrontSquare(Batch batch, float parentAlpha) {
+		if (this.allNotCombiningSquare2d.size == 0) {
+			return;
+		}
+		Array<Square2d> notCombiningNotFrontSquares = new Array<>();
+		for (Square2d notCombiningSquare : this.allNotCombiningSquare2d) {
+			if (this.isMoreFrontThan(notCombiningSquare)) {
+				notCombiningNotFrontSquares.add(notCombiningSquare);
+			}
+		}
+		if (notCombiningNotFrontSquares.size == 0) {
+			return;
+		}
+		this.drawAsThisChild(batch, parentAlpha, notCombiningNotFrontSquares);
+	}
+
+	private void drawNotCombiningFrontSquare(Batch batch, float parentAlpha) {
+		if (this.allNotCombiningSquare2d.size == 0) {
+			return;
+		}
+
+		Array<Square2d> notCombiningFrontSquares = new Array<>();
+		for (Square2d notCombiningSquare : this.allNotCombiningSquare2d) {
+			if (!this.isMoreFrontThan(notCombiningSquare)) {
+				notCombiningFrontSquares.add(notCombiningSquare);
+			}
+		}
+		if (notCombiningFrontSquares.size == 0) {
+			return;
+		}
+		this.drawAsThisChild(batch, parentAlpha, notCombiningFrontSquares);
+	}
+
+	private boolean isMoreFrontThan(Square2d square) {
+		final float thisMostTopVertexStageCoodinateY = this.getStageCoordinates().y + this.getMostTopVertex().y;
+		final float squareMostTopVertexStageCoodinateY = square.getStageCoordinates().y + square.getMostTopVertex().y;
+		return thisMostTopVertexStageCoodinateY <= squareMostTopVertexStageCoodinateY;
+	}
+
+	private <T extends Actor> void drawAsThisChild(Batch batch, float parentAlpha, Array<T> drawActors) {
+		final Actor[] oldChildren = this.getChildren().toArray();
+		this.getChildren().clear();
+		this.getChildren().addAll(drawActors);
+		super.draw(batch, parentAlpha);
+		this.getChildren().clear();
+		this.getChildren().addAll(oldChildren);
 	}
 
 	@Override

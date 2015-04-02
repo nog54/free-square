@@ -219,7 +219,7 @@ public class CombineSquare2dTest {
 
 			boolean actual1 = combineSquare1.combine(combineSquare1.getVertices()[0], combineSquare2, combineSquare2.getVertices()[0]);
 			assertThat(actual1, is(true));
-			assertThat(((Array<Square2dObject>) combineSquare1.getObjects()).size, is(2));
+			assertThat(combineSquare1.getObjects().length, is(2));
 			
 		  // create same value square with SimpleSquare2d
 			CombineSquare2d compareSquare = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
