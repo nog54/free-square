@@ -18,17 +18,17 @@ import com.badlogic.gdx.utils.TimeUtils;
  * @author goshi 2015/01/17
  * @param <T>
  */
-public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver{
+public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver {
 	private static final Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	private Player player;
 	private final BitmapFont font;
 
-	private static final float tapCountInterval = 0.6f; // [s]
+	private static final float tapCountInterval = 0.4f; // [s]
 
 	/**
-	 * @param width 
-	 * @param height 
+	 * @param width
+	 * @param height
 	 * @param player
 	 * @param font
 	 */
@@ -49,7 +49,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			private boolean isSameItemTouch;
 
 			private long lastTapTime;
-			private int sameItemTapCount = 0;
+			private int sameItemSuccessiveTapCount = 0;
 
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -89,14 +89,15 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 				final boolean isSuccessiveTap = (currentTapTime - this.lastTapTime) / 1000f < tapCountInterval;
 				this.lastTapTime = currentTapTime;
 				if (this.isSameItemTouch) {
-					if (!isSuccessiveTap) {
-						this.sameItemTapCount = 0;
+					if (isSuccessiveTap) {
+						this.sameItemSuccessiveTapCount = Math.max(2, this.sameItemSuccessiveTapCount + 1);
+					} else {
+						this.sameItemSuccessiveTapCount = 1;
 					}
-					this.sameItemTapCount++;
-					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, this.sameItemTapCount);
+					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, this.sameItemSuccessiveTapCount);
 					return;
 				}
-				this.sameItemTapCount = 0;
+				this.sameItemSuccessiveTapCount = 0;
 				this.list.setSelected(this.lastTouchDownedItem);
 				this.lastSelectedItem = this.lastTouchDownedItem;
 			}
@@ -162,7 +163,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	 *            the player to set
 	 */
 	public void setPlayer(Player player) {
-		if(this.player != null){
+		if (this.player != null) {
 			this.player.removeObserver(this);
 		}
 		this.player = player;
