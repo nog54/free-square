@@ -236,14 +236,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.enableSquare();
 			this.square.removeSquareObserver(this);
 			this.square.remove();
-			//this.square.setDrawEdge(false);
+			// this.square.setDrawEdge(false);
 		}
 		this.square = square;
 		if (this.square != null) {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
-			//this.square.setDrawEdge(true);
+			// this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}
@@ -681,8 +681,19 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 	@Override
 	public void render() {
-		this.stage.act();
+		this.act(Gdx.graphics.getDeltaTime());
 		this.drawStage();
+	}
+
+	private void act(float delta) {
+		this.stage.act(delta);
+		if (this.player != null) {
+			for (Square<?> playerSquare : this.player.getSquares()) {
+				if (playerSquare instanceof Square2d && playerSquare != this.square) {
+					((Square2d) playerSquare).act(delta);
+				}
+			}
+		}
 	}
 
 	private void actLongTime(float longDelta) {
@@ -693,7 +704,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			if (ramainActTime < 0) {
 				delta += ramainActTime;
 			}
-			this.stage.act(delta);
+			this.act(delta);
 		}
 	}
 

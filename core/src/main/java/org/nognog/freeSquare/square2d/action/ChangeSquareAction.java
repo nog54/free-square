@@ -132,7 +132,7 @@ public class ChangeSquareAction extends Action {
 		boolean beforeSquareIsNull = this.freeSquare.getSquare() == null;
 		this.freeSquare.setSquare(this.square);
 		final OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
-		if(beforeSquareIsNull){
+		if (beforeSquareIsNull) {
 			camera.zoom = this.freeSquare.getMaxZoom();
 		}
 		if (this.square == null) {
@@ -143,15 +143,15 @@ public class ChangeSquareAction extends Action {
 		}
 		if (this.direction == Direction.UP) {
 			camera.position.x = this.square.getCenterX();
-			camera.position.y = this.square.getBottomEndY() - camera.viewportHeight;
+			camera.position.y = this.square.getBottomEndY() - camera.viewportHeight * camera.zoom;
 		} else if (this.direction == Direction.DOWN) {
 			camera.position.x = this.square.getCenterX();
-			camera.position.y = this.square.getTopEndY() + camera.viewportHeight;
+			camera.position.y = this.square.getTopEndY() + camera.viewportHeight * camera.zoom;
 		} else if (this.direction == Direction.RIGHT) {
-			camera.position.x = this.square.getLeftEndX() - camera.viewportWidth;
+			camera.position.x = this.square.getLeftEndX() - camera.viewportWidth * camera.zoom;
 			camera.position.y = this.square.getCenterY();
 		} else if (this.direction == Direction.LEFT) {
-			camera.position.x = this.square.getRightEndX() + camera.viewportWidth;
+			camera.position.x = this.square.getRightEndX() + camera.viewportWidth * camera.zoom;
 			camera.position.y = this.square.getCenterY();
 		}
 		this.zoomInTargetValue = MathUtils.clamp(this.zoomInTargetValue, this.freeSquare.getMinZoom(), this.freeSquare.getMaxZoom());
