@@ -234,6 +234,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void setSquare(Square2d square) {
 		if (this.square != null) {
 			this.enableSquare();
+			this.square.setDrawEdge(false);
 			this.square.removeSquareObserver(this);
 			this.square.remove();
 		}
@@ -242,6 +243,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
+			this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}
@@ -432,11 +434,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		final float viewingWidth = camera.viewportWidth * camera.zoom;
 		final float viewingHeight = camera.viewportHeight * camera.zoom;
-		if (viewingWidth > squareWidth || viewingHeight > squareHeight) {
-			camera.position.x = this.square.getX() + squareWidth / 2;
-			camera.position.y = this.square.getY() + squareHeight / 2;
-			return;
-		}
+
 		final float minCameraPositionX = this.getVisibleRangeLowerLeft().x + viewingWidth / 2f;
 		final float maxCameraPositionX = this.getVisibleRangeUpperRight().x - viewingWidth / 2f;
 		final float minCameraPositionY = this.getVisibleRangeLowerLeft().y + viewingHeight / 2f;
@@ -550,10 +548,6 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			return;
 		}
 		this.menu.setPosition(x, y);
-		final OrthographicCamera camera = (OrthographicCamera) this.stage.getCamera();
-		final float cameraViewingWidth = camera.zoom * camera.viewportWidth;
-		final float goldenRatio = Settings.getGoldenRatio();
-		this.menu.setScale(cameraViewingWidth / (this.menu.getButtonWidthHeight() * 3) * (goldenRatio / (1 + goldenRatio)));
 		this.menu.showFirstLevel();
 		this.show(this.menu);
 	}

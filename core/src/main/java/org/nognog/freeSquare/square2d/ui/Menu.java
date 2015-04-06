@@ -1,8 +1,10 @@
 package org.nognog.freeSquare.square2d.ui;
 
 import org.nognog.freeSquare.CameraObserver;
+import org.nognog.freeSquare.Settings;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /**
@@ -21,6 +23,9 @@ public class Menu extends MultiLevelFlickButtonController implements CameraObser
 
 	@Override
 	public void updateCamera(Camera camera) {
-		// nothing
+		final OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+		final float cameraViewingWidth = orthographicCamera.zoom * orthographicCamera.viewportWidth;
+		final float goldenRatio = Settings.getGoldenRatio();
+		this.setScale(cameraViewingWidth / (this.getButtonWidthHeight() * 3) * (goldenRatio / (1 + goldenRatio)));
 	}
 }
