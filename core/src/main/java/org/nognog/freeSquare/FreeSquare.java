@@ -420,11 +420,18 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final float maxZoom = this.getMaxZoom();
 		final OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
 		camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
-
-		final float viewingWidth = camera.viewportWidth * camera.zoom;
-		final float viewingHeight = camera.viewportHeight * camera.zoom;
+		final float minViewableWidth = camera.viewportWidth * minZoom;
+		final float minViewableHeight = camera.viewportHeight * minZoom;
+		
 		float squareWidth = this.square.getWidth();
 		float squareHeight = this.square.getHeight();
+		if (minViewableWidth > squareWidth + minViewableWidth / 2f || minViewableHeight > squareHeight + minViewableHeight / 2f) {
+			camera.position.x = this.square.getX() + squareWidth / 2;
+			camera.position.y = this.square.getY() + squareHeight / 2;
+			return;
+		}
+		final float viewingWidth = camera.viewportWidth * camera.zoom;
+		final float viewingHeight = camera.viewportHeight * camera.zoom;
 		if (viewingWidth > squareWidth || viewingHeight > squareHeight) {
 			camera.position.x = this.square.getX() + squareWidth / 2;
 			camera.position.y = this.square.getY() + squareHeight / 2;
@@ -759,9 +766,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
-			System.out.println("new player"); //$NON-NLS-1$
-			this.player = new Player("goshi"); //$NON-NLS-1$
-			PersistItems.PLAYER.save(this.player);
+//			System.out.println("new player"); //$NON-NLS-1$
+//			this.player = new Player("goshi"); //$NON-NLS-1$
+//			PersistItems.PLAYER.save(this.player);
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
