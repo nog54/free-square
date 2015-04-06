@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  */
 public class FreeSquareGestureDetector extends InputMultiplexer {
 
-
 	boolean isLastLongPressed;
 
 	/**
@@ -59,7 +58,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 
 			@Override
 			public boolean pan(float x, float y, float deltaX, float deltaY) {
-				if(freeSquare.getSquare() == null){
+				if (freeSquare.getSquare() == null) {
 					return false;
 				}
 				if (!this.isLastTouchBackGround()) {
@@ -68,10 +67,11 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				if (freeSquare.isLockingCameraMove()) {
 					return false;
 				}
-				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
-				float currentZoom = camera.zoom;
-
-				camera.translate(-deltaX * currentZoom, deltaY * currentZoom, 0);
+				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
+				final float currentZoom = camera.zoom;
+				final float cameraMoveX = -deltaX * currentZoom;
+				final float cameraMoveY = deltaY * currentZoom;
+				camera.translate(cameraMoveX, cameraMoveY, 0);
 				freeSquare.adjustCameraZoomAndPositionIfRangeOver();
 				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
 				freeSquare.notifyCameraObservers();

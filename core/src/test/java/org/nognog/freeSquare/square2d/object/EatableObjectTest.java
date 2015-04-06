@@ -31,7 +31,7 @@ public class EatableObjectTest {
 	@Test
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		for (EatableObjectType type : EatableObjectType.values()) {
 			EatableObject object = type.create();
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);

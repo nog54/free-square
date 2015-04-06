@@ -573,7 +573,10 @@ public class CombineSquare2d extends Square2d {
 		if (separateTargetCombinePoints.length == 0) {
 			return false;
 		}
-		if (this.validateRemoveCombinePoints(separateTarget) == false) {
+		if (this.validateThatSquaresAfterSeparateIsCombineWithOtherSquare(separateTarget) == false) {
+			return false;
+		}
+		if (this.validateThatNotExistsIsolatedCombinePoint(separateTarget) == false) {
 			return false;
 		}
 		Vertex[] singleVertices = getSingleCombineVertices(separateTargetCombinePoints);
@@ -584,7 +587,7 @@ public class CombineSquare2d extends Square2d {
 		return this.trySeparateBuriedSquare(separateTarget);
 	}
 
-	private boolean validateRemoveCombinePoints(Square2d separateTarget) {
+	private boolean validateThatSquaresAfterSeparateIsCombineWithOtherSquare(Square2d separateTarget) {
 		if (this.squares.contains(separateTarget, true) && this.squares.size == 2) {
 			return true;
 		}
@@ -596,13 +599,13 @@ public class CombineSquare2d extends Square2d {
 			final Array<Square2d> compareSquares = new Array<>(this.squares);
 			compareSquares.removeValue(validateSquare, true);
 			compareSquares.removeValue(separateTarget, true);
-			boolean combinedWithOtherSquare = false;
+			boolean hasCombinedWithOtherSquareAtVertices = false;
 			int closeToOtherSquareVertexCount = 0;
 			for (CombinePoint combinePoint : this.combinePoints.values().toArray()) {
 				if (combinePoint.contains(validateSquare)) {
 					final int afterRemoveCombineVerticesCount = (combinePoint.contains(separateTarget)) ? combinePoint.combinedVertices.size - 1 : combinePoint.combinedVertices.size;
 					if (afterRemoveCombineVerticesCount != 1) {
-						combinedWithOtherSquare = true;
+						hasCombinedWithOtherSquareAtVertices = true;
 						closeToOtherSquareVertexCount++;
 					} else {
 						for (Square2d compareSquare : compareSquares) {
@@ -621,7 +624,7 @@ public class CombineSquare2d extends Square2d {
 					}
 				}
 			}
-			if (!combinedWithOtherSquare) {
+			if (!hasCombinedWithOtherSquareAtVertices) {
 				return false;
 			}
 			if (closeToOtherSquareVertexCount < 2) {
@@ -629,6 +632,51 @@ public class CombineSquare2d extends Square2d {
 			}
 		}
 		return true;
+	}
+
+	private boolean validateThatNotExistsIsolatedCombinePoint(Square2d separateTarget) {
+		final CombinePoint[] allCombinePoints = this.getCombinePoints();
+		final boolean isLinkingToBase[] = new boolean[allCombinePoints.length];
+		Array<Square2d> alreadyCheckSquare = new Array<>();
+		this.updateIsLinkingToBase(isLinkingToBase, allCombinePoints, this.base);
+		alreadyCheckSquare.add(this.base);
+		while (true) {
+			boolean isChange = false;
+			for (int i = 0; i < isLinkingToBase.length; i++) {
+				if (isLinkingToBase[i] == false) {
+					continue;
+				}
+				final CombinedVertex[] combinePointVertices = allCombinePoints[i].combinedVertices.<CombinedVertex> toArray(CombinedVertex.class);
+				for (CombinedVertex combinedVertex : combinePointVertices) {
+					if (combinedVertex.square == separateTarget || alreadyCheckSquare.contains(combinedVertex.square, true)) {
+						continue;
+					}
+					this.updateIsLinkingToBase(isLinkingToBase, allCombinePoints, combinedVertex.square);
+					alreadyCheckSquare.add(combinedVertex.square);
+					isChange = true;
+				}
+			}
+			if (isChange == false || alreadyCheckSquare.size == this.squares.size - 1) {
+				break;
+			}
+		}
+		return alreadyCheckSquare.size == this.squares.size - 1;
+	}
+
+	private void updateIsLinkingToBase(boolean[] isLinkingToBase, CombinePoint[] allCombinePoints, Square2d square) {
+		final CombinePoint[] baseCombinePoints = this.getCombinePointOf(square);
+		for (CombinePoint baseCombinePoint : baseCombinePoints) {
+			isLinkingToBase[getIndexOf(baseCombinePoint, allCombinePoints)] = true;
+		}
+	}
+
+	private static int getIndexOf(Object searchObject, Object[] objects) {
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] == searchObject) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private boolean trySeparateProjectingSquare(Square2d separateTarget, Vertex[] singleVertices) {

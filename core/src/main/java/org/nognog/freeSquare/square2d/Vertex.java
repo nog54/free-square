@@ -101,6 +101,17 @@ public class Vertex {
 		return new Vertex(x, y);
 	}
 
+	/**
+	 * factory method
+	 * 
+	 * @param x
+	 * @param y
+	 * @return new instance
+	 */
+	public static Vertex vertex(double x, double y) {
+		return new Vertex((float) x, (float) y);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

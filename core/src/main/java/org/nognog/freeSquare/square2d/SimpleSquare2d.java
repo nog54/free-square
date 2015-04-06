@@ -67,9 +67,9 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 
 	private static Image createSquareImage(Square2dType createSquareType) {
 		Image image = new Image(createSquareType.getTexture());
-		image.setWidth(createSquareType.getSize().getWidth());
-		image.setHeight(image.getHeight() * (createSquareType.getSize().getWidth() / createSquareType.getTexture().getWidth()));
-		image.setY(createSquareType.getSquarePositionOffsetY());
+		image.setWidth((float) createSquareType.getSize().getWidth());
+		image.setHeight((float) (image.getHeight() * (createSquareType.getSize().getWidth() / createSquareType.getTexture().getWidth())));
+		image.setY((float) createSquareType.getSquarePositionOffsetY());
 		image.setName(createSquareType.getName());
 		image.setTouchable(Touchable.disabled);
 		return image;

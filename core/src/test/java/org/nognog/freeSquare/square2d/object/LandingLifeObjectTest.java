@@ -37,7 +37,7 @@ public class LandingLifeObjectTest {
 			final boolean actual1 = object.isValid();
 			assertThat(actual1, is(expected1));
 
-			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 			square.addSquareObject(object);
 
 			final boolean expected2 = true;
@@ -63,7 +63,7 @@ public class LandingLifeObjectTest {
 			} catch (ClassCastException e) {
 				continue;
 			}
-			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 			square.addSquareObject(object);
 
 			String jsonString = json.toJson(object);
@@ -95,7 +95,7 @@ public class LandingLifeObjectTest {
 			} catch (NullPointerException e) {
 				// ok
 			}
-			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 			Vertex[] vertices = square.getVertices();
 			final float x = (vertices[1].x + vertices[3].x) / 2;
 			final float y = (vertices[0].y + vertices[2].y) / 2;

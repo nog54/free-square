@@ -140,7 +140,7 @@ public class Square2dObjectTest {
 	}
 
 	private void serializeAndDeserialize(Json json, Square2dObjectType type) {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		Square2dObject object = type.create();
 		square.addSquareObject(object);
 		String jsonString = json.toJson(object);

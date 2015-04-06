@@ -28,7 +28,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testGetWidth() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		final float expected1 = square.getSquareImage().getWidth();
 		final float actual1 = square.getWidth();
 
@@ -42,7 +42,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testGetHeight() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		final float expected1 = square.getSquareImage().getHeight();
 		final float actual1 = square.getHeight();
 		assertThat(actual1, is(expected1));
@@ -57,7 +57,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testDrawBatchFloat() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		square.addActor(mock(Square2dObject.class));
 		Batch batch = mock(Batch.class);
 		when(batch.getTransformMatrix()).thenReturn(new Matrix4());
@@ -86,7 +86,7 @@ public class SimpleSquare2dTest {
 		assertThat(actual1, is(expected1));
 		assertThat(actual2, is(expected2));
 
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		final float x = -1;
 		final float y = 1;
 		square.addSquareObject(object, x, y);
@@ -101,7 +101,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testGetObjects() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		for (Square2dObject object : square.getObjects()) {
 			fail();
 		}
@@ -116,7 +116,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testGetSquareSize() {
-		SimpleSquare2d square1 = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square1 = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		Square2dSize expected1 = Square2dSize.MEDIUM;
 		Square2dSize actual1 = square1.getSquareSize();
 		assertThat(actual1, is(expected1));
@@ -134,7 +134,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testIsConcave() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		boolean expected1 = false;
 		boolean actual1 = square.isConcave();
 		assertThat(actual1, is(expected1));
@@ -142,7 +142,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testContainsInSquareArea() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		boolean expected1 = true;
 		Vertex[] vertices = square.getVertices();
 		boolean actual1 = square.containsPosition(vertices[0].x, vertices[0].y);
@@ -159,16 +159,16 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testToString() {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		boolean expected1 = true;
-		boolean actual1 = square.toString().contains(Square2dType.GRASSY_SQUARE1.getName());
+		boolean actual1 = square.toString().contains(Square2dType.GRASSY_SQUARE1_MEDIUM.getName());
 		assertThat(actual1, is(expected1));
 	}
 
 	@Test
 	public final void testNotifyObservers() {
 		System.out.println(Gdx.gl);
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		SquareObserver observer1 = mock(SquareObserver.class);
 		SquareObserver observer2 = mock(SquareObserver.class);
 		SquareObserver observer3 = mock(SquareObserver.class);
@@ -194,7 +194,7 @@ public class SimpleSquare2dTest {
 	
 	@Test
 	public final void testGetBorder(){
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1.create();
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		float actual1 = square.getLeftEndX();
 		float actual2 = square.getRightEndX();
 		float actual3 = square.getBottomEndY();

@@ -20,10 +20,12 @@ import com.badlogic.gdx.math.Intersector;
 @SuppressWarnings("javadoc")
 public enum Square2dType {
 
-	GRASSY_SQUARE1(
+	
+	GRASSY_SQUARE1_MEDIUM(
 			getString("grassy-square1", "medium"), Resources.grassy1Path, vertex(511.5f, 64f), vertex(1010f, 272f), vertex(511.5f, 478f), vertex(14f, 272f), Square2dSize.MEDIUM, HopSquare.class), //$NON-NLS-1$ //$NON-NLS-2$
-	GRASSY_SQUARE1_SMALL(GRASSY_SQUARE1, getString("grassy-square1", "small"), Square2dSize.SMALL), //$NON-NLS-1$ //$NON-NLS-2$
-	GRASSY_SQUARE1_LARGE(GRASSY_SQUARE1, getString("grassy-square1", "large"), Square2dSize.LARGE), //$NON-NLS-1$ //$NON-NLS-2$
+	GRASSY_SQUARE1_TINY(GRASSY_SQUARE1_MEDIUM, getString("grassy-square1", "tiny"), Square2dSize.TINY), //$NON-NLS-1$ //$NON-NLS-2$
+	GRASSY_SQUARE1_SMALL(GRASSY_SQUARE1_MEDIUM, getString("grassy-square1", "small"), Square2dSize.SMALL), //$NON-NLS-1$ //$NON-NLS-2$
+	GRASSY_SQUARE1_LARGE(GRASSY_SQUARE1_MEDIUM, getString("grassy-square1", "large"), Square2dSize.LARGE), //$NON-NLS-1$ //$NON-NLS-2$
 
 	;
 
@@ -51,7 +53,7 @@ public enum Square2dType {
 		this.baseVertex4 = baseVertex4;
 		this.size = size;
 
-		final float scale = size.getWidth() / texture.getWidth();
+		final double scale = size.getWidth() / texture.getWidth();
 		this.squarePositionOffsetY = size.getWidth() / 12;
 		this.vertex1 = vertex(baseVertex1.x * scale, baseVertex1.y * scale + this.getSquarePositionOffsetY());
 		this.vertex2 = vertex(baseVertex2.x * scale, baseVertex2.y * scale + this.getSquarePositionOffsetY());
@@ -80,7 +82,7 @@ public enum Square2dType {
 	private final Vertex baseVertex2;
 	private final Vertex baseVertex3;
 	private final Vertex baseVertex4;
-	private final float squarePositionOffsetY;
+	private final double squarePositionOffsetY;
 	private final Square2dSize size;
 	private final boolean isConcave;
 
@@ -99,7 +101,7 @@ public enum Square2dType {
 	/**
 	 * @return the squarePositionOffsetY
 	 */
-	public float getSquarePositionOffsetY() {
+	public double getSquarePositionOffsetY() {
 		return this.squarePositionOffsetY;
 	}
 

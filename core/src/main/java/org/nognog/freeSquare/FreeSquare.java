@@ -92,14 +92,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		this.setSquare(null);
 		this.actLongTime(timeFromLastRun);
-		InputMultiplexer multiplexer = new InputMultiplexer();
+		final InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(new FreeSquareGestureDetector(this));
 		multiplexer.addProcessor(this.stage);
 		Gdx.input.setInputProcessor(multiplexer);
 		final int fontSize = this.logicalCameraWidth / 18;
 		this.font = FontUtil.createMPlusFont(fontSize);
 		this.initializeWidgets();
-
 	}
 
 	private void initializeWidgets() {
@@ -139,13 +138,14 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void right() {
+				FreeSquare.this.setSquare(null);
 				FreeSquare.this.getPlayer().clearSquares();
 				FreeSquare.this.showSquareOnly();
 			}
 
 			@Override
 			public void left() {
-				FreeSquare.this.getStage().setDebugAll(!FreeSquare.this.getStage().getRoot().getDebug());
+				((OrthographicCamera) FreeSquare.this.getStage().getCamera()).zoom = FreeSquare.this.getMaxZoom();
 				FreeSquare.this.showSquareOnly();
 			}
 
@@ -187,11 +187,11 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		if (!(this.square instanceof SimpleSquare2d)) {
 			throw new IllegalArgumentException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
 		}
-		Square2d convertTarget = this.square;
+		final Square2d convertTarget = this.square;
 		final float cameraX = this.getStage().getCamera().position.x;
 		final float cameraY = this.getStage().getCamera().position.y;
 		this.setSquare(null);
-		CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
+		final CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
 		this.player.replaceSquare(convertTarget, combineSquare);
 		this.setSquare(combineSquare);
 		this.getStage().getCamera().position.x = cameraX;
@@ -236,14 +236,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.enableSquare();
 			this.square.removeSquareObserver(this);
 			this.square.remove();
-			// this.square.setDrawEdge(false);
 		}
 		this.square = square;
 		if (this.square != null) {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
-			// this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}
@@ -310,7 +308,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public boolean putSquareObject(Square2dObject putObject) {
 		if (putObject.isLandingOnSquare()) {
 			putObject.setEnabledAction(true);
-			Square2dEvent event = new AddObjectEvent(putObject);
+			final Square2dEvent event = new AddObjectEvent(putObject);
 			event.addExceptObserver(putObject);
 			this.getSquare().notifyObservers(event);
 			return true;
@@ -425,6 +423,13 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 		final float viewingWidth = camera.viewportWidth * camera.zoom;
 		final float viewingHeight = camera.viewportHeight * camera.zoom;
+		float squareWidth = this.square.getWidth();
+		float squareHeight = this.square.getHeight();
+		if (viewingWidth > squareWidth || viewingHeight > squareHeight) {
+			camera.position.x = this.square.getX() + squareWidth / 2;
+			camera.position.y = this.square.getY() + squareHeight / 2;
+			return;
+		}
 		final float minCameraPositionX = this.getVisibleRangeLowerLeft().x + viewingWidth / 2f;
 		final float maxCameraPositionX = this.getVisibleRangeUpperRight().x - viewingWidth / 2f;
 		final float minCameraPositionY = this.getVisibleRangeLowerLeft().y + viewingHeight / 2f;
@@ -439,7 +444,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	 */
 	@SuppressWarnings("static-method")
 	public float getMinZoom() {
-		return 1f;
+		return 1;
 	}
 
 	/**
@@ -764,15 +769,15 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.lastRun = new Date();
 			return 0;
 		}
-		Date now = new Date();
+		final Date now = new Date();
 		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
 		return diffSecond;
 	}
 
 	private static Item<?, ?>[] getAllItems() {
-		Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.getAllItems();
-		Item<?, ?>[] allSquareItem = Square2dItem.getAllItems();
-		Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItem.length];
+		final Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.getAllItems();
+		final Item<?, ?>[] allSquareItem = Square2dItem.getAllItems();
+		final Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItem.length];
 		System.arraycopy(allSquare2dObjectItems, 0, allItems, 0, allSquare2dObjectItems.length);
 		System.arraycopy(allSquareItem, 0, allItems, allSquare2dObjectItems.length, allSquareItem.length);
 		return allItems;
@@ -829,7 +834,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	@Override
 	public void notify(SquareEvent event) {
 		if (event instanceof CollectObjectRequestEvent) {
-			Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
+			final Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
 			if (collectRequestedObject instanceof LifeObject) {
 				this.player.addLife(((LifeObject) collectRequestedObject).getLife());
 			} else {
@@ -839,7 +844,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 
 		if (event instanceof RenameRequestEvent) {
-			Nameable renameRequestedObject = ((RenameRequestEvent) event).getRenameRequestedObject();
+			final Nameable renameRequestedObject = ((RenameRequestEvent) event).getRenameRequestedObject();
 			final String title;
 			if (renameRequestedObject instanceof Life) {
 				title = Messages.getString("lifeNameInput"); //$NON-NLS-1$

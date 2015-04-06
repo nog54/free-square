@@ -6,9 +6,9 @@ package org.nognog.freeSquare.square2d;
 @SuppressWarnings("javadoc")
 public enum Square2dSize {
 
-	SMALL(1024), MEDIUM(1536), LARGE(2048);
+	TINY(256), SMALL(1024), MEDIUM(1536), LARGE(2048);
 
-	private final float width;
+	private final double width;
 
 	private Square2dSize(float width) {
 		this.width = width;
@@ -17,7 +17,7 @@ public enum Square2dSize {
 	/**
 	 * @return width
 	 */
-	public float getWidth() {
+	public double getWidth() {
 		return this.width;
 	}
 }
