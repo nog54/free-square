@@ -8,6 +8,7 @@ import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
 import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.exception.CombineSquare2dReadFailureException;
 
@@ -253,14 +254,18 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
 				continue;
 			}
-			if (field.getName() == "squares") { //$NON-NLS-1$
+			if (field.getName().equals("squares")) { //$NON-NLS-1$
 				this.squares = new Array<>();
 				JsonValue squaresData = jsonData.get("squares"); //$NON-NLS-1$
 				for (JsonValue squareData = squaresData.child; squareData != null; squareData = squareData.next) {
 					try {
 						Square2d readSquare = json.readValue(Square2d.class, squareData);
+						setupSquare(readSquare);
 						this.squares.add(readSquare);
 					} catch (CombineSquare2dReadFailureException e) {
+						for(Square2d square : e.getContainedSquares()){
+							setupSquare(square);	
+						}
 						this.squares.addAll(e.getContainedSquares());
 					}
 				}
@@ -269,5 +274,12 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 			}
 		}
 		this.itemBox.addObserver(this);
+	}
+
+	private static void setupSquare(Square2d readSquare) {
+		if(readSquare instanceof CombineSquare2d){
+			((CombineSquare2d) readSquare).startCreateSimpleTextureAsyncIfNotStart();
+			((CombineSquare2d) readSquare).startSetupSeparatableSquaresAsyncIfNotStart();
+		}
 	}
 }

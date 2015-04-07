@@ -114,7 +114,7 @@ public enum Square2dType {
 			Constructor<?> c = this.klass.getConstructor(Square2dType.class);
 			return (SimpleSquare2d) c.newInstance(this);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 
 		try {

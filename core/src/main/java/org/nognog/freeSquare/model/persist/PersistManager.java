@@ -9,6 +9,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.nognog.freeSquare.model.player.PlayLog;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -25,6 +26,7 @@ public class PersistManager {
 	private static byte[] encryptionKey;
 
 	static {
+		CombineSquare2d.addCombineSquare2dSerializerTo(json);
 		try {
 			PlayLog playlog = loadPlayLog();
 			encryptionKey = toEncryptKey(playlog);
@@ -32,11 +34,11 @@ public class PersistManager {
 			encryptionKey = null;
 		}
 	}
-	
+
 	/**
 	 * @return json
 	 */
-	public static Json getUseJson(){
+	public static Json getUseJson() {
 		return json;
 	}
 
@@ -106,10 +108,10 @@ public class PersistManager {
 		if (key == null) {
 			throw new SaveFailureException("key is null."); //$NON-NLS-1$
 		}
-		if(!saveObject.isValid()){
+		if (!saveObject.isValid()) {
 			throw new SaveFailureException("save object is invalid."); //$NON-NLS-1$
 		}
-		
+
 		final String saveJson = json.toJson(saveObject);
 		try {
 			final byte[] encryptedSaveJson = encrypt(saveJson.getBytes(charSet));
@@ -175,8 +177,8 @@ public class PersistManager {
 		if (loadItem == PersistItems.PLAY_LOG) {
 			return (T) loadPlayLog();
 		}
-		
-		if(!isAlreadyPersisted(loadItem)){
+
+		if (!isAlreadyPersisted(loadItem)) {
 			throw new LoadFailureException("load item is not persisted."); //$NON-NLS-1$
 		}
 

@@ -192,6 +192,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		final float cameraY = this.getStage().getCamera().position.y;
 		this.setSquare(null);
 		final CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
+		combineSquare.startCreateSimpleTextureAsyncIfNotStart();
+		combineSquare.startSetupSeparatableSquaresAsyncIfNotStart();
 		this.player.replaceSquare(convertTarget, combineSquare);
 		this.setSquare(combineSquare);
 		this.getStage().getCamera().position.x = cameraX;
@@ -283,7 +285,12 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
 				final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
 				if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
-					return baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
+					final boolean isSuccess = baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
+					if(isSuccess){
+						baseSquare.startCreateSimpleTextureAsyncIfNotStart();
+						baseSquare.startSetupSeparatableSquaresAsyncIfNotStart();
+					}
+					return isSuccess;
 				}
 			}
 		}
@@ -298,6 +305,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			Square2d containsSeparateSquareSquare = ((CombineSquare2d) this.square).getSquareThatContains(separateSquare);
 			final boolean isSuccessSeparate = ((CombineSquare2d) this.square).separate(containsSeparateSquareSquare);
 			if (isSuccessSeparate) {
+				((CombineSquare2d) this.square).startCreateSimpleTextureAsyncIfNotStart();
+				((CombineSquare2d) this.square).startSetupSeparatableSquaresAsyncIfNotStart();
 				this.player.addSquare(containsSeparateSquareSquare);
 			}
 		}
