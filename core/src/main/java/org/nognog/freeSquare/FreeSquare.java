@@ -236,7 +236,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void setSquare(Square2d square) {
 		if (this.square != null) {
 			this.enableSquare();
-			this.square.setDrawEdge(false);
+			//this.square.setDrawEdge(false);
 			this.square.removeSquareObserver(this);
 			this.square.remove();
 		}
@@ -245,7 +245,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
-			this.square.setDrawEdge(true);
+			//this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}

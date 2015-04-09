@@ -596,10 +596,7 @@ public class CombineSquare2d extends Square2d {
 		if (separateTargetCombinePoints.length == 0) {
 			return false;
 		}
-		if (this.validateThatSquaresAfterSeparateIsCombineWithOtherSquare(separateTarget) == false) {
-			return false;
-		}
-		if (this.validateThatNotExistsIsolatedCombinePoint(separateTarget) == false) {
+		if (this.validateThatAllSquaresAfterSeparateLinkToBaseSquare(separateTarget) == false) {
 			return false;
 		}
 		Vertex[] singleVertices = getSingleCombineVertices(separateTargetCombinePoints);
@@ -610,96 +607,69 @@ public class CombineSquare2d extends Square2d {
 		return this.trySeparateBuriedSquare(separateTarget);
 	}
 
-	private boolean validateThatSquaresAfterSeparateIsCombineWithOtherSquare(Square2d separateTarget) {
+	private boolean validateThatAllSquaresAfterSeparateLinkToBaseSquare(Square2d separateTarget) {
 		if (this.squares.contains(separateTarget, true) && this.squares.size == 2) {
 			return true;
 		}
-		for (Square2d validateSquare : this.squares) {
-			if (validateSquare == separateTarget) {
-				continue;
-			}
-			final Vertex[] validateSquareActualVertices = this.getOrderedActualVertices(validateSquare).<Vertex> toArray(Vertex.class);
-			final Array<Square2d> compareSquares = new Array<>(this.squares);
-			compareSquares.removeValue(validateSquare, true);
-			compareSquares.removeValue(separateTarget, true);
-			boolean hasCombinedWithOtherSquareAtVertices = false;
-			int closeToOtherSquareVertexCount = 0;
-			for (CombinePoint combinePoint : this.combinePoints.values().toArray()) {
-				if (combinePoint.contains(validateSquare)) {
-					final int afterRemoveCombineVerticesCount = (combinePoint.contains(separateTarget)) ? combinePoint.combinedVertices.size - 1 : combinePoint.combinedVertices.size;
-					if (afterRemoveCombineVerticesCount != 1) {
-						hasCombinedWithOtherSquareAtVertices = true;
-						closeToOtherSquareVertexCount++;
-					} else {
-						for (Square2d compareSquare : compareSquares) {
-							final Vertex[] compareSquareActualVertices = this.getOrderedActualVertices(compareSquare).<Vertex> toArray(Vertex.class);
-							if (CombineSquare2dUtils.getNearestSufficientlyCloseEdge(combinePoint.actualVertex, compareSquareActualVertices) != null) {
-								closeToOtherSquareVertexCount++;
-							}
-						}
-					}
-				} else {
-					if (combinePoint.contains(separateTarget) && combinePoint.combinedVertices.size == 1) {
-						continue;
-					}
-					if (CombineSquare2dUtils.getNearestSufficientlyCloseEdge(combinePoint.actualVertex, validateSquareActualVertices) != null) {
-						closeToOtherSquareVertexCount++;
-					}
-				}
-			}
-			if (!hasCombinedWithOtherSquareAtVertices) {
-				return false;
-			}
-			if (closeToOtherSquareVertexCount < 2) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean validateThatNotExistsIsolatedCombinePoint(Square2d separateTarget) {
-		final CombinePoint[] allCombinePoints = this.getCombinePoints();
-		final boolean isLinkingToBase[] = new boolean[allCombinePoints.length];
-		Array<Square2d> alreadyCheckSquare = new Array<>();
-		this.updateIsLinkingToBase(isLinkingToBase, allCombinePoints, this.base);
-		alreadyCheckSquare.add(this.base);
+		Array<Square2d> linkToBaseSquares = new Array<>(new Square2d[] { this.base });
 		while (true) {
-			boolean isChange = false;
-			for (int i = 0; i < isLinkingToBase.length; i++) {
-				if (isLinkingToBase[i] == false) {
-					continue;
-				}
-				final CombinedVertex[] combinePointVertices = allCombinePoints[i].combinedVertices.<CombinedVertex> toArray(CombinedVertex.class);
-				for (CombinedVertex combinedVertex : combinePointVertices) {
-					if (combinedVertex.square == separateTarget || alreadyCheckSquare.contains(combinedVertex.square, true)) {
-						continue;
-					}
-					this.updateIsLinkingToBase(isLinkingToBase, allCombinePoints, combinedVertex.square);
-					alreadyCheckSquare.add(combinedVertex.square);
-					isChange = true;
-				}
-			}
-			if (isChange == false || alreadyCheckSquare.size == this.squares.size - 1) {
+			boolean isAdded = findAndAddSquareThatLinkToBaseSquareFromCurrentLinkToBaseSquares(separateTarget, linkToBaseSquares);
+			if (isAdded == false) {
 				break;
 			}
-		}
-		return alreadyCheckSquare.size == this.squares.size - 1;
-	}
-
-	private void updateIsLinkingToBase(boolean[] isLinkingToBase, CombinePoint[] allCombinePoints, Square2d square) {
-		final CombinePoint[] baseCombinePoints = this.getCombinePointOf(square);
-		for (CombinePoint baseCombinePoint : baseCombinePoints) {
-			isLinkingToBase[getIndexOf(baseCombinePoint, allCombinePoints)] = true;
-		}
-	}
-
-	private static int getIndexOf(Object searchObject, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] == searchObject) {
-				return i;
+			if (linkToBaseSquares.size == this.squares.size - 1) {
+				return true;
 			}
 		}
-		return -1;
+		return false;
+	}
+
+	private boolean findAndAddSquareThatLinkToBaseSquareFromCurrentLinkToBaseSquares(Square2d separateTarget, Array<Square2d> linkToBaseSquares) {
+		boolean result = false;
+		for (Square2d validateSquare : this.squares) {
+			if (validateSquare == separateTarget || linkToBaseSquares.contains(validateSquare, true)) {
+				continue;
+			}
+			final Vertex[] validateSquareVertices = this.getOrderedActualVertices(validateSquare).<Vertex> toArray(Vertex.class);
+			final CombinePoint[] validateSquareCombinePoints = this.getCombinePointOf(validateSquare);
+			boolean validateSquareIsCombinedWithVertices = false;
+			int closeToOtherSquareVertexCount = 0;
+			for (Square2d compareSquare : linkToBaseSquares) {
+				final Vertex[] compareSquareVertices = this.getOrderedActualVertices(compareSquare).<Vertex> toArray(Vertex.class);
+				closeToOtherSquareVertexCount += countSufficientlyCloseVertex(validateSquareVertices, compareSquareVertices);
+				closeToOtherSquareVertexCount += countSufficientlyCloseVertex(compareSquareVertices, validateSquareVertices);
+				for (CombinePoint compareSquareCombinePoint : this.getCombinePointOf(compareSquare)) {
+					if (contains(compareSquareCombinePoint, validateSquareCombinePoints)) {
+						validateSquareIsCombinedWithVertices = true;
+						closeToOtherSquareVertexCount--;
+					}
+				}
+			}
+			if (validateSquareIsCombinedWithVertices && closeToOtherSquareVertexCount > 1) {
+				linkToBaseSquares.add(validateSquare);
+				result = true;
+			}
+		}
+		return result;
+	}
+
+	private static int countSufficientlyCloseVertex(final Vertex[] validateVertices, final Vertex[] squareVertices) {
+		int result = 0;
+		for (Vertex validateSquareVertex : validateVertices) {
+			if (CombineSquare2dUtils.getNearestSufficientlyCloseEdge(validateSquareVertex, squareVertices) != null) {
+				result++;
+			}
+		}
+		return result;
+	}
+
+	private static boolean contains(Object findObject, Object[] objects) {
+		for (Object object : objects) {
+			if (object == findObject) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean trySeparateProjectingSquare(Square2d separateTarget, Vertex[] singleVertices) {
