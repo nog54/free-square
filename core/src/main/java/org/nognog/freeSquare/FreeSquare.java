@@ -139,7 +139,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			@Override
 			public void right() {
 				FreeSquare.this.setSquare(null);
-				FreeSquare.this.getPlayer().clearSquares();
+				//FreeSquare.this.getPlayer().clearSquares();
 				FreeSquare.this.showSquareOnly();
 			}
 
@@ -236,7 +236,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 	public void setSquare(Square2d square) {
 		if (this.square != null) {
 			this.enableSquare();
-			//this.square.setDrawEdge(false);
+			// this.square.setDrawEdge(false);
 			this.square.removeSquareObserver(this);
 			this.square.remove();
 		}
@@ -245,7 +245,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			this.square.setPosition(0, 0);
 			this.stage.addActor(square);
 			this.square.addSquareObserver(this);
-			//this.square.setDrawEdge(true);
+			// this.square.setDrawEdge(true);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
 			}
@@ -286,7 +286,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 				final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
 				if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
 					final boolean isSuccess = baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
-					if(isSuccess){
+					if (isSuccess) {
 						baseSquare.startCreateSimpleTextureAsyncIfNotStart();
 						baseSquare.startSetupSeparatableSquaresAsyncIfNotStart();
 					}
@@ -407,7 +407,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		if (this.square == null) {
 			return new Vector2(0, 0);
 		}
-		return new Vector2(this.square.getLeftEndX() - this.square.getWidth() / 2, this.square.getBottomEndY() - this.square.getWidth() / 2);
+		return new Vector2(this.square.getLeftEndX() - this.square.getWidth(), this.square.getBottomEndY() - this.square.getHeight());
 	}
 
 	/**
@@ -417,7 +417,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		if (this.square == null) {
 			return new Vector2(0, 0);
 		}
-		return new Vector2(this.square.getRightEndX() + this.square.getWidth() / 2, this.square.getTopEndY() + this.square.getWidth() / 2);
+		return new Vector2(this.square.getRightEndX() + this.square.getWidth(), this.square.getTopEndY() + this.square.getHeight());
 	}
 
 	/**
@@ -433,7 +433,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
 		final float minViewableWidth = camera.viewportWidth * minZoom;
 		final float minViewableHeight = camera.viewportHeight * minZoom;
-		
+
 		float squareWidth = this.square.getWidth();
 		float squareHeight = this.square.getHeight();
 		if (minViewableWidth > squareWidth + minViewableWidth / 2f || minViewableHeight > squareHeight + minViewableHeight / 2f) {
@@ -769,9 +769,9 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
-//			System.out.println("new player"); //$NON-NLS-1$
-//			this.player = new Player("goshi"); //$NON-NLS-1$
-//			PersistItems.PLAYER.save(this.player);
+			//			System.out.println("new player"); //$NON-NLS-1$
+			//			this.player = new Player("goshi"); //$NON-NLS-1$
+			// PersistItems.PLAYER.save(this.player);
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {

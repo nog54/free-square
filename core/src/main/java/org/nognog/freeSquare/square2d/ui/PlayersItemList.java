@@ -128,7 +128,6 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			Square2d putSquare = (Square2d) putTargetFetchingActor;
 			this.putSquareAndTakeOutItemIfSuccess(putSquare, this.fetchingItem.getItem());
 		}
-		this.getList().setSelectedIndex(-1);
 		this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
 		this.freeSquare.showPlayerItemList();
 	}
@@ -167,6 +166,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			if (tappedItem.getItem() instanceof Square2dItem) {
 				Square2d putSquare = ((Square2dItem) tappedItem.getItem()).createSquare2d();
 				this.putSquareAndTakeOutItemIfSuccess(putSquare, tappedItem.getItem());
+				this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
 				this.freeSquare.showSquareOnly();
 			}
 		}
