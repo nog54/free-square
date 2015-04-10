@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 
+import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItemClass;
@@ -19,7 +20,7 @@ import com.badlogic.gdx.utils.JsonValue;
 /**
  * @author goshi 2014/10/28
  */
-public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializable {
+public class Player implements Nameable, PersistItemClass, ItemBoxObserver, Json.Serializable {
 	private static final String defaultName = "noname"; //$NON-NLS-1$
 
 	private String name;
@@ -31,9 +32,10 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 	private Array<Life> lifes;
 	private Array<Square<?>> squares;
 
-	@SuppressWarnings("unused")
-	private Player() {
-		// used by json
+	/**
+	 * create instance with default name
+	 */
+	public Player() {
 		this(defaultName);
 	}
 
@@ -49,12 +51,13 @@ public class Player implements PersistItemClass, ItemBoxObserver, Json.Serializa
 		this.lifes = new Array<>();
 		this.squares = new Array<>();
 	}
+	
+	@Override
+	public void setName(String name){
+		this.name = name;
+	}
 
-	/**
-	 * プレイヤー名を返します
-	 * 
-	 * @return name
-	 */
+	@Override
 	public String getName() {
 		return this.name;
 	}

@@ -6,7 +6,6 @@ import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.persist.PersistItems;
-import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
@@ -89,6 +88,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		this.logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 		final float timeFromLastRun = setupPersistItems();
+
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		this.setSquare(null);
 		this.actLongTime(timeFromLastRun);
@@ -139,7 +139,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			@Override
 			public void right() {
 				FreeSquare.this.setSquare(null);
-				//FreeSquare.this.getPlayer().clearSquares();
+				// FreeSquare.this.getPlayer().clearSquares();
 				FreeSquare.this.showSquareOnly();
 			}
 
@@ -689,7 +689,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 
 			@Override
 			public void canceled() {
-				// nothing
+				//
 			}
 		}, title, nameable.getName());
 	}
@@ -757,7 +757,7 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;
 		}
-		System.out.println(PersistManager.getUseJson().prettyPrint(this.player));
+		// System.out.println(PersistManager.getUseJson().prettyPrint(this.player));
 	}
 
 	private float setupPersistItems() {
@@ -769,9 +769,8 @@ public class FreeSquare extends ApplicationAdapter implements SquareObserver {
 		}
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
-			//			System.out.println("new player"); //$NON-NLS-1$
-			//			this.player = new Player("goshi"); //$NON-NLS-1$
-			// PersistItems.PLAYER.save(this.player);
+			this.player = new Player(""); //$NON-NLS-1$
+			this.inputName(this.player, "プレイヤー名入力"); //$NON-NLS-1$
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {

@@ -6,6 +6,7 @@ import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
@@ -144,6 +145,9 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 		final float squareY = stageCoodinateXY.y - (pannedSquare.getMostTopVertex().y + pannedSquare.getMostBottomVertex().y) / 2;
 		pannedSquare.setPosition(squareX, squareY);
 		if (this.freeSquare.getSquare() != null) {
+			if (!(this.freeSquare.getSquare() instanceof CombineSquare2d)) {
+				this.freeSquare.convertThisSquareToCombineSquare2d();
+			}
 			this.freeSquare.getSquare().addActorForce(pannedSquare);
 		} else {
 			this.freeSquare.getStage().addActor(pannedSquare);

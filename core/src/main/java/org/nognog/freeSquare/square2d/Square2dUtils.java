@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2014/12/24
@@ -18,6 +19,14 @@ public class Square2dUtils {
 	 */
 	public static boolean isTwist(Square2d square) {
 		return isTwist(square.getVertices());
+	}
+
+	/**
+	 * @param vertices
+	 * @return true if square vertices is twist.
+	 */
+	public static boolean isTwist(Array<Vertex> vertices) {
+		return isTwist(vertices.<Vertex> toArray(Vertex.class));
 	}
 
 	/**

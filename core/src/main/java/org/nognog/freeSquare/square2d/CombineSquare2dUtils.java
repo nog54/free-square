@@ -107,7 +107,7 @@ public class CombineSquare2dUtils {
 		}
 		final float theta1 = edge1.getTheta();
 		final float theta2 = edge2.getTheta();
-		if(theta1 == 0 || theta2 == 0){
+		if (theta1 == 0 || theta2 == 0) {
 			return true;
 		}
 		return isSufficientlySameSlope(theta1, theta2);
@@ -127,7 +127,7 @@ public class CombineSquare2dUtils {
 		for (int i = 1; i <= vertices.length; i++) {
 			Edge edge1 = new Edge(insertVertex, vertices[i % vertices.length]);
 			Edge edge2 = new Edge(vertices[i - 1], insertVertex);
-			if(isSufficientlySameSlope(edge1.getTheta(), edge2.getTheta())){
+			if (isSufficientlySameSlope(edge1.getTheta(), edge2.getTheta())) {
 				return i % vertices.length;
 			}
 		}
@@ -178,6 +178,15 @@ public class CombineSquare2dUtils {
 			}
 		}
 		return result.toArray(Edge.class);
+	}
+
+	/**
+	 * @param checkVertex
+	 * @param vertices
+	 * @return edge under vertex. may be null.
+	 */
+	public static Edge getNearestSufficientlyCloseEdge(Vertex checkVertex, Array<Vertex> vertices) {
+		return getNearestSufficientlyCloseEdge(checkVertex, vertices.<Vertex> toArray(Vertex.class));
 	}
 
 	/**
