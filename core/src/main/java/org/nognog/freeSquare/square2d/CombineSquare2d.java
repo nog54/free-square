@@ -196,6 +196,7 @@ public class CombineSquare2d extends Square2d {
 						return null;
 					}
 					this.simpleTexture = new Texture(pixmap);
+					pixmap.dispose();
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 					return null;
@@ -407,10 +408,6 @@ public class CombineSquare2d extends Square2d {
 		this.allNotCombiningSquare2d = allOrderedNotCombiningSquare2d.<Square2d> toArray(Square2d.class);
 
 		if (this.simpleTexture != null) {
-			if (!this.simpleTexture.getTextureData().isPrepared()) {
-				this.simpleTexture.getTextureData().prepare();
-			}
-			this.simpleTexture.getTextureData().consumePixmap().dispose();
 			this.simpleTexture.dispose();
 		}
 		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
