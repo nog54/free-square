@@ -3,7 +3,7 @@ package org.nognog.freeSquare.square2d.object;
 import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.model.square.SquareObject;
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -25,7 +25,7 @@ import com.badlogic.gdx.utils.JsonValue;
 /**
  * @author goshi 2014/12/03
  */
-public class Square2dObject extends Group implements SquareObject<Square2d>, SquareObserver, SelfValidatable, Json.Serializable {
+public class Square2dObject extends Group implements SquareObject<Square2d>, SquareEventListener, SelfValidatable, Json.Serializable {
 
 	private Square2dObjectType<?> type;
 	private float logicalWidth;

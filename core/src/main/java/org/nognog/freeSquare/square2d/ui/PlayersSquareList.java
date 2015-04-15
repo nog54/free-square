@@ -1,8 +1,8 @@
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.Messages;
 import org.nognog.freeSquare.Settings;
+import org.nognog.freeSquare.activity.MainActivity;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
@@ -24,16 +24,16 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 
 	// TODO extract Presenter, extract super class
 
-	private FreeSquare freeSquare;
+	private MainActivity mainActivity;
 
 	/**
-	 * @param freeSquare
+	 * @param mainActivity
 	 * @param player
 	 * @param font
 	 */
-	public PlayersSquareList(FreeSquare freeSquare, Player player, BitmapFont font) {
-		super(freeSquare.getStage().getCamera().viewportWidth / Settings.getGoldenRatio(), freeSquare.getStage().getCamera().viewportHeight / 2, player, font);
-		this.freeSquare = freeSquare;
+	public PlayersSquareList(MainActivity mainActivity, Player player, BitmapFont font) {
+		super(mainActivity.getFreeSquare().getStage().getCamera().viewportWidth / Settings.getGoldenRatio(), mainActivity.getFreeSquare().getStage().getCamera().viewportHeight / 2, player, font);
+		this.mainActivity = mainActivity;
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 	@Override
 	protected Square<?>[] getShowListItemsFromPlayer(Player setupPlayer) {
 		Array<Square<?>> playersSquares = new Array<>(setupPlayer.getSquares());
-		if (this.freeSquare != null) {
-			playersSquares.removeValue(this.freeSquare.getSquare(), true);
+		if (this.mainActivity != null) {
+			playersSquares.removeValue(this.mainActivity.getSquare(), true);
 		}
 		return playersSquares.toArray(Square.class);
 	}
@@ -69,15 +69,15 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 		final float squareX = stageCoodinateXY.x - (beFetchedSquare.getMostLeftVertex().x + beFetchedSquare.getMostRightVertex().x) / 2;
 		final float squareY = stageCoodinateXY.y - (beFetchedSquare.getMostTopVertex().y + beFetchedSquare.getMostBottomVertex().y) / 2;
 		beFetchedSquare.setPosition(squareX, squareY);
-		if (!(this.freeSquare.getSquare() instanceof CombineSquare2d)) {
-			this.freeSquare.convertThisSquareToCombineSquare2d();
+		if (!(this.mainActivity.getSquare() instanceof CombineSquare2d)) {
+			this.mainActivity.convertThisSquareToCombineSquare2d();
 		}
-		if (this.freeSquare.getSquare() != null) {
-			this.freeSquare.getSquare().addActorForce(beFetchedSquare);
+		if (this.mainActivity.getSquare() != null) {
+			this.mainActivity.getSquare().addActorForce(beFetchedSquare);
 		} else {
-			this.freeSquare.getStage().addActor(beFetchedSquare);
+			this.mainActivity.getStage().addActor(beFetchedSquare);
 		}
-		this.freeSquare.showSquareOnly();
+		this.mainActivity.showSquareOnly();
 		beFetchedSquare.toFront();
 	}
 
@@ -88,50 +88,50 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 
 	@Override
 	protected void fetchingActorMoved() {
-		if (this.freeSquare.getSquare() != null) {
-			this.freeSquare.getSquare().notify(new UpdateSquareEvent());
+		if (this.mainActivity.getSquare() != null) {
+			this.mainActivity.getSquare().notify(new UpdateSquareEvent());
 		}
 	}
 
 	@Override
 	protected void cameraMoved() {
-		final float oldX = this.freeSquare.getStage().getCamera().position.x;
-		final float oldY = this.freeSquare.getStage().getCamera().position.y;
-		this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-		final float afterX = this.freeSquare.getStage().getCamera().position.x;
-		final float afterY = this.freeSquare.getStage().getCamera().position.y;
+		final float oldX = this.mainActivity.getStage().getCamera().position.x;
+		final float oldY = this.mainActivity.getStage().getCamera().position.y;
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		final float afterX = this.mainActivity.getStage().getCamera().position.x;
+		final float afterY = this.mainActivity.getStage().getCamera().position.y;
 		this.fetchingActor.moveBy(afterX - oldX, afterY - oldY);
-		this.freeSquare.notifyCameraObservers();
+		this.mainActivity.getFreeSquare().notifyCameraObservers();
 	}
 
 	@Override
 	protected void putFetchingActor(Square2d putTargetFetchingActor) {
-		if (this.freeSquare.getSquare() != null) {
-			this.freeSquare.getSquare().removeActorForce(this.fetchingActor);
+		if (this.mainActivity.getSquare() != null) {
+			this.mainActivity.getSquare().removeActorForce(this.fetchingActor);
 		} else {
-			this.freeSquare.getStage().getRoot().removeActor(this.fetchingActor);
+			this.mainActivity.getStage().getRoot().removeActor(this.fetchingActor);
 		}
-		final boolean existsBaseSquare = this.freeSquare.getSquare() != null;
-		final boolean successPut = this.freeSquare.putSquare2d(this.fetchingActor);
+		final boolean existsBaseSquare = this.mainActivity.getSquare() != null;
+		final boolean successPut = this.mainActivity.putSquare2d(this.fetchingActor);
 		final boolean executedCombine = existsBaseSquare && successPut;
 		if (executedCombine) {
 			this.getPlayer().removeSquare(this.fetchingActor);
 		}
-		this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-		this.freeSquare.showPlayersSquareList();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		this.mainActivity.showPlayersSquareList();
 	}
 
 	@Override
 	protected void selectedItemLongPressed(Square<?> longPressedItem, float x, float y) {
-		this.freeSquare.inputName(longPressedItem, Messages.getString("squareNameInput")); //$NON-NLS-1$
+		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("squareNameInput")); //$NON-NLS-1$
 	}
 
 	@Override
 	protected void selectedItemTapped(Square<?> tappedItem, int count) {
 		final boolean isDoubleTapped = (count == 2);
 		if (isDoubleTapped && tappedItem instanceof Square2d) {
-			this.freeSquare.setSquareWithAction((Square2d) tappedItem);
-			this.freeSquare.showSquareOnly();
+			this.mainActivity.setSquareWithAction((Square2d) tappedItem);
+			this.mainActivity.showSquareOnly();
 		}
 	}
 

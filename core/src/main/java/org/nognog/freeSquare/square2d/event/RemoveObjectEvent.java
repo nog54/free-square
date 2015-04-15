@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.event;
 
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 
@@ -27,7 +27,7 @@ public class RemoveObjectEvent extends Square2dEvent {
 	/**
 	 * @param target
 	 */
-	public RemoveObjectEvent(SquareObserver target) {
+	public RemoveObjectEvent(SquareEventListener target) {
 		this(null, target);
 	}
 
@@ -35,7 +35,7 @@ public class RemoveObjectEvent extends Square2dEvent {
 	 * @param removedObject
 	 * @param target
 	 */
-	public RemoveObjectEvent(Square2dObject removedObject, SquareObserver target) {
+	public RemoveObjectEvent(Square2dObject removedObject, SquareEventListener target) {
 		super(target);
 		this.removedObject = removedObject;
 	}

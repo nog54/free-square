@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.CombineInfo.ReconstructCombineInfo;
 import org.nognog.freeSquare.square2d.CombinePoint.CombinedVertex;
 import org.nognog.freeSquare.square2d.event.UpdateSquareEvent;
@@ -355,7 +355,8 @@ public class CombineSquare2d extends Square2d {
 			square.removeSquareObject(object, false);
 			this.addSquareObject(object, object.getX() + squarePositionDiffX, object.getY() + squarePositionDiffY, false);
 		}
-		this.addSquareObservers(square.observers.<SquareObserver> toArray(SquareObserver.class));
+		this.addSquareObservers(square.observers.<SquareEventListener> toArray(SquareEventListener.class));
+		this.disposeSimpleTexture();
 		this.calculateBorder();
 		this.requestDrawOrderUpdate();
 	}
@@ -365,16 +366,28 @@ public class CombineSquare2d extends Square2d {
 			return false;
 		}
 		this.removeActorForce(square);
-		this.requestDrawOrderUpdate();
+		this.disposeSimpleTexture();
 		this.calculateBorder();
+		this.requestDrawOrderUpdate();
 		return true;
+	}
+	
+	private void disposeSimpleTexture() {
+		if (this.simpleTexture != null) {
+			this.simpleTexture.dispose();
+		}
+		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
+			this.simpleTextureBaseFuture.cancel(true);
+		}
+		this.simpleTexture = null;
+		this.simpleTextureBaseFuture = null;
 	}
 
 	@Override
 	public void addActorForce(Actor actor) {
 		super.addActorForce(actor);
 		if (actor instanceof Square2d) {
-			this.resetAllCombiningSimpleSquare2d();
+			this.resetAllSimpleSquare2d();
 		}
 	}
 
@@ -382,11 +395,11 @@ public class CombineSquare2d extends Square2d {
 	public void removeActorForce(Actor actor) {
 		super.removeActorForce(actor);
 		if (actor instanceof Square2d) {
-			this.resetAllCombiningSimpleSquare2d();
+			this.resetAllSimpleSquare2d();
 		}
 	}
 
-	private void resetAllCombiningSimpleSquare2d() {
+	private void resetAllSimpleSquare2d() {
 		Array<SimpleSquare2d> allCombiningSimpleSquare2d = new Array<>();
 		for (Square2d square : this.squares) {
 			if (square instanceof SimpleSquare2d) {
@@ -406,15 +419,6 @@ public class CombineSquare2d extends Square2d {
 		}
 		allOrderedNotCombiningSquare2d.sort(actorComparator);
 		this.allNotCombiningSquare2d = allOrderedNotCombiningSquare2d.<Square2d> toArray(Square2d.class);
-
-		if (this.simpleTexture != null) {
-			this.simpleTexture.dispose();
-		}
-		if (this.simpleTextureBaseFuture != null && !this.simpleTextureBaseFuture.isDone()) {
-			this.simpleTextureBaseFuture.cancel(true);
-		}
-		this.simpleTexture = null;
-		this.simpleTextureBaseFuture = null;
 	}
 
 	/**

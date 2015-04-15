@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
@@ -169,9 +169,9 @@ public class SimpleSquare2dTest {
 	public final void testNotifyObservers() {
 		System.out.println(Gdx.gl);
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		SquareObserver observer1 = mock(SquareObserver.class);
-		SquareObserver observer2 = mock(SquareObserver.class);
-		SquareObserver observer3 = mock(SquareObserver.class);
+		SquareEventListener observer1 = mock(SquareEventListener.class);
+		SquareEventListener observer2 = mock(SquareEventListener.class);
+		SquareEventListener observer3 = mock(SquareEventListener.class);
 
 		Square2dEvent event = new Square2dEvent();
 		square.addSquareObserver(observer1);

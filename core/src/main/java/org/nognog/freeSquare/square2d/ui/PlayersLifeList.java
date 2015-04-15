@@ -1,8 +1,8 @@
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.Messages;
 import org.nognog.freeSquare.Settings;
+import org.nognog.freeSquare.activity.MainActivity;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.square2d.Square2dEvent;
@@ -25,16 +25,16 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	// TODO extract Presenter, extract super class
 
-	private FreeSquare freeSquare;
+	private MainActivity mainActivity;
 
 	/**
-	 * @param freeSquare
+	 * @param mainActivity 
 	 * @param player
 	 * @param font
 	 */
-	public PlayersLifeList(FreeSquare freeSquare, Player player, BitmapFont font) {
-		super(freeSquare.getStage().getCamera().viewportWidth / Settings.getGoldenRatio(), freeSquare.getStage().getCamera().viewportHeight / 2, player, font);
-		this.freeSquare = freeSquare;
+	public PlayersLifeList(MainActivity mainActivity, Player player, BitmapFont font) {
+		super(mainActivity.getFreeSquare().getStage().getCamera().viewportWidth / Settings.getGoldenRatio(), mainActivity.getFreeSquare().getStage().getCamera().viewportHeight / 2, player, font);
+		this.mainActivity = mainActivity;
 	}
 
 	@Override
@@ -62,11 +62,11 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	@Override
 	protected void beginFetchActor(float x, float y, LifeObject beFetchedActor, Life beFetchedItem) {
 		beFetchedActor.setEnabledAction(false);
-		Vector2 squareCoodinateXY = this.freeSquare.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-		this.freeSquare.getSquare().addSquareObject(beFetchedActor, squareCoodinateXY.x, squareCoodinateXY.y, false);
-		this.freeSquare.showSquareOnly();
+		Vector2 squareCoodinateXY = this.mainActivity.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
+		this.mainActivity.getSquare().addSquareObject(beFetchedActor, squareCoodinateXY.x, squareCoodinateXY.y, false);
+		this.mainActivity.showSquareOnly();
 	}
-	
+
 	@Override
 	protected boolean isMovableFetchingActor() {
 		return true;
@@ -74,38 +74,38 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected void cameraMoved() {
-		final float oldX = this.freeSquare.getStage().getCamera().position.x;
-		final float oldY = this.freeSquare.getStage().getCamera().position.y;
-		this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-		final float afterX = this.freeSquare.getStage().getCamera().position.x;
-		final float afterY = this.freeSquare.getStage().getCamera().position.y;
+		final float oldX = this.mainActivity.getStage().getCamera().position.x;
+		final float oldY = this.mainActivity.getStage().getCamera().position.y;
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		final float afterX = this.mainActivity.getStage().getCamera().position.x;
+		final float afterY = this.mainActivity.getStage().getCamera().position.y;
 		this.fetchingActor.moveBy(afterX - oldX, afterY - oldY);
-		this.freeSquare.notifyCameraObservers();
+		this.mainActivity.getFreeSquare().notifyCameraObservers();
 	}
 
 	@Override
 	protected void fetchingActorMoved() {
-		this.freeSquare.getSquare().notify(new UpdateSquareObjectEvent());
+		this.mainActivity.getSquare().notify(new UpdateSquareObjectEvent());
 	}
 
 	@Override
 	protected void putFetchingActor(LifeObject putTargetFetchingActor) {
 		if (putTargetFetchingActor.isValid()) {
-			this.freeSquare.getPlayer().removeLife(putTargetFetchingActor.getLife());
+			this.mainActivity.getPlayer().removeLife(putTargetFetchingActor.getLife());
 			putTargetFetchingActor.setEnabledAction(true);
 			Square2dEvent event = new AddObjectEvent(putTargetFetchingActor);
 			event.addExceptObserver(putTargetFetchingActor);
-			this.freeSquare.getSquare().notifyObservers(event);
+			this.mainActivity.getSquare().notifyObservers(event);
 		} else {
-			this.freeSquare.getSquare().removeSquareObject(putTargetFetchingActor);
+			this.mainActivity.getSquare().removeSquareObject(putTargetFetchingActor);
 		}
-		this.freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-		this.freeSquare.showPlayersLifeList();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		this.mainActivity.showPlayersLifeList();
 	}
 
 	@Override
 	protected void selectedItemLongPressed(Life longPressedItem, float x, float y) {
-		this.freeSquare.inputName(longPressedItem, Messages.getString("lifeNameInput")); //$NON-NLS-1$
+		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("lifeNameInput")); //$NON-NLS-1$
 	}
 
 	@Override

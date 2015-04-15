@@ -19,6 +19,8 @@ public class Settings {
 	private static float aspectRatio;
 	private static int defaultLogicalCameraWidth;
 	private static int defaultLogicalCameraHeight;
+	private static float playerNameMaxTextDrawWidth;
+	private static float objectNameMaxTextDrawWidth;
 	
 	private static final float goldenRatio = 1.6180339887f;
 
@@ -31,6 +33,8 @@ public class Settings {
 		aspectRatio = (float) physicalDisplayHeight / physicalDisplayWidth;
 		defaultLogicalCameraWidth = 1024;
 		defaultLogicalCameraHeight = (int) (defaultLogicalCameraWidth * aspectRatio);
+		playerNameMaxTextDrawWidth = defaultLogicalCameraWidth / goldenRatio;
+		objectNameMaxTextDrawWidth = defaultLogicalCameraWidth / goldenRatio;
 	}
 
 	/**
@@ -72,9 +76,30 @@ public class Settings {
 	}
 	
 	/**
+	 * @return max width of player name
+	 */
+	public static float getPlayerNameMaxTextDrawWidth(){
+		return playerNameMaxTextDrawWidth;
+	}
+	
+	/**
+	 * @return max width of object name
+	 */
+	public static float getObjectNameMaxTextDrawWidth(){
+		return objectNameMaxTextDrawWidth;
+	}
+	
+	/**
 	 * @return golden ratio
 	 */
 	public static float getGoldenRatio(){
 		return goldenRatio;
+	}
+
+	/**
+	 * @return font size
+	 */
+	public static int getFontSize() {
+		return defaultLogicalCameraWidth / 18;
 	}
 }

@@ -1,10 +1,16 @@
 package org.nognog.freeSquare.square2d.action;
 
-import org.nognog.freeSquare.FreeSquare;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.END;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SET_SQUARE;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_IN;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_OUT;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.START;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_IN;
+import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_OUT;
+
+import org.nognog.freeSquare.activity.MainActivity;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
-
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.*;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
  */
 public class ChangeSquareAction extends Action {
 
-	private FreeSquare freeSquare;
+	private MainActivity activity;
 	private Square2d square;
 	private Direction direction;
 
@@ -37,16 +43,16 @@ public class ChangeSquareAction extends Action {
 	}
 
 	/**
-	 * @param freeSquare
+	 * @param activity
 	 * @param square
 	 * @param direction
 	 */
-	public ChangeSquareAction(FreeSquare freeSquare, Square2d square, Direction direction) {
+	public ChangeSquareAction(MainActivity activity, Square2d square, Direction direction) {
 		this();
-		if (freeSquare == null || direction == null) {
+		if (activity == null || direction == null) {
 			throw new IllegalArgumentException(""); //$NON-NLS-1$
 		}
-		this.freeSquare = freeSquare;
+		this.activity = activity;
 		this.square = square;
 		this.direction = direction;
 	}
@@ -84,7 +90,7 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performStartPhase() {
-		final Group stageRoot = this.freeSquare.getStage().getRoot();
+		final Group stageRoot = this.activity.getStage().getRoot();
 		for (Action stageRootAction : stageRoot.getActions()) {
 			if (stageRootAction instanceof ChangeSquareAction) {
 				if (((ChangeSquareAction) stageRootAction).phase != START) {
@@ -93,47 +99,47 @@ public class ChangeSquareAction extends Action {
 			}
 		}
 		stageRoot.setTouchable(Touchable.disabled);
-		if (this.freeSquare.getSquare() == null) {
+		if (this.activity.getSquare() == null) {
 			this.zoomInTargetValue = 1;
 		} else {
-			this.zoomInTargetValue = ((OrthographicCamera) this.freeSquare.getStage().getCamera()).zoom;
+			this.zoomInTargetValue = ((OrthographicCamera) this.activity.getStage().getCamera()).zoom;
 		}
 		this.phase = ZOOM_OUT;
 		return;
 	}
 
 	private void performZoomOut(float delta) {
-		OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
-		camera.zoom = MathUtils.clamp(camera.zoom + delta * zoomSpeed, this.freeSquare.getMinZoom(), this.freeSquare.getMaxZoom());
-		if (camera.zoom == this.freeSquare.getMaxZoom()) {
+		OrthographicCamera camera = (OrthographicCamera) this.activity.getStage().getCamera();
+		camera.zoom = MathUtils.clamp(camera.zoom + delta * zoomSpeed, this.activity.getMinZoom(), this.activity.getMaxZoom());
+		if (camera.zoom == this.activity.getMaxZoom()) {
 			this.phase = SLIDE_OUT;
 		}
 	}
 
 	private void performSlideOut(float delta) {
-		if (this.freeSquare.getSquare() == null) {
+		if (this.activity.getSquare() == null) {
 			this.phase = SET_SQUARE;
 			return;
 		}
 
 		this.moveCamera(delta, this.direction);
-		final OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		final OrthographicCamera camera = (OrthographicCamera) this.activity.getStage().getCamera();
 		final float viewingWidth = camera.viewportWidth * camera.zoom;
 		final float viewingHeight = camera.viewportHeight * camera.zoom;
-		final boolean slideOutEnd = (camera.position.x + viewingWidth / 2 < this.freeSquare.getSquare().getLeftEndX())
-				|| (camera.position.x - viewingWidth / 2 > this.freeSquare.getSquare().getRightEndX()) || (camera.position.y + viewingHeight / 2 < this.freeSquare.getSquare().getBottomEndY())
-				|| (camera.position.y - viewingHeight / 2 > this.freeSquare.getSquare().getTopEndY());
+		final boolean slideOutEnd = (camera.position.x + viewingWidth / 2 < this.activity.getSquare().getLeftEndX())
+				|| (camera.position.x - viewingWidth / 2 > this.activity.getSquare().getRightEndX()) || (camera.position.y + viewingHeight / 2 < this.activity.getSquare().getBottomEndY())
+				|| (camera.position.y - viewingHeight / 2 > this.activity.getSquare().getTopEndY());
 		if (slideOutEnd) {
 			this.phase = SET_SQUARE;
 		}
 	}
 
 	private void performSetSquare() {
-		boolean beforeSquareIsNull = this.freeSquare.getSquare() == null;
-		this.freeSquare.setSquare(this.square);
-		final OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		boolean beforeSquareIsNull = this.activity.getSquare() == null;
+		this.activity.setSquare(this.square);
+		final OrthographicCamera camera = (OrthographicCamera) this.activity.getStage().getCamera();
 		if (beforeSquareIsNull) {
-			camera.zoom = this.freeSquare.getMaxZoom();
+			camera.zoom = this.activity.getMaxZoom();
 		}
 		if (this.square == null) {
 			camera.position.x = 0;
@@ -154,13 +160,13 @@ public class ChangeSquareAction extends Action {
 			camera.position.x = this.square.getRightEndX() + camera.viewportWidth * camera.zoom;
 			camera.position.y = this.square.getCenterY();
 		}
-		this.zoomInTargetValue = MathUtils.clamp(this.zoomInTargetValue, this.freeSquare.getMinZoom(), this.freeSquare.getMaxZoom());
+		this.zoomInTargetValue = MathUtils.clamp(this.zoomInTargetValue, this.activity.getMinZoom(), this.activity.getMaxZoom());
 		this.phase = SLIDE_IN;
 	}
 
 	private void performSlideIn(float delta) {
 		this.moveCamera(delta, this.direction);
-		final Camera camera = this.freeSquare.getStage().getCamera();
+		final Camera camera = this.activity.getStage().getCamera();
 		final boolean slideInEnd = (this.direction == Direction.DOWN && camera.position.y <= this.square.getCenterY())
 				|| (this.direction == Direction.UP && camera.position.y >= this.square.getCenterY()) || (this.direction == Direction.LEFT && camera.position.x <= this.square.getCenterX())
 				|| (this.direction == Direction.RIGHT && camera.position.x >= this.square.getCenterX());
@@ -172,7 +178,7 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performZoomIn(float delta) {
-		OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		OrthographicCamera camera = (OrthographicCamera) this.activity.getStage().getCamera();
 		camera.zoom -= delta * zoomSpeed;
 		if (camera.zoom < this.zoomInTargetValue) {
 			camera.zoom = this.zoomInTargetValue;
@@ -181,13 +187,13 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performEndPhase() {
-		this.freeSquare.getStage().getRoot().setTouchable(Touchable.enabled);
+		this.activity.getStage().getRoot().setTouchable(Touchable.enabled);
 	}
 
 	private void moveCamera(float delta, Direction moveDirection) {
 		final float speedX = getMoveX(moveDirection);
 		final float speedY = getMoveY(moveDirection);
-		OrthographicCamera camera = (OrthographicCamera) this.freeSquare.getStage().getCamera();
+		OrthographicCamera camera = (OrthographicCamera) this.activity.getStage().getCamera();
 		camera.translate(speedX * delta, speedY * delta, 0);
 	}
 
@@ -212,21 +218,21 @@ public class ChangeSquareAction extends Action {
 	}
 
 	/**
-	 * @return the freeSquare
+	 * @return the activity
 	 */
-	public FreeSquare getFreeSquare() {
-		return this.freeSquare;
+	public MainActivity getActivity() {
+		return this.activity;
 	}
 
 	/**
-	 * @param freeSquare
-	 *            the freeSquare to set
+	 * @param activity
+	 *            the activity to set
 	 */
-	public void setFreeSquare(FreeSquare freeSquare) {
-		if (freeSquare == null) {
+	public void setActivity(MainActivity activity) {
+		if (activity == null) {
 			throw new IllegalArgumentException();
 		}
-		this.freeSquare = freeSquare;
+		this.activity = activity;
 	}
 
 	/**

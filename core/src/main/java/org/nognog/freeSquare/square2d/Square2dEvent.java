@@ -1,7 +1,7 @@
 package org.nognog.freeSquare.square2d;
 
 import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.Array;
  */
 public class Square2dEvent implements SquareEvent{
 
-	private final SquareObserver targetObserver;
-	private Array<SquareObserver> exceptObservers;
+	private final SquareEventListener targetObserver;
+	private Array<SquareEventListener> exceptObservers;
 
 	/**
 	 * 
@@ -23,7 +23,7 @@ public class Square2dEvent implements SquareEvent{
 	/**
 	 * @param targetObserver
 	 */
-	public Square2dEvent(SquareObserver targetObserver) {
+	public Square2dEvent(SquareEventListener targetObserver) {
 		this.targetObserver = targetObserver;
 		this.exceptObservers = new Array<>();
 	}
@@ -31,14 +31,14 @@ public class Square2dEvent implements SquareEvent{
 	/**
 	 * @return target observer
 	 */
-	public SquareObserver getTargetObserver() {
+	public SquareEventListener getTargetObserver() {
 		return this.targetObserver;
 	}
 
 	/**
 	 * @param observer
 	 */
-	public void addExceptObserver(SquareObserver observer) {
+	public void addExceptObserver(SquareEventListener observer) {
 		if (this.targetObserver != null) {
 			throw new RuntimeException("target observer should be null when addExceptObserver is called."); //$NON-NLS-1$
 		}
@@ -50,7 +50,7 @@ public class Square2dEvent implements SquareEvent{
 	/**
 	 * @return except observers.
 	 */
-	public Array<SquareObserver> getExceptObservers() {
+	public Array<SquareEventListener> getExceptObservers() {
 		return this.exceptObservers;
 	}
 }

@@ -57,7 +57,9 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 
 	@Override
 	protected void selectedItemPanned(T1 pannedItem, float x, float y, float deltaX, float deltaY) {
-
+		if (pannedItem == null) {
+			return;
+		}
 		if (this.fetchingActor == null) {
 			this.fetchingItem = pannedItem;
 			this.fetchingActor = this.transformToFetchActorType(pannedItem);

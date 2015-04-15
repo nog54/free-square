@@ -5,7 +5,7 @@ import java.util.Comparator;
 import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.RemoveObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.Array;
  */
 public abstract class Square2d extends Group implements Square<Square2dObject>, SimpleDrawable {
 
-	protected Array<SquareObserver> observers = new Array<>();
+	protected Array<SquareEventListener> observers = new Array<>();
 	protected Array<Square2dObject> objects = new Array<>();
 
 	protected boolean drawEdge;
@@ -453,7 +453,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	}
 
 	@Override
-	public void addSquareObserver(SquareObserver observer) {
+	public void addSquareObserver(SquareEventListener observer) {
 		if (this.observers.contains(observer, true)) {
 			return;
 		}
@@ -463,14 +463,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	/**
 	 * @param addObservers
 	 */
-	public void addSquareObservers(SquareObserver... addObservers) {
-		for (SquareObserver observer : addObservers) {
+	public void addSquareObservers(SquareEventListener... addObservers) {
+		for (SquareEventListener observer : addObservers) {
 			this.addSquareObserver(observer);
 		}
 	}
 
 	@Override
-	public void removeSquareObserver(SquareObserver observer) {
+	public void removeSquareObserver(SquareEventListener observer) {
 		this.observers.removeValue(observer, true);
 	}
 
@@ -487,7 +487,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			return;
 		}
 		Square2dEvent square2dEvent = (Square2dEvent) event;
-		SquareObserver notifyTarget = square2dEvent.getTargetObserver();
+		SquareEventListener notifyTarget = square2dEvent.getTargetObserver();
 		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
 			notifyTarget.notify(square2dEvent);
 			return;

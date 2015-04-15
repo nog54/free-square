@@ -1,5 +1,6 @@
-package org.nognog.freeSquare;
+package org.nognog.freeSquare.activity;
 
+import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.square2d.Square2d;
 
 import com.badlogic.gdx.InputAdapter;
@@ -13,21 +14,21 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 /**
  * @author goshi 2015/01/17
  */
-public class FreeSquareGestureDetector extends InputMultiplexer {
+public class MainActivityInputProcessor extends InputMultiplexer {
 
 	boolean isLastLongPressed;
 
 	/**
-	 * @param freeSquare
+	 * @param activity
 	 */
-	FreeSquareGestureDetector(FreeSquare freeSquare) {
-		GestureDetector gestureDetector = new GestureDetector(createFreeSquareGestureListener(freeSquare));
+	public MainActivityInputProcessor(MainActivity activity) {
+		GestureDetector gestureDetector = new GestureDetector(this.createFreeSquareGestureListener(activity));
 		gestureDetector.setLongPressSeconds(0.2f);
 		InputAdapter longTouchTapCanceller = new InputAdapter() {
 
 			@Override
 			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-				if (FreeSquareGestureDetector.this.isLastLongPressed) {
+				if (MainActivityInputProcessor.this.isLastLongPressed) {
 					return true;
 				}
 				return false;
@@ -37,7 +38,8 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 		this.addProcessor(longTouchTapCanceller);
 	}
 
-	private GestureListener createFreeSquareGestureListener(final FreeSquare freeSquare) {
+	private GestureListener createFreeSquareGestureListener(final MainActivity activity) {
+		final FreeSquare freeSquare = activity.getFreeSquare();
 		GestureListener listener = new GestureDetector.GestureAdapter() {
 			private float initialScale = 1;
 			private Actor lastTouchDownActor;
@@ -48,7 +50,7 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				this.lastTouchDownActor = freeSquare.getStage().hit(worldPosition.x, worldPosition.y, true);
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				this.initialScale = camera.zoom;
-				FreeSquareGestureDetector.this.isLastLongPressed = false;
+				MainActivityInputProcessor.this.isLastLongPressed = false;
 				return false;
 			}
 
@@ -58,13 +60,13 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 
 			@Override
 			public boolean pan(float x, float y, float deltaX, float deltaY) {
-				if (freeSquare.getSquare() == null) {
+				if (activity.getSquare() == null) {
 					return false;
 				}
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
-				if (freeSquare.isLockingCameraMove()) {
+				if (activity.isLockingCameraMove()) {
 					return false;
 				}
 				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
@@ -72,9 +74,9 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				final float cameraMoveX = -deltaX * currentZoom;
 				final float cameraMoveY = deltaY * currentZoom;
 				camera.translate(cameraMoveX, cameraMoveY, 0);
-				freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
-				freeSquare.notifyCameraObservers();
+				activity.adjustCameraZoomAndPositionIfRangeOver();
+				activity.getStage().cancelTouchFocus(activity.getSquare());
+				activity.getFreeSquare().notifyCameraObservers();
 				return true;
 			}
 
@@ -83,15 +85,15 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
-				if (freeSquare.isLockingCameraZoom()) {
+				if (activity.isLockingCameraZoom()) {
 					return false;
 				}
 				final float ratio = initialDistance / distance;
 				final float nextZoom = this.initialScale * ratio;
 				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				camera.zoom = nextZoom;
-				freeSquare.adjustCameraZoomAndPositionIfRangeOver();
-				freeSquare.getStage().cancelTouchFocus(freeSquare.getSquare());
+				activity.adjustCameraZoomAndPositionIfRangeOver();
+				activity.getStage().cancelTouchFocus(activity.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
 			}
@@ -99,18 +101,18 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 			@Override
 			public boolean tap(float x, float y, int count, int button) {
 				if (this.lastTouchDownActor != null) {
-					if (freeSquare.isSeparateSquareMode() && this.lastTouchDownActor instanceof Square2d) {
-						freeSquare.separateSquare((Square2d) this.lastTouchDownActor);
+					if (activity.isSeparateSquareMode() && this.lastTouchDownActor instanceof Square2d) {
+						activity.separateSquare((Square2d) this.lastTouchDownActor);
 						return true;
 					}
 					return false;
 				}
-				final int beforeShowingUICount = freeSquare.getViewableUICount();
-				freeSquare.showSquareOnly();
-				final int afterShowingUICount = freeSquare.getViewableUICount();
+				final int beforeShowingUICount = activity.getViewableUICount();
+				activity.showSquareOnly();
+				final int afterShowingUICount = activity.getViewableUICount();
 				if (beforeShowingUICount == afterShowingUICount) {
 					Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
-					freeSquare.showMenu(menuPosition.x, menuPosition.y);
+					activity.showMenu(menuPosition.x, menuPosition.y);
 				}
 				return true;
 			}
@@ -119,8 +121,8 @@ public class FreeSquareGestureDetector extends InputMultiplexer {
 			public boolean longPress(float x, float y) {
 				if (this.isLastTouchBackGround()) {
 					Vector2 menuPosition = freeSquare.getStage().screenToStageCoordinates(new Vector2(x, y));
-					freeSquare.showMenu(menuPosition.x, menuPosition.y);
-					FreeSquareGestureDetector.this.isLastLongPressed = true;
+					activity.showMenu(menuPosition.x, menuPosition.y);
+					MainActivityInputProcessor.this.isLastLongPressed = true;
 					return true;
 				}
 				return false;

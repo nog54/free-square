@@ -28,12 +28,12 @@ public interface Square<T extends SquareObject<?>> extends Nameable{
 	 * @param observer
 	 * 
 	 */
-	void addSquareObserver(SquareObserver observer);
+	void addSquareObserver(SquareEventListener observer);
 
 	/**
 	 * @param observer
 	 */
-	void removeSquareObserver(SquareObserver observer);
+	void removeSquareObserver(SquareEventListener observer);
 
 	/**
 	 * @param event

@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.event;
 
-import org.nognog.freeSquare.model.square.SquareObserver;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
@@ -29,7 +29,7 @@ public class EatObjectEvent extends Square2dEvent {
 	 * @param amount 
 	 * @param target
 	 */
-	public EatObjectEvent(Square2dObject eater, EatableObject eatenObject, int amount, SquareObserver target) {
+	public EatObjectEvent(Square2dObject eater, EatableObject eatenObject, int amount, SquareEventListener target) {
 		super(target);
 		this.eater = eater;
 		this.eatenObject = eatenObject;

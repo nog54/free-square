@@ -1,6 +1,6 @@
 package org.nognog.freeSquare.square2d.action;
 
-import org.nognog.freeSquare.FreeSquare;
+import org.nognog.freeSquare.activity.MainActivity;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -171,14 +171,14 @@ public class Square2dActions {
 	}
 
 	/**
-	 * @param freeSquare
+	 * @param activity
 	 * @param setSquare
 	 * @param direction
 	 * @return change square action
 	 */
-	public static Action changeSquare(FreeSquare freeSquare, Square2d setSquare, Direction direction) {
+	public static Action changeSquare(MainActivity activity, Square2d setSquare, Direction direction) {
 		final ChangeSquareAction changeSquareAction = Actions.action(ChangeSquareAction.class);
-		changeSquareAction.setFreeSquare(freeSquare);
+		changeSquareAction.setActivity(activity);
 		changeSquareAction.setSquare(setSquare);
 		changeSquareAction.setDirection(direction);
 		return changeSquareAction;
