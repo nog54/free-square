@@ -304,7 +304,7 @@ public class MainActivity extends FreeSquareActivity {
 		this.square = square;
 		if (this.square != null) {
 			this.square.setPosition(0, 0);
-			this.addActor(square);
+			this.addActor(this.square);
 			this.square.addSquareObserver(this);
 			if (this.square instanceof CombineSquare2d) {
 				((CombineSquare2d) this.square).setHighlightSeparatableSquare(this.isSeparateSquareMode);
@@ -719,12 +719,13 @@ public class MainActivity extends FreeSquareActivity {
 
 	@Override
 	public void act(float delta) {
-		if (this.square != null) {
-			this.removeActor(this.square);
+		final int oldSquareIndex = this.getChildren().indexOf(this.square, true);
+		if (oldSquareIndex != -1) {
+			this.getChildren().removeValue(this.square, true);
 		}
 		super.act(delta);
-		if (this.square != null) {
-			this.addActor(this.square);
+		if (oldSquareIndex != -1) {
+			this.getChildren().insert(oldSquareIndex, this.square);
 		}
 	}
 }

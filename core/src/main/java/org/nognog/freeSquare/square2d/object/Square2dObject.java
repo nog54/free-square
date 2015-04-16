@@ -31,7 +31,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private float logicalWidth;
 	private float logicalHeight;
 	protected Square2d square;
-	
+
 	protected Square2dObjectIcon icon;
 
 	private boolean enableAction = true;
@@ -124,8 +124,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		mainIconImage.setWidth(this.logicalWidth);
 		mainIconImage.setHeight(this.logicalHeight);
 		this.icon = new Square2dObjectIcon(mainIconImage);
-		this.icon.setOriginX(this.getOriginX());
-		this.icon.setOriginY(this.getOriginY());
+		this.icon.setX(-this.icon.getWidth() / 2);
 		this.addActor(this.icon);
 		this.setColor(type.getColor());
 	}
@@ -138,36 +137,11 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.square = square;
 	}
 
-	@Override
-	public void setX(float x) {
-		this.setPosition(x, this.getY());
-	}
-
-	@Override
-	public void setY(float y) {
-		this.setPosition(this.getX(), y);
-	}
-
-	@Override
-	public void setPosition(float x, float y) {
-		super.setPosition(x - this.getOriginX(), y - this.getOriginY());
-	}
-
 	/**
 	 * @return type of this object
 	 */
 	public Square2dObjectType<?> getType() {
 		return this.type;
-	}
-
-	@Override
-	public float getX() {
-		return super.getX() + this.getOriginX();
-	}
-
-	@Override
-	public float getY() {
-		return super.getY() + this.getOriginY();
 	}
 
 	/**
@@ -191,14 +165,14 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	/**
 	 * @return icon
 	 */
-	public Square2dObjectIcon getIcon(){
+	public Square2dObjectIcon getIcon() {
 		return this.icon;
 	}
-	
+
 	protected Image getIconMainImage() {
 		return this.icon.getMainImage();
 	}
-	
+
 	/**
 	 * @return logical width
 	 */
@@ -222,11 +196,11 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		}
 		return this.square.containsPosition(this.getX(), this.getY());
 	}
-	
+
 	/**
 	 * @return true if this is landing on vertex
 	 */
-	public boolean isLandingOnVertex(){
+	public boolean isLandingOnVertex() {
 		return this.square.isVertexPosition(this.getX(), this.getY());
 	}
 

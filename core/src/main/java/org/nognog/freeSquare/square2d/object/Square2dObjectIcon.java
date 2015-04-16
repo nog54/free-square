@@ -4,8 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
- * @author goshi
- * 2015/03/13
+ * @author goshi 2015/03/13
  */
 public class Square2dObjectIcon extends Group {
 	private final Image mainImage;
@@ -18,6 +17,7 @@ public class Square2dObjectIcon extends Group {
 		this.addActor(this.mainImage);
 		this.setWidth(mainIcon.getWidth());
 		this.setHeight(mainIcon.getHeight());
+		this.setOriginX(this.getWidth() / 2);
 	}
 
 	/**

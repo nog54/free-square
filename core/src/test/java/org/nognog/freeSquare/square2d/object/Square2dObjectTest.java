@@ -43,8 +43,8 @@ public class Square2dObjectTest {
 	@Test
 	public final void testGetX() {
 		Square2dObject object = EatableObjectType.TOFU.create();
-		object.setX(1);
-		float expected1 = object.getX(Align.center);
+		final float expected1 = 1;
+		object.setX(expected1);
 		float actual1 = object.getX();
 		assertThat(actual1, is(expected1));
 	}
@@ -52,8 +52,8 @@ public class Square2dObjectTest {
 	@Test
 	public final void testGetY() {
 		Square2dObject object = EatableObjectType.TOFU.create();
+		float expected1 = 0.3f;
 		object.setY(0.3f);
-		float expected1 = object.getY(Align.bottom) + object.getOriginY();
 		float actual1 = object.getY();
 		assertThat(actual1, is(expected1));
 	}
@@ -135,7 +135,7 @@ public class Square2dObjectTest {
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
 		for (Square2dObjectType type : Square2dObjectType.Manager.getAllTypeValues()) {
-			serializeAndDeserialize(json, type);
+			this.serializeAndDeserialize(json, type);
 		}
 	}
 

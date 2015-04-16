@@ -79,9 +79,9 @@ public class SimpleSquare2dTest {
 	@Test
 	public final void testAddSquareObjectSquare2dObjectFloatFloat() {
 		Square2dObject object = EatableObjectType.TOFU.create();
-		final float expected1 = object.getOriginX();
+		final float expected1 = 0;
 		final float actual1 = object.getX();
-		final float expected2 = object.getOriginY();
+		final float expected2 = 0;
 		final float actual2 = object.getY();
 		assertThat(actual1, is(expected1));
 		assertThat(actual2, is(expected2));

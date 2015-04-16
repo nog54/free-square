@@ -60,7 +60,7 @@ public class FreeRunningAction extends RepeatAction {
 	 * reset target position.
 	 */
 	public void resetTargetPosition() {
-		this.getMoveToNextTargetPositionAciton().reset();
+		this.getMoveToNextTargetPositionAciton().restart();
 	}
 
 	/**
