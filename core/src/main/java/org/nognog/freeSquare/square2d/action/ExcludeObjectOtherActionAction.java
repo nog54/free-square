@@ -62,16 +62,16 @@ public class ExcludeObjectOtherActionAction extends Action {
 		if (this.action == null) {
 			return false;
 		}
-		Square2dObject target = ((Square2dObject) this.actor);
+		Square2dObject actTarget = ((Square2dObject) this.actor);
 		if (this.isActing == false) {
-			this.pausingAction = target.pausePerformingActionsExcept(this);
-			target.lockAddAction();
+			this.pausingAction = actTarget.pausePerformingActionsExcept(this);
+			actTarget.lockAddAction();
 			this.isActing = true;
 		}
 
 		if (this.action.act(delta)) {
-			target.unlockAddAction();
-			target.resumePausingAction(this.pausingAction);
+			actTarget.unlockAddAction();
+			actTarget.resumePausingAction(this.pausingAction);
 			return true;
 		}
 		return false;

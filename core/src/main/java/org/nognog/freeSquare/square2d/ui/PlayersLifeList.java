@@ -105,7 +105,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected void selectedItemLongPressed(Life longPressedItem, float x, float y) {
-		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("lifeNameInput")); //$NON-NLS-1$
+		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("lifeNameInput"), ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override

@@ -685,7 +685,7 @@ public class MainActivity extends FreeSquareActivity {
 			} else {
 				title = ""; //$NON-NLS-1$
 			}
-			this.getFreeSquare().inputName(renameRequestedObject, title);
+			this.getFreeSquare().inputName(renameRequestedObject, title, ""); //$NON-NLS-1$
 		}
 	}
 

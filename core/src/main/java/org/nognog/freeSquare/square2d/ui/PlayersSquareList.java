@@ -123,7 +123,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 
 	@Override
 	protected void selectedItemLongPressed(Square<?> longPressedItem, float x, float y) {
-		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("squareNameInput")); //$NON-NLS-1$
+		this.mainActivity.getFreeSquare().inputName(longPressedItem, Messages.getString("squareNameInput"), ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override

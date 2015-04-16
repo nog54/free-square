@@ -95,11 +95,11 @@ public class FreeSquare extends ApplicationAdapter {
 	public BitmapFont getFont() {
 		return this.font;
 	}
-	
+
 	/**
 	 * @return stage camera
 	 */
-	public Camera getCamera(){
+	public Camera getCamera() {
 		return this.stage.getCamera();
 	}
 
@@ -133,17 +133,19 @@ public class FreeSquare extends ApplicationAdapter {
 	/**
 	 * @param nameable
 	 * @param title
+	 * @param hint
 	 */
-	public void inputName(final Nameable nameable, String title) {
-		this.inputName(nameable, title, Settings.getObjectNameMaxTextDrawWidth());
+	public void inputName(final Nameable nameable, String title, String hint) {
+		this.inputName(nameable, title, hint, Settings.getObjectNameMaxTextDrawWidth());
 	}
 
 	/**
 	 * @param nameable
 	 * @param title
+	 * @param hint
 	 * @param maxTextDrawWidth
 	 */
-	public void inputName(final Nameable nameable, String title, final float maxTextDrawWidth) {
+	public void inputName(final Nameable nameable, String title, String hint, final float maxTextDrawWidth) {
 		Gdx.input.getTextInput(new TextInputListener() {
 			@Override
 			public void input(String text) {
@@ -172,7 +174,7 @@ public class FreeSquare extends ApplicationAdapter {
 			public void canceled() {
 				//
 			}
-		}, title, nameable.getName());
+		}, title, nameable.getName(), hint);
 	}
 
 	@Override
@@ -251,7 +253,7 @@ public class FreeSquare extends ApplicationAdapter {
 		this.player = PersistItems.PLAYER.load();
 		if (this.player == null) {
 			this.player = new Player(""); //$NON-NLS-1$
-			this.inputName(this.player, "プレイヤー名入力", Settings.getPlayerNameMaxTextDrawWidth()); //$NON-NLS-1$
+			this.inputName(this.player, "プレイヤー名入力", "", Settings.getPlayerNameMaxTextDrawWidth()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
