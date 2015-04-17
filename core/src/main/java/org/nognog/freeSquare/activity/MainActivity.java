@@ -738,7 +738,7 @@ public class MainActivity extends FreeSquareActivity {
 			this.getChildren().removeValue(this.square, true);
 		}
 		super.act(delta);
-		if (oldSquareIndex != -1) {
+		if (oldSquareIndex != -1 && this.square != null) {
 			this.getChildren().insert(oldSquareIndex, this.square);
 		}
 	}
