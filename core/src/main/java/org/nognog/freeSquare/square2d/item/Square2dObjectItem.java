@@ -1,3 +1,17 @@
+/** Copyright 2015 Goshi Noguchi (noggon54@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License. */
+
 package org.nognog.freeSquare.square2d.item;
 
 import org.nognog.freeSquare.model.item.AbstractItem;
@@ -58,11 +72,11 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	public Color getColor() {
 		return this.getTypeInItem().getSquare2dObjectType().getColor();
 	}
-	
+
 	/**
 	 * @return square2d object
 	 */
-	public Square2dObject createSquare2dObject(){
+	public Square2dObject createSquare2dObject() {
 		return this.getTypeInItem().getSquare2dObjectType().create();
 	}
 
@@ -79,7 +93,7 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 		}
 		return allItems;
 	}
-	
+
 	@Override
 	public boolean isValid() {
 		return this.getTypeInItem() != null;
@@ -89,6 +103,5 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	public String toString() {
 		return this.getTypeInItem().toString();
 	}
-
 
 }

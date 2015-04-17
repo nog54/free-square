@@ -1,3 +1,17 @@
+/** Copyright 2015 Goshi Noguchi (noggon54@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License. */
+
 package org.nognog.freeSquare.square2d.squares;
 
 import static org.nognog.freeSquare.Messages.getString;
@@ -20,7 +34,6 @@ import com.badlogic.gdx.math.Intersector;
 @SuppressWarnings("javadoc")
 public enum Square2dType {
 
-	
 	GRASSY_SQUARE1_MEDIUM(
 			getString("grassy-square1", "medium"), Resources.grassy1Path, vertex(511.5f, 64f), vertex(1010f, 272f), vertex(511.5f, 478f), vertex(14f, 272f), Square2dSize.MEDIUM, HopSquare.class), //$NON-NLS-1$ //$NON-NLS-2$
 	GRASSY_SQUARE1_TINY(GRASSY_SQUARE1_MEDIUM, getString("grassy-square1", "tiny"), Square2dSize.TINY), //$NON-NLS-1$ //$NON-NLS-2$

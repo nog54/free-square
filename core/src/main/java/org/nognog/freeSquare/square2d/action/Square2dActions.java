@@ -1,3 +1,17 @@
+/** Copyright 2015 Goshi Noguchi (noggon54@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License. */
+
 package org.nognog.freeSquare.square2d.action;
 
 import org.nognog.freeSquare.activity.MainActivity;
@@ -21,7 +35,7 @@ public class Square2dActions {
 	/**
 	 * @param eatObject
 	 * @param eatAmount
-	 * @param moveSpeed 
+	 * @param moveSpeed
 	 * @return action
 	 */
 	public static EatAction eat(EatableObject eatObject, int eatAmount) {
@@ -31,9 +45,9 @@ public class Square2dActions {
 	/**
 	 * @param eatObject
 	 * @param eatAmount
-	 * @param eatCount 
-	 * @param eatInterval 
-	 * @param moveSpeed 
+	 * @param eatCount
+	 * @param eatInterval
+	 * @param moveSpeed
 	 * @return action
 	 */
 	public static EatAction eat(EatableObject eatObject, int eatAmount, int eatCount) {
@@ -44,7 +58,7 @@ public class Square2dActions {
 		action.setEatInterval(1);
 		return action;
 	}
-	
+
 	/**
 	 * @param targetObject
 	 * @param speed
