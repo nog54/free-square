@@ -131,14 +131,11 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		final Image mainIconImage = new Image(texture);
 		this.logicalWidth = type.getLogicalWidth();
 		this.logicalHeight = mainIconImage.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		this.setWidth(this.logicalWidth);
-		this.setHeight(this.getLogicalHeight());
-		this.setOriginX(this.logicalWidth / 2);
-		this.setOriginY(this.logicalHeight / 4);
 		mainIconImage.setWidth(this.logicalWidth);
 		mainIconImage.setHeight(this.logicalHeight);
 		this.icon = new Square2dObjectIcon(mainIconImage);
 		this.icon.setX(-this.icon.getWidth() / 2);
+		this.icon.setY(-this.icon.getHeight() / 8);
 		this.addActor(this.icon);
 		this.setColor(type.getColor());
 	}

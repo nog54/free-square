@@ -30,6 +30,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 
@@ -69,6 +70,14 @@ public class ChangeSquareAction extends Action {
 		this.activity = activity;
 		this.square = square;
 		this.direction = direction;
+	}
+
+	@Override
+	public void setActor(Actor actor) {
+		if (actor != null && !(actor instanceof MainActivity)) {
+			throw new IllegalArgumentException();
+		}
+		super.setActor(actor);
 	}
 
 	@Override
@@ -199,6 +208,7 @@ public class ChangeSquareAction extends Action {
 			this.phase = END;
 		}
 	}
+
 	private void performEndPhase() {
 		this.activity.getFreeSquare().getStage().getRoot().setTouchable(Touchable.enabled);
 	}

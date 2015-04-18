@@ -113,8 +113,8 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this.icon.addAction(this.upDownRoutineAction);
 		this.isEnabledUpDownRoutineAction = true;
 		final Image frame = new Image(frameTexture);
-		frame.setWidth(this.getWidth());
-		frame.setHeight(this.getHeight());
+		frame.setWidth(this.icon.getWidth());
+		frame.setHeight(this.icon.getHeight());
 		this.icon.addActor(frame);
 
 		this.addListener(new ActorGestureListener() {

@@ -66,7 +66,6 @@ public class FreeSquare extends ApplicationAdapter {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 		this.font = FontUtil.createMPlusFont(Settings.getFontSize());
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-
 		final float timeFromLastRun = setupPersistItems();
 		this.actLongTime(timeFromLastRun);
 

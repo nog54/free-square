@@ -707,6 +707,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (observer == null || this.childCameraObserver.contains(observer, true)) {
 			return;
 		}
+		
 		this.childCameraObserver.add(observer);
 	}
 
