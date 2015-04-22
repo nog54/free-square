@@ -22,10 +22,36 @@ import com.badlogic.gdx.graphics.Color;
 @SuppressWarnings("javadoc")
 public class ColorUtils {
 
+	private static final float softClearA = 0.25f;
+	private static final float clearA = 0.75f;
+
+	// use flat colors
 	public static final Color emerald = Color.valueOf("2ecc71"); //$NON-NLS-1$
 	public static final Color nephritis = Color.valueOf("27ae60"); //$NON-NLS-1$
+	//public static final Color greemSea = Color.valueOf("16a085"); //$NON-NLS-1$
 	public static final Color peterRiver = Color.valueOf("3498db"); //$NON-NLS-1$
 	public static final Color belizeHole = Color.valueOf("2980b9"); //$NON-NLS-1$
+	//public static final Color midnightBlue = Color.valueOf("2c3e50"); //$NON-NLS-1$
 	public static final Color carrot = Color.valueOf("e67e22"); //$NON-NLS-1$
 	public static final Color pampkin = Color.valueOf("d35400"); //$NON-NLS-1$
+
+	// use soft-clear flat colors
+	public static final Color softClearBlack = toSoftClearColor(Color.BLACK);
+	public static final Color softClearPeterRiver = toSoftClearColor(peterRiver);
+	public static final Color softClearBelizeHole = toSoftClearColor(belizeHole);
+
+	// use clear flat colors
+	public static final Color clearBlack = toClearColor(Color.BLACK);
+
+	private static Color toSoftClearColor(Color baseColor) {
+		final Color result = new Color(baseColor);
+		result.a = softClearA;
+		return result;
+	}
+
+	private static Color toClearColor(Color baseColor) {
+		final Color result = new Color(baseColor);
+		result.a = clearA;
+		return result;
+	}
 }

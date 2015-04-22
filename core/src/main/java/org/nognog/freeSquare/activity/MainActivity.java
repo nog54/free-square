@@ -14,6 +14,8 @@
 
 package org.nognog.freeSquare.activity;
 
+import net.dermetfan.gdx.scenes.scene2d.ui.FileChooser;
+
 import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.Messages;
@@ -40,6 +42,7 @@ import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
+import org.nognog.freeSquare.square2d.ui.FreeSquareFileChooser;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
 import org.nognog.freeSquare.square2d.ui.ModePresenter;
@@ -49,8 +52,10 @@ import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
 
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -79,6 +84,7 @@ public class MainActivity extends FreeSquareActivity {
 	private PlayersSquareList playersSquareList;
 	private ItemList itemList;
 	private ModePresenter modePresenter;
+	private FreeSquareFileChooser fileChooser;
 
 	private final Array<CameraObserver> childCameraObserver;
 
@@ -97,12 +103,14 @@ public class MainActivity extends FreeSquareActivity {
 		this.addActor(this.playersSquareList);
 		this.addActor(this.itemList);
 		this.addActor(this.modePresenter);
+		this.addActor(this.fileChooser);
 		this.hideAll();
 	}
 
 	private void initializeWidgets() {
 		final FreeSquare freeSquare = this.getFreeSquare();
-		this.menu = new Menu(freeSquare.getFont(), freeSquare.getLogicalCameraWidth() / ratioOfMenuButtonWidthToCameraWidth);
+		final BitmapFont font = freeSquare.getFont();
+		this.menu = new Menu(font, freeSquare.getLogicalCameraWidth() / ratioOfMenuButtonWidthToCameraWidth);
 		this.menu.addFlickButtonController(new MultiLevelFlickButtonController.MultiLevelFlickButtonInputListener() {
 			@Override
 			public void up() {
@@ -128,7 +136,7 @@ public class MainActivity extends FreeSquareActivity {
 				MainActivity.this.showItemList();
 			}
 
-		}, Messages.getString("item"), "リスト", Messages.getString("square"), Messages.getString("life")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}, Messages.getString("item"), "リスト", Messages.getString("square"), Messages.getString("life"), ColorUtils.emerald, ColorUtils.nephritis); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		this.menu.addFlickButtonController(new MultiLevelFlickButtonController.MultiLevelFlickButtonInputListener() {
 			@Override
 			public void up() {
@@ -138,10 +146,8 @@ public class MainActivity extends FreeSquareActivity {
 
 			@Override
 			public void right() {
-				MainActivity.this.setSquare(null);
-				// MainActivity.this.getPlayer().clearSquares();
 				MainActivity.this.showSquareOnly();
-				// MainActivity.this.getFreeSquare().setActivity(null);
+				MainActivity.this.showFileChooser();
 			}
 
 			@Override
@@ -156,25 +162,42 @@ public class MainActivity extends FreeSquareActivity {
 				MainActivity.this.setSeparateSquareMode(true);
 			}
 
-		}, Messages.getString("clear"), Messages.getString("separate"), "clear square", "/", ColorUtils.peterRiver, ColorUtils.belizeHole); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}, Messages.getString("clear"), Messages.getString("separate"), "file", "/", ColorUtils.nephritis, ColorUtils.emerald); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-		this.playersItemList = new PlayersItemList(this, freeSquare.getPlayer(), freeSquare.getFont());
-		this.playersLifeList = new PlayersLifeList(this, freeSquare.getPlayer(), freeSquare.getFont());
-		this.playersSquareList = new PlayersSquareList(this, freeSquare.getPlayer(), freeSquare.getFont());
+		this.playersItemList = new PlayersItemList(this, freeSquare.getPlayer(), font);
+		this.playersLifeList = new PlayersLifeList(this, freeSquare.getPlayer(), font);
+		this.playersSquareList = new PlayersSquareList(this, freeSquare.getPlayer(), font);
 
-		this.itemList = new ItemList(freeSquare.getCamera(), getAllItems(), freeSquare.getFont()) {
+		this.itemList = new ItemList(freeSquare.getCamera(), getAllItems(), font) {
 			@Override
 			protected void selectedItemTapped(Item<?, ?> tappedItem) {
 				freeSquare.getPlayer().putItem(tappedItem);
 			}
 		};
 
-		this.modePresenter = new ModePresenter(freeSquare.getCamera(), freeSquare.getFont()) {
+		this.modePresenter = new ModePresenter(freeSquare.getCamera(), font) {
 			@Override
 			public void tapped() {
 				MainActivity.this.showSquareOnly();
 			}
 		};
+		final FileChooser.Listener listener = new FileChooser.Listener() {
+			@Override
+			public void choose(Array<FileHandle> files) {
+				MainActivity.this.showSquareOnly();
+			}
+
+			@Override
+			public void choose(FileHandle file) {
+				MainActivity.this.showSquareOnly();
+			}
+
+			@Override
+			public void cancel() {
+				MainActivity.this.showSquareOnly();
+			}
+		};
+		this.fileChooser = new FreeSquareFileChooser(freeSquare.getCamera(), font, listener);
 	}
 
 	private static Item<?, ?>[] getAllItems() {
@@ -422,6 +445,7 @@ public class MainActivity extends FreeSquareActivity {
 		this.hidePlayersSquareList();
 		this.hideItemList();
 		this.hideModePresenter();
+		this.hideFileChooser();
 	}
 
 	private void enableSquare() {
@@ -570,6 +594,20 @@ public class MainActivity extends FreeSquareActivity {
 		this.hide(this.modePresenter);
 	}
 
+	/**
+	 * show file chooser
+	 */
+	public void showFileChooser() {
+		this.show(this.fileChooser);
+	}
+
+	/**
+	 * hide file chooser
+	 */
+	public void hideFileChooser() {
+		this.hide(this.fileChooser);
+	}
+
 	@Override
 	public InputProcessor getInputProcesser() {
 		return this.inputProcessor;
@@ -707,7 +745,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (observer == null || this.childCameraObserver.contains(observer, true)) {
 			return;
 		}
-		
+
 		this.childCameraObserver.add(observer);
 	}
 

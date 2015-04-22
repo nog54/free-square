@@ -33,7 +33,6 @@ import com.badlogic.gdx.utils.TimeUtils;
  * @param <T>
  */
 public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver {
-	private static final Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	private Player player;
 	private final BitmapFont font;
@@ -146,7 +145,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 	private static ListStyle createListStyle(BitmapFont font) {
 		final ListStyle style = new ListStyle(font, ColorUtils.emerald, ColorUtils.nephritis, UiUtils.getPlaneTextureRegionDrawable(256, 128, Color.WHITE));
-		style.background = UiUtils.getPlaneTextureRegionDrawable(256, 128, clearBlack);
+		style.background = UiUtils.getPlaneTextureRegionDrawable(256, 128, ColorUtils.clearBlack);
 		return style;
 	}
 

@@ -48,19 +48,6 @@ public class MultiLevelFlickButtonController extends FlickButtonController {
 	 * @param buttonUpColor
 	 * @param buttonDownColor
 	 */
-	public void addFlickButtonController(MultiLevelFlickButtonInputListener inputListener, String upButtonText, String downButtonText, String rightButtonText, String leftButtonText) {
-		this.addFlickButtonController(inputListener, upButtonText, downButtonText, rightButtonText, leftButtonText, defaultUpColor, defaultDownColor);
-	}
-
-	/**
-	 * @param inputListener
-	 * @param upButtonText
-	 * @param downButtonText
-	 * @param rightButtonText
-	 * @param leftButtonText
-	 * @param buttonUpColor
-	 * @param buttonDownColor
-	 */
 	public void addFlickButtonController(MultiLevelFlickButtonInputListener inputListener, String upButtonText, String downButtonText, String rightButtonText, String leftButtonText,
 			Color buttonUpColor, Color buttonDownColor) {
 		FlickButtonInputListener flickButtonInputListener = toFlickButtonInputListener(inputListener);
