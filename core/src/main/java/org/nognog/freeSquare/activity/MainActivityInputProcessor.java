@@ -30,15 +30,19 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  */
 public class MainActivityInputProcessor extends InputMultiplexer {
 
-	boolean isLastLongPressed;
+	private final GestureDetector gestureDetector;
+	private final InputAdapter longTouchTapCanceller;
+	private boolean isEnable = false;
+
+	protected boolean isLastLongPressed;
 
 	/**
 	 * @param activity
 	 */
 	public MainActivityInputProcessor(MainActivity activity) {
-		GestureDetector gestureDetector = new GestureDetector(this.createFreeSquareGestureListener(activity));
-		gestureDetector.setLongPressSeconds(0.2f);
-		InputAdapter longTouchTapCanceller = new InputAdapter() {
+		this.gestureDetector = new GestureDetector(this.createFreeSquareGestureListener(activity));
+		this.gestureDetector.setLongPressSeconds(0.2f);
+		this.longTouchTapCanceller = new InputAdapter() {
 
 			@Override
 			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
@@ -48,13 +52,43 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				return false;
 			}
 		};
-		this.addProcessor(gestureDetector);
-		this.addProcessor(longTouchTapCanceller);
+		this.enable();
+	}
+
+	/**
+	 * enable this processor
+	 */
+	public void enable() {
+		if (this.isEnable()) {
+			return;
+		}
+		this.addProcessor(this.gestureDetector);
+		this.addProcessor(this.longTouchTapCanceller);
+		this.isEnable = true;
+	}
+
+	/**
+	 * disable this processor
+	 */
+	public void disable() {
+		if (!this.isEnable()) {
+			return;
+		}
+		this.removeProcessor(this.gestureDetector);
+		this.removeProcessor(this.longTouchTapCanceller);
+		this.isEnable = false;
+	}
+
+	/**
+	 * @return true if this is enable
+	 */
+	public boolean isEnable() {
+		return this.isEnable;
 	}
 
 	private GestureListener createFreeSquareGestureListener(final MainActivity activity) {
 		final FreeSquare freeSquare = activity.getFreeSquare();
-		GestureListener listener = new GestureDetector.GestureAdapter() {
+		final GestureListener listener = new GestureDetector.GestureAdapter() {
 			private float initialScale = 1;
 			private Actor lastTouchDownActor;
 
@@ -80,9 +114,6 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
-				if (activity.isLockingCameraMove()) {
-					return false;
-				}
 				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
 				final float currentZoom = camera.zoom;
 				final float cameraMoveX = -deltaX * currentZoom;
@@ -97,9 +128,6 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 			@Override
 			public boolean zoom(float initialDistance, float distance) {
 				if (!this.isLastTouchBackGround()) {
-					return false;
-				}
-				if (activity.isLockingCameraZoom()) {
 					return false;
 				}
 				final float ratio = initialDistance / distance;
@@ -143,6 +171,6 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 			}
 		};
 		return listener;
-
 	}
+
 }

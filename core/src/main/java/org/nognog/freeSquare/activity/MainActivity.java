@@ -75,8 +75,6 @@ public class MainActivity extends FreeSquareActivity {
 	private MainActivityInputProcessor inputProcessor;
 
 	private boolean isSeparateSquareMode;
-	private boolean isLockingCameraZoom;
-	private boolean isLockingCameraMove;
 
 	private Menu menu;
 	private PlayersItemList playersItemList;
@@ -454,9 +452,6 @@ public class MainActivity extends FreeSquareActivity {
 		}
 		this.square.getColor().a = 1;
 		this.square.setTouchable(Touchable.enabled);
-		this.isLockingCameraMove = false;
-		this.isLockingCameraZoom = false;
-		this.setSeparateSquareMode(false);
 	}
 
 	private void disableSquare() {
@@ -611,20 +606,6 @@ public class MainActivity extends FreeSquareActivity {
 	@Override
 	public InputProcessor getInputProcesser() {
 		return this.inputProcessor;
-	}
-
-	/**
-	 * @return true if locking camera zoom
-	 */
-	public boolean isLockingCameraZoom() {
-		return this.isLockingCameraZoom;
-	}
-
-	/**
-	 * @return true if locking camera move
-	 */
-	public boolean isLockingCameraMove() {
-		return this.isLockingCameraMove;
 	}
 
 	/**

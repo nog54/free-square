@@ -23,6 +23,7 @@ import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSqu
 import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_OUT;
 
 import org.nognog.freeSquare.activity.MainActivity;
+import org.nognog.freeSquare.activity.MainActivityInputProcessor;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 
@@ -122,6 +123,7 @@ public class ChangeSquareAction extends Action {
 			}
 		}
 		stageRoot.setTouchable(Touchable.disabled);
+		((MainActivityInputProcessor) this.activity.getInputProcesser()).disable();
 		if (this.activity.getSquare() == null) {
 			this.zoomInTargetValue = 1;
 		} else {
@@ -211,6 +213,7 @@ public class ChangeSquareAction extends Action {
 
 	private void performEndPhase() {
 		this.activity.getFreeSquare().getStage().getRoot().setTouchable(Touchable.enabled);
+		((MainActivityInputProcessor) this.activity.getInputProcesser()).enable();
 	}
 
 	private void moveCamera(float delta, Direction moveDirection) {
