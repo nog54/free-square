@@ -138,8 +138,20 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.icon.setY(-this.icon.getHeight() / 8);
 		this.addActor(this.icon);
 		this.setColor(type.getColor());
+		this.setWidth(this.logicalWidth);
+		this.setHeight(this.logicalHeight);
 	}
+	
 
+	@Override
+	public Actor hit(float x, float y, boolean touchable) {
+		final Actor superResult = super.hit(x, y, touchable);
+		if(superResult == this){
+			return null;
+		}
+		return superResult;
+	}
+	
 	@Override
 	public void setSquare(Square2d square) {
 		if (this.square != null && square != null) {

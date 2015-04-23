@@ -182,10 +182,12 @@ public class EatAction extends Action {
 		final float moveX = r * MathUtils.cos(theta);
 		if (Math.abs(remainingDistanceX) < Math.abs(moveX)) {
 			this.actor.setPosition(targetPositionX, targetPositionY);
+			return;
 		}
 		final float moveY = r * MathUtils.sin(theta);
 		if (Math.abs(remainingDistanceY) < Math.abs(moveY)) {
 			this.actor.setPosition(targetPositionX, targetPositionY);
+			return;
 		}
 
 		this.actor.moveBy(moveX, moveY);

@@ -80,7 +80,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @param life
 	 */
 	public LifeObject(Life life) {
-		this(LifeObjectType.getBindingLifeObjectType(life), life);
+		this(LifeObjectType.Manager.getBindingLifeObjectType(life), life);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return eat amount / second
 	 */
 	public int getEatAmountPerSecond() {
-		return LifeObjectType.getBindingLifeObjectType(this.life).getEatAmountPerSec();
+		return LifeObjectType.Manager.getBindingLifeObjectType(this.life).getEatAmountPerSec();
 	}
 
 	/**
@@ -345,7 +345,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return lifeObject
 	 */
 	public static LifeObject create(Life life) {
-		LifeObject newInstance = LifeObjectType.getBindingLifeObjectType(life).create();
+		LifeObject newInstance = LifeObjectType.Manager.getBindingLifeObjectType(life).create();
 		newInstance.setLife(life);
 		return newInstance;
 	}

@@ -25,7 +25,7 @@ import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -247,13 +247,12 @@ public class FreeSquare extends ApplicationAdapter {
 				this.font.dispose();
 			}
 			this.stage.dispose();
-			Square2dObjectType.Manager.dispose();
+			Square2dObjectTypeManager.disposeAll();
 			Square2d.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
 			throw t;
 		}
-		// System.out.println(PersistManager.getUseJson().prettyPrint(this.player));
 	}
 
 	private float setupPersistItems() {

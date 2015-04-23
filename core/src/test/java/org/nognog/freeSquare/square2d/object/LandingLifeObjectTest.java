@@ -40,7 +40,7 @@ public class LandingLifeObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testIsValid() {
-		for (LifeObjectType type : LifeObjectType.values()) {
+		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();
@@ -70,7 +70,7 @@ public class LandingLifeObjectTest {
 	@Test
 	public final void testWrite() {
 		Json json = PersistManager.getUseJson();
-		for (LifeObjectType type : LifeObjectType.values()) {
+		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();
@@ -96,7 +96,7 @@ public class LandingLifeObjectTest {
 	@SuppressWarnings({ "null", "boxing" })
 	@Test
 	public final void testGoToSquareNearestVertex() {
-		for (LifeObjectType type : LifeObjectType.values()) {
+		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();

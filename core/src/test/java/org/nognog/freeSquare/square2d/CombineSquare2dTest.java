@@ -228,8 +228,8 @@ public class CombineSquare2dTest {
 			CombineSquare2d combineSquare2 = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			combineSquare2.combine(combineSquare2.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-			combineSquare2.addSquareObject(LifeObjectType.RIKI.create());
-			combineSquare2.addSquareObject(EatableObjectType.TOFU.create());
+			combineSquare2.addSquareObject(LifeObjectType.Prepared.RIKI.create());
+			combineSquare2.addSquareObject(EatableObjectType.Prepared.TOFU.create());
 
 			boolean actual1 = combineSquare1.combine(combineSquare1.getVertices()[0], combineSquare2, combineSquare2.getVertices()[0]);
 			assertThat(actual1, is(true));

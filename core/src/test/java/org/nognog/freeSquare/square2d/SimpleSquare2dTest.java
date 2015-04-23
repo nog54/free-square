@@ -92,7 +92,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testAddSquareObjectSquare2dObjectFloatFloat() {
-		Square2dObject object = EatableObjectType.TOFU.create();
+		Square2dObject object = EatableObjectType.Prepared.TOFU.create();
 		final float expected1 = 0;
 		final float actual1 = object.getX();
 		final float expected2 = 0;
