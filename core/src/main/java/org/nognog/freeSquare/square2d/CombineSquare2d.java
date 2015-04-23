@@ -968,11 +968,11 @@ public class CombineSquare2d extends Square2d {
 
 	private void drawSquare2dObjects(Batch batch, float parentAlpha) {
 		if (this.getX() == 0 && this.getY() == 0) {
-			for (Square2dObject object : this.getObjects()) {
+			for (Square2dObject object : this.getSortedObjects()) {
 				object.draw(batch, parentAlpha);
 			}
 		} else {
-			for (Square2dObject object : this.getObjects()) {
+			for (Square2dObject object : this.getSortedObjects()) {
 				object.moveBy(this.getX(), this.getY()); // Caution!
 															// positionChanged
 															// is invoked

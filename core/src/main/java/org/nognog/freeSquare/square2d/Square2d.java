@@ -14,6 +14,7 @@
 
 package org.nognog.freeSquare.square2d;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import org.nognog.freeSquare.model.SimpleDrawable;
@@ -395,6 +396,15 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	@Override
 	public Square2dObject[] getObjects() {
 		return this.objects.<Square2dObject> toArray(Square2dObject.class);
+	}
+	
+	/**
+	 * @return sorted object array
+	 */
+	public Square2dObject[] getSortedObjects(){
+		final Square2dObject[] result = this.getObjects();
+		Arrays.sort(result, actorComparator);
+		return result;
 	}
 
 	/**
