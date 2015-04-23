@@ -14,6 +14,8 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
+import java.io.File;
+
 import net.dermetfan.gdx.scenes.scene2d.ui.FileChooser.Listener;
 import net.dermetfan.gdx.scenes.scene2d.ui.ListFileChooser;
 import net.dermetfan.gdx.scenes.scene2d.ui.ListFileChooser.Style;
@@ -48,6 +50,20 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 		this.setSize(width, height);
 		this.chooser = new ListFileChooser(createFileChooserStyle(font), listener);
 		this.chooser.setSize(width, height);
+		this.chooser.setFileFilter(new java.io.FileFilter(){
+
+			@Override
+			public boolean accept(File pathname) {
+				if(pathname.isDirectory()){
+					return true;
+				}
+				final String fileExtension = this.getExtension(pathname.getName());
+				return fileExtension.equals("png") || fileExtension.equals("jpg") || fileExtension.equals("jpeg"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+
+			private String getExtension(String filename) {
+				return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase(); //$NON-NLS-1$
+			}});
 		this.addActor(this.chooser);
 	}
 
