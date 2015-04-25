@@ -32,6 +32,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -71,9 +72,13 @@ public class FreeSquare extends ApplicationAdapter {
 
 		this.multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(this.multiplexer);
-
+		this.player = null;
 		this.activityFactory = new FreeSquareActivityFactory(this);
-		this.setActivity(this.activityFactory.getMainActivity());
+		if (this.player != null) {
+			this.setActivity(this.activityFactory.getMainActivity());
+		} else {
+			this.setActivity(this.activityFactory.getInitializeActivity());
+		}
 	}
 
 	/**
@@ -88,7 +93,10 @@ public class FreeSquare extends ApplicationAdapter {
 		this.stage.getRoot().removeActor(this.currentActivity);
 
 		this.stage.getRoot().addActor(activity);
-		this.multiplexer.addProcessor(activity.getInputProcesser());
+		final InputProcessor inputProcesser = activity.getInputProcesser();
+		if (inputProcesser != null) {
+			this.multiplexer.addProcessor(inputProcesser);
+		}
 		this.multiplexer.addProcessor(this.stage);
 		this.currentActivity = activity;
 		this.addCameraObserver(this.currentActivity);
@@ -141,6 +149,14 @@ public class FreeSquare extends ApplicationAdapter {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param nameable
+	 * @param title
+	 */
+	public void inputName(final Nameable nameable, String title) {
+		this.inputName(nameable, title, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -227,16 +243,20 @@ public class FreeSquare extends ApplicationAdapter {
 
 	@Override
 	public void pause() {
-		PersistItems.PLAYER.save(this.player);
-		LastPlay.update();
+		if (this.player != null) {
+			PersistItems.PLAYER.save(this.player);
+			LastPlay.update();
+		}
 		Gdx.graphics.setContinuousRendering(false);
 	}
 
 	@Override
 	public void resume() {
-		Date lastPauseDate = LastPlay.getLastPlayDate();
-		Date now = new Date();
-		this.actLongTime((now.getTime() - lastPauseDate.getTime()) / 1000f);
+		if (this.player != null) {
+			Date lastPauseDate = LastPlay.getLastPlayDate();
+			Date now = new Date();
+			this.actLongTime((now.getTime() - lastPauseDate.getTime()) / 1000f);
+		}
 		Gdx.graphics.setContinuousRendering(true);
 	}
 
@@ -263,10 +283,6 @@ public class FreeSquare extends ApplicationAdapter {
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
 		this.player = PersistItems.PLAYER.load();
-		if (this.player == null) {
-			this.player = new Player(""); //$NON-NLS-1$
-			this.inputName(this.player, "プレイヤー名入力", "", Settings.getPlayerNameMaxTextDrawWidth()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
 			System.out.println("new last Run"); //$NON-NLS-1$
@@ -283,6 +299,24 @@ public class FreeSquare extends ApplicationAdapter {
 	 */
 	public Player getPlayer() {
 		return this.player;
+	}
+
+	/**
+	 * create player
+	 */
+	public void createPlayer() {
+		if(this.player != null){
+			throw new RuntimeException("player should be null if create new player."); //$NON-NLS-1$
+		}
+		this.player = new Player();
+		this.inputName(this.player, "プレイヤー名入力"); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return activity factory
+	 */
+	public FreeSquareActivityFactory getActivityFactory() {
+		return this.activityFactory;
 	}
 
 	/**
@@ -308,5 +342,13 @@ public class FreeSquare extends ApplicationAdapter {
 		for (int i = 0; i < this.cameraObservers.size; i++) {
 			this.cameraObservers.get(i).updateCamera(this.stage.getCamera());
 		}
+	}
+
+	/**
+	 * exit application
+	 */
+	@SuppressWarnings("static-method")
+	public void exit() {
+		Gdx.app.exit();
 	}
 }

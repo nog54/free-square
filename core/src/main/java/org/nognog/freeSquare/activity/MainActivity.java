@@ -39,8 +39,11 @@ import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
+import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.FreeSquareFileChooser;
 import org.nognog.freeSquare.square2d.ui.ItemList;
@@ -188,6 +191,9 @@ public class MainActivity extends FreeSquareActivity {
 			@Override
 			public void choose(FileHandle file) {
 				MainActivity.this.showSquareOnly();
+				Square2dObjectType<?> newType = new LifeObjectType.LoadedObject("new", file.path(), 100, 5, LandingLifeObject.class); //$NON-NLS-1$
+				Square2dObject newObject = newType.create();
+				MainActivity.this.getSquare().addSquareObject(newObject);
 			}
 
 			@Override

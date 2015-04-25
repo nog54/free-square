@@ -118,6 +118,53 @@ public interface OtherObjectType extends Square2dObjectType<Square2dObject> {
 	/**
 	 * @author goshi 2015/04/23
 	 */
+	public static class LoadedObject implements OtherObjectType {
+		private final String name;
+		private final Texture texture;
+
+		/**
+		 * @param name
+		 * @param texturePath
+		 */
+		public LoadedObject(String name, String texturePath){
+			this.name = name;
+			this.texture = new Texture(texturePath);
+		}
+		@Override
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public Texture getTexture() {
+			return this.texture;
+		}
+
+		@Override
+		public float getLogicalWidth() {
+			return 100;
+		}
+
+		@Override
+		public Color getColor() {
+			return Color.WHITE;
+		}
+
+		@Override
+		public Class<?> getSquareObjectClass() {
+			return Square2dObject.class;
+		}
+
+		@Override
+		public Square2dObject create() {
+			return new Square2dObject(this);
+		}
+
+	}
+
+	/**
+	 * @author goshi 2015/04/23
+	 */
 	public static class Manager {
 		/**
 		 * dispose

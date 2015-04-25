@@ -14,6 +14,8 @@
 
 package org.nognog.freeSquare.activity;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.nognog.freeSquare.FreeSquare;
 
 import com.badlogic.gdx.utils.ObjectMap;
@@ -35,11 +37,27 @@ public class FreeSquareActivityFactory extends FlyweightFactory<FreeSquareActivi
 	 * @return MainActivity
 	 */
 	public MainActivity getMainActivity() {
-		final MainActivity cacheInstance = this.get(MainActivity.class);
+		return getAndCache(MainActivity.class);
+	}
+
+	/**
+	 * @return InitializeActivity
+	 */
+	public InitializeActivity getInitializeActivity() {
+		return getAndCache(InitializeActivity.class);
+	}
+
+	private <T extends FreeSquareActivity> T getAndCache(Class<T> activityClass) {
+		final T cacheInstance = this.get(activityClass);
 		if (cacheInstance != null) {
 			return cacheInstance;
 		}
-		final MainActivity activity = new MainActivity(this.freeSquare);
+		T activity = null;
+		try {
+			activity = activityClass.getConstructor(FreeSquare.class).newInstance(this.freeSquare);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
 		this.cache(activity);
 		return activity;
 	}
