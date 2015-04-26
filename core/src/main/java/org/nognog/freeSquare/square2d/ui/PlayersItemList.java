@@ -176,6 +176,9 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 
 	@Override
 	protected void selectedItemTapped(PossessedItem<?> tappedItem, int count) {
+		if(tappedItem == null){
+			return;
+		}
 		if (this.mainActivity.getSquare() != null) {
 			return;
 		}
