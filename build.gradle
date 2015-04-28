@@ -87,8 +87,7 @@ project(":core") {
 		compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 		compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 		compile "net.dermetfan.libgdx-utils:libgdx-utils:$libgdxUtilsVersion"
-		compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:$libgdxUtilsVersion" // Box2D module
-		compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d-gwt:$libgdxUtilsVersion:sources" // Box2D module GWT backend (sources)
+		compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:$libgdxUtilsVersion" 
 		testCompile "junit:junit:+"
 		testCompile "org.exparity:hamcrest-date:1.0.1"
 		testCompile "org.mockito:mockito-core:1.+"
@@ -97,7 +96,6 @@ project(":core") {
 		testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 		testCompile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 		testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-
 	}
 }
 
