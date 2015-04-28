@@ -50,7 +50,7 @@ public class EatableObjectTest {
 			EatableObject object = type.create();
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
 			object.setPosition(randomPoint.x, randomPoint.y);
-			LifeObject eater = LifeObject.create(new Life(Family.RIKI));
+			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			final int baseAmount = object.getAmount();
 			final int amount1 = 5, amount2 = 10, amount3 = 15, amount4 = 20;
 			object.eatenBy(eater, amount1, Direction.DOWN);
@@ -83,7 +83,7 @@ public class EatableObjectTest {
 	public final void testResurrection() {
 		for (EatableObjectType type : EatableObjectType.Manager.getAll()) {
 			EatableObject object = type.create();
-			LifeObject eater = LifeObject.create(new Life(Family.RIKI));
+			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			final int baseAmount = object.getAmount();
 			final int amount1 = 5, amount2 = 10, amount3 = 15, amount4 = 20;
 			object.eatenBy(eater, amount1, Direction.DOWN);
@@ -101,7 +101,7 @@ public class EatableObjectTest {
 	public final void testIsBeingEaten() {
 		for (EatableObjectType type : EatableObjectType.Manager.getAll()) {
 			EatableObject object = type.create();
-			LifeObject eater = LifeObject.create(new Life(Family.RIKI));
+			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			object.eatenBy(eater, 0, Direction.DOWN);
 			assertThat(object.isBeingEaten(), is(false));
 			object.eatenBy(eater, 1, Direction.DOWN);

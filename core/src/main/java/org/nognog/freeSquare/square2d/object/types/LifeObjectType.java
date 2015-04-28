@@ -53,17 +53,17 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 	 */
 	@SuppressWarnings("javadoc")
 	public static enum Prepared implements LifeObjectType {
-		RIKI(Family.RIKI, Resources.rikiPath, LandingLifeObject.class, 100),
+		RIKI(Family.Prepared.RIKI, Resources.rikiPath, LandingLifeObject.class, 100),
 
-		SMALL_RIKI(Family.SMALL_RIKI, RIKI, 50),
+		SMALL_RIKI(Family.Prepared.SMALL_RIKI, RIKI, 50),
 
-		BIG_RIKI(Family.BIG_RIKI, RIKI, 150),
+		BIG_RIKI(Family.Prepared.BIG_RIKI, RIKI, 150),
 
-		FLY_RIKI(Family.FLY_RIKI, RIKI, FryingLifeObject.class, 100),
+		FLY_RIKI(Family.Prepared.FLY_RIKI, RIKI, FryingLifeObject.class, 100),
 
-		FLY_SMALL_RIKI(Family.SMALL_FLY_RIKI, RIKI, 50),
+		FLY_SMALL_RIKI(Family.Prepared.SMALL_FLY_RIKI, RIKI, 50),
 
-		FLY_BIG_RIKI(Family.BIG_FLY_RIKI, RIKI, 150),
+		FLY_BIG_RIKI(Family.Prepared.BIG_FLY_RIKI, RIKI, 150),
 
 		;
 
@@ -216,7 +216,7 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 
 		@Override
 		public Family getFamily() {
-			return null;
+			return Family.Prepared.UNKNOWN;
 		}
 
 		@Override

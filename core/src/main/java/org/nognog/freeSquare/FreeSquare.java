@@ -72,7 +72,6 @@ public class FreeSquare extends ApplicationAdapter {
 
 		this.multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(this.multiplexer);
-		this.player = null;
 		this.activityFactory = new FreeSquareActivityFactory(this);
 		if (this.player != null) {
 			this.setActivity(this.activityFactory.getMainActivity());
