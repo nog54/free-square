@@ -470,6 +470,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 
 	@Override
 	public void write(Json json) {
+		json.writeType(this.getClass());
 		json.writeField(this, "type"); //$NON-NLS-1$
 		json.writeValue("positionX", Float.valueOf(this.getX())); //$NON-NLS-1$
 		json.writeValue("positionY", Float.valueOf(this.getY())); //$NON-NLS-1$

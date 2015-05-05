@@ -14,24 +14,19 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import org.nognog.freeSquare.FreeSquare;
 
 /**
- * @author goshi 2015/04/24
+ * @author goshi 2015/05/05
  */
-public abstract class SimpleYesNoDialog extends SimpleDialog {
+public abstract class FreeSquareSimpleYesNoDialog extends FreeSquareSimpleDialog {
 
 	/**
-	 * @param width
-	 * @param height
+	 * @param freeSquare
 	 * @param text
-	 * @param textFont
-	 * @param yesButtonStyle
-	 * @param noButtonStyle
 	 */
-	public SimpleYesNoDialog(float width, float height, String text, BitmapFont textFont, TextButtonStyle yesButtonStyle, TextButtonStyle noButtonStyle) {
-		super(width, height, text, textFont, "Yes", "No", yesButtonStyle, noButtonStyle); //$NON-NLS-1$ //$NON-NLS-2$
+	public FreeSquareSimpleYesNoDialog(FreeSquare freeSquare, String text) {
+		super(freeSquare, text, "Yes", "No"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -42,10 +37,10 @@ public abstract class SimpleYesNoDialog extends SimpleDialog {
 	@Override
 	protected void rightButtonClicked() {
 		this.no();
-
 	}
 
 	protected abstract void yes();
 
 	protected abstract void no();
+
 }

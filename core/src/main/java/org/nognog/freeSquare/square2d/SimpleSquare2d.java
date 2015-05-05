@@ -91,6 +91,10 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 
 	@Override
 	public Actor hit(float x, float y, boolean touchable) {
+		final Actor hit = super.hit(x, y, touchable);
+		if (hit != null) {
+			return hit;
+		}
 		if (touchable && this.getTouchable() != Touchable.enabled)
 			return null;
 		if (this.containsPosition(x, y)) {

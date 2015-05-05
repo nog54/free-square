@@ -69,7 +69,6 @@ public class FreeSquare extends ApplicationAdapter {
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
 		final float timeFromLastRun = setupPersistItems();
 		this.actLongTime(timeFromLastRun);
-
 		this.multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(this.multiplexer);
 		this.activityFactory = new FreeSquareActivityFactory(this);

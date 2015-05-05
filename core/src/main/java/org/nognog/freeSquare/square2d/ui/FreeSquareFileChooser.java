@@ -22,14 +22,18 @@ import net.dermetfan.gdx.scenes.scene2d.ui.ListFileChooser.Style;
 
 import org.nognog.freeSquare.CameraObserver;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
@@ -50,11 +54,11 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 		this.setSize(width, height);
 		this.chooser = new ListFileChooser(createFileChooserStyle(font), listener);
 		this.chooser.setSize(width, height);
-		this.chooser.setFileFilter(new java.io.FileFilter(){
+		this.chooser.setFileFilter(new java.io.FileFilter() {
 
 			@Override
 			public boolean accept(File pathname) {
-				if(pathname.isDirectory()){
+				if (pathname.isDirectory()) {
 					return true;
 				}
 				final String fileExtension = this.getExtension(pathname.getName());
@@ -63,8 +67,38 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 
 			private String getExtension(String filename) {
 				return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase(); //$NON-NLS-1$
-			}});
+			}
+		});
+		this.chooser.getContents().addListener(new ClickListener() {
+			private String lastTouchPath;
+
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (this.lastTouchPath != null && this.lastTouchPath == this.getFileChooser().getContents().getSelected()) {
+					final FileHandle currentlySelected = this.getFileChooser().currentlySelected();
+					if (currentlySelected.isDirectory()) {
+						this.getFileChooser().setDirectory(currentlySelected);
+					} else {
+						for (@SuppressWarnings("hiding") EventListener listener : this.getFileChooser().getChooseButton().getListeners()) {
+							if (listener instanceof ClickListener) {
+								((ClickListener) listener).clicked(event, x, y);
+							}
+						}
+
+					}
+				}
+				this.lastTouchPath = this.getFileChooser().getContents().getSelected();
+			}
+
+			private ListFileChooser getFileChooser() {
+				return FreeSquareFileChooser.this.getBody();
+			}
+		});
 		this.addActor(this.chooser);
+	}
+
+	protected ListFileChooser getBody() {
+		return this.chooser;
 	}
 
 	@Override

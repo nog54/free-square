@@ -22,11 +22,12 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.square2d.object.FryingLifeObject;
 import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
-import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2015/04/23
@@ -167,12 +168,22 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 	/**
 	 * @author goshi 2015/04/23
 	 */
-	public static class LoadedObject implements LifeObjectType {
-		private final String name;
-		private final Texture texture;
-		private final float moveSpeed;
-		private final int eatAmountPerSec;
-		private final Class<?> squareObjectClass;
+	public static class LoadedObject implements LifeObjectType, Json.Serializable {
+		private String name;
+		private String texturePath;
+		private float moveSpeed;
+		private int eatAmountPerSec;
+		private String squareObjectClassName;
+
+		private transient Class<?> squareObjectClass;
+		private transient Texture texture;
+
+		/**
+		 * 
+		 */
+		public <T extends LifeObject> LoadedObject() {
+
+		}
 
 		/**
 		 * @param name
@@ -183,9 +194,11 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 		 */
 		public <T extends LifeObject> LoadedObject(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
 			this.name = name;
-			this.texture = new Texture(texturePath);
+			this.texturePath = texturePath;
+			this.texture = new Texture(this.texturePath);
 			this.moveSpeed = moveSpeed;
 			this.eatAmountPerSec = eatAmountPerSec;
+			this.squareObjectClassName = squareObjectClass.getName();
 			this.squareObjectClass = squareObjectClass;
 		}
 
@@ -211,7 +224,7 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 
 		@Override
 		public Class<?> getSquareObjectClass() {
-			return Square2dObject.class;
+			return this.squareObjectClass;
 		}
 
 		@Override
@@ -241,6 +254,27 @@ public interface LifeObjectType extends Square2dObjectType<LifeObject> {
 			try {
 				return (LifeObject) this.squareObjectClass.newInstance();
 			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Override
+		public void write(Json json) {
+			json.writeFields(this);
+		}
+
+		@Override
+		public void read(Json json, JsonValue jsonData) {
+			this.name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+			this.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
+			this.texture = new Texture(this.texturePath);
+			this.moveSpeed = json.readValue("moveSpeed", Float.class, jsonData).floatValue(); //$NON-NLS-1$
+			this.eatAmountPerSec = json.readValue("eatAmountPerSec", Integer.class, jsonData).intValue(); //$NON-NLS-1$
+			this.squareObjectClassName = json.readValue("squareObjectClassName", String.class, jsonData); //$NON-NLS-1$
+			try {
+				this.squareObjectClass = Class.forName(this.squareObjectClassName);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 		}

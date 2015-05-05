@@ -148,7 +148,9 @@ public class MainActivity extends FreeSquareActivity {
 			@Override
 			public void right() {
 				MainActivity.this.showSquareOnly();
-				MainActivity.this.showFileChooser();
+				if (MainActivity.this.getSquare() != null) {
+					MainActivity.this.showFileChooser();
+				}
 			}
 
 			@Override
@@ -190,10 +192,14 @@ public class MainActivity extends FreeSquareActivity {
 
 			@Override
 			public void choose(FileHandle file) {
+				
 				MainActivity.this.showSquareOnly();
+				//Square2dObjectType<?> newType = new OtherObjectType.LoadedObject("new", file.path()); //$NON-NLS-1$
 				Square2dObjectType<?> newType = new LifeObjectType.LoadedObject("new", file.path(), 100, 5, LandingLifeObject.class); //$NON-NLS-1$
 				Square2dObject newObject = newType.create();
-				MainActivity.this.getSquare().addSquareObject(newObject);
+				if (MainActivity.this.getSquare() != null) {
+					MainActivity.this.getSquare().addSquareObject(newObject);
+				}
 			}
 
 			@Override

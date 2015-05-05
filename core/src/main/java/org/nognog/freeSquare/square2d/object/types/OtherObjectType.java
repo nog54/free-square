@@ -21,6 +21,8 @@ import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2015/02/08
@@ -118,18 +120,29 @@ public interface OtherObjectType extends Square2dObjectType<Square2dObject> {
 	/**
 	 * @author goshi 2015/04/23
 	 */
-	public static class LoadedObject implements OtherObjectType {
-		private final String name;
-		private final Texture texture;
+	public static class LoadedObject implements OtherObjectType, Json.Serializable {
+		private String name;
+		private String texturePath;
+		
+		private transient Texture texture;
 
+		/**
+		 * 
+		 */
+		public LoadedObject(){
+			
+		}
+		
 		/**
 		 * @param name
 		 * @param texturePath
 		 */
-		public LoadedObject(String name, String texturePath){
+		public LoadedObject(String name, String texturePath) {
 			this.name = name;
-			this.texture = new Texture(texturePath);
+			this.texturePath = texturePath;
+			this.texture = new Texture(this.texturePath);
 		}
+
 		@Override
 		public String getName() {
 			return this.name;
@@ -158,6 +171,18 @@ public interface OtherObjectType extends Square2dObjectType<Square2dObject> {
 		@Override
 		public Square2dObject create() {
 			return new Square2dObject(this);
+		}
+
+		@Override
+		public void write(Json json) {
+			json.writeFields(this);
+		}
+
+		@Override
+		public void read(Json json, JsonValue jsonData) {
+			this.name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+			this.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
+			this.texture = new Texture(this.texturePath);
 		}
 
 	}

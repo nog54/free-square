@@ -16,36 +16,28 @@ package org.nognog.freeSquare.activity;
 
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.freeSquare.square2d.ui.ColorUtils;
-import org.nognog.freeSquare.square2d.ui.SimpleYesNoDialog;
-import org.nognog.freeSquare.square2d.ui.UiUtils;
+import org.nognog.freeSquare.square2d.ui.FreeSquareSimpleYesNoDialog;
+import org.nognog.freeSquare.square2d.ui.SimpleDialog;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * @author goshi 2015/04/24
  */
 public class InitializeActivity extends FreeSquareActivity {
-	private SimpleYesNoDialog yesNoDialog;
+	private SimpleDialog yesNoDialog;
 
 	/**
 	 * @param freeSquare
 	 */
 	public InitializeActivity(final FreeSquare freeSquare) {
 		super(freeSquare);
-		final TextureRegionDrawable softClearPeterRiverDrawable = UiUtils.getPlaneTextureRegionDrawable(1, 1, ColorUtils.softClearPeterRiver);
-		final TextureRegionDrawable softClearBelizeHoleDrawable = UiUtils.getPlaneTextureRegionDrawable(1, 1, ColorUtils.softClearBelizeHole);
-		final BitmapFont font = freeSquare.getFont();
-		final TextButtonStyle upButtonStyle = new TextButtonStyle(softClearPeterRiverDrawable, softClearBelizeHoleDrawable, softClearPeterRiverDrawable, font);
-		final TextButtonStyle downButtonStyle = upButtonStyle;
+
 		final float width = freeSquare.getCamera().viewportWidth;
 		final float height = freeSquare.getCamera().viewportHeight;
 		final String message = "Create New Player?"; //$NON-NLS-1$
-		this.yesNoDialog = new SimpleYesNoDialog(width, height, message, font, upButtonStyle, downButtonStyle) {
+		this.yesNoDialog = new FreeSquareSimpleYesNoDialog(freeSquare, message) {
 
 			@Override
 			protected void yes() {
