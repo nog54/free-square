@@ -43,9 +43,11 @@ import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.OtherObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.FreeSquareFileChooser;
+import org.nognog.freeSquare.square2d.ui.FreeSquareSimpleDialog;
 import org.nognog.freeSquare.square2d.ui.ItemList;
 import org.nognog.freeSquare.square2d.ui.Menu;
 import org.nognog.freeSquare.square2d.ui.ModePresenter;
@@ -53,6 +55,7 @@ import org.nognog.freeSquare.square2d.ui.MultiLevelFlickButtonController;
 import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
+import org.nognog.freeSquare.square2d.ui.SimpleDialog.SimpleDialogListener;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
@@ -86,6 +89,7 @@ public class MainActivity extends FreeSquareActivity {
 	private ItemList itemList;
 	private ModePresenter modePresenter;
 	private FreeSquareFileChooser fileChooser;
+	private FreeSquareSimpleDialog dialog;
 
 	private final Array<CameraObserver> childCameraObserver;
 
@@ -98,14 +102,6 @@ public class MainActivity extends FreeSquareActivity {
 		this.initializeWidgets();
 		this.inputProcessor = new MainActivityInputProcessor(this);
 		this.setPlayer(freeSquare.getPlayer());
-		this.addActor(this.menu);
-		this.addActor(this.playersItemList);
-		this.addActor(this.playersLifeList);
-		this.addActor(this.playersSquareList);
-		this.addActor(this.itemList);
-		this.addActor(this.modePresenter);
-		this.addActor(this.fileChooser);
-		this.hideAll();
 	}
 
 	private void initializeWidgets() {
@@ -191,15 +187,32 @@ public class MainActivity extends FreeSquareActivity {
 			}
 
 			@Override
-			public void choose(FileHandle file) {
-				
+			public void choose(final FileHandle file) {
 				MainActivity.this.showSquareOnly();
-				//Square2dObjectType<?> newType = new OtherObjectType.LoadedObject("new", file.path()); //$NON-NLS-1$
-				Square2dObjectType<?> newType = new LifeObjectType.LoadedObject("new", file.path(), 100, 5, LandingLifeObject.class); //$NON-NLS-1$
-				Square2dObject newObject = newType.create();
-				if (MainActivity.this.getSquare() != null) {
-					MainActivity.this.getSquare().addSquareObject(newObject);
-				}
+				MainActivity.this.showDialog("Please select object type.", "Decoration", "Life", new SimpleDialogListener() { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+							@Override
+							public void leftButtonClicked() {
+								Square2dObjectType<?> newType = new OtherObjectType.LoadedObject("noname", file.path()); //$NON-NLS-1$
+								Square2dObject newObject = newType.create();
+								if (MainActivity.this.getSquare() != null) {
+									MainActivity.this.getSquare().addSquareObject(newObject);
+								}
+								MainActivity.this.showSquareOnly();
+							}
+
+							@Override
+							public void rightButtonClicked() {
+								Square2dObjectType<?> newType = new LifeObjectType.LoadedObject("noname", file.path(), 100, 5, LandingLifeObject.class); //$NON-NLS-1$
+								Square2dObject newObject = newType.create();
+								if (MainActivity.this.getSquare() != null) {
+									MainActivity.this.getSquare().addSquareObject(newObject);
+								}
+								MainActivity.this.showSquareOnly();
+							}
+
+						});
+
 			}
 
 			@Override
@@ -208,6 +221,7 @@ public class MainActivity extends FreeSquareActivity {
 			}
 		};
 		this.fileChooser = new FreeSquareFileChooser(freeSquare.getCamera(), font, listener);
+		this.dialog = new FreeSquareSimpleDialog(freeSquare);
 	}
 
 	private static Item<?, ?>[] getAllItems() {
@@ -456,6 +470,7 @@ public class MainActivity extends FreeSquareActivity {
 		this.hideItemList();
 		this.hideModePresenter();
 		this.hideFileChooser();
+		this.hideDialog();
 	}
 
 	private void enableSquare() {
@@ -486,8 +501,9 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	private void show(Actor actor) {
-		actor.getColor().a = 1f;
-		actor.setTouchable(Touchable.enabled);
+		if (!this.getChildren().contains(actor, true)) {
+			this.addActor(actor);
+		}
 		actor.toFront();
 		if (actor instanceof CameraObserver) {
 			this.addChildCameraObserver((CameraObserver) actor);
@@ -498,9 +514,7 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	private void hide(Actor actor) {
-		actor.getColor().a = 0f;
-		actor.setTouchable(Touchable.disabled);
-		actor.toBack();
+		this.removeActor(actor);
 		if (actor instanceof CameraObserver) {
 			this.removeChildCameraObserver((CameraObserver) actor);
 		}
@@ -613,6 +627,30 @@ public class MainActivity extends FreeSquareActivity {
 	 */
 	public void hideFileChooser() {
 		this.hide(this.fileChooser);
+	}
+
+	/**
+	 * show file chooser
+	 * 
+	 * @param text
+	 * @param leftButtonText
+	 * @param rightButtonText
+	 * @param listener
+	 */
+	public void showDialog(String text, String leftButtonText, String rightButtonText, SimpleDialogListener listener) {
+		this.dialog.setText(text);
+		this.dialog.setLeftButtonText(leftButtonText);
+		this.dialog.setRightButtonText(rightButtonText);
+		this.dialog.setListener(listener);
+		this.dialog.setDebug(true);
+		this.show(this.dialog);
+	}
+
+	/**
+	 * hide file chooser
+	 */
+	public void hideDialog() {
+		this.hide(this.dialog);
 	}
 
 	@Override

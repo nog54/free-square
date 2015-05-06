@@ -26,21 +26,25 @@ public abstract class FreeSquareSimpleYesNoDialog extends FreeSquareSimpleDialog
 	 * @param text
 	 */
 	public FreeSquareSimpleYesNoDialog(FreeSquare freeSquare, String text) {
-		super(freeSquare, text, "Yes", "No"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	@Override
-	protected void leftButtonClicked() {
-		this.yes();
-	}
-
-	@Override
-	protected void rightButtonClicked() {
-		this.no();
+		super(freeSquare); 
+		this.setText(text);
+		this.setLeftButtonText("Yes"); //$NON-NLS-1$
+		this.setRightButtonText("No"); //$NON-NLS-1$
+		this.setListener(new SimpleDialogListener() {	
+			@Override
+			public void rightButtonClicked() {
+				FreeSquareSimpleYesNoDialog.this.yes();
+			}
+			
+			@Override
+			public void leftButtonClicked() {
+				FreeSquareSimpleYesNoDialog.this.yes();
+			}
+		});
 	}
 
 	protected abstract void yes();
-
+	
 	protected abstract void no();
 
 }

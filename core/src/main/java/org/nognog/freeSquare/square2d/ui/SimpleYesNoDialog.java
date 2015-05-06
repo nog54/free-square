@@ -32,20 +32,29 @@ public abstract class SimpleYesNoDialog extends SimpleDialog {
 	 */
 	public SimpleYesNoDialog(float width, float height, String text, BitmapFont textFont, TextButtonStyle yesButtonStyle, TextButtonStyle noButtonStyle) {
 		super(width, height, text, textFont, "Yes", "No", yesButtonStyle, noButtonStyle); //$NON-NLS-1$ //$NON-NLS-2$
+		this.setListener(new SimpleDialog.SimpleDialogListener() {
+
+			@Override
+			public void rightButtonClicked() {
+				SimpleYesNoDialog.this.no();
+			}
+
+			@Override
+			public void leftButtonClicked() {
+				SimpleYesNoDialog.this.yes();
+			}
+		});
+
 	}
 
-	@Override
-	protected void leftButtonClicked() {
-		this.yes();
-	}
-
-	@Override
-	protected void rightButtonClicked() {
-		this.no();
-
-	}
-
+	/**
+	 * called when yes clicked
+	 */
 	protected abstract void yes();
 
+	/**
+	 * called when no clicked
+	 */
 	protected abstract void no();
+
 }
