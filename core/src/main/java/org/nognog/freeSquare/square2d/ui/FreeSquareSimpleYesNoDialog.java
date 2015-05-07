@@ -33,7 +33,7 @@ public abstract class FreeSquareSimpleYesNoDialog extends FreeSquareSimpleDialog
 		this.setListener(new SimpleDialogListener() {	
 			@Override
 			public void rightButtonClicked() {
-				FreeSquareSimpleYesNoDialog.this.yes();
+				FreeSquareSimpleYesNoDialog.this.no();
 			}
 			
 			@Override
