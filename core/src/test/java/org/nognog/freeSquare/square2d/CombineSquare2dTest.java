@@ -23,12 +23,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
-import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.PreparedLifeObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 @SuppressWarnings("all")
@@ -228,8 +226,8 @@ public class CombineSquare2dTest {
 			CombineSquare2d combineSquare2 = new CombineSquare2d(Square2dType.GRASSY_SQUARE1_SMALL.create());
 			SimpleSquare2d appendSquare1 = Square2dType.GRASSY_SQUARE1_SMALL.create();
 			combineSquare2.combine(combineSquare2.getVertices()[0], appendSquare1, appendSquare1.getVertex2());
-			combineSquare2.addSquareObject(LifeObjectType.Prepared.RIKI.create());
-			combineSquare2.addSquareObject(EatableObjectType.Prepared.TOFU.create());
+			combineSquare2.addSquareObject(PreparedLifeObjectType.RIKI.create());
+			combineSquare2.addSquareObject(PreparedEatableObjectType.TOFU.create());
 
 			boolean actual1 = combineSquare1.combine(combineSquare1.getVertices()[0], combineSquare2, combineSquare2.getVertices()[0]);
 			assertThat(actual1, is(true));

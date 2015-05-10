@@ -20,7 +20,7 @@ import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;

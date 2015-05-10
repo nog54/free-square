@@ -26,6 +26,10 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
+import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -248,6 +252,24 @@ public class FreeSquare extends ApplicationAdapter {
 		Gdx.graphics.setContinuousRendering(false);
 	}
 
+	/**
+	 * save other object dictionary to file
+	 * @param dictionary 
+	 */
+	@SuppressWarnings("static-method")
+	public void saveExternalOtherObjectTypeDictionary(ExternalOtherObjectTypeDictionary dictionary) {
+		PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.save(dictionary);
+	}
+
+	/**
+	 * save life object dictionary to file
+	 * @param dictionary 
+	 */
+	@SuppressWarnings("static-method")
+	public void saveExternalLifeObjectTypeDictionary(ExternalLifeObjectTypeDictionary dictionary) {
+		PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.save(dictionary);
+	}
+
 	@Override
 	public void resume() {
 		if (this.player != null) {
@@ -280,6 +302,16 @@ public class FreeSquare extends ApplicationAdapter {
 			this.playlog = PlayLog.create();
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
+		
+		final ExternalLifeObjectTypeDictionary externalLifeObjectTypes = PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.load();
+		if (externalLifeObjectTypes != null) {
+			LifeObjectTypeManager.setExternalLifeObjectTypeDictionary(externalLifeObjectTypes);
+		}
+		final ExternalOtherObjectTypeDictionary externalOtherObjectTypes = PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.load();
+		if (externalLifeObjectTypes != null) {
+			OtherObjectTypeManager.setExternalOtherObjectTypeDictionary(externalOtherObjectTypes);
+		}
+		
 		this.player = PersistItems.PLAYER.load();
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {
@@ -287,6 +319,7 @@ public class FreeSquare extends ApplicationAdapter {
 			this.lastRun = new Date();
 			return 0;
 		}
+
 		final Date now = new Date();
 		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
 		return diffSecond;
@@ -303,7 +336,7 @@ public class FreeSquare extends ApplicationAdapter {
 	 * create player
 	 */
 	public void createPlayer() {
-		if(this.player != null){
+		if (this.player != null) {
 			throw new RuntimeException("player should be null if create new player."); //$NON-NLS-1$
 		}
 		this.player = new Player();

@@ -15,8 +15,8 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.square2d.Direction;
-import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;

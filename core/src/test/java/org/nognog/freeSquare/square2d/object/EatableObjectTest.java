@@ -28,7 +28,8 @@ import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
-import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.math.Vector2;
@@ -46,7 +47,7 @@ public class EatableObjectTest {
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		for (EatableObjectType type : EatableObjectType.Manager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
 			EatableObject object = type.create();
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
 			object.setPosition(randomPoint.x, randomPoint.y);
@@ -81,7 +82,7 @@ public class EatableObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testResurrection() {
-		for (EatableObjectType type : EatableObjectType.Manager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
 			EatableObject object = type.create();
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			final int baseAmount = object.getAmount();
@@ -99,7 +100,7 @@ public class EatableObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testIsBeingEaten() {
-		for (EatableObjectType type : EatableObjectType.Manager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
 			EatableObject object = type.create();
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			object.eatenBy(eater, 0, Direction.DOWN);

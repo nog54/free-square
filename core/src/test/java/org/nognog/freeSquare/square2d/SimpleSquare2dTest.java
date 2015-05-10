@@ -28,13 +28,12 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
 
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
@@ -92,7 +91,7 @@ public class SimpleSquare2dTest {
 
 	@Test
 	public final void testAddSquareObjectSquare2dObjectFloatFloat() {
-		Square2dObject object = EatableObjectType.Prepared.TOFU.create();
+		Square2dObject object = PreparedEatableObjectType.TOFU.create();
 		final float expected1 = 0;
 		final float actual1 = object.getX();
 		final float expected2 = 0;

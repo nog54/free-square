@@ -14,27 +14,62 @@
 
 package org.nognog.freeSquare.square2d.object.types;
 
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.life.PreparedLifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.other.OtherObjectType;
+import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.PreparedOtherObjectType;
+
 /**
  * @author goshi 2015/04/23
  */
 public class Square2dObjectTypeManager {
 
 	/**
-	 * @return all type
+	 * @return all prepared types
 	 */
-	public static Square2dObjectType<?>[] getAllPreparedTypeValues() {
-		int allValuesLength = EatableObjectType.Prepared.values().length + LifeObjectType.Prepared.values().length + OtherObjectType.Prepared.values().length;
+	public static Square2dObjectType<?>[] getAllPreparedTypes() {
+		int allValuesLength = PreparedEatableObjectType.values().length + PreparedLifeObjectType.values().length + PreparedOtherObjectType.values().length;
 		final Square2dObjectType<?>[] allValues = new Square2dObjectType[allValuesLength];
 		int i = 0;
-		for (LifeObjectType type : LifeObjectType.Prepared.values()) {
+		for (LifeObjectType type : PreparedLifeObjectType.values()) {
 			allValues[i] = type;
 			i++;
 		}
-		for (EatableObjectType type : EatableObjectType.Prepared.values()) {
+		for (EatableObjectType type : PreparedEatableObjectType.values()) {
 			allValues[i] = type;
 			i++;
 		}
-		for (OtherObjectType type : OtherObjectType.Prepared.values()) {
+		for (OtherObjectType type : PreparedOtherObjectType.values()) {
+			allValues[i] = type;
+			i++;
+		}
+		return allValues;
+	}
+
+	/**
+	 * @return all types
+	 */
+	public static Square2dObjectType<?>[] getAllTypes() {
+		final EatableObjectType[] allEatableObjectTypes = EatableObjectTypeManager.getAll();
+		final LifeObjectType[] allLifeObjectTypes = LifeObjectTypeManager.getAllTypes();
+		final OtherObjectType[] allOtherObjectTypes = OtherObjectTypeManager.getAllTypes();
+		int allValuesLength = allEatableObjectTypes.length + allLifeObjectTypes.length + allOtherObjectTypes.length;
+		final Square2dObjectType<?>[] allValues = new Square2dObjectType[allValuesLength];
+		int i = 0;
+		for (LifeObjectType type : allLifeObjectTypes) {
+			allValues[i] = type;
+			i++;
+		}
+		for (EatableObjectType type : allEatableObjectTypes) {
+			allValues[i] = type;
+			i++;
+		}
+		for (OtherObjectType type : allOtherObjectTypes) {
 			allValues[i] = type;
 			i++;
 		}
@@ -45,8 +80,8 @@ public class Square2dObjectTypeManager {
 	 * dispose all type
 	 */
 	public static void disposeAll() {
-		LifeObjectType.Manager.dispose();
-		EatableObjectType.Manager.dispose();
-		OtherObjectType.Manager.dispose();
+		LifeObjectTypeManager.dispose();
+		EatableObjectTypeManager.dispose();
+		OtherObjectTypeManager.dispose();
 	}
 }

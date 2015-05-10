@@ -28,8 +28,9 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -80,7 +81,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @param life
 	 */
 	public LifeObject(Life life) {
-		this(LifeObjectType.Manager.getBindingLifeObjectType(life), life);
+		this(LifeObjectTypeManager.getBindingLifeObjectType(life), life);
 	}
 
 	/**
@@ -190,7 +191,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return eat amount / second
 	 */
 	public int getEatAmountPerSecond() {
-		return LifeObjectType.Manager.getBindingLifeObjectType(this.life).getEatAmountPerSec();
+		return ((LifeObjectType) this.getType()).getEatAmountPerSec();
 	}
 
 	/**
@@ -345,21 +346,25 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return lifeObject
 	 */
 	public static LifeObject create(Life life) {
-		LifeObject newInstance = LifeObjectType.Manager.getBindingLifeObjectType(life).create();
+		LifeObject newInstance = LifeObjectTypeManager.getBindingLifeObjectType(life).create();
 		newInstance.setLife(life);
 		return newInstance;
 	}
 
 	@Override
 	public void write(Json json) {
-		super.write(json);
 		json.writeField(this, "life"); //$NON-NLS-1$
+		json.writeType(this.getClass());
+		json.writeValue("positionX", Float.valueOf(this.getX())); //$NON-NLS-1$
+		json.writeValue("positionY", Float.valueOf(this.getY())); //$NON-NLS-1$
 	}
 
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		super.read(json, jsonData);
 		json.readField(this, "life", jsonData); //$NON-NLS-1$
+		this.setupType(LifeObjectTypeManager.getBindingLifeObjectType(this.life));
+		this.setX(json.readValue("positionX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+		this.setY(json.readValue("positionY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 	}
 
 }

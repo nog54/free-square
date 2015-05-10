@@ -17,6 +17,8 @@ package org.nognog.freeSquare.model.persist;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
+import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
 
 /**
  * 保存項目を表すクラス 列挙型でジェネリクス使えるなら使いたい
@@ -36,6 +38,13 @@ public class PersistItems<T extends PersistItemClass> {
 	/** プレイ記録 */
 	public static final PersistItems<PlayLog> PLAY_LOG = new PersistItems<>(PlayLog.class, "playlog"); //$NON-NLS-1$
 
+	/** 外部から読み込んだLifeObjectType */
+	public static final PersistItems<ExternalLifeObjectTypeDictionary> EXTERNAL_LIFE_OBJECT_TYPES = new PersistItems<>(ExternalLifeObjectTypeDictionary.class, "externalLifeObjects"); //$NON-NLS-1$
+
+	/** 外部から読み込んだOtherObjectType */
+	public static final PersistItems<ExternalOtherObjectTypeDictionary> EXTERNAL_OTHER_OBJECT_TYPES = new PersistItems<>(ExternalOtherObjectTypeDictionary.class, "externalOtherObjects"); //$NON-NLS-1$
+
+	
 	static final PersistItems<Player> TEST_ITEM = new PersistItems<>(Player.class, "PersistManagerTestItem"); //$NON-NLS-1$
 
 	private static final PersistItems<?>[] items = new PersistItems[] { PLAYER, LAST_PLAY, PLAY_LOG };

@@ -51,20 +51,29 @@ public interface Family {
 			return this.name;
 		}
 	}
-	
-	public static class OriginalFamily implements Family{
 
-		private final String name;
+	public static class OriginalFamily implements Family {
+		
+		private String name;
+
+		/**
+		 * 
+		 */
+		public OriginalFamily() {
+			this("noname"); //$NON-NLS-1$
+		}
+
 		/**
 		 * 
 		 */
 		public OriginalFamily(String name) {
 			this.name = name;
 		}
+
 		@Override
 		public String getName() {
 			return this.name;
 		}
-		
+
 	}
 }

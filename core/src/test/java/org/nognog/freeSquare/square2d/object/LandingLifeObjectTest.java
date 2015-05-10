@@ -25,7 +25,8 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.utils.Json;
@@ -40,7 +41,7 @@ public class LandingLifeObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testIsValid() {
-		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
+		for (LifeObjectType type : LifeObjectTypeManager.getAllTypes()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();
@@ -70,7 +71,7 @@ public class LandingLifeObjectTest {
 	@Test
 	public final void testWrite() {
 		Json json = PersistManager.getUseJson();
-		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
+		for (LifeObjectType type : LifeObjectTypeManager.getAllTypes()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();
@@ -96,7 +97,7 @@ public class LandingLifeObjectTest {
 	@SuppressWarnings({ "null", "boxing" })
 	@Test
 	public final void testGoToSquareNearestVertex() {
-		for (LifeObjectType type : LifeObjectType.Manager.getAll()) {
+		for (LifeObjectType type : LifeObjectTypeManager.getAllTypes()) {
 			LandingLifeObject object = null;
 			try {
 				object = (LandingLifeObject) type.create();

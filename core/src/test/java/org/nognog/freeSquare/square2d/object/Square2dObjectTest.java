@@ -27,9 +27,10 @@ import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
-import org.nognog.freeSquare.square2d.object.types.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -43,7 +44,7 @@ public class Square2dObjectTest {
 	@Test
 	public final void testAct() {
 		final Action mock = Mockito.mock(Action.class);
-		final Square2dObject object = new Square2dObject(EatableObjectType.Prepared.TOFU);
+		final Square2dObject object = new Square2dObject(PreparedEatableObjectType.TOFU);
 		object.addAction(mock);
 
 		final float delta = 0.1f;
@@ -56,7 +57,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetX() {
-		Square2dObject object = EatableObjectType.Prepared.TOFU.create();
+		Square2dObject object = PreparedEatableObjectType.TOFU.create();
 		final float expected1 = 1;
 		object.setX(expected1);
 		float actual1 = object.getX();
@@ -65,7 +66,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetY() {
-		Square2dObject object = EatableObjectType.Prepared.TOFU.create();
+		Square2dObject object = PreparedEatableObjectType.TOFU.create();
 		float expected1 = 0.3f;
 		object.setY(0.3f);
 		float actual1 = object.getY();
@@ -74,8 +75,8 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testSetPositionFloatFloat() {
-		Square2dObject object1 = EatableObjectType.Prepared.TOFU.create();
-		Square2dObject object2 = EatableObjectType.Prepared.TOFU.create();
+		Square2dObject object1 = PreparedEatableObjectType.TOFU.create();
+		Square2dObject object2 = PreparedEatableObjectType.TOFU.create();
 		final float x = 0.1f;
 		final float y = 0.3f;
 
@@ -89,7 +90,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testSetSquare() {
-		Square2dObject object = EatableObjectType.Prepared.TOFU.create();
+		Square2dObject object = PreparedEatableObjectType.TOFU.create();
 		SimpleSquare2d square = mock(SimpleSquare2d.class);
 		object.setSquare(square);
 		try {
@@ -104,7 +105,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetType() {
-		for (Square2dObjectType type : EatableObjectType.Manager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
 			Square2dObject object = type.create();
 			assertThat(object.getType(), is(type));
 		}
@@ -112,7 +113,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalWidth() {
-		for (Square2dObjectType type : EatableObjectType.Manager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
 			Square2dObject object = type.create();
 			assertThat(object.getLogicalWidth(), is(type.getLogicalWidth()));
 		}
@@ -120,7 +121,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalHeight() {
-		for (Square2dObjectType type : EatableObjectType.Manager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
 			Square2dObject object = type.create();
 			final float ratio = type.getTexture().getHeight() / type.getTexture().getWidth();
 			assertThat(object.getLogicalHeight(), is(type.getLogicalWidth() * ratio));
@@ -131,7 +132,7 @@ public class Square2dObjectTest {
 	public final void testIsLandingOnSquare() {
 		for (Square2dType type : Square2dType.values()) {
 			SimpleSquare2d square = type.create();
-			Square2dObject object = EatableObjectType.Prepared.TOFU.create();
+			Square2dObject object = PreparedEatableObjectType.TOFU.create();
 			square.addSquareObject(object, MathUtils.random(square.getWidth()), MathUtils.random(square.getHeight()));
 
 			boolean expected1 = square.containsPosition(object.getX(), object.getY());
@@ -148,7 +149,7 @@ public class Square2dObjectTest {
 	@Test
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
-		for (Square2dObjectType type : Square2dObjectTypeManager.getAllPreparedTypeValues()) {
+		for (Square2dObjectType type : Square2dObjectTypeManager.getAllPreparedTypes()) {
 			this.serializeAndDeserialize(json, type);
 		}
 	}

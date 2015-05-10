@@ -39,12 +39,13 @@ import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
+import org.nognog.freeSquare.square2d.object.FlyingLifeObject;
 import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
-import org.nognog.freeSquare.square2d.object.types.OtherObjectType;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.FreeSquareFileChooser;
 import org.nognog.freeSquare.square2d.ui.FreeSquareSimpleDialog;
@@ -193,7 +194,8 @@ public class MainActivity extends FreeSquareActivity {
 
 							@Override
 							public void leftButtonClicked() {
-								Square2dObjectType<?> newType = new OtherObjectType.LoadedObject("noname", file.path()); //$NON-NLS-1$
+								Square2dObjectType<?> newType = OtherObjectTypeManager.createExternalOtherObjectType("noname", file.path()); //$NON-NLS-1$
+								freeSquare.saveExternalOtherObjectTypeDictionary(OtherObjectTypeManager.getExternalOtherObjectTypeDictionary());
 								Square2dObject newObject = newType.create();
 								if (MainActivity.this.getSquare() != null) {
 									MainActivity.this.getSquare().addSquareObject(newObject);
@@ -203,14 +205,29 @@ public class MainActivity extends FreeSquareActivity {
 
 							@Override
 							public void rightButtonClicked() {
-								Square2dObjectType<?> newType = new LifeObjectType.LoadedObject("noname", file.path(), 100, 5, LandingLifeObject.class); //$NON-NLS-1$
-								Square2dObject newObject = newType.create();
-								if (MainActivity.this.getSquare() != null) {
-									MainActivity.this.getSquare().addSquareObject(newObject);
-								}
-								MainActivity.this.showSquareOnly();
-							}
+								MainActivity.this.showDialog("Please select Landing or Flying", "Landing", "Flying", new SimpleDialogListener() { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+											@Override
+											public void leftButtonClicked() {
+												this.addNewLifeObject(LandingLifeObject.class);
+											}
+
+											@Override
+											public void rightButtonClicked() {
+												this.addNewLifeObject(FlyingLifeObject.class);
+											}
+
+											private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
+												Square2dObjectType<?> newType = LifeObjectTypeManager.createExternalLifeObjectType("noname", file.path(), 100, 5, newLifeObjectClass); //$NON-NLS-1$
+												freeSquare.saveExternalLifeObjectTypeDictionary(LifeObjectTypeManager.getExternalLifeObjectTypeDictionary());
+												Square2dObject newObject = newType.create();
+												if (MainActivity.this.getSquare() != null) {
+													MainActivity.this.getSquare().addSquareObject(newObject);
+												}
+												MainActivity.this.showSquareOnly();
+											}
+										});
+							}
 						});
 
 			}
@@ -804,11 +821,12 @@ public class MainActivity extends FreeSquareActivity {
 	@Override
 	public void act(float delta) {
 		final int oldSquareIndex = this.getChildren().indexOf(this.square, true);
+		final Square2d temporaryRemovedSquare = this.square;
 		if (oldSquareIndex != -1) {
 			this.getChildren().removeValue(this.square, true);
 		}
 		super.act(delta);
-		if (oldSquareIndex != -1 && this.square != null) {
+		if (oldSquareIndex != -1 && this.square == temporaryRemovedSquare) {
 			this.getChildren().insert(oldSquareIndex, this.square);
 		}
 	}

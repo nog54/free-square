@@ -23,7 +23,8 @@ import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.LifeObject;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -53,13 +54,13 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected Texture getDrawTextureOf(Life item) {
-		final LifeObjectType bindingLifeObjectType = LifeObjectType.Manager.getBindingLifeObjectType(item);
+		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getBindingLifeObjectType(item);
 		return bindingLifeObjectType.getTexture();
 	}
 
 	@Override
 	protected Color getDrawTextureColorOf(Life item) {
-		final LifeObjectType bindingLifeObjectType = LifeObjectType.Manager.getBindingLifeObjectType(item);
+		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getBindingLifeObjectType(item);
 		return bindingLifeObjectType.getColor();
 	}
 
@@ -70,7 +71,10 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected LifeObject transformToFetchActorType(Life listItem) {
-		return LifeObject.create(listItem);
+		if (this.mainActivity.getSquare() != null) {
+			return LifeObject.create(listItem);
+		}
+		return null;
 	}
 
 	@Override

@@ -85,7 +85,7 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	 * @return all items
 	 */
 	public static Square2dObjectItem[] getAllItems() {
-		final Square2dObjectType<?>[] allTypes = Square2dObjectTypeManager.getAllPreparedTypeValues();
+		final Square2dObjectType<?>[] allTypes = Square2dObjectTypeManager.getAllPreparedTypes();
 		final Square2dObjectItem[] allItems = new Square2dObjectItem[allTypes.length];
 		int i = 0;
 		for (Square2dObjectType<?> type : allTypes) {

@@ -15,7 +15,7 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.square2d.object.types.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -23,9 +23,9 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * @author goshi 2015/01/11
  */
-public class FryingLifeObject extends LifeObject {
+public class FlyingLifeObject extends LifeObject {
 
-	private FryingLifeObject() {
+	private FlyingLifeObject() {
 		super();
 	}
 
@@ -34,7 +34,7 @@ public class FryingLifeObject extends LifeObject {
 	 * @param moveSpeed
 	 * @param generator
 	 */
-	public FryingLifeObject(LifeObjectType type) {
+	public FlyingLifeObject(LifeObjectType type) {
 		this();
 		this.setupType(type);
 		this.setLife(new Life(type.getFamily()));
