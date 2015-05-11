@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/05/07
  */
-public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObjectType>, ExternalSquare2dObjectTypeManager<ExternalLifeObjectType> {
+public class LifeObjectTypeManager extends ExternalSquare2dObjectTypeManager<ExternalLifeObjectType, ExternalLifeObjectTypeDictionary> implements Square2dObjectTypeManager<LifeObjectType> {
 
 	static {
 		validatePreparedFamilyDuplication();
@@ -34,10 +34,8 @@ public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObje
 
 	private static LifeObjectTypeManager instance = new LifeObjectTypeManager();
 
-	private ExternalLifeObjectTypeDictionary externalLifeObjectTypes = new ExternalLifeObjectTypeDictionary();
-
 	private LifeObjectTypeManager() {
-
+		this.setDictionary(new ExternalLifeObjectTypeDictionary());
 	}
 
 	/**
@@ -63,10 +61,10 @@ public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObje
 	 * @param squareObjectClass
 	 * @return create new instance
 	 */
-	public <T extends LifeObject> ExternalLifeObjectType createExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
-		final ExternalLifeObjectType newInstance = new ExternalLifeObjectType(name, texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
-		this.externalLifeObjectTypes.addExternalObjectType(newInstance);
-		return newInstance;
+	public <T extends LifeObject> ExternalLifeObjectType createAndRegisterExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
+		final ExternalLifeObjectType newType = new ExternalLifeObjectType(name, texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
+		this.register(newType);
+		return newType;
 	}
 
 	/**
@@ -94,18 +92,13 @@ public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObje
 		return PreparedLifeObjectType.values();
 	}
 
-	@Override
-	public ExternalLifeObjectType[] getAllExternalTypes() {
-		return this.getExternalLifeObjectTypeDictionary().getAllExternalLifeObjectType();
-	}
-
 	/**
 	 * @return all type
 	 */
 	@Override
 	public LifeObjectType[] getAllTypes() {
 		final LifeObjectType[] preparedTypes = PreparedLifeObjectType.values();
-		final LifeObjectType[] externalTypes = this.externalLifeObjectTypes.getAllExternalLifeObjectType();
+		final LifeObjectType[] externalTypes = this.getAllExternalTypes().toArray(LifeObjectType.class);
 		final LifeObjectType[] result = new LifeObjectType[preparedTypes.length + externalTypes.length];
 		int i = 0;
 		for (LifeObjectType type : preparedTypes) {
@@ -117,21 +110,6 @@ public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObje
 			i++;
 		}
 		return result;
-	}
-
-	/**
-	 * @return the externalLifeObjectTypes
-	 */
-	public ExternalLifeObjectTypeDictionary getExternalLifeObjectTypeDictionary() {
-		return this.externalLifeObjectTypes;
-	}
-
-	/**
-	 * @param externalLifeObjectTypes
-	 *            the externalLifeObjectTypes to set
-	 */
-	public void setExternalLifeObjectTypeDictionary(ExternalLifeObjectTypeDictionary externalLifeObjectTypes) {
-		this.externalLifeObjectTypes = externalLifeObjectTypes;
 	}
 
 	/**

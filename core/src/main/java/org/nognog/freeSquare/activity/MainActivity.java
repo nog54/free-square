@@ -196,7 +196,7 @@ public class MainActivity extends FreeSquareActivity {
 							@Override
 							public void leftButtonClicked() {
 								Square2dObjectType<?> newType = OtherObjectTypeManager.getInstance().createExternalOtherObjectType("noname", file.path()); //$NON-NLS-1$
-								freeSquare.saveExternalOtherObjectTypeDictionary(OtherObjectTypeManager.getInstance().getExternalOtherObjectTypeDictionary());
+								freeSquare.saveDictionary(OtherObjectTypeManager.getInstance().getDictionary());
 								Square2dObject newObject = newType.create();
 								if (MainActivity.this.getSquare() != null) {
 									MainActivity.this.getSquare().addSquareObject(newObject);
@@ -220,8 +220,8 @@ public class MainActivity extends FreeSquareActivity {
 
 											private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
 												final LifeObjectTypeManager lifeObjectManager = LifeObjectTypeManager.getInstance();
-												Square2dObjectType<?> newType = lifeObjectManager.createExternalLifeObjectType("noname", file.path(), 100, 5, newLifeObjectClass); //$NON-NLS-1$
-												freeSquare.saveExternalLifeObjectTypeDictionary(lifeObjectManager.getExternalLifeObjectTypeDictionary());
+												Square2dObjectType<?> newType = lifeObjectManager.createAndRegisterExternalLifeObjectType("noname", file.path(), 100, 5, newLifeObjectClass); //$NON-NLS-1$
+												freeSquare.saveDictionary(lifeObjectManager.getDictionary());
 												Square2dObject newObject = newType.create();
 												if (MainActivity.this.getSquare() != null) {
 													MainActivity.this.getSquare().addSquareObject(newObject);

@@ -39,7 +39,7 @@ public class ExternalLifeObjectTypeDictionaryTest {
 	@Test
 	public final void testExternalLifeObjectTypeDictionary() {
 		final ExternalLifeObjectTypeDictionary dictionary = new ExternalLifeObjectTypeDictionary();
-		ExternalLifeObjectType[] types = dictionary.getAllExternalLifeObjectType();
+		ExternalLifeObjectType[] types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(0));
 	}
 
@@ -65,26 +65,26 @@ public class ExternalLifeObjectTypeDictionaryTest {
 
 		final ExternalLifeObjectType family1MockType1 = this.createTypeMock("family1"); //$NON-NLS-1$
 		dictionary.addExternalObjectType(family1MockType1);
-		ExternalLifeObjectType[] types = dictionary.getAllExternalLifeObjectType();
+		ExternalLifeObjectType[] types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(1));
 		assertThat(types[0], is(family1MockType1));
 
 		final ExternalLifeObjectType family1MockType2 = this.createTypeMock("family1"); //$NON-NLS-1$
 		dictionary.addExternalObjectType(family1MockType1);
 		dictionary.addExternalObjectType(family1MockType2);
-		types = dictionary.getAllExternalLifeObjectType();
+		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(1));
 		assertThat(types[0], is(family1MockType1));
 
 		final ExternalLifeObjectType family2MockType = this.createTypeMock("family2"); //$NON-NLS-1$
 		dictionary.addExternalObjectType(family2MockType);
-		types = dictionary.getAllExternalLifeObjectType();
+		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(2));
 		assertThat(types[0], is(family1MockType1));
 		assertThat(types[1], is(family2MockType));
 		
 		dictionary.clear();
-		types = dictionary.getAllExternalLifeObjectType();
+		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(0));
 	}
 

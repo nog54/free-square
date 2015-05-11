@@ -28,7 +28,7 @@ public class AllSquare2dObjectTypeManager {
 
 	private static Square2dObjectTypeManager<?>[] managers = { LifeObjectTypeManager.getInstance(), EatableObjectTypeManager.getInstance(), OtherObjectTypeManager.getInstance() };
 
-	private static ExternalSquare2dObjectTypeManager<?>[] externalTypeManagers = { LifeObjectTypeManager.getInstance(), OtherObjectTypeManager.getInstance() };
+	private static ExternalSquare2dObjectTypeManager<?, ?>[] externalTypeManagers = { LifeObjectTypeManager.getInstance(), OtherObjectTypeManager.getInstance() };
 
 	/**
 	 * @return all type
@@ -54,12 +54,12 @@ public class AllSquare2dObjectTypeManager {
 	 */
 	public static Square2dObjectType<?>[] getAllExternalTypes() {
 		int size = 0;
-		for (ExternalSquare2dObjectTypeManager<?> manager : externalTypeManagers) {
-			size += manager.getAllExternalTypes().length;
+		for (ExternalSquare2dObjectTypeManager<?, ?> manager : externalTypeManagers) {
+			size += manager.getAllExternalTypes().size;
 		}
 		final Square2dObjectType<?>[] result = new Square2dObjectType[size];
 		int i = 0;
-		for (ExternalSquare2dObjectTypeManager<?> manager : externalTypeManagers) {
+		for (ExternalSquare2dObjectTypeManager<?, ?> manager : externalTypeManagers) {
 			for (Square2dObjectType<?> type : manager.getAllExternalTypes()) {
 				result[i] = type;
 				i++;

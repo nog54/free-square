@@ -18,7 +18,8 @@ import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/05/10
- * @param <T> type of external object type 
+ * @param <T>
+ *            type of external object type
  */
 public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSquare2dObjectType<?>> {
 	private Array<T> externalObjectTypes;
@@ -26,7 +27,7 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 	/**
 	 * 
 	 */
-	protected ExternalSquare2dObjectTypeDictionary() {
+	public ExternalSquare2dObjectTypeDictionary() {
 		this.externalObjectTypes = new Array<>();
 	}
 
@@ -40,6 +41,14 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @param type
+	 * @return true if remove from dictionary
+	 */
+	public boolean removeExternalObjectType(T type) {
+		return this.externalObjectTypes.removeValue(type, true);
 	}
 
 	/**
@@ -58,7 +67,7 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 	/**
 	 * @return all type of external LifeObject array (copy)
 	 */
-	protected Array<T> getAllExternalObjectType() {
+	public Array<T> getAllExternalObjectType() {
 		return new Array<>(this.externalObjectTypes);
 	}
 

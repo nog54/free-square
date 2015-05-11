@@ -254,19 +254,21 @@ public class FreeSquare extends ApplicationAdapter {
 
 	/**
 	 * save other object dictionary to file
-	 * @param dictionary 
+	 * 
+	 * @param dictionary
 	 */
 	@SuppressWarnings("static-method")
-	public void saveExternalOtherObjectTypeDictionary(ExternalOtherObjectTypeDictionary dictionary) {
+	public void saveDictionary(ExternalOtherObjectTypeDictionary dictionary) {
 		PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.save(dictionary);
 	}
 
 	/**
 	 * save life object dictionary to file
-	 * @param dictionary 
+	 * 
+	 * @param dictionary
 	 */
 	@SuppressWarnings("static-method")
-	public void saveExternalLifeObjectTypeDictionary(ExternalLifeObjectTypeDictionary dictionary) {
+	public void saveDictionary(ExternalLifeObjectTypeDictionary dictionary) {
 		PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.save(dictionary);
 	}
 
@@ -302,16 +304,17 @@ public class FreeSquare extends ApplicationAdapter {
 			this.playlog = PlayLog.create();
 			PersistItems.PLAY_LOG.save(this.playlog);
 		}
-		
-		final ExternalLifeObjectTypeDictionary externalLifeObjectTypes = PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.load();
-		if (externalLifeObjectTypes != null) {
-			LifeObjectTypeManager.getInstance().setExternalLifeObjectTypeDictionary(externalLifeObjectTypes);
+
+		final ExternalLifeObjectTypeDictionary externalLifeObjectDictionary = PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.load();
+		if (externalLifeObjectDictionary != null) {
+			LifeObjectTypeManager.getInstance().setDictionary(externalLifeObjectDictionary);
 		}
-		final ExternalOtherObjectTypeDictionary externalOtherObjectTypes = PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.load();
-		if (externalOtherObjectTypes != null) {
-			OtherObjectTypeManager.getInstance().setExternalOtherObjectTypeDictionary(externalOtherObjectTypes);
+
+		final ExternalOtherObjectTypeDictionary externalOtherObjectDictionary = PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.load();
+		if (externalOtherObjectDictionary != null) {
+			OtherObjectTypeManager.getInstance().setDictionary(externalOtherObjectDictionary);
 		}
-		
+
 		this.player = PersistItems.PLAYER.load();
 		this.lastRun = LastPlay.getLastPlayDate();
 		if (this.lastRun == null) {

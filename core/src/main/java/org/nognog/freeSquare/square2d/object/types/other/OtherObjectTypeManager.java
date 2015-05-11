@@ -20,13 +20,12 @@ import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 /**
  * @author goshi 2015/05/07
  */
-public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherObjectType>, ExternalSquare2dObjectTypeManager<ExternalOtherObjectType> {
+public class OtherObjectTypeManager extends ExternalSquare2dObjectTypeManager<ExternalOtherObjectType, ExternalOtherObjectTypeDictionary> implements Square2dObjectTypeManager<OtherObjectType> {
 
 	private static final OtherObjectTypeManager instance = new OtherObjectTypeManager();
 
-	private ExternalOtherObjectTypeDictionary externalOtherObjectTypes = new ExternalOtherObjectTypeDictionary();
-
 	private OtherObjectTypeManager() {
+		this.setDictionary(new ExternalOtherObjectTypeDictionary());
 	}
 
 	/**
@@ -42,9 +41,9 @@ public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherOb
 	 * @return created new instance
 	 */
 	public ExternalOtherObjectType createExternalOtherObjectType(String name, String texturePath) {
-		final ExternalOtherObjectType newInstance = new ExternalOtherObjectType(name, texturePath);
-		this.externalOtherObjectTypes.addExternalObjectType(newInstance);
-		return newInstance;
+		final ExternalOtherObjectType newType = new ExternalOtherObjectType(name, texturePath);
+		this.register(newType);
+		return newType;
 	}
 
 	/**
@@ -53,7 +52,7 @@ public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherOb
 	@Override
 	public OtherObjectType[] getAllTypes() {
 		final OtherObjectType[] preparedTypes = PreparedOtherObjectType.values();
-		final OtherObjectType[] externalTypes = this.getAllExternalTypes();
+		final OtherObjectType[] externalTypes = this.getAllExternalTypes().toArray(OtherObjectType.class);
 		final OtherObjectType[] result = new OtherObjectType[preparedTypes.length + externalTypes.length];
 		int i = 0;
 		for (OtherObjectType type : preparedTypes) {
@@ -68,21 +67,6 @@ public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherOb
 	}
 
 	/**
-	 * @return the externalOtherObjectTypes
-	 */
-	public ExternalOtherObjectTypeDictionary getExternalOtherObjectTypeDictionary() {
-		return this.externalOtherObjectTypes;
-	}
-
-	/**
-	 * @param externalOtherObjectTypes
-	 *            the externalOtherObjectTypes to set
-	 */
-	public void setExternalOtherObjectTypeDictionary(ExternalOtherObjectTypeDictionary externalOtherObjectTypes) {
-		this.externalOtherObjectTypes = externalOtherObjectTypes;
-	}
-
-	/**
 	 * dispose
 	 */
 	@Override
@@ -90,10 +74,5 @@ public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherOb
 		for (OtherObjectType type : PreparedOtherObjectType.values()) {
 			type.getTexture().dispose();
 		}
-	}
-
-	@Override
-	public ExternalOtherObjectType[] getAllExternalTypes() {
-		return this.externalOtherObjectTypes.getAllExternalOtherObjectType();
 	}
 }

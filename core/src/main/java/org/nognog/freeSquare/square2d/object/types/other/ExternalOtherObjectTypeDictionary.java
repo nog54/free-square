@@ -21,14 +21,7 @@ import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeDic
  * @author goshi 2015/05/07
  */
 public class ExternalOtherObjectTypeDictionary extends ExternalSquare2dObjectTypeDictionary<ExternalOtherObjectType> implements PersistItemClass {
-
-	/**
-	 * @return all external types
-	 */
-	public ExternalOtherObjectType[] getAllExternalOtherObjectType() {
-		return this.getAllExternalObjectType().toArray(ExternalOtherObjectType.class);
-	}
-
+	
 	@Override
 	public boolean isValid() {
 		return true;
