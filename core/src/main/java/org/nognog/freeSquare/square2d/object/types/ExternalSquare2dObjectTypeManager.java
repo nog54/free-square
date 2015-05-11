@@ -15,20 +15,15 @@
 package org.nognog.freeSquare.square2d.object.types;
 
 /**
- * The class that implements this should be singleton
- * 
  * @author goshi 2015/05/11
- * @param <T>
- *            be managed type
+ * @param <T1>
+ *            external type
  */
-public interface Square2dObjectTypeManager<T extends Square2dObjectType<?>> {
-	/**
-	 * @return all type
-	 */
-	public T[] getAllTypes();
+public interface ExternalSquare2dObjectTypeManager<T1 extends ExternalSquare2dObjectType<?>> {
 
 	/**
-	 * dispose prepares
+	 * @return all external type
 	 */
-	public void dispose();
+	T1[] getAllExternalTypes();
+
 }

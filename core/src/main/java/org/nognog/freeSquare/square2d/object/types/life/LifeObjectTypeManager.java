@@ -17,21 +17,37 @@ package org.nognog.freeSquare.square2d.object.types.life;
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.square2d.object.LifeObject;
+import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/05/07
  */
-public class LifeObjectTypeManager {
-
-	private static ExternalLifeObjectTypeDictionary externalLifeObjectTypes = new ExternalLifeObjectTypeDictionary();
+public class LifeObjectTypeManager implements Square2dObjectTypeManager<LifeObjectType>, ExternalSquare2dObjectTypeManager<ExternalLifeObjectType> {
 
 	static {
-		validateFamilyDuplication();
+		validatePreparedFamilyDuplication();
 	}
 
-	private static void validateFamilyDuplication() {
+	private static LifeObjectTypeManager instance = new LifeObjectTypeManager();
+
+	private ExternalLifeObjectTypeDictionary externalLifeObjectTypes = new ExternalLifeObjectTypeDictionary();
+
+	private LifeObjectTypeManager() {
+
+	}
+
+	/**
+	 * @return singleton instance
+	 */
+	public static LifeObjectTypeManager getInstance() {
+		return instance;
+	}
+
+	private static void validatePreparedFamilyDuplication() {
 		Array<Family> families = new Array<>();
 		for (LifeObjectType type : PreparedLifeObjectType.values()) {
 			assert !families.contains(type.getFamily(), true);
@@ -47,9 +63,9 @@ public class LifeObjectTypeManager {
 	 * @param squareObjectClass
 	 * @return create new instance
 	 */
-	public static <T extends LifeObject> ExternalLifeObjectType createExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
+	public <T extends LifeObject> ExternalLifeObjectType createExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
 		final ExternalLifeObjectType newInstance = new ExternalLifeObjectType(name, texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
-		externalLifeObjectTypes.addExternalObjectType(newInstance);
+		this.externalLifeObjectTypes.addExternalObjectType(newInstance);
 		return newInstance;
 	}
 
@@ -57,13 +73,13 @@ public class LifeObjectTypeManager {
 	 * @param life
 	 * @return bind type
 	 */
-	public static LifeObjectType getBindingLifeObjectType(Life life) {
-		for (LifeObjectType type : LifeObjectTypeManager.getPreparedLifeObjectTypes()) {
+	public LifeObjectType getBindingLifeObjectType(Life life) {
+		for (LifeObjectType type : getPreparedLifeObjectTypes()) {
 			if (life.getFamily() == type.getFamily()) {
 				return type;
 			}
 		}
-		for (LifeObjectType type : LifeObjectTypeManager.getExternalLifeObjectTypes()) {
+		for (LifeObjectType type : this.getAllExternalTypes()) {
 			if (life.getFamily().getName().equals(type.getFamily().getName())) {
 				return type;
 			}
@@ -72,25 +88,24 @@ public class LifeObjectTypeManager {
 	}
 
 	/**
-	 * @return
+	 * @return prepared types
 	 */
-	private static LifeObjectType[] getPreparedLifeObjectTypes() {
+	public static LifeObjectType[] getPreparedLifeObjectTypes() {
 		return PreparedLifeObjectType.values();
 	}
 
-	/**
-	 * @return
-	 */
-	private static LifeObjectType[] getExternalLifeObjectTypes() {
-		return LifeObjectTypeManager.getExternalLifeObjectTypeDictionary().getAllExternalLifeObjectType();
+	@Override
+	public ExternalLifeObjectType[] getAllExternalTypes() {
+		return this.getExternalLifeObjectTypeDictionary().getAllExternalLifeObjectType();
 	}
 
 	/**
 	 * @return all type
 	 */
-	public static LifeObjectType[] getAllTypes() {
+	@Override
+	public LifeObjectType[] getAllTypes() {
 		final LifeObjectType[] preparedTypes = PreparedLifeObjectType.values();
-		final LifeObjectType[] externalTypes = externalLifeObjectTypes.getAllExternalLifeObjectType();
+		final LifeObjectType[] externalTypes = this.externalLifeObjectTypes.getAllExternalLifeObjectType();
 		final LifeObjectType[] result = new LifeObjectType[preparedTypes.length + externalTypes.length];
 		int i = 0;
 		for (LifeObjectType type : preparedTypes) {
@@ -107,24 +122,28 @@ public class LifeObjectTypeManager {
 	/**
 	 * @return the externalLifeObjectTypes
 	 */
-	public static ExternalLifeObjectTypeDictionary getExternalLifeObjectTypeDictionary() {
-		return externalLifeObjectTypes;
+	public ExternalLifeObjectTypeDictionary getExternalLifeObjectTypeDictionary() {
+		return this.externalLifeObjectTypes;
 	}
 
 	/**
 	 * @param externalLifeObjectTypes
 	 *            the externalLifeObjectTypes to set
 	 */
-	public static void setExternalLifeObjectTypeDictionary(ExternalLifeObjectTypeDictionary externalLifeObjectTypes) {
-		LifeObjectTypeManager.externalLifeObjectTypes = externalLifeObjectTypes;
+	public void setExternalLifeObjectTypeDictionary(ExternalLifeObjectTypeDictionary externalLifeObjectTypes) {
+		this.externalLifeObjectTypes = externalLifeObjectTypes;
 	}
 
 	/**
 	 * dispose prepares
 	 */
-	public static void dispose() {
-		for (LifeObjectType type : PreparedLifeObjectType.values()) {
-			type.getTexture().dispose();
+	@Override
+	public void dispose() {
+		for (LifeObjectType type : this.getAllTypes()) {
+			final Texture texture = type.getTexture();
+			if (texture != null) {
+				texture.dispose();
+			}
 		}
 	}
 }

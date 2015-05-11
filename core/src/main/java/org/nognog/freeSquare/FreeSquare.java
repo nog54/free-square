@@ -25,12 +25,12 @@ import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
+import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -287,7 +287,7 @@ public class FreeSquare extends ApplicationAdapter {
 				this.font.dispose();
 			}
 			this.stage.dispose();
-			Square2dObjectTypeManager.disposeAll();
+			AllSquare2dObjectTypeManager.disposeAll();
 			Square2d.dispose();
 		} catch (Throwable t) {
 			Gdx.app.error(this.getClass().getName(), "error occured in dispose", t); //$NON-NLS-1$
@@ -305,11 +305,11 @@ public class FreeSquare extends ApplicationAdapter {
 		
 		final ExternalLifeObjectTypeDictionary externalLifeObjectTypes = PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.load();
 		if (externalLifeObjectTypes != null) {
-			LifeObjectTypeManager.setExternalLifeObjectTypeDictionary(externalLifeObjectTypes);
+			LifeObjectTypeManager.getInstance().setExternalLifeObjectTypeDictionary(externalLifeObjectTypes);
 		}
 		final ExternalOtherObjectTypeDictionary externalOtherObjectTypes = PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.load();
-		if (externalLifeObjectTypes != null) {
-			OtherObjectTypeManager.setExternalOtherObjectTypeDictionary(externalOtherObjectTypes);
+		if (externalOtherObjectTypes != null) {
+			OtherObjectTypeManager.getInstance().setExternalOtherObjectTypeDictionary(externalOtherObjectTypes);
 		}
 		
 		this.player = PersistItems.PLAYER.load();

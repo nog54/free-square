@@ -47,7 +47,7 @@ public class EatableObjectTest {
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			EatableObject object = type.create();
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
 			object.setPosition(randomPoint.x, randomPoint.y);
@@ -82,7 +82,7 @@ public class EatableObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testResurrection() {
-		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			EatableObject object = type.create();
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			final int baseAmount = object.getAmount();
@@ -100,7 +100,7 @@ public class EatableObjectTest {
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testIsBeingEaten() {
-		for (EatableObjectType type : EatableObjectTypeManager.getAll()) {
+		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			EatableObject object = type.create();
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
 			object.eatenBy(eater, 0, Direction.DOWN);

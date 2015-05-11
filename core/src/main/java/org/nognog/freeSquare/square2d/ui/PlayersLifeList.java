@@ -54,13 +54,13 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected Texture getDrawTextureOf(Life item) {
-		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getBindingLifeObjectType(item);
+		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getInstance().getBindingLifeObjectType(item);
 		return bindingLifeObjectType.getTexture();
 	}
 
 	@Override
 	protected Color getDrawTextureColorOf(Life item) {
-		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getBindingLifeObjectType(item);
+		final LifeObjectType bindingLifeObjectType = LifeObjectTypeManager.getInstance().getBindingLifeObjectType(item);
 		return bindingLifeObjectType.getColor();
 	}
 

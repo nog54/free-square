@@ -81,7 +81,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @param life
 	 */
 	public LifeObject(Life life) {
-		this(LifeObjectTypeManager.getBindingLifeObjectType(life), life);
+		this(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life), life);
 	}
 
 	/**
@@ -346,7 +346,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return lifeObject
 	 */
 	public static LifeObject create(Life life) {
-		LifeObject newInstance = LifeObjectTypeManager.getBindingLifeObjectType(life).create();
+		LifeObject newInstance = LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life).create();
 		newInstance.setLife(life);
 		return newInstance;
 	}
@@ -362,7 +362,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		json.readField(this, "life", jsonData); //$NON-NLS-1$
-		this.setupType(LifeObjectTypeManager.getBindingLifeObjectType(this.life));
+		this.setupType(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(this.life));
 		this.setX(json.readValue("positionX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 		this.setY(json.readValue("positionY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 	}

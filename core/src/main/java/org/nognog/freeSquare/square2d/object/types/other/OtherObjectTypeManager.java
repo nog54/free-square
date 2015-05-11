@@ -14,30 +14,46 @@
 
 package org.nognog.freeSquare.square2d.object.types.other;
 
+import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
+
 /**
  * @author goshi 2015/05/07
  */
-public class OtherObjectTypeManager {
+public class OtherObjectTypeManager implements Square2dObjectTypeManager<OtherObjectType>, ExternalSquare2dObjectTypeManager<ExternalOtherObjectType> {
 
-	private static ExternalOtherObjectTypeDictionary externalOtherObjectTypes = new ExternalOtherObjectTypeDictionary();
+	private static final OtherObjectTypeManager instance = new OtherObjectTypeManager();
+
+	private ExternalOtherObjectTypeDictionary externalOtherObjectTypes = new ExternalOtherObjectTypeDictionary();
+
+	private OtherObjectTypeManager() {
+	}
+
+	/**
+	 * @return singleton instance
+	 */
+	public static OtherObjectTypeManager getInstance() {
+		return instance;
+	}
 
 	/**
 	 * @param name
 	 * @param texturePath
 	 * @return created new instance
 	 */
-	public static ExternalOtherObjectType createExternalOtherObjectType(String name, String texturePath) {
+	public ExternalOtherObjectType createExternalOtherObjectType(String name, String texturePath) {
 		final ExternalOtherObjectType newInstance = new ExternalOtherObjectType(name, texturePath);
-		externalOtherObjectTypes.addExternalObjectType(newInstance);
+		this.externalOtherObjectTypes.addExternalObjectType(newInstance);
 		return newInstance;
 	}
 
 	/**
 	 * @return all type
 	 */
-	public static OtherObjectType[] getAllTypes() {
+	@Override
+	public OtherObjectType[] getAllTypes() {
 		final OtherObjectType[] preparedTypes = PreparedOtherObjectType.values();
-		final OtherObjectType[] externalTypes = externalOtherObjectTypes.getAllExternalOtherObjectType();
+		final OtherObjectType[] externalTypes = this.getAllExternalTypes();
 		final OtherObjectType[] result = new OtherObjectType[preparedTypes.length + externalTypes.length];
 		int i = 0;
 		for (OtherObjectType type : preparedTypes) {
@@ -54,24 +70,30 @@ public class OtherObjectTypeManager {
 	/**
 	 * @return the externalOtherObjectTypes
 	 */
-	public static ExternalOtherObjectTypeDictionary getExternalOtherObjectTypeDictionary() {
-		return externalOtherObjectTypes;
+	public ExternalOtherObjectTypeDictionary getExternalOtherObjectTypeDictionary() {
+		return this.externalOtherObjectTypes;
 	}
 
 	/**
 	 * @param externalOtherObjectTypes
 	 *            the externalOtherObjectTypes to set
 	 */
-	public static void setExternalOtherObjectTypeDictionary(ExternalOtherObjectTypeDictionary externalOtherObjectTypes) {
-		OtherObjectTypeManager.externalOtherObjectTypes = externalOtherObjectTypes;
+	public void setExternalOtherObjectTypeDictionary(ExternalOtherObjectTypeDictionary externalOtherObjectTypes) {
+		this.externalOtherObjectTypes = externalOtherObjectTypes;
 	}
 
 	/**
 	 * dispose
 	 */
-	public static void dispose() {
+	@Override
+	public void dispose() {
 		for (OtherObjectType type : PreparedOtherObjectType.values()) {
 			type.getTexture().dispose();
 		}
+	}
+
+	@Override
+	public ExternalOtherObjectType[] getAllExternalTypes() {
+		return this.externalOtherObjectTypes.getAllExternalOtherObjectType();
 	}
 }

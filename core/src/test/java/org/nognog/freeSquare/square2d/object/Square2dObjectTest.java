@@ -28,10 +28,10 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -105,7 +105,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetType() {
-		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			Square2dObject object = type.create();
 			assertThat(object.getType(), is(type));
 		}
@@ -113,7 +113,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalWidth() {
-		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			Square2dObject object = type.create();
 			assertThat(object.getLogicalWidth(), is(type.getLogicalWidth()));
 		}
@@ -121,7 +121,7 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testGetLogicalHeight() {
-		for (Square2dObjectType type : EatableObjectTypeManager.getAll()) {
+		for (Square2dObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			Square2dObject object = type.create();
 			final float ratio = type.getTexture().getHeight() / type.getTexture().getWidth();
 			assertThat(object.getLogicalHeight(), is(type.getLogicalWidth() * ratio));
@@ -149,7 +149,7 @@ public class Square2dObjectTest {
 	@Test
 	public final void testReadWrite() {
 		Json json = PersistManager.getUseJson();
-		for (Square2dObjectType type : Square2dObjectTypeManager.getAllPreparedTypes()) {
+		for (Square2dObjectType type : AllSquare2dObjectTypeManager.getAllPreparedTypes()) {
 			this.serializeAndDeserialize(json, type);
 		}
 	}

@@ -18,7 +18,6 @@ import org.nognog.freeSquare.model.item.AbstractItem;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -82,17 +81,17 @@ public class Square2dObjectItem extends AbstractItem<Square2dObjectItem, Square2
 	}
 
 	/**
-	 * @return all items
+	 * @param types
+	 * @return SquareObjectItem
 	 */
-	public static Square2dObjectItem[] getAllItems() {
-		final Square2dObjectType<?>[] allTypes = Square2dObjectTypeManager.getAllPreparedTypes();
-		final Square2dObjectItem[] allItems = new Square2dObjectItem[allTypes.length];
+	public static Square2dObjectItem[] toSquare2dObjectItem(Square2dObjectType<?>... types) {
+		final Square2dObjectItem[] result = new Square2dObjectItem[types.length];
 		int i = 0;
-		for (Square2dObjectType<?> type : allTypes) {
-			allItems[i] = Square2dObjectItem.getInstance(type);
+		for (Square2dObjectType<?> type : types) {
+			result[i] = Square2dObjectItem.getInstance(type);
 			i++;
 		}
-		return allItems;
+		return result;
 	}
 
 	@Override
