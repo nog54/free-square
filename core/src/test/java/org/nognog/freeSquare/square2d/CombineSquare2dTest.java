@@ -19,10 +19,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.PreparedLifeObjectType;
 import org.nognog.freeSquare.square2d.squares.Square2dType;
@@ -32,6 +33,11 @@ import com.badlogic.gdx.utils.Json;
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
 public class CombineSquare2dTest {
+
+	@BeforeClass
+	public static void beforeClass() {
+		CombineSquare2d.addCombineSquare2dSerializerTo(PersistManager.getUseJson());
+	}
 
 	private final void testReadWrite(Square2d combineSquare) {
 		Json json = PersistManager.getUseJson();

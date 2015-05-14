@@ -24,7 +24,7 @@ import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.status.Status;
 import org.nognog.freeSquare.model.life.status.StatusInfluence;
-import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;

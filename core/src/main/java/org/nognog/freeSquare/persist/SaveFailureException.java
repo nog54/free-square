@@ -12,17 +12,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.persist;
-
-import org.nognog.freeSquare.model.SelfValidatable;
+package org.nognog.freeSquare.persist;
 
 /**
- * PersistManager経由で永続化する対象はPersistItemClassを実装しているものを対象としています。
- * また、jsonファイルから復元したオブジェクトが不正でないか検証できるように、SelfValidatableを継承します。
- * PersistManager経由でのオブジェクト復元では、復元後にオブジェクト検証が行われます。
- * 
- * @author goshi 2014/11/18
+ * @author goshi 2014/11/01
  */
-public interface PersistItemClass extends SelfValidatable {
-	//
+public class SaveFailureException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	SaveFailureException() {
+	}
+
+	SaveFailureException(Throwable t) {
+		super(t);
+	}
+
+	SaveFailureException(String string) {
+		super(string);
+	}
+
 }

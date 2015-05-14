@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;

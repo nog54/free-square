@@ -245,10 +245,10 @@ public class MainActivity extends FreeSquareActivity {
 
 	private static Item<?, ?>[] getAllItems() {
 		final Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.toSquare2dObjectItem(AllSquare2dObjectTypeManager.getAllTypes());
-		final Item<?, ?>[] allSquareItem = Square2dItem.getAllItems();
-		final Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItem.length];
+		final Item<?, ?>[] allSquareItems = Square2dItem.getAllItems();
+		final Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItems.length];
 		System.arraycopy(allSquare2dObjectItems, 0, allItems, 0, allSquare2dObjectItems.length);
-		System.arraycopy(allSquareItem, 0, allItems, allSquare2dObjectItems.length, allSquareItem.length);
+		System.arraycopy(allSquareItems, 0, allItems, allSquare2dObjectItems.length, allSquareItems.length);
 		return allItems;
 	}
 

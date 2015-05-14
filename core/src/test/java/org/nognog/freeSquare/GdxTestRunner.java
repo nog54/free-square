@@ -20,6 +20,8 @@ import org.junit.internal.runners.model.EachTestNotifier;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
+import org.nognog.freeSquare.persist.PersistManager;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -28,6 +30,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 @SuppressWarnings("all")
 public class GdxTestRunner extends BlockJUnit4ClassRunner {
+	
 	public GdxTestRunner(Class<?> klass) throws InitializationError {
 		super(klass);
 	}

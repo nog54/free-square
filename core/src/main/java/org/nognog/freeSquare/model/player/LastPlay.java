@@ -16,9 +16,9 @@ package org.nognog.freeSquare.model.player;
 
 import java.util.Date;
 
-import org.nognog.freeSquare.model.persist.LoadFailureException;
-import org.nognog.freeSquare.model.persist.PersistItems;
-import org.nognog.freeSquare.model.persist.PersistItemClass;
+import org.nognog.freeSquare.persist.LoadFailureException;
+import org.nognog.freeSquare.persist.PersistItemClass;
+import org.nognog.freeSquare.persist.PersistItems;
 
 /**
  * @author goshi 2014/11/18

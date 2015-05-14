@@ -14,7 +14,7 @@
 
 package org.nognog.freeSquare.square2d;
 
-import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.persist.PersistManager;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;

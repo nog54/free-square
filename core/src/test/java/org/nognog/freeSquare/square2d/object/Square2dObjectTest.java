@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.model.persist.PersistManager;
+import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;

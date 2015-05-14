@@ -19,14 +19,18 @@ import java.util.Date;
 import org.nognog.freeSquare.activity.FreeSquareActivity;
 import org.nognog.freeSquare.activity.FreeSquareActivityFactory;
 import org.nognog.freeSquare.model.Nameable;
-import org.nognog.freeSquare.model.persist.PersistItems;
 import org.nognog.freeSquare.model.player.LastPlay;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
+import org.nognog.freeSquare.persist.PersistItems;
+import org.nognog.freeSquare.persist.PersistManager;
+import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectType;
 import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
@@ -42,6 +46,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
@@ -71,8 +76,11 @@ public class FreeSquare extends ApplicationAdapter {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 		this.font = FontUtil.createMPlusFont(Settings.getFontSize());
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-		final float timeFromLastRun = setupPersistItems();
+
+		this.setupPersistItems();
+		final float timeFromLastRun = this.getTimeFromLastRun();
 		this.actLongTime(timeFromLastRun);
+
 		this.multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(this.multiplexer);
 		this.activityFactory = new FreeSquareActivityFactory(this);
@@ -81,6 +89,38 @@ public class FreeSquare extends ApplicationAdapter {
 		} else {
 			this.setActivity(this.activityFactory.getInitializeActivity());
 		}
+	}
+
+	private float getTimeFromLastRun() {
+		final Date now = new Date();
+		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
+		final float timeFromLastRun = diffSecond;
+		return timeFromLastRun;
+	}
+
+	private void setupPersistItems() {
+		setupSerializers(PersistManager.getUseJson());
+		this.playlog = PersistItems.PLAY_LOG.load();
+		if (this.playlog == null) {
+			System.out.println("new playlog"); //$NON-NLS-1$
+			this.playlog = PlayLog.create();
+			PersistItems.PLAY_LOG.save(this.playlog);
+		}
+
+		this.setupExternalSquare2dObjectType();
+
+		this.player = PersistItems.PLAYER.load();
+		this.lastRun = LastPlay.getLastPlayDate();
+		if (this.lastRun == null) {
+			System.out.println("new last Run"); //$NON-NLS-1$
+			this.lastRun = new Date();
+		}
+	}
+
+	private static void setupSerializers(Json json) {
+		CombineSquare2d.addCombineSquare2dSerializerTo(json);
+		ExternalLifeObjectType.addExternalLifeObjectTypeSerializerTo(json);
+		ExternalOtherObjectType.addExternalOtherObjectTypeSerializerTo(json);
 	}
 
 	/**
@@ -297,14 +337,8 @@ public class FreeSquare extends ApplicationAdapter {
 		}
 	}
 
-	private float setupPersistItems() {
-		this.playlog = PersistItems.PLAY_LOG.load();
-		if (this.playlog == null) {
-			System.out.println("new playlog"); //$NON-NLS-1$
-			this.playlog = PlayLog.create();
-			PersistItems.PLAY_LOG.save(this.playlog);
-		}
-
+	@SuppressWarnings("static-method")
+	private void setupExternalSquare2dObjectType() {
 		final ExternalLifeObjectTypeDictionary externalLifeObjectDictionary = PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.load();
 		if (externalLifeObjectDictionary != null) {
 			LifeObjectTypeManager.getInstance().setDictionary(externalLifeObjectDictionary);
@@ -314,18 +348,6 @@ public class FreeSquare extends ApplicationAdapter {
 		if (externalOtherObjectDictionary != null) {
 			OtherObjectTypeManager.getInstance().setDictionary(externalOtherObjectDictionary);
 		}
-
-		this.player = PersistItems.PLAYER.load();
-		this.lastRun = LastPlay.getLastPlayDate();
-		if (this.lastRun == null) {
-			System.out.println("new last Run"); //$NON-NLS-1$
-			this.lastRun = new Date();
-			return 0;
-		}
-
-		final Date now = new Date();
-		float diffSecond = (now.getTime() - this.lastRun.getTime()) / 1000f;
-		return diffSecond;
 	}
 
 	/**

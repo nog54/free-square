@@ -12,26 +12,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.persist;
+package org.nognog.freeSquare.persist;
 
 /**
- * @author goshi 2014/11/01
+ * @author goshi 2014/11/18
  */
-public class SaveFailureException extends Exception {
+public class InvalidLoadDataException extends LoadFailureException {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	SaveFailureException() {
-	}
-
-	SaveFailureException(Throwable t) {
-		super(t);
-	}
-
-	SaveFailureException(String string) {
-		super(string);
-	}
-
 }

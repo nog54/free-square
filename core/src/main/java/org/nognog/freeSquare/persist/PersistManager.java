@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.persist;
+package org.nognog.freeSquare.persist;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +23,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.nognog.freeSquare.model.player.PlayLog;
-import org.nognog.freeSquare.square2d.CombineSquare2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -40,7 +39,6 @@ public class PersistManager {
 	private static byte[] encryptionKey;
 
 	static {
-		CombineSquare2d.addCombineSquare2dSerializerTo(json);
 		try {
 			PlayLog playlog = loadPlayLog();
 			encryptionKey = toEncryptKey(playlog);

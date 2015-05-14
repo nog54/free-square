@@ -25,13 +25,12 @@ import com.badlogic.gdx.utils.JsonValue;
 /**
  * @author goshi 2015/05/07
  */
-public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2dObjectType<Square2dObject>, Json.Serializable {
+public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2dObjectType<Square2dObject> {
 	private String name;
 	private String texturePath;
 
 	private transient Texture texture;
 
-	@SuppressWarnings("unused")
 	private ExternalOtherObjectType() {
 		// used by json
 	}
@@ -76,16 +75,42 @@ public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2
 		return new Square2dObject(this);
 	}
 
-	@Override
-	public void write(Json json) {
-		json.writeFields(this);
-	}
+	/**
+	 * @param json
+	 */
+	public static void addExternalOtherObjectTypeSerializerTo(Json json) {
+		json.setSerializer(ExternalOtherObjectType.class, new Json.Serializer<ExternalOtherObjectType>() {
 
-	@Override
-	public void read(Json json, JsonValue jsonData) {
-		this.name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
-		this.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
-		this.texture = new Texture(this.texturePath);
+			@Override
+			@SuppressWarnings({ "rawtypes", "synthetic-access" })
+			public void write(@SuppressWarnings("hiding") Json json, ExternalOtherObjectType object, Class knownType) {
+				json.writeObjectStart();
+				json.writeType(ExternalOtherObjectType.class);
+				json.writeValue("name", object.name); //$NON-NLS-1$
+				json.writeValue("texturePath", object.texturePath); //$NON-NLS-1$
+				json.writeObjectEnd();
+			}
+
+			@Override
+			@SuppressWarnings({ "rawtypes", "synthetic-access" })
+			public ExternalOtherObjectType read(@SuppressWarnings("hiding") Json json, JsonValue jsonData, Class type) {
+
+				final String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+				final ExternalOtherObjectTypeDictionary dictionary = OtherObjectTypeManager.getInstance().getDictionary();
+				if (dictionary != null) {
+					for (ExternalOtherObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
+						if (name.equals(alreadyExistsType.getName())) {
+							return alreadyExistsType;
+						}
+					}
+				}
+				ExternalOtherObjectType result = new ExternalOtherObjectType();
+				result.name = name;
+				result.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
+				result.texture = new Texture(result.texturePath);
+				return result;
+			}
+		});
 	}
 
 }

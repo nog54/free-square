@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.persist;
+package org.nognog.freeSquare.persist;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,6 +25,10 @@ import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.model.player.PlayLog;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.freeSquare.persist.LoadFailureException;
+import org.nognog.freeSquare.persist.PersistItems;
+import org.nognog.freeSquare.persist.PersistManager;
+import org.nognog.freeSquare.persist.SaveFailureException;
 
 @SuppressWarnings({ "javadoc", "static-method", "boxing" })
 @RunWith(GdxTestRunner.class)

@@ -14,7 +14,7 @@
 
 package org.nognog.freeSquare.square2d.object.types.other;
 
-import org.nognog.freeSquare.model.persist.PersistItemClass;
+import org.nognog.freeSquare.persist.PersistItemClass;
 import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeDictionary;
 
 /**
