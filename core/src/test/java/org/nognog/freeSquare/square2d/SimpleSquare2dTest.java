@@ -29,7 +29,7 @@ import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;

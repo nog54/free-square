@@ -115,6 +115,13 @@ public class ItemList extends ScrollPane implements CameraObserver {
 		return (List<Item<?, ?>>) this.getWidget();
 	}
 
+	/**
+	 * @param items
+	 */
+	public void updateItems(Item<?, ?>[] items) {
+		this.getList().setItems(items);
+	}
+
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;

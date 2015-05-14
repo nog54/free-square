@@ -30,7 +30,7 @@ import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
 import com.badlogic.gdx.math.MathUtils;

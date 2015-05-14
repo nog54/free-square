@@ -44,7 +44,9 @@ import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
 import org.nognog.freeSquare.square2d.ui.FreeSquareFileChooser;
@@ -153,8 +155,13 @@ public class MainActivity extends FreeSquareActivity {
 
 			@Override
 			public void left() {
-				((OrthographicCamera) freeSquare.getCamera()).zoom = MainActivity.this.getMaxZoom();
 				MainActivity.this.showSquareOnly();
+				final ExternalLifeObjectTypeDictionary externalLifeObjectTypeDictionary = LifeObjectTypeManager.getInstance().getDictionary();
+				externalLifeObjectTypeDictionary.clear();
+				final ExternalOtherObjectTypeDictionary externalOtherObjectTypeDictionary = OtherObjectTypeManager.getInstance().getDictionary();
+				externalOtherObjectTypeDictionary.clear();
+				MainActivity.this.saveDictionary(externalLifeObjectTypeDictionary);
+				MainActivity.this.saveDictionary(externalOtherObjectTypeDictionary);
 			}
 
 			@Override
@@ -169,7 +176,7 @@ public class MainActivity extends FreeSquareActivity {
 		this.playersLifeList = new PlayersLifeList(this, freeSquare.getPlayer(), font);
 		this.playersSquareList = new PlayersSquareList(this, freeSquare.getPlayer(), font);
 
-		this.itemList = new ItemList(freeSquare.getCamera(), getAllItems(), font) {
+		this.itemList = new ItemList(freeSquare.getCamera(), MainActivity.getAllItems(), font) {
 			@Override
 			protected void selectedItemTapped(Item<?, ?> tappedItem) {
 				freeSquare.getPlayer().putItem(tappedItem);
@@ -196,7 +203,7 @@ public class MainActivity extends FreeSquareActivity {
 							@Override
 							public void leftButtonClicked() {
 								Square2dObjectType<?> newType = OtherObjectTypeManager.getInstance().createExternalOtherObjectType("noname", file.path()); //$NON-NLS-1$
-								freeSquare.saveDictionary(OtherObjectTypeManager.getInstance().getDictionary());
+								MainActivity.this.saveDictionary(OtherObjectTypeManager.getInstance().getDictionary());
 								Square2dObject newObject = newType.create();
 								if (MainActivity.this.getSquare() != null) {
 									MainActivity.this.getSquare().addSquareObject(newObject);
@@ -221,7 +228,7 @@ public class MainActivity extends FreeSquareActivity {
 											private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
 												final LifeObjectTypeManager lifeObjectManager = LifeObjectTypeManager.getInstance();
 												Square2dObjectType<?> newType = lifeObjectManager.createAndRegisterExternalLifeObjectType("noname", file.path(), 100, 5, newLifeObjectClass); //$NON-NLS-1$
-												freeSquare.saveDictionary(lifeObjectManager.getDictionary());
+												MainActivity.this.saveDictionary(lifeObjectManager.getDictionary());
 												Square2dObject newObject = newType.create();
 												if (MainActivity.this.getSquare() != null) {
 													MainActivity.this.getSquare().addSquareObject(newObject);
@@ -763,6 +770,15 @@ public class MainActivity extends FreeSquareActivity {
 		final float fitSquareHeightZoom = this.square.getHeight() / camera.viewportHeight;
 		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
 		return maxZoom;
+	}
+	
+	protected void saveDictionary(ExternalLifeObjectTypeDictionary dictionary){
+		this.getFreeSquare().saveDictionary(dictionary);
+		this.itemList.updateItems(MainActivity.getAllItems());
+	}
+	protected void saveDictionary(ExternalOtherObjectTypeDictionary dictionary){
+		this.getFreeSquare().saveDictionary(dictionary);
+		this.itemList.updateItems(MainActivity.getAllItems());
 	}
 
 	@Override

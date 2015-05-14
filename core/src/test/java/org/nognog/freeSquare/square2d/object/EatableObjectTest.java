@@ -30,7 +30,7 @@ import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;

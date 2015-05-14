@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.squares;
+package org.nognog.freeSquare.square2d.type;
 
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.object.Square2dObject;

@@ -17,7 +17,7 @@ package org.nognog.freeSquare.square2d.item;
 import org.nognog.freeSquare.model.item.AbstractItem;
 import org.nognog.freeSquare.model.item.DrawableItem;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

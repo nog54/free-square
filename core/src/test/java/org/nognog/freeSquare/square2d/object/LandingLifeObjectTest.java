@@ -27,7 +27,7 @@ import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.utils.Json;
 

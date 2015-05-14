@@ -26,7 +26,7 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.PreparedLifeObjectType;
-import org.nognog.freeSquare.square2d.squares.Square2dType;
+import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.utils.Json;
 
