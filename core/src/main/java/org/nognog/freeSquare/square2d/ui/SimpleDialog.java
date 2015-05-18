@@ -65,6 +65,7 @@ public class SimpleDialog extends Group {
 			public void clicked(InputEvent event, float x, float y) {
 				if (SimpleDialog.this.getListener() != null) {
 					SimpleDialog.this.getListener().leftButtonClicked();
+					SimpleDialog.this.getListener().beforeClickedHandle();
 				}
 			}
 		});
@@ -73,6 +74,7 @@ public class SimpleDialog extends Group {
 			public void clicked(InputEvent event, float x, float y) {
 				if (SimpleDialog.this.getListener() != null) {
 					SimpleDialog.this.getListener().rightButtonClicked();
+					SimpleDialog.this.getListener().beforeClickedHandle();
 				}
 			}
 		});
@@ -139,15 +141,32 @@ public class SimpleDialog extends Group {
 	/**
 	 * @author goshi 2015/05/05
 	 */
-	public static interface SimpleDialogListener {
+	public static abstract class SimpleDialogListener {
+
+		/**
+		 * called when before {@link SimpleDialogListener#leftButtonClicked()}
+		 * or {@link SimpleDialogListener#rightButtonClicked()}
+		 */
+		public void beforeClickedHandle() {
+			// nothing in default
+		}
+
+		/**
+		 * called when after {@link SimpleDialogListener#leftButtonClicked()} or
+		 * {@link SimpleDialogListener#rightButtonClicked()}
+		 */
+		public void afterClickedHandle() {
+			// nothing in default
+		}
+
 		/**
 		 * called when left button clicked
 		 */
-		void leftButtonClicked();
+		public abstract void leftButtonClicked();
 
 		/**
 		 * called when right button clicked
 		 */
-		void rightButtonClicked();
+		public abstract void rightButtonClicked();
 	}
 }

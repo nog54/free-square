@@ -42,9 +42,9 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	private transient Class<?> squareObjectClass;
 	private transient Texture texture;
 
-	private ExternalLifeObjectType(){
+	private ExternalLifeObjectType() {
 	}
-	
+
 	/**
 	 * @param name
 	 * @param texturePath
@@ -52,7 +52,7 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	 * @param eatAmountPerSec
 	 * @param squareObjectClass
 	 */
-	<T extends LifeObject> ExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
+	public <T extends LifeObject> ExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
 		this.texturePath = texturePath;
 		this.texture = new Texture(this.texturePath);
 		this.family = new Family.OriginalFamily(name);
@@ -65,6 +65,11 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	@Override
 	public String getName() {
 		return this.family.getName();
+	}
+
+	@Override
+	public void setName(String name) {
+		this.family.setName(name);
 	}
 
 	@Override
@@ -143,9 +148,9 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 
 				final Family.OriginalFamily family = json.readValue("family", Family.OriginalFamily.class, jsonData); //$NON-NLS-1$
 				final ExternalLifeObjectTypeDictionary dictionary = LifeObjectTypeManager.getInstance().getDictionary();
-				if(dictionary != null){
-					for(ExternalLifeObjectType alreadyExistsType : dictionary.getAllExternalObjectType()){
-						if(family.getName().equals(alreadyExistsType.getFamily().getName())){
+				if (dictionary != null) {
+					for (ExternalLifeObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
+						if (family.getName().equals(alreadyExistsType.getFamily().getName())) {
 							return alreadyExistsType;
 						}
 					}

@@ -34,16 +34,24 @@ public class OtherObjectTypeManager extends ExternalSquare2dObjectTypeManager<Ex
 	public static OtherObjectTypeManager getInstance() {
 		return instance;
 	}
+	
 
 	/**
-	 * @param name
 	 * @param texturePath
 	 * @return created new instance
 	 */
+	public ExternalOtherObjectType createExternalOtherObjectType(String texturePath) {
+		return this.createExternalOtherObjectType(this.generateName(), texturePath);
+	}
+	
+	/**
+	 * @param name 
+	 * @param texturePath
+	 * @return created new instance
+	 */
+	@SuppressWarnings("static-method")
 	public ExternalOtherObjectType createExternalOtherObjectType(String name, String texturePath) {
-		final ExternalOtherObjectType newType = new ExternalOtherObjectType(name, texturePath);
-		this.register(newType);
-		return newType;
+		return new ExternalOtherObjectType(name, texturePath);
 	}
 
 	/**
@@ -74,5 +82,10 @@ public class OtherObjectTypeManager extends ExternalSquare2dObjectTypeManager<Ex
 		for (OtherObjectType type : PreparedOtherObjectType.values()) {
 			type.getTexture().dispose();
 		}
+	}
+
+	@Override
+	public boolean isRegisterable(ExternalOtherObjectType type) {
+		return this.getDictionary().isAlreadyExistsName(type.getName()) == false;
 	}
 }

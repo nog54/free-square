@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.Array;
 public abstract class ExternalSquare2dObjectTypeManager<T1 extends ExternalSquare2dObjectType<?>, T2 extends ExternalSquare2dObjectTypeDictionary<T1>> {
 
 	private T2 dictionary;
-	
+
 	/**
 	 * @return all external type
 	 */
@@ -36,10 +36,21 @@ public abstract class ExternalSquare2dObjectTypeManager<T1 extends ExternalSquar
 
 	/**
 	 * @param type
+	 * @return true if success register
 	 */
-	public void register(T1 type) {
-		this.dictionary.addExternalObjectType(type);
+	public boolean register(T1 type) {
+		if (this.isRegisterable(type)) {
+			this.dictionary.addExternalObjectType(type);
+			return true;
+		}
+		return false;
 	}
+
+	/**
+	 * @param type
+	 * @return true if registable
+	 */
+	public abstract boolean isRegisterable(T1 type);
 
 	/**
 	 * @param type
@@ -61,4 +72,21 @@ public abstract class ExternalSquare2dObjectTypeManager<T1 extends ExternalSquar
 	public void setDictionary(T2 dictionary) {
 		this.dictionary = dictionary;
 	}
+
+	protected String generateName() {
+		StringBuilder sb = new StringBuilder();
+		final String base = "noname"; //$NON-NLS-1$
+		sb.append(base);
+		for (int number = 1; number < Integer.MAX_VALUE; number++) {
+			sb.append(number);
+			final String resultCandidate = sb.toString();
+			if (this.getDictionary().isAlreadyExistsName(resultCandidate) == false) {
+				return resultCandidate;
+			}
+			final int numberDigits = (int) (Math.log10(number)) + 1;
+			sb.delete(sb.length() - numberDigits, sb.length());
+		}
+		return "FailedToGenerateName"; //$NON-NLS-1$
+	}
+
 }

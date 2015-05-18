@@ -37,15 +37,15 @@ import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
-import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.FlyingLifeObject;
 import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectType;
 import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.square2d.ui.ColorUtils;
@@ -59,7 +59,6 @@ import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
 import org.nognog.freeSquare.square2d.ui.SimpleDialog.SimpleDialogListener;
-import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
@@ -148,9 +147,7 @@ public class MainActivity extends FreeSquareActivity {
 			@Override
 			public void right() {
 				MainActivity.this.showSquareOnly();
-				if (MainActivity.this.getSquare() != null) {
-					MainActivity.this.showFileChooser();
-				}
+				MainActivity.this.showFileChooser();
 			}
 
 			@Override
@@ -160,8 +157,8 @@ public class MainActivity extends FreeSquareActivity {
 				externalLifeObjectTypeDictionary.clear();
 				final ExternalOtherObjectTypeDictionary externalOtherObjectTypeDictionary = OtherObjectTypeManager.getInstance().getDictionary();
 				externalOtherObjectTypeDictionary.clear();
-				MainActivity.this.saveDictionary(externalLifeObjectTypeDictionary);
-				MainActivity.this.saveDictionary(externalOtherObjectTypeDictionary);
+				MainActivity.this.getFreeSquare().saveDictionary(externalLifeObjectTypeDictionary);
+				MainActivity.this.getFreeSquare().saveDictionary(externalOtherObjectTypeDictionary);
 			}
 
 			@Override
@@ -176,12 +173,14 @@ public class MainActivity extends FreeSquareActivity {
 		this.playersLifeList = new PlayersLifeList(this, freeSquare.getPlayer(), font);
 		this.playersSquareList = new PlayersSquareList(this, freeSquare.getPlayer(), font);
 
-		this.itemList = new ItemList(freeSquare.getCamera(), MainActivity.getAllItems(), font) {
+		this.itemList = new ItemList(freeSquare.getCamera(), font) {
 			@Override
 			protected void selectedItemTapped(Item<?, ?> tappedItem) {
 				freeSquare.getPlayer().putItem(tappedItem);
 			}
 		};
+		LifeObjectTypeManager.getInstance().getDictionary().addDictionaryObserver(this.itemList);
+		OtherObjectTypeManager.getInstance().getDictionary().addDictionaryObserver(this.itemList);
 
 		this.modePresenter = new ModePresenter(freeSquare.getCamera(), font) {
 			@Override
@@ -189,6 +188,7 @@ public class MainActivity extends FreeSquareActivity {
 				MainActivity.this.showSquareOnly();
 			}
 		};
+
 		final FileChooser.Listener listener = new FileChooser.Listener() {
 			@Override
 			public void choose(Array<FileHandle> files) {
@@ -198,46 +198,51 @@ public class MainActivity extends FreeSquareActivity {
 			@Override
 			public void choose(final FileHandle file) {
 				MainActivity.this.showSquareOnly();
-				MainActivity.this.showDialog("Please select object type.", "Decoration", "Life", new SimpleDialogListener() { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				final SimpleDialogListener createNewExternalTypeDialogListener = new SimpleDialogListener() {
+					@Override
+					public void leftButtonClicked() {
+						final OtherObjectTypeManager otherObjectTypeManager = OtherObjectTypeManager.getInstance();
+						final ExternalOtherObjectType newType = otherObjectTypeManager.createExternalOtherObjectType(file.path());
+						MainActivity.this.showSquareOnly();
+						MainActivity.this.getFreeSquare().inputName(newType, "Please input decoration name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
+									@Override
+									public void afterInputName() {
+										otherObjectTypeManager.register(newType);
+										MainActivity.this.getFreeSquare().saveDictionary(otherObjectTypeManager.getDictionary());
+									}
+								});
+					}
 
+					@Override
+					public void rightButtonClicked() {
+						final SimpleDialogListener createExternelLifeObjectTypeDialogLister = new SimpleDialogListener() {
 							@Override
 							public void leftButtonClicked() {
-								Square2dObjectType<?> newType = OtherObjectTypeManager.getInstance().createExternalOtherObjectType("noname", file.path()); //$NON-NLS-1$
-								MainActivity.this.saveDictionary(OtherObjectTypeManager.getInstance().getDictionary());
-								Square2dObject newObject = newType.create();
-								if (MainActivity.this.getSquare() != null) {
-									MainActivity.this.getSquare().addSquareObject(newObject);
-								}
-								MainActivity.this.showSquareOnly();
+								this.addNewLifeObject(LandingLifeObject.class);
 							}
 
 							@Override
 							public void rightButtonClicked() {
-								MainActivity.this.showDialog("Please select Landing or Flying", "Landing", "Flying", new SimpleDialogListener() { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								this.addNewLifeObject(FlyingLifeObject.class);
+							}
 
+							private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
+								final LifeObjectTypeManager lifeObjectTypeManager = LifeObjectTypeManager.getInstance();
+								final ExternalLifeObjectType newType = lifeObjectTypeManager.createExternalLifeObjectType(file.path(), 100, 5, newLifeObjectClass);
+								MainActivity.this.showSquareOnly();
+								MainActivity.this.getFreeSquare().inputName(newType, "Please input name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
 											@Override
-											public void leftButtonClicked() {
-												this.addNewLifeObject(LandingLifeObject.class);
-											}
-
-											@Override
-											public void rightButtonClicked() {
-												this.addNewLifeObject(FlyingLifeObject.class);
-											}
-
-											private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
-												final LifeObjectTypeManager lifeObjectManager = LifeObjectTypeManager.getInstance();
-												Square2dObjectType<?> newType = lifeObjectManager.createAndRegisterExternalLifeObjectType("noname", file.path(), 100, 5, newLifeObjectClass); //$NON-NLS-1$
-												MainActivity.this.saveDictionary(lifeObjectManager.getDictionary());
-												Square2dObject newObject = newType.create();
-												if (MainActivity.this.getSquare() != null) {
-													MainActivity.this.getSquare().addSquareObject(newObject);
-												}
-												MainActivity.this.showSquareOnly();
+											public void afterInputName() {
+												lifeObjectTypeManager.register(newType);
+												MainActivity.this.getFreeSquare().saveDictionary(lifeObjectTypeManager.getDictionary());
 											}
 										});
 							}
-						});
+						};
+						MainActivity.this.showDialog("Please select Landing or Flying", "Landing", "Flying", createExternelLifeObjectTypeDialogLister); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				};
+				MainActivity.this.showDialog("Please select object type.", "Decoration", "Life", createNewExternalTypeDialogListener); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			}
 
@@ -250,19 +255,11 @@ public class MainActivity extends FreeSquareActivity {
 		this.dialog = new FreeSquareSimpleDialog(freeSquare);
 	}
 
-	private static Item<?, ?>[] getAllItems() {
-		final Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.toSquare2dObjectItem(AllSquare2dObjectTypeManager.getAllTypes());
-		final Item<?, ?>[] allSquareItems = Square2dItem.getAllItems();
-		final Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItems.length];
-		System.arraycopy(allSquare2dObjectItems, 0, allItems, 0, allSquare2dObjectItems.length);
-		System.arraycopy(allSquareItems, 0, allItems, allSquare2dObjectItems.length, allSquareItems.length);
-		return allItems;
-	}
-
 	/**
 	 * @return the playerItemList
 	 */
 	public PlayersItemList getPlayerItemList() {
+
 		return this.playersItemList;
 	}
 
@@ -771,15 +768,6 @@ public class MainActivity extends FreeSquareActivity {
 		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
 		return maxZoom;
 	}
-	
-	protected void saveDictionary(ExternalLifeObjectTypeDictionary dictionary){
-		this.getFreeSquare().saveDictionary(dictionary);
-		this.itemList.updateItems(MainActivity.getAllItems());
-	}
-	protected void saveDictionary(ExternalOtherObjectTypeDictionary dictionary){
-		this.getFreeSquare().saveDictionary(dictionary);
-		this.itemList.updateItems(MainActivity.getAllItems());
-	}
 
 	@Override
 	public void notify(SquareEvent event) {
@@ -803,7 +791,7 @@ public class MainActivity extends FreeSquareActivity {
 			} else {
 				title = ""; //$NON-NLS-1$
 			}
-			this.getFreeSquare().inputName(renameRequestedObject, title, ""); //$NON-NLS-1$
+			this.getFreeSquare().inputName(renameRequestedObject, title);
 		}
 	}
 

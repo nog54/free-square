@@ -51,6 +51,11 @@ public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2
 	}
 
 	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
 	public Texture getTexture() {
 		return this.texture;
 	}

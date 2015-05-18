@@ -12,15 +12,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object.types;
-
-import org.nognog.freeSquare.model.Nameable;
-import org.nognog.freeSquare.square2d.object.Square2dObject;
+package org.nognog.freeSquare.square2d.object.types.other;
 
 /**
- * @author goshi 2015/05/10
- * @param <T>
+ * @author goshi
+ * 2015/05/17
  */
-public interface ExternalSquare2dObjectType<T extends Square2dObject> extends Square2dObjectType<T>, Nameable {
-	// marker
+public interface DictionaryObserver {
+	/**
+	 * called when dictionary update
+	 */
+	void updateDictionary();
 }

@@ -61,10 +61,21 @@ public class LifeObjectTypeManager extends ExternalSquare2dObjectTypeManager<Ext
 	 * @param squareObjectClass
 	 * @return create new instance
 	 */
-	public <T extends LifeObject> ExternalLifeObjectType createAndRegisterExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
-		final ExternalLifeObjectType newType = new ExternalLifeObjectType(name, texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
-		this.register(newType);
-		return newType;
+	public <T extends LifeObject> ExternalLifeObjectType createExternalLifeObjectType(String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
+		return this.createExternalLifeObjectType(this.generateName(), texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
+	}
+
+	/**
+	 * @param name
+	 * @param texturePath
+	 * @param moveSpeed
+	 * @param eatAmountPerSec
+	 * @param squareObjectClass
+	 * @return create new instance
+	 */
+	@SuppressWarnings("static-method")
+	public <T extends LifeObject> ExternalLifeObjectType createExternalLifeObjectType(String name, String texturePath, float moveSpeed, int eatAmountPerSec, Class<T> squareObjectClass) {
+		return new ExternalLifeObjectType(name, texturePath, moveSpeed, eatAmountPerSec, squareObjectClass);
 	}
 
 	/**
@@ -123,5 +134,11 @@ public class LifeObjectTypeManager extends ExternalSquare2dObjectTypeManager<Ext
 				texture.dispose();
 			}
 		}
+	}
+
+
+	@Override
+	public boolean isRegisterable(ExternalLifeObjectType type) {
+		return this.getDictionary().isAlreadyExistsName(type.getName()) == false;
 	}
 }

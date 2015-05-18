@@ -196,18 +196,29 @@ public class FreeSquare extends ApplicationAdapter {
 	/**
 	 * @param nameable
 	 * @param title
+	 * @param listener
 	 */
 	public void inputName(final Nameable nameable, String title) {
-		this.inputName(nameable, title, ""); //$NON-NLS-1$
+		this.inputName(nameable, title, null);
+	}
+
+	/**
+	 * @param nameable
+	 * @param title
+	 * @param listener
+	 */
+	public void inputName(final Nameable nameable, String title, InputTextListener listener) {
+		this.inputName(nameable, title, "", listener); //$NON-NLS-1$
 	}
 
 	/**
 	 * @param nameable
 	 * @param title
 	 * @param hint
+	 * @param listener
 	 */
-	public void inputName(final Nameable nameable, String title, String hint) {
-		this.inputName(nameable, title, hint, Settings.getObjectNameMaxTextDrawWidth());
+	public void inputName(final Nameable nameable, String title, String hint, InputTextListener listener) {
+		this.inputName(nameable, title, hint, Settings.getObjectNameMaxTextDrawWidth(), listener);
 	}
 
 	/**
@@ -215,8 +226,9 @@ public class FreeSquare extends ApplicationAdapter {
 	 * @param title
 	 * @param hint
 	 * @param maxTextDrawWidth
+	 * @param listener
 	 */
-	public void inputName(final Nameable nameable, String title, String hint, final float maxTextDrawWidth) {
+	public void inputName(final Nameable nameable, String title, String hint, final float maxTextDrawWidth, final InputTextListener listener) {
 		Gdx.input.getTextInput(new TextInputListener() {
 			@Override
 			public void input(String text) {
@@ -239,6 +251,9 @@ public class FreeSquare extends ApplicationAdapter {
 					return;
 				}
 				nameable.setName(inputText);
+				if (listener != null) {
+					listener.afterInputName();
+				}
 			}
 
 			@Override
@@ -290,6 +305,14 @@ public class FreeSquare extends ApplicationAdapter {
 			LastPlay.update();
 		}
 		Gdx.graphics.setContinuousRendering(false);
+	}
+
+	/**
+	 * update dictionary
+	 */
+	public void saveDictionaries() {
+		this.saveDictionary(LifeObjectTypeManager.getInstance().getDictionary());
+		this.saveDictionary(OtherObjectTypeManager.getInstance().getDictionary());
 	}
 
 	/**
@@ -406,5 +429,15 @@ public class FreeSquare extends ApplicationAdapter {
 	@SuppressWarnings("static-method")
 	public void exit() {
 		Gdx.app.exit();
+	}
+
+	/**
+	 * @author goshi 2015/05/14
+	 */
+	public static interface InputTextListener {
+		/**
+		 * called when after input name
+		 */
+		void afterInputName();
 	}
 }

@@ -16,6 +16,8 @@ package org.nognog.freeSquare.model.life;
 
 import static org.nognog.freeSquare.Messages.getString;
 
+import org.nognog.freeSquare.model.Nameable;
+
 /**
  * 種族を示す列挙
  * 
@@ -52,8 +54,8 @@ public interface Family {
 		}
 	}
 
-	public static class OriginalFamily implements Family {
-		
+	public static class OriginalFamily implements Family, Nameable {
+
 		private String name;
 
 		/**
@@ -73,6 +75,11 @@ public interface Family {
 		@Override
 		public String getName() {
 			return this.name;
+		}
+
+		@Override
+		public void setName(String name) {
+			this.name = name;
 		}
 
 	}

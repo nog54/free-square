@@ -18,6 +18,10 @@ import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.Settings;
 import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.item.Item;
+import org.nognog.freeSquare.square2d.item.Square2dItem;
+import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
+import org.nognog.freeSquare.square2d.object.types.other.DictionaryObserver;
+import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -33,7 +37,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 /**
  * @author goshi 2015/01/17
  */
-public class ItemList extends ScrollPane implements CameraObserver {
+public class ItemList extends ScrollPane implements CameraObserver, DictionaryObserver {
 	private static Color clearBlack = new Color(0, 0, 0, 0.75f);
 
 	/**
@@ -41,8 +45,8 @@ public class ItemList extends ScrollPane implements CameraObserver {
 	 * @param items
 	 * @param font
 	 */
-	public ItemList(Camera camera, Item<?, ?>[] items, BitmapFont font) {
-		super(createList(items, font));
+	public ItemList(Camera camera, BitmapFont font) {
+		super(createList(font));
 		this.setupOverscroll(0, 0, 0);
 		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
 		this.setHeight(camera.viewportHeight / 2);
@@ -79,7 +83,8 @@ public class ItemList extends ScrollPane implements CameraObserver {
 		});
 	}
 
-	private static List<Item<?, ?>> createList(Item<?, ?>[] items, BitmapFont font) {
+	private static List<Item<?, ?>> createList(BitmapFont font) {
+		Item<?, ?>[] items = getAllItems();
 		ImageIncludedItemList<Item<?, ?>> list = new ImageIncludedItemList<Item<?, ?>>(createListStyle(font)) {
 
 			@Override
@@ -102,6 +107,15 @@ public class ItemList extends ScrollPane implements CameraObserver {
 		list.setItems(items);
 		list.setSelectedIndex(-1);
 		return list;
+	}
+	
+	private static Item<?, ?>[] getAllItems() {
+		final Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.toSquare2dObjectItem(AllSquare2dObjectTypeManager.getAllTypes());
+		final Item<?, ?>[] allSquareItems = Square2dItem.getAllItems();
+		final Item<?, ?>[] allItems = new Item<?, ?>[allSquare2dObjectItems.length + allSquareItems.length];
+		System.arraycopy(allSquare2dObjectItems, 0, allItems, 0, allSquare2dObjectItems.length);
+		System.arraycopy(allSquareItems, 0, allItems, allSquare2dObjectItems.length, allSquareItems.length);
+		return allItems;
 	}
 
 	private static ListStyle createListStyle(BitmapFont font) {
@@ -130,8 +144,15 @@ public class ItemList extends ScrollPane implements CameraObserver {
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}
+	
+	@Override
+	public void updateDictionary() {
+		this.getList().setItems(getAllItems());
+	}
 
 	protected void selectedItemTapped(Item<?, ?> tappedItem) {
 		// default is empty.
 	}
+
+
 }

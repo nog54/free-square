@@ -14,21 +14,31 @@
 
 package org.nognog.freeSquare.square2d.object.types;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+import org.nognog.freeSquare.persist.PersistItemClass;
+import org.nognog.freeSquare.square2d.object.types.other.DictionaryObserver;
+
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2015/05/10
  * @param <T>
  *            type of external object type
  */
-public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSquare2dObjectType<?>> {
+public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSquare2dObjectType<?>> implements PersistItemClass, Json.Serializable {
 	private Array<T> externalObjectTypes;
+	private transient Array<DictionaryObserver> observers;
 
 	/**
 	 * 
 	 */
 	public ExternalSquare2dObjectTypeDictionary() {
 		this.externalObjectTypes = new Array<>();
+		this.observers = new Array<>();
 	}
 
 	/**
@@ -36,8 +46,9 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 	 * @return true if added
 	 */
 	public boolean addExternalObjectType(T type) {
-		if (this.isAlreadyExistsFamilyName(type.getName()) == false) {
+		if (this.isAlreadyExistsName(type.getName()) == false) {
 			this.externalObjectTypes.add(type);
+			this.notifyObservers();
 			return true;
 		}
 		return false;
@@ -48,16 +59,20 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 	 * @return true if remove from dictionary
 	 */
 	public boolean removeExternalObjectType(T type) {
-		return this.externalObjectTypes.removeValue(type, true);
+		final boolean isRemoved = this.externalObjectTypes.removeValue(type, true);
+		if (isRemoved) {
+			this.notifyObservers();
+		}
+		return isRemoved;
 	}
 
 	/**
-	 * @param familyName
+	 * @param name
 	 * @return true if already exists name
 	 */
-	public boolean isAlreadyExistsFamilyName(String familyName) {
+	public boolean isAlreadyExistsName(String name) {
 		for (T type : this.externalObjectTypes) {
-			if (type.getName().equals(familyName)) {
+			if (type.getName().equals(name)) {
 				return true;
 			}
 		}
@@ -76,5 +91,56 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 	 */
 	public void clear() {
 		this.externalObjectTypes.clear();
+		this.notifyObservers();
+	}
+
+	private void notifyObservers() {
+		for (DictionaryObserver observer : this.observers) {
+			observer.updateDictionary();
+		}
+	}
+
+	/**
+	 * @param observer
+	 */
+	public void addDictionaryObserver(DictionaryObserver observer) {
+		if (this.observers.contains(observer, true) == false) {
+			this.observers.add(observer);
+		}
+	}
+
+	/**
+	 * @param observer
+	 * @return true if removed
+	 */
+	public boolean removeDictionaryObserver(DictionaryObserver observer) {
+		return this.observers.removeValue(observer, true);
+	}
+
+	protected abstract void fixDictionaryToSavableState();
+
+	@Override
+	public void write(Json json) {
+		if (!this.isValid()) {
+			this.fixDictionaryToSavableState();
+		}
+		for (Field field : ExternalSquare2dObjectTypeDictionary.class.getDeclaredFields()) {
+			final int modifiers = field.getModifiers();
+			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
+				continue;
+			}
+			json.writeField(this, field.getName());
+		}
+	}
+
+	@Override
+	public void read(Json json, JsonValue jsonData) {
+		for (Field field : ExternalSquare2dObjectTypeDictionary.class.getDeclaredFields()) {
+			final int modifiers = field.getModifiers();
+			if (Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers)) {
+				continue;
+			}
+			json.readField(this, field.getName(), jsonData);
+		}
 	}
 }
