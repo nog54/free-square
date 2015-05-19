@@ -16,10 +16,15 @@ package org.nognog.freeSquare.square2d.object.types.other;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.Random;
+
 import mockit.Mocked;
 
-import org.junit.Before;
 import org.junit.Test;
+
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 /**
  * @author goshi 2015/05/10
@@ -29,16 +34,6 @@ public class ExternalOtherObjectTypeDictionaryTest {
 
 	@Mocked("(String, String)")
 	private ExternalOtherObjectType mock;
-
-	/**
-	 * setup
-	 */
-	@Before
-	public void setup() {
-		//		this.family1MockType1.setName("family1"); //$NON-NLS-1$
-		//		this.family1MockType2.setName("family1"); //$NON-NLS-1$
-		//		this.family2MockType.setName("family2"); //$NON-NLS-1$
-	}
 
 	/**
 	 * Test method for
@@ -118,28 +113,55 @@ public class ExternalOtherObjectTypeDictionaryTest {
 		}
 
 		dictionary.fixDictionaryToSavableState();
-		
+
 		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length));
 		assertThat(mockTypes[0].getName(), is("name0")); //$NON-NLS-1$
 		for (int i = 1; i < mockTypes.length; i++) {
 			assertThat(mockTypes[i].getName(), is("name0" + i)); //$NON-NLS-1$
 		}
-		
+
 		final ExternalOtherObjectType mockType105 = new ExternalOtherObjectType(null, null);
 		final ExternalOtherObjectType mockType106 = new ExternalOtherObjectType(null, null);
 		mockType105.setName("knuth"); //$NON-NLS-1$
 		mockType106.setName("dekker"); //$NON-NLS-1$
-		
+
 		dictionary.addExternalObjectType(mockType105);
 		dictionary.addExternalObjectType(mockType106);
 		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length + 2));
-		
+
 		mockType105.setName("name00"); //$NON-NLS-1$
 		mockType106.setName("name0"); //$NON-NLS-1$
-		
+
 		dictionary.fixDictionaryToSavableState();
-		
+
 		assertThat(mockType105.getName(), is("name00")); //$NON-NLS-1$
 		assertThat(mockType106.getName(), is("name0" + (mockTypes.length))); //$NON-NLS-1$
+	}
+
+	/**
+	 * test read and write method
+	 */
+	@Test
+	public void testReadWrite() {
+		final ExternalOtherObjectTypeDictionary originDictionary = new ExternalOtherObjectTypeDictionary();
+		final ExternalOtherObjectType[] mockTypes = new ExternalOtherObjectType[200];
+		final Random random = new Random();
+		for (int i = 0; i < mockTypes.length; i++) {
+			mockTypes[i] = new ExternalOtherObjectType(null, null);
+			mockTypes[i].setName("name" + random.nextInt(200)); //$NON-NLS-1$
+			originDictionary.addExternalObjectType(mockTypes[i]);
+		}
+		Json json = new Json();
+		final String jsonString = json.toJson(originDictionary);
+		final ExternalOtherObjectTypeDictionary readDictionary = json.fromJson(ExternalOtherObjectTypeDictionary.class, jsonString);
+
+		final Array<ExternalOtherObjectType> originDictionaryTypes = originDictionary.getAllExternalObjectType();
+		final Array<ExternalOtherObjectType> readDictionaryTypes = readDictionary.getAllExternalObjectType();
+		assertThat(readDictionaryTypes.size, is(originDictionaryTypes.size));
+		for (int i = 0; i < originDictionaryTypes.size; i++) {
+			final ExternalOtherObjectType readDictionaryType = readDictionaryTypes.get(i);
+			final ExternalOtherObjectType originDictionaryType = originDictionaryTypes.get(i);
+			assertThat(readDictionaryType.getName(), is(originDictionaryType.getName()));
+		}
 	}
 }

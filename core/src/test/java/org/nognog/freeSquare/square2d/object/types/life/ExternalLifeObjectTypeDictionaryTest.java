@@ -16,6 +16,9 @@ package org.nognog.freeSquare.square2d.object.types.life;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.Random;
+
 import mockit.Mocked;
 
 import org.junit.Test;
@@ -24,6 +27,8 @@ import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.square2d.object.LifeObject;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 /**
  * @author goshi 2015/05/10
@@ -130,5 +135,31 @@ public class ExternalLifeObjectTypeDictionaryTest {
 
 		assertThat(mockType105.getName(), is("name00")); //$NON-NLS-1$
 		assertThat(mockType106.getName(), is("name0" + (mockTypes.length))); //$NON-NLS-1$
+	}
+
+	/**
+	 * test read and write method
+	 */
+	@Test
+	public void testReadWrite() {
+		final ExternalLifeObjectTypeDictionary originDictionary = new ExternalLifeObjectTypeDictionary();
+		final ExternalLifeObjectType[] mockTypes = new ExternalLifeObjectType[200];
+		final Random random = new Random();
+		for (int i = 0; i < mockTypes.length; i++) {
+			mockTypes[i] = new ExternalLifeObjectType("name" + random.nextInt(200), null, 0, 0, LifeObject.class); //$NON-NLS-1$
+			originDictionary.addExternalObjectType(mockTypes[i]);
+		}
+		Json json = new Json();
+		final String jsonString = json.toJson(originDictionary);
+		final ExternalLifeObjectTypeDictionary readDictionary = json.fromJson(ExternalLifeObjectTypeDictionary.class, jsonString);
+
+		final Array<ExternalLifeObjectType> originDictionaryTypes = originDictionary.getAllExternalObjectType();
+		final Array<ExternalLifeObjectType> readDictionaryTypes = readDictionary.getAllExternalObjectType();
+		assertThat(readDictionaryTypes.size, is(originDictionaryTypes.size));
+		for (int i = 0; i < originDictionaryTypes.size; i++) {
+			final ExternalLifeObjectType readDictionaryType = readDictionaryTypes.get(i);
+			final ExternalLifeObjectType originDictionaryType = originDictionaryTypes.get(i);
+			assertThat(readDictionaryType.getName(), is(originDictionaryType.getName()));
+		}
 	}
 }
