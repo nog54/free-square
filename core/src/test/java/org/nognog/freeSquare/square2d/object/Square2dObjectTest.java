@@ -17,13 +17,12 @@ package org.nognog.freeSquare.square2d.object;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import mockit.Injectable;
+import mockit.Mocked;
+import mockit.Verifications;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
@@ -41,18 +40,29 @@ import com.badlogic.gdx.utils.Json;
 @RunWith(GdxTestRunner.class)
 public class Square2dObjectTest {
 
+	@Mocked
+	private Action mockAction;
+	
+	@Injectable
+	private SimpleSquare2d mockSquare;
+
 	@Test
 	public final void testAct() {
-		final Action mock = Mockito.mock(Action.class);
 		final Square2dObject object = new Square2dObject(PreparedEatableObjectType.TOFU);
-		object.addAction(mock);
+		object.addAction(mockAction);
 
 		final float delta = 0.1f;
 		final int actCount = 10;
 		for (int i = 0; i < actCount; i++) {
 			object.act(delta);
 		}
-		verify(mock, times(actCount)).act(delta);
+
+		new Verifications() {
+			{
+				mockAction.act(delta);
+				times = actCount;
+			}
+		};
 	}
 
 	@Test
@@ -91,16 +101,15 @@ public class Square2dObjectTest {
 	@Test
 	public final void testSetSquare() {
 		Square2dObject object = PreparedEatableObjectType.TOFU.create();
-		SimpleSquare2d square = mock(SimpleSquare2d.class);
-		object.setSquare(square);
+		object.setSquare(mockSquare);
 		try {
-			object.setSquare(square);
+			object.setSquare(mockSquare);
 			fail();
 		} catch (RuntimeException e) {
 			// ok
 		}
 
-		assertThat((SimpleSquare2d) object.getSquare(), is(square));
+		assertThat((SimpleSquare2d) object.getSquare(), is(mockSquare));
 	}
 
 	@Test

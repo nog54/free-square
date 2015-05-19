@@ -16,7 +16,7 @@ package org.nognog.freeSquare.model.player;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
+import mockit.Mocked;
 
 import org.junit.Test;
 import org.nognog.freeSquare.model.item.Item;
@@ -25,15 +25,13 @@ import org.nognog.freeSquare.model.item.Item;
 public class PossessedItemTest {
 
 	@Test
-	public final void testGetItem() {
-		Item mock = mock(Item.class);
+	public final void testGetItem(@Mocked Item mock) {
 		PossessedItem<?> items = new PossessedItem<>(mock);
 		assertThat(items.getItem(), is(mock));
 	}
 
 	@Test
-	public final void testGetQuantity() {
-		Item mock = mock(Item.class);
+	public final void testGetQuantity(@Mocked Item mock) {
 		PossessedItem<?> items = new PossessedItem<>(mock);
 		final int expected1 = 0;
 		final int actual1 = items.getQuantity();

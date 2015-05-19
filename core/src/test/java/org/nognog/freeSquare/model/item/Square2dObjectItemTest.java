@@ -17,7 +17,7 @@ package org.nognog.freeSquare.model.item;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import mockit.Mocked;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +32,8 @@ import com.badlogic.gdx.graphics.Texture;
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
 public class Square2dObjectItemTest {
+	
+	@Mocked private Item item;
 
 	@Test
 	public final void testGetInstance() {
@@ -66,7 +68,7 @@ public class Square2dObjectItemTest {
 		assertThat(actual4, is(expected4));
 
 		final boolean expected5 = false;
-		final boolean actual5 = item1.isSameItem(mock(Item.class));
+		final boolean actual5 = item1.isSameItem(item);
 		assertThat(actual5, is(expected5));
 	}
 

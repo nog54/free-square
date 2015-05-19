@@ -17,10 +17,10 @@ package org.nognog.freeSquare.square2d;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import mockit.Injectable;
+import mockit.Mocked;
+import mockit.NonStrictExpectations;
+import mockit.Verifications;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +38,13 @@ import com.badlogic.gdx.math.Matrix4;
 @SuppressWarnings("all")
 @RunWith(GdxTestRunner.class)
 public class SimpleSquare2dTest {
+
+	@Injectable
+	private Square2dObject mockObject1;
+	@Injectable
+	private Square2dObject mockObject2;
+	@Mocked
+	private Batch mockBatch;
 
 	@Test
 	public final void testGetWidth() {
@@ -71,18 +78,19 @@ public class SimpleSquare2dTest {
 	@Test
 	public final void testDrawBatchFloat() {
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		square.addActor(mock(Square2dObject.class));
-		Batch batch = mock(Batch.class);
-		when(batch.getTransformMatrix()).thenReturn(new Matrix4());
+		square.addActor(this.mockObject1);
+		new NonStrictExpectations(){{
+			mockBatch.getTransformMatrix();result = new Matrix4();
+		}};
 		square.getSquareImage().setZIndex(1);
-		square.draw(batch, 0);
+		square.draw(mockBatch, 0);
 
 		final int expected1 = 1;
 		final int actual1 = square.getSquareImage().getZIndex();
 		assertThat(actual1, is(expected1));
 
 		square.notify(new UpdateSquareObjectEvent());
-		square.draw(batch, 0);
+		square.draw(mockBatch, 0);
 
 		final int expected2 = 0;
 		final int actual2 = square.getSquareImage().getZIndex();
@@ -118,8 +126,8 @@ public class SimpleSquare2dTest {
 		for (Square2dObject object : square.getObjects()) {
 			fail();
 		}
-		square.addSquareObject(mock(Square2dObject.class));
-		square.addSquareObject(mock(Square2dObject.class));
+		square.addSquareObject(this.mockObject1);
+		square.addSquareObject(this.mockObject2);
 		int counter = 0;
 		for (Square2dObject object : square.getObjects()) {
 			counter++;
@@ -179,30 +187,31 @@ public class SimpleSquare2dTest {
 	}
 
 	@Test
-	public final void testNotifyObservers() {
+	public final void testNotifyObservers(@Mocked final SquareEventListener listener1, @Mocked final SquareEventListener listener2, @Mocked final SquareEventListener listener3) {
 		System.out.println(Gdx.gl);
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		SquareEventListener observer1 = mock(SquareEventListener.class);
-		SquareEventListener observer2 = mock(SquareEventListener.class);
-		SquareEventListener observer3 = mock(SquareEventListener.class);
 
-		Square2dEvent event = new Square2dEvent();
-		square.addSquareObserver(observer1);
-		square.addSquareObserver(observer3);
+		final Square2dEvent event = new Square2dEvent();
+		square.addSquareObserver(listener1);
+		square.addSquareObserver(listener3);
 		square.notifyObservers(event);
-		square.addSquareObserver(observer2);
+		square.addSquareObserver(listener2);
+		square.notifyObservers(event);
+		
+		new Verifications(){{
+			listener1.notify(event); times = 2;
+			listener2.notify(event); times = 1;
+			listener3.notify(event); times = 2;
+		}};
+
+		square.removeSquareObserver(listener1);
 		square.notifyObservers(event);
 
-		verify(observer1, times(2)).notify(event);
-		verify(observer2, times(1)).notify(event);
-		verify(observer3, times(2)).notify(event);
-
-		square.removeSquareObserver(observer1);
-		square.notifyObservers(event);
-
-		verify(observer1, times(2)).notify(event);
-		verify(observer2, times(2)).notify(event);
-		verify(observer3, times(3)).notify(event);
+		new Verifications(){{
+			listener1.notify(event); times = 2;
+			listener2.notify(event); times = 2;
+			listener3.notify(event); times = 3;
+		}};
 	}
 
 	@Test

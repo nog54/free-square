@@ -117,7 +117,10 @@ public abstract class ExternalSquare2dObjectTypeDictionary<T extends ExternalSqu
 		return this.observers.removeValue(observer, true);
 	}
 
-	protected abstract void fixDictionaryToSavableState();
+	/**
+	 * fix me
+	 */
+	public abstract void fixDictionaryToSavableState();
 
 	@Override
 	public void write(Json json) {

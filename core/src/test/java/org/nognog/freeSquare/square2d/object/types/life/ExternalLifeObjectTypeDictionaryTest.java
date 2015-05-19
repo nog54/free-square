@@ -16,12 +16,14 @@ package org.nognog.freeSquare.square2d.object.types.life;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import mockit.Mocked;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.square2d.object.LifeObject;
+
+import com.badlogic.gdx.graphics.Texture;
 
 /**
  * @author goshi 2015/05/10
@@ -30,12 +32,14 @@ import org.nognog.freeSquare.GdxTestRunner;
 @RunWith(GdxTestRunner.class)
 public class ExternalLifeObjectTypeDictionaryTest {
 
+	@Mocked("(String)")
+	private Texture texture;
+
 	/**
 	 * Test method for
 	 * {@link org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary#ExternalLifeObjectTypeDictionary()}
 	 * .
 	 */
-
 	@Test
 	public final void testExternalLifeObjectTypeDictionary() {
 		final ExternalLifeObjectTypeDictionary dictionary = new ExternalLifeObjectTypeDictionary();
@@ -62,36 +66,69 @@ public class ExternalLifeObjectTypeDictionaryTest {
 	@Test
 	public final void testAddExternalLifeObjectType() {
 		final ExternalLifeObjectTypeDictionary dictionary = new ExternalLifeObjectTypeDictionary();
+		final ExternalLifeObjectType mockType1 = new ExternalLifeObjectType("family1", null, 0, 0, LifeObject.class); //$NON-NLS-1$
+		final ExternalLifeObjectType mockType2 = new ExternalLifeObjectType("family1", null, 0, 0, LifeObject.class); //$NON-NLS-1$
+		final ExternalLifeObjectType mockType3 = new ExternalLifeObjectType("family2", null, 0, 0, LifeObject.class); //$NON-NLS-1$
 
-		final ExternalLifeObjectType family1MockType1 = this.createTypeMock("family1"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family1MockType1);
+		dictionary.addExternalObjectType(mockType1);
 		ExternalLifeObjectType[] types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(1));
-		assertThat(types[0], is(family1MockType1));
+		assertThat(types[0], is(mockType1));
 
-		final ExternalLifeObjectType family1MockType2 = this.createTypeMock("family1"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family1MockType1);
-		dictionary.addExternalObjectType(family1MockType2);
+		dictionary.addExternalObjectType(mockType1);
+		dictionary.addExternalObjectType(mockType2);
 		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(1));
-		assertThat(types[0], is(family1MockType1));
+		assertThat(types[0], is(mockType1));
 
-		final ExternalLifeObjectType family2MockType = this.createTypeMock("family2"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family2MockType);
+		dictionary.addExternalObjectType(mockType3);
 		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(2));
-		assertThat(types[0], is(family1MockType1));
-		assertThat(types[1], is(family2MockType));
-		
+		assertThat(types[0], is(mockType1));
+		assertThat(types[1], is(mockType3));
+
 		dictionary.clear();
 		types = dictionary.getAllExternalObjectType().toArray(ExternalLifeObjectType.class);
 		assertThat(types.length, is(0));
 	}
 
-	private ExternalLifeObjectType createTypeMock(String familyName) {
-		final ExternalLifeObjectType typeMock = mock(ExternalLifeObjectType.class);
-		when(typeMock.getName()).thenReturn(familyName);
-		return typeMock;
-	}
+	@SuppressWarnings({ "javadoc" })
+	@Test
+	public void testFixDictionary() {
+		final ExternalLifeObjectTypeDictionary dictionary = new ExternalLifeObjectTypeDictionary();
+		final ExternalLifeObjectType[] mockTypes = new ExternalLifeObjectType[105];
+		for (int i = 0; i < mockTypes.length; i++) {
+			mockTypes[i] = new ExternalLifeObjectType("name" + i, null, 0, 0, LifeObject.class); //$NON-NLS-1$
+			dictionary.addExternalObjectType(mockTypes[i]);
+		}
 
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length));
+
+		for (int i = 1; i < mockTypes.length; i++) {
+			mockTypes[i].setName("name0"); //$NON-NLS-1$
+		}
+
+		dictionary.fixDictionaryToSavableState();
+
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length));
+		assertThat(mockTypes[0].getName(), is("name0")); //$NON-NLS-1$
+		for (int i = 1; i < mockTypes.length; i++) {
+			assertThat(mockTypes[i].getName(), is("name0" + i)); //$NON-NLS-1$
+		}
+
+		final ExternalLifeObjectType mockType105 = new ExternalLifeObjectType("knuth", null, 0, 0, LifeObject.class); //$NON-NLS-1$
+		final ExternalLifeObjectType mockType106 = new ExternalLifeObjectType("dekker", null, 0, 0, LifeObject.class); //$NON-NLS-1$
+
+		dictionary.addExternalObjectType(mockType105);
+		dictionary.addExternalObjectType(mockType106);
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length + 2));
+
+		mockType105.setName("name00"); //$NON-NLS-1$
+		mockType106.setName("name0"); //$NON-NLS-1$
+
+		dictionary.fixDictionaryToSavableState();
+
+		assertThat(mockType105.getName(), is("name00")); //$NON-NLS-1$
+		assertThat(mockType106.getName(), is("name0" + (mockTypes.length))); //$NON-NLS-1$
+	}
 }

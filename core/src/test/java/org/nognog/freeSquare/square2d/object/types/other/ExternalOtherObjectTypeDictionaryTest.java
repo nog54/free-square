@@ -16,9 +16,9 @@ package org.nognog.freeSquare.square2d.object.types.other;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import mockit.Mocked;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -26,6 +26,19 @@ import org.junit.Test;
  */
 @SuppressWarnings({ "boxing", "static-method" })
 public class ExternalOtherObjectTypeDictionaryTest {
+
+	@Mocked("(String, String)")
+	private ExternalOtherObjectType mock;
+
+	/**
+	 * setup
+	 */
+	@Before
+	public void setup() {
+		//		this.family1MockType1.setName("family1"); //$NON-NLS-1$
+		//		this.family1MockType2.setName("family1"); //$NON-NLS-1$
+		//		this.family2MockType.setName("family2"); //$NON-NLS-1$
+	}
 
 	/**
 	 * Test method for
@@ -56,38 +69,77 @@ public class ExternalOtherObjectTypeDictionaryTest {
 	 * .
 	 */
 	@Test
-	public final void testAddExternalOtherObjectType() {
+	public final void testAddExternalObjectType() {
 		final ExternalOtherObjectTypeDictionary dictionary = new ExternalOtherObjectTypeDictionary();
+		final ExternalOtherObjectType mockType1 = new ExternalOtherObjectType(null, null);
+		final ExternalOtherObjectType mockType2 = new ExternalOtherObjectType(null, null);
+		final ExternalOtherObjectType mockType3 = new ExternalOtherObjectType(null, null);
+		mockType1.setName("family1"); //$NON-NLS-1$
+		mockType2.setName("family1"); //$NON-NLS-1$
+		mockType3.setName("family2"); //$NON-NLS-1$
 
-		final ExternalOtherObjectType family1MockType1 = this.createTypeMock("family1"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family1MockType1);
+		dictionary.addExternalObjectType(mockType1);
 		ExternalOtherObjectType[] types = dictionary.getAllExternalObjectType().toArray(ExternalOtherObjectType.class);
 		assertThat(types.length, is(1));
-		assertThat(types[0], is(family1MockType1));
+		assertThat(types[0], is(mockType1));
 
-		final ExternalOtherObjectType family1MockType2 = this.createTypeMock("family1"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family1MockType1);
-		dictionary.addExternalObjectType(family1MockType2);
+		dictionary.addExternalObjectType(mockType1);
+		dictionary.addExternalObjectType(mockType2);
 		types = dictionary.getAllExternalObjectType().toArray(ExternalOtherObjectType.class);
 		assertThat(types.length, is(1));
-		assertThat(types[0], is(family1MockType1));
+		assertThat(types[0], is(mockType1));
 
-		final ExternalOtherObjectType family2MockType = this.createTypeMock("family2"); //$NON-NLS-1$
-		dictionary.addExternalObjectType(family2MockType);
+		dictionary.addExternalObjectType(mockType3);
 		types = dictionary.getAllExternalObjectType().toArray(ExternalOtherObjectType.class);
 		assertThat(types.length, is(2));
-		assertThat(types[0], is(family1MockType1));
-		assertThat(types[1], is(family2MockType));
+		assertThat(types[0], is(mockType1));
+		assertThat(types[1], is(mockType3));
 
 		dictionary.clear();
 		types = dictionary.getAllExternalObjectType().toArray(ExternalOtherObjectType.class);
 		assertThat(types.length, is(0));
 	}
 
-	private ExternalOtherObjectType createTypeMock(String familyName) {
-		final ExternalOtherObjectType typeMock = mock(ExternalOtherObjectType.class);
-		when(typeMock.getName()).thenReturn(familyName);
-		return typeMock;
-	}
+	@SuppressWarnings({ "javadoc" })
+	@Test
+	public void testFixDictionary() {
+		final ExternalOtherObjectTypeDictionary dictionary = new ExternalOtherObjectTypeDictionary();
+		final ExternalOtherObjectType[] mockTypes = new ExternalOtherObjectType[105];
+		for (int i = 0; i < mockTypes.length; i++) {
+			mockTypes[i] = new ExternalOtherObjectType(null, null);
+			mockTypes[i].setName("name" + i); //$NON-NLS-1$
+			dictionary.addExternalObjectType(mockTypes[i]);
+		}
 
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length));
+
+		for (int i = 1; i < mockTypes.length; i++) {
+			mockTypes[i].setName("name0"); //$NON-NLS-1$
+		}
+
+		dictionary.fixDictionaryToSavableState();
+		
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length));
+		assertThat(mockTypes[0].getName(), is("name0")); //$NON-NLS-1$
+		for (int i = 1; i < mockTypes.length; i++) {
+			assertThat(mockTypes[i].getName(), is("name0" + i)); //$NON-NLS-1$
+		}
+		
+		final ExternalOtherObjectType mockType105 = new ExternalOtherObjectType(null, null);
+		final ExternalOtherObjectType mockType106 = new ExternalOtherObjectType(null, null);
+		mockType105.setName("knuth"); //$NON-NLS-1$
+		mockType106.setName("dekker"); //$NON-NLS-1$
+		
+		dictionary.addExternalObjectType(mockType105);
+		dictionary.addExternalObjectType(mockType106);
+		assertThat(dictionary.getAllExternalObjectType().size, is(mockTypes.length + 2));
+		
+		mockType105.setName("name00"); //$NON-NLS-1$
+		mockType106.setName("name0"); //$NON-NLS-1$
+		
+		dictionary.fixDictionaryToSavableState();
+		
+		assertThat(mockType105.getName(), is("name00")); //$NON-NLS-1$
+		assertThat(mockType106.getName(), is("name0" + (mockTypes.length))); //$NON-NLS-1$
+	}
 }

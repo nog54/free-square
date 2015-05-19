@@ -56,7 +56,7 @@ public class ExternalOtherObjectTypeDictionary extends ExternalSquare2dObjectTyp
 	}
 
 	@Override
-	protected void fixDictionaryToSavableState() {
+	public void fixDictionaryToSavableState() {
 		while (this.hasDuplicateNameType()) {
 			Array<ExternalOtherObjectType> types = this.getAllExternalObjectType();
 			for (int i = 0; i < types.size - 1; i++) {

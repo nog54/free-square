@@ -17,14 +17,13 @@ package org.nognog.freeSquare.square2d.ui;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import mockit.Mocked;
+import mockit.NonStrictExpectations;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.square2d.ui.FlickButtonController;
 import org.nognog.freeSquare.square2d.ui.FlickButtonController.FlickButtonInputListener;
 import org.nognog.freeSquare.util.font.FontUtil;
 
@@ -34,9 +33,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 @RunWith(GdxTestRunner.class)
 public class FlickButtonControllerTest {
 
+	@Mocked
+	FlickButtonInputListener mockListener;
+
 	private BitmapFont font;
 	private float buttonWidthHeight;
-	private FlickButtonInputListener listener;
 	int centerCounter, rightCounter, upCounter, leftCounter, downCounter;
 	private String centerMessage = "center"; //$NON-NLS-1$
 	private String rightMessage = "right"; //$NON-NLS-1$
@@ -47,21 +48,30 @@ public class FlickButtonControllerTest {
 	/**
 	 * 
 	 */
+	@SuppressWarnings({ "unused", "synthetic-access" })
 	@Before
 	public void setup() {
 		this.font = FontUtil.createMPlusFont(42);
 		this.buttonWidthHeight = 64;
-		this.listener = mock(FlickButtonInputListener.class);
-		doThrow(new RuntimeException(this.centerMessage)).when(this.listener).center();
-		doThrow(new RuntimeException(this.rightMessage)).when(this.listener).right();
-		doThrow(new RuntimeException(this.upMessage)).when(this.listener).up();
-		doThrow(new RuntimeException(this.leftMessage)).when(this.listener).left();
-		doThrow(new RuntimeException(this.downMessage)).when(this.listener).down();
+		new NonStrictExpectations() {
+			{
+				FlickButtonControllerTest.this.mockListener.center();
+				result = new RuntimeException(FlickButtonControllerTest.this.centerMessage);
+				FlickButtonControllerTest.this.mockListener.up();
+				result = new RuntimeException(FlickButtonControllerTest.this.upMessage);
+				FlickButtonControllerTest.this.mockListener.left();
+				result = new RuntimeException(FlickButtonControllerTest.this.leftMessage);
+				FlickButtonControllerTest.this.mockListener.down();
+				result = new RuntimeException(FlickButtonControllerTest.this.downMessage);
+				FlickButtonControllerTest.this.mockListener.right();
+				result = new RuntimeException(FlickButtonControllerTest.this.rightMessage);
+			}
+		};
 	}
 
 	@Test
 	public final void testSelectCenterButton() {
-		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.listener);
+		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.mockListener);
 		controller.centerButton.setChecked(true);
 		boolean expected1 = true;
 		boolean actual1 = controller.centerButton.isChecked();
@@ -81,7 +91,7 @@ public class FlickButtonControllerTest {
 
 	@Test
 	public final void testSelectUpButton() {
-		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.listener);
+		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.mockListener);
 		controller.upButton.setChecked(true);
 		boolean expected1 = true;
 		boolean actual1 = controller.upButton.isChecked();
@@ -101,7 +111,7 @@ public class FlickButtonControllerTest {
 
 	@Test
 	public final void testSelectDownButton() {
-		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.listener);
+		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.mockListener);
 		controller.downButton.setChecked(true);
 		try {
 			controller.selectDownButton();
@@ -118,7 +128,7 @@ public class FlickButtonControllerTest {
 
 	@Test
 	public final void testSelectRightButton() {
-		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.listener);
+		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.mockListener);
 		controller.rightButton.setChecked(true);
 		try {
 			controller.selectRightButton();
@@ -135,7 +145,7 @@ public class FlickButtonControllerTest {
 
 	@Test
 	public final void testSelectLeftButton() {
-		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.listener);
+		FlickButtonController controller = new FlickButtonController(this.font, this.buttonWidthHeight, this.mockListener);
 		controller.leftButton.setChecked(true);
 		try {
 			controller.selectLeftButton();
