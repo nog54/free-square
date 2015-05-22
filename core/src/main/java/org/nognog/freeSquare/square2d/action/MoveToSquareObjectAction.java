@@ -15,8 +15,8 @@
 package org.nognog.freeSquare.square2d.action;
 
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.object.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
 
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;

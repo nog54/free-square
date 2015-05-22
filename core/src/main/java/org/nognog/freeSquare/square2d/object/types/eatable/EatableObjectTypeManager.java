@@ -14,7 +14,7 @@
 
 package org.nognog.freeSquare.square2d.object.types.eatable;
 
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.Square2dObjectTypeManager;
 
 /**
  * @author goshi 2015/05/07

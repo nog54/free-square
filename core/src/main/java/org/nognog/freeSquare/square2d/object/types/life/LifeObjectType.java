@@ -15,8 +15,7 @@
 package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Family;
-import org.nognog.freeSquare.square2d.object.LifeObject;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 
 /**
  * @author goshi 2015/04/23

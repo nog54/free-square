@@ -12,10 +12,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object;
+package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -42,8 +43,8 @@ public class FlyingLifeObject extends LifeObject {
 
 	@Override
 	public Vector2 nextTargetPosition() {
-		final float x = MathUtils.random(0, this.square.getWidth());
-		final float y = MathUtils.random(0, this.square.getHeight());
+		final float x = MathUtils.random(0, this.getSquare().getWidth());
+		final float y = MathUtils.random(0, this.getSquare().getHeight());
 		return new Vector2(x, y);
 	}
 
@@ -51,7 +52,7 @@ public class FlyingLifeObject extends LifeObject {
 	protected EatableObject getEasyReachableNearestEatableLandingObject() {
 		EatableObject result = null;
 		float resultDistance = 0;
-		for (Square2dObject object : this.square.getObjects()) {
+		for (Square2dObject object : this.getSquare().getObjects()) {
 			if (object instanceof EatableObject && object.isLandingOnSquare()) {
 				if (result == null) {
 					result = (EatableObject) object;

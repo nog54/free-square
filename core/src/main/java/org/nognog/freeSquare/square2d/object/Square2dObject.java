@@ -21,7 +21,6 @@ import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -44,9 +43,9 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private Square2dObjectType<?> type;
 	private float logicalWidth;
 	private float logicalHeight;
-	protected Square2d square;
+	private Square2d square;
 
-	protected Square2dObjectIcon icon;
+	private Square2dObjectIcon icon;
 
 	private boolean enableAction = true;
 

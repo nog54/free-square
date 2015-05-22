@@ -17,7 +17,6 @@ package org.nognog.freeSquare.square2d.object.types.life;
 import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.model.life.Family;
-import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectType;
 
 import com.badlogic.gdx.graphics.Color;

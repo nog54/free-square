@@ -18,9 +18,6 @@ import java.lang.reflect.Constructor;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.life.Family;
-import org.nognog.freeSquare.square2d.object.FlyingLifeObject;
-import org.nognog.freeSquare.square2d.object.LandingLifeObject;
-import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.Colors;
 
 import com.badlogic.gdx.graphics.Color;

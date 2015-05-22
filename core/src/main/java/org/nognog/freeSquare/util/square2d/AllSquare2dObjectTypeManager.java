@@ -14,9 +14,9 @@
 
 package org.nognog.freeSquare.util.square2d;
 
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.Square2dObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeManager;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;

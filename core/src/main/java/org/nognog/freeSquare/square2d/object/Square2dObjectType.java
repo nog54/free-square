@@ -12,9 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object.types;
-
-import org.nognog.freeSquare.square2d.object.Square2dObject;
+package org.nognog.freeSquare.square2d.object;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

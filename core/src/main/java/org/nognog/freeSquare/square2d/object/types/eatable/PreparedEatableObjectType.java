@@ -23,9 +23,8 @@ import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.food.Food;
 import org.nognog.freeSquare.model.food.Taste;
 import org.nognog.freeSquare.model.life.status.StatusInfluence;
-import org.nognog.freeSquare.square2d.object.EatableObject;
-import org.nognog.freeSquare.square2d.object.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.Colors;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

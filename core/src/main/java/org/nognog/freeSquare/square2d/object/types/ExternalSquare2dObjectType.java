@@ -16,6 +16,7 @@ package org.nognog.freeSquare.square2d.object.types;
 
 import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 
 /**
  * @author goshi 2015/05/10

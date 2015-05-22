@@ -923,9 +923,9 @@ public class CombineSquare2d extends Square2d {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (this.isRequestedDrawOrderUpdate) {
+		if (this.isRequestedDrawOrderUpdate()) {
 			this.getChildren().sort(actorComparator);
-			this.isRequestedDrawOrderUpdate = false;
+			this.cancelRequestDrawOrderUpdate();
 		}
 
 		final float alpha = parentAlpha * this.getColor().a;
@@ -933,7 +933,7 @@ public class CombineSquare2d extends Square2d {
 		this.drawAllCombiningSimpleSquares(batch, alpha);
 		this.drawSquare2dObjects(batch, alpha);
 		this.drawNotCombiningFrontSquare(batch, alpha);
-		if (this.drawEdge) {
+		if (this.isDrawEdge()) {
 			this.drawEdge(batch);
 		}
 	}

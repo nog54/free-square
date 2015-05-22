@@ -22,7 +22,7 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
-import org.nognog.freeSquare.square2d.object.LifeObject;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 

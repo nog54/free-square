@@ -16,9 +16,8 @@ package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import org.nognog.freeSquare.model.food.Taste;
 import org.nognog.freeSquare.model.life.status.StatusInfluence;
-import org.nognog.freeSquare.square2d.object.EatableObject;
-import org.nognog.freeSquare.square2d.object.LifeObject;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 /**
  * @author goshi 2015/02/08

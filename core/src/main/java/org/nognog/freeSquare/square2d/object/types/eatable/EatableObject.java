@@ -12,11 +12,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object;
+package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import org.nognog.freeSquare.square2d.Direction;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
+import org.nognog.freeSquare.square2d.object.LandObject;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;

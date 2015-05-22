@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object;
+package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.SquareEvent;
@@ -20,7 +20,9 @@ import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
+import org.nognog.freeSquare.square2d.object.LandObject;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
@@ -83,7 +85,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		double maxMoveY = calcSmallerAbsYThanTrueValueY(maxMoveDistance, theta);
 		float maxTargetPositionX = addWithRoundToSmallerAbs(thisX, maxMoveX);
 		float maxTargetPositionY = addWithRoundToSmallerAbs(thisY, maxMoveY);
-		final Vertex[] vertices = this.square.getVertices();
+		final Vertex[] vertices = this.getSquare().getVertices();
 		for (int i = 0; i < vertices.length; i++) {
 			final Vertex v1 = vertices[i];
 			final Vertex v2 = vertices[(i + 1) % vertices.length];
@@ -104,7 +106,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		final double moveY = calcSmallerAbsYThanTrueValueY(moveDistance, theta);
 		final float targetPositionX = addWithRoundToSmallerAbs(thisX, moveX);
 		final float targetPositionY = addWithRoundToSmallerAbs(thisY, moveY);
-		if (!this.square.containsPosition(targetPositionX, targetPositionY)) {
+		if (!this.getSquare().containsPosition(targetPositionX, targetPositionY)) {
 			System.out.println(maxMoveDistance);
 			System.out.println(moveDistance);
 			return new Vector2(thisX, thisY);
@@ -118,7 +120,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		final double moveY = calcSmallerAbsYThanTrueValueY(tryMoveDistance, theta);
 		final float targetPositionX = addWithRoundToSmallerAbs(thisX, moveX);
 		final float targetPositionY = addWithRoundToSmallerAbs(thisY, moveY);
-		if (this.square.containsPosition(targetPositionX, targetPositionY)) {
+		if (this.getSquare().containsPosition(targetPositionX, targetPositionY)) {
 			return false;
 		}
 		return true;
@@ -157,7 +159,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	@Override
 	public void write(Json json) {
 		if (!this.isLandingOnSquare()) {
-			Vector2 randomPointOnSquare = Square2dUtils.getRandomPointOn(this.square);
+			Vector2 randomPointOnSquare = Square2dUtils.getRandomPointOn(this.getSquare());
 			this.setPosition(randomPointOnSquare.x, randomPointOnSquare.y);
 		}
 		super.write(json);
@@ -167,7 +169,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	protected EatableObject getEasyReachableNearestEatableLandingObject() {
 		EatableObject result = null;
 		float resultDistance = Float.MAX_VALUE;
-		for (Square2dObject object : this.square.getObjects()) {
+		for (Square2dObject object : this.getSquare().getObjects()) {
 			if (object instanceof EatableObject && object.isLandingOnSquare() && this.canGoStraightTo(object)) {
 				final float objectDistance = this.getDistanceTo(object);
 				if (objectDistance < resultDistance) {

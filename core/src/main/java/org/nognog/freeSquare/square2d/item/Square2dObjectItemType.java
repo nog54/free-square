@@ -15,7 +15,7 @@
 package org.nognog.freeSquare.square2d.item;
 
 import org.nognog.freeSquare.model.item.TypeInItem;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 
 /**
  * Adapter to TypeInItem　from Square2dObjectType

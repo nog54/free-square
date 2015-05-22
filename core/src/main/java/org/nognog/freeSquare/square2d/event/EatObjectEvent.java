@@ -16,8 +16,8 @@ package org.nognog.freeSquare.square2d.event;
 
 import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.Square2dEvent;
-import org.nognog.freeSquare.square2d.object.EatableObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 /**
  * @author goshi 2015/02/02

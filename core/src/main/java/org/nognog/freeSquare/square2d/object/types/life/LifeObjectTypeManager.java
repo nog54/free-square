@@ -16,9 +16,8 @@ package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.square2d.object.LifeObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.ExternalSquare2dObjectTypeManager;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectTypeManager;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;

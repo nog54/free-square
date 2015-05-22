@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object;
+package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.life.Life;
@@ -28,9 +28,9 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
-import org.nognog.freeSquare.square2d.object.types.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -111,12 +111,12 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
 		this.upDownRoutineAction = createUpDownAction();
-		this.icon.addAction(this.upDownRoutineAction);
+		this.getIcon().addAction(this.upDownRoutineAction);
 		this.isEnabledUpDownRoutineAction = true;
 		final Image frame = new Image(frameTexture);
-		frame.setWidth(this.icon.getWidth());
-		frame.setHeight(this.icon.getHeight());
-		this.icon.addActor(frame);
+		frame.setWidth(this.getIcon().getWidth());
+		frame.setHeight(this.getIcon().getHeight());
+		this.getIcon().addActor(frame);
 
 		this.addListener(new ActorGestureListener() {
 			@Override
@@ -127,13 +127,13 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if (this.isTripleTapped(count)) {
-					LifeObject.this.square.notifyObservers(new CollectObjectRequestEvent(LifeObject.this));
+					LifeObject.this.getSquare().notifyObservers(new CollectObjectRequestEvent(LifeObject.this));
 				}
 			}
 
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
-				LifeObject.this.square.notifyObservers(new RenameRequestEvent(LifeObject.this.getLife()));
+				LifeObject.this.getSquare().notifyObservers(new RenameRequestEvent(LifeObject.this.getLife()));
 				return true;
 			}
 
@@ -168,11 +168,11 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 	 * @return actually eat amount
 	 */
 	public int eat(EatableObject eatObject, int amount, Direction eatDirection) {
-		if (this.square == null || eatObject == null || eatObject.getAmount() == 0) {
+		if (this.getSquare() == null || eatObject == null || eatObject.getAmount() == 0) {
 			return 0;
 		}
 		final int actuallyEatAmount = eatObject.eatenBy(this, amount, eatDirection);
-		this.square.notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
+		this.getSquare().notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
 		return actuallyEatAmount;
 	}
 
@@ -337,7 +337,7 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
 			Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
 			Action hop = Actions.sequence(up, down);
-			this.icon.addAction(hop);
+			this.getIcon().addAction(hop);
 		}
 	}
 

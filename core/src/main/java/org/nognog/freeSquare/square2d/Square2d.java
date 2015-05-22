@@ -41,12 +41,12 @@ import com.badlogic.gdx.utils.Array;
  */
 public abstract class Square2d extends Group implements Square<Square2dObject>, SimpleDrawable {
 
-	protected Array<SquareEventListener> observers = new Array<>();
 	protected Array<Square2dObject> objects = new Array<>();
+	protected Array<SquareEventListener> observers = new Array<>();
 
-	protected boolean drawEdge;
+	private boolean drawEdge;
 
-	protected boolean isRequestedDrawOrderUpdate = false;
+	private boolean isRequestedDrawOrderUpdate = false;
 
 	// cache
 	private transient Vector2 stageCoordinatesPosition;
@@ -397,11 +397,11 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	public Square2dObject[] getObjects() {
 		return this.objects.<Square2dObject> toArray(Square2dObject.class);
 	}
-	
+
 	/**
 	 * @return sorted object array
 	 */
-	public Square2dObject[] getSortedObjects(){
+	public Square2dObject[] getSortedObjects() {
 		final Square2dObject[] result = this.getObjects();
 		Arrays.sort(result, actorComparator);
 		return result;
@@ -455,6 +455,13 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 */
 	public void setDrawEdge(boolean enable) {
 		this.drawEdge = enable;
+	}
+
+	/**
+	 * @return true if draw edge
+	 */
+	public boolean isDrawEdge() {
+		return this.drawEdge;
 	}
 
 	protected void drawEdge(Batch batch) {
@@ -526,6 +533,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	protected void requestDrawOrderUpdate() {
 		this.isRequestedDrawOrderUpdate = true;
+	}
+
+	protected void cancelRequestDrawOrderUpdate() {
+		this.isRequestedDrawOrderUpdate = false;
+	}
+
+	protected boolean isRequestedDrawOrderUpdate() {
+		return this.isRequestedDrawOrderUpdate;
 	}
 
 	/**

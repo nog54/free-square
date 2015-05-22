@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object;
+package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,8 +28,11 @@ import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.math.Vector2;
