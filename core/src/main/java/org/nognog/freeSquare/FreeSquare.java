@@ -76,7 +76,6 @@ public class FreeSquare extends ApplicationAdapter {
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 		this.font = FontUtil.createMPlusFont(Settings.getFontSize());
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
-
 		this.setupPersistItems();
 		final float timeFromLastRun = this.getTimeFromLastRun();
 		this.actLongTime(timeFromLastRun);
@@ -371,6 +370,14 @@ public class FreeSquare extends ApplicationAdapter {
 		if (externalOtherObjectDictionary != null) {
 			OtherObjectTypeManager.getInstance().setDictionary(externalOtherObjectDictionary);
 		}
+	}
+	
+	/**
+	 * clear external type
+	 */
+	public static void clearExternalSquare2dObjectType(){
+		PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.save(new ExternalLifeObjectTypeDictionary());
+		PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.save(new ExternalOtherObjectTypeDictionary());
 	}
 
 	/**

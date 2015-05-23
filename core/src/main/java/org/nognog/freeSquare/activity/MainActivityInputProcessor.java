@@ -35,7 +35,7 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 	private boolean isEnable = false;
 
 	protected boolean isLastLongPressed;
-
+	
 	/**
 	 * @param activity
 	 */
@@ -89,11 +89,14 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 	private GestureListener createFreeSquareGestureListener(final MainActivity activity) {
 		final FreeSquare freeSquare = activity.getFreeSquare();
 		final GestureListener listener = new GestureDetector.GestureAdapter() {
+			
 			private float initialScale = 1;
 			private Actor lastTouchDownActor;
 
 			@Override
 			public boolean touchDown(float x, float y, int pointer, int button) {
+				activity.setCameraVelocityX(0);
+				activity.setCameraVelocityY(0);
 				Vector2 worldPosition = freeSquare.getStage().getViewport().unproject(new Vector2(x, y));
 				this.lastTouchDownActor = freeSquare.getStage().hit(worldPosition.x, worldPosition.y, true);
 				OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
@@ -138,6 +141,19 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				activity.getStage().cancelTouchFocus(activity.getSquare());
 				freeSquare.notifyCameraObservers();
 				return true;
+			}
+
+			@Override
+			public boolean fling(float velocityX, float velocityY, int button) {
+				if (activity.getSquare() == null) {
+					return false;
+				}
+				if (!this.isLastTouchBackGround()) {
+					return false;
+				}
+				activity.setCameraVelocityX(-velocityX);
+				activity.setCameraVelocityY(velocityY);
+				return false;
 			}
 
 			@Override

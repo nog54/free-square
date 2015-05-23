@@ -75,11 +75,15 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2015/04/13
  */
 public class MainActivity extends FreeSquareActivity {
+	private static final float cameraDeceleration = 20;
 
 	private static final int ratioOfMenuButtonWidthToCameraWidth = 4;
 
 	private Player player;
 	private Square2d square;
+
+	private float cameraVelocityX;
+	private float cameraVelocityY;
 
 	private MainActivityInputProcessor inputProcessor;
 
@@ -826,6 +830,7 @@ public class MainActivity extends FreeSquareActivity {
 
 	@Override
 	public void act(float delta) {
+		this.calcCameraMomentum(delta);
 		final int oldSquareIndex = this.getChildren().indexOf(this.square, true);
 		final Square2d temporaryRemovedSquare = this.square;
 		if (oldSquareIndex != -1) {
@@ -835,5 +840,53 @@ public class MainActivity extends FreeSquareActivity {
 		if (oldSquareIndex != -1 && this.square == temporaryRemovedSquare) {
 			this.getChildren().insert(oldSquareIndex, this.square);
 		}
+	}
+
+	/**
+	 * @param delta
+	 */
+	private void calcCameraMomentum(float delta) {
+		this.calcCameraMomentumX(delta);
+		this.calcCameraMomentumY(delta);
+	}
+
+	private void calcCameraMomentumX(float delta) {
+		if (this.cameraVelocityX == 0) {
+			return;
+		}
+		this.getFreeSquare().getCamera().position.x += delta * this.cameraVelocityX;
+		if (Math.abs(this.cameraVelocityX) < cameraDeceleration) {
+			this.cameraVelocityX = 0;
+			return;
+		}
+		final float signum = Math.signum(this.cameraVelocityX);
+		this.cameraVelocityX += -signum * cameraDeceleration;
+	}
+
+	private void calcCameraMomentumY(float delta) {
+		if (this.cameraVelocityY == 0) {
+			return;
+		}
+		this.getFreeSquare().getCamera().position.y += delta * this.cameraVelocityY;
+		if (Math.abs(this.cameraVelocityY) < cameraDeceleration) {
+			this.cameraVelocityY = 0;
+			return;
+		}
+		final float signum = Math.signum(this.cameraVelocityY);
+		this.cameraVelocityY += -signum * cameraDeceleration;
+	}
+
+	/**
+	 * @param velocityX
+	 */
+	public void setCameraVelocityX(float velocityX) {
+		this.cameraVelocityX = velocityX;
+	}
+	
+	/**
+	 * @param velocityY
+	 */
+	public void setCameraVelocityY(float velocityY) {
+		this.cameraVelocityY = velocityY;
 	}
 }

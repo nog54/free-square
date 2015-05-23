@@ -140,6 +140,11 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 			private boolean isTripleTapped(int count) {
 				return count == 3;
 			}
+
+//			@Override
+//			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
+//
+//			}
 		});
 	}
 
