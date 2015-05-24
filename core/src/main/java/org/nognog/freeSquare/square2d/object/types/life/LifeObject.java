@@ -141,10 +141,11 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 				return count == 3;
 			}
 
-//			@Override
-//			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
-//
-//			}
+			@Override
+			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
+				final float deceleration = 200;
+				LifeObject.this.addAction(Square2dActions.momentumMove(deceleration, velocityX, velocityY));
+			}
 		});
 	}
 

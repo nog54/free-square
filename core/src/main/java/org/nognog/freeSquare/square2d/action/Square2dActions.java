@@ -138,8 +138,8 @@ public class Square2dActions {
 	 * @param mainAction
 	 * @return action
 	 */
-	public static ExcludeObjectOtherActionAction excludeObjectOtherAction(Action mainAction) {
-		final ExcludeObjectOtherActionAction action = Actions.action(ExcludeObjectOtherActionAction.class);
+	public static ExcludeExtenalInputAction excludeObjectOtherAction(Action mainAction) {
+		final ExcludeExtenalInputAction action = Actions.action(ExcludeExtenalInputAction.class);
 		action.setAction(mainAction);
 		return action;
 	}
@@ -190,7 +190,7 @@ public class Square2dActions {
 	 * @param direction
 	 * @return change square action
 	 */
-	public static Action changeSquare(MainActivity activity, Square2d setSquare, Direction direction) {
+	public static ChangeSquareAction changeSquare(MainActivity activity, Square2d setSquare, Direction direction) {
 		final ChangeSquareAction changeSquareAction = Actions.action(ChangeSquareAction.class);
 		changeSquareAction.setActivity(activity);
 		changeSquareAction.setSquare(setSquare);
@@ -198,4 +198,17 @@ public class Square2dActions {
 		return changeSquareAction;
 	}
 
+	/**
+	 * @param deceleration
+	 * @param velocityX
+	 * @param velocityY
+	 * @return momentum move action
+	 */
+	public static MomentumMoveAction momentumMove(float deceleration, float velocityX, float velocityY) {
+		final MomentumMoveAction momentumMoveAction = Actions.action(MomentumMoveAction.class);
+		momentumMoveAction.setDeceleration(deceleration);
+		momentumMoveAction.setVelocityX(velocityX);
+		momentumMoveAction.setVelocityY(velocityY);
+		return momentumMoveAction;
+	}
 }

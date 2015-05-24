@@ -18,6 +18,7 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.action.ExcludeExtenalInputAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.LandObject;
@@ -40,16 +41,11 @@ import com.badlogic.gdx.utils.Json;
 public class LandingLifeObject extends LifeObject implements LandObject {
 
 	private LandingLifeObject() {
-		// used by json
 		super();
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				if (!LandingLifeObject.this.isLandingOnSquare()) {
-					LandingLifeObject.this.goToSquareNearestVertex();
-				} else {
-					LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
-				}
+				LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
 			}
 		});
 	}
@@ -65,11 +61,33 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		this.setLife(new Life(type.getFamily()));
 	}
 
+	@Override
+	public void act(float delta) {
+		if (!this.isBeingTouched() && !LandingLifeObject.this.isLandingOnSquare() && this.isOnlyFreeRunning()) {
+			LandingLifeObject.this.goToSquareNearestVertex();
+		}
+		super.act(delta);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isOnlyFreeRunning() {
+		if (this.getActions().size != 1) {
+			return false;
+		}
+		if (this.freeRunningAction == null) {
+			return false;
+		}
+		return this.getActions().get(0) == this.freeRunningAction;
+	}
+
 	protected void goToSquareNearestVertex() {
 		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
 		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
 		final Action notifyUpdateEventAction = Square2dActions.fireEventAction(this, new UpdateSquareObjectEvent(this));
-		this.addAction(Square2dActions.excludeObjectOtherAction(Actions.sequence(moveToNearestSquareVertexAction, notifyUpdateEventAction)));
+		final ExcludeExtenalInputAction goToSquareNearestVertexAction = Square2dActions.excludeObjectOtherAction(Actions.sequence(moveToNearestSquareVertexAction, notifyUpdateEventAction));
+		this.addAction(goToSquareNearestVertexAction);
 	}
 
 	@Override
@@ -107,8 +125,6 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		final float targetPositionX = addWithRoundToSmallerAbs(thisX, moveX);
 		final float targetPositionY = addWithRoundToSmallerAbs(thisY, moveY);
 		if (!this.getSquare().containsPosition(targetPositionX, targetPositionY)) {
-			System.out.println(maxMoveDistance);
-			System.out.println(moveDistance);
 			return new Vector2(thisX, thisY);
 		}
 		return new Vector2(targetPositionX, targetPositionY);

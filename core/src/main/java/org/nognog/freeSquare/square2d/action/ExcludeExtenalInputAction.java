@@ -18,22 +18,25 @@ import org.nognog.freeSquare.square2d.object.Square2dObject;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
 
 /**
  * @author goshi 2015/01/30
  */
-public class ExcludeObjectOtherActionAction extends Action {
+public class ExcludeExtenalInputAction extends Action {
 
 	private Action action;
 	private boolean isActing;
 
 	private Array<Action> pausingAction;
 
+	private Touchable oldTouchable;
+
 	/**
 	 * 
 	 */
-	public ExcludeObjectOtherActionAction() {
+	public ExcludeExtenalInputAction() {
 		this(null);
 	}
 
@@ -41,7 +44,7 @@ public class ExcludeObjectOtherActionAction extends Action {
 	 * @param action
 	 * @param squareObject
 	 */
-	public ExcludeObjectOtherActionAction(Action action) {
+	public ExcludeExtenalInputAction(Action action) {
 		this.setAction(action);
 		this.isActing = false;
 	}
@@ -80,12 +83,15 @@ public class ExcludeObjectOtherActionAction extends Action {
 		if (this.isActing == false) {
 			this.pausingAction = actTarget.pausePerformingActionsExcept(this);
 			actTarget.lockAddAction();
+			this.oldTouchable = actTarget.getTouchable();
+			actTarget.setTouchable(Touchable.disabled);
 			this.isActing = true;
 		}
 
 		if (this.action.act(delta)) {
 			actTarget.unlockAddAction();
 			actTarget.resumePausingAction(this.pausingAction);
+			actTarget.setTouchable(this.oldTouchable);
 			return true;
 		}
 		return false;
