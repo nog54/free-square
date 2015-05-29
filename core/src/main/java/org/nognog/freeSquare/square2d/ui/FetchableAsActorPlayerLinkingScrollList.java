@@ -61,7 +61,7 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 
 	protected abstract void beginFetchActor(float x, float y, T2 beFetchedActor, T1 beFetchedItem);
 
-	protected abstract boolean isMovableFetchingActor();
+	protected abstract boolean isFetchingMovableActor();
 
 	protected abstract void fetchingActorMoved();
 
@@ -82,17 +82,17 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 			}
 			this.beginFetchActor(x, y, this.fetchingActor, this.fetchingItem);
 		} else {
-			if (this.isMovableFetchingActor()) {
+			if (this.isFetchingMovableActor()) {
 				this.fetchingActor.moveBy(deltaX - this.totalActMoveXFromLastPan, deltaY - this.totalActMoveYFromLastPan);
 				this.totalActMoveXFromLastPan = 0;
 				this.totalActMoveYFromLastPan = 0;
-				this.setMoveCameraFlagsIfPanningNearEdge(this.fetchingActor);
+				this.enableMoveCameraFlagsIfPanningNearEdge(this.fetchingActor);
 				this.fetchingActorMoved();
 			}
 		}
 	}
 
-	private void setMoveCameraFlagsIfPanningNearEdge(Actor actor) {
+	private void enableMoveCameraFlagsIfPanningNearEdge(Actor actor) {
 		this.requestedMoveCameraToLeft = false;
 		this.requestedMoveCameraToRight = false;
 		this.requestedMoveCameraToDown = false;

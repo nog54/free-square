@@ -28,7 +28,7 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
-import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
@@ -49,7 +49,7 @@ import com.badlogic.gdx.utils.JsonValue;
 /**
  * @author goshi 2014/12/31
  */
-public abstract class LifeObject extends Square2dObject implements TargetPositionGenerator {
+public abstract class LifeObject extends MovableSquare2dObject implements TargetPositionGenerator {
 
 	private static final Texture frameTexture = new Texture(Gdx.files.internal(Resources.frame1Path));
 	protected static final StopTimeGenerator defaultStopTimeGenerator = new StopTimeGenerator() {
@@ -119,10 +119,6 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 		this.getIcon().addActor(frame);
 
 		this.addListener(new ActorGestureListener() {
-			@Override
-			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
-				LifeObject.this.moveBy(deltaX, deltaY);
-			}
 
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
@@ -141,11 +137,6 @@ public abstract class LifeObject extends Square2dObject implements TargetPositio
 				return count == 3;
 			}
 
-			@Override
-			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
-				final float deceleration = 200;
-				LifeObject.this.addAction(Square2dActions.momentumMove(deceleration, velocityX, velocityY));
-			}
 		});
 	}
 

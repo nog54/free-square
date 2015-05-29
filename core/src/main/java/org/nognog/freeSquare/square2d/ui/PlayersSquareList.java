@@ -96,7 +96,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 	}
 
 	@Override
-	protected boolean isMovableFetchingActor() {
+	protected boolean isFetchingMovableActor() {
 		return true;
 	}
 

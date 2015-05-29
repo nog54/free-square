@@ -106,7 +106,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	}
 
 	@Override
-	protected boolean isMovableFetchingActor() {
+	protected boolean isFetchingMovableActor() {
 		return !this.fetchingActorIsBeingEaten();
 	}
 

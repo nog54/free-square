@@ -86,7 +86,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	}
 
 	@Override
-	protected boolean isMovableFetchingActor() {
+	protected boolean isFetchingMovableActor() {
 		return true;
 	}
 
