@@ -24,7 +24,6 @@ import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.CombineInfo.ReconstructCombineInfo;
 import org.nognog.freeSquare.square2d.CombinePoint.CombinedVertex;
 import org.nognog.freeSquare.square2d.event.UpdateSquareEvent;
-import org.nognog.freeSquare.square2d.exception.CombineSquare2dReadFailureException;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 

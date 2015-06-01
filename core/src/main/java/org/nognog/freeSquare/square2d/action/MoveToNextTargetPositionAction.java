@@ -21,6 +21,8 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class MoveToNextTargetPositionAction extends MoveToTargetPositionAction {
 	private TargetPositionGenerator targetPositionGenerator;
+	
+	private boolean isGoingToTargetPosition = false;
 
 	/**
 	 * 
@@ -51,13 +53,25 @@ public class MoveToNextTargetPositionAction extends MoveToTargetPositionAction {
 	public TargetPositionGenerator getTargetPositionGenerator() {
 		return this.targetPositionGenerator;
 	}
-
+	
+	@Override
+	public boolean act(float delta) {
+		if(this.isGoingToTargetPosition == false){
+			Vector2 nextTargetPosition = this.targetPositionGenerator.nextTargetPosition();
+			if(nextTargetPosition == null){
+				return false;
+			}
+			this.setTargetPositionX(nextTargetPosition.x);
+			this.setTargetPositionY(nextTargetPosition.y);
+			this.isGoingToTargetPosition = true;
+		}
+		return super.act(delta);
+	}
+	
 	@Override
 	public void restart() {
+		this.isGoingToTargetPosition = false;
 		super.restart();
-		Vector2 nextTargetPosition = this.targetPositionGenerator.nextTargetPosition();
-		this.setTargetPositionX(nextTargetPosition.x);
-		this.setTargetPositionY(nextTargetPosition.y);
 	}
 
 }

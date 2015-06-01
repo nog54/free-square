@@ -102,7 +102,6 @@ public class Square2dActions {
 		final MoveToNextTargetPositionAction action = Actions.action(MoveToNextTargetPositionAction.class);
 		action.setTargetPositionGenerator(targetPositionGenerator);
 		action.setSpeed(speed);
-		action.restart();
 		return action;
 	}
 
@@ -131,16 +130,6 @@ public class Square2dActions {
 		Action moveAction = moveToNextTargetPosition(targetPositionGenerator, speed);
 		Action delayAction = delayNextStopTime(stopTimeGenerator);
 		action.setMoveActionDelayActionSequence(Actions.sequence(moveAction, delayAction));
-		return action;
-	}
-
-	/**
-	 * @param mainAction
-	 * @return action
-	 */
-	public static ExcludeExtenalInputAction excludeObjectOtherAction(Action mainAction) {
-		final ExcludeExtenalInputAction action = Actions.action(ExcludeExtenalInputAction.class);
-		action.setAction(mainAction);
 		return action;
 	}
 
@@ -210,5 +199,29 @@ public class Square2dActions {
 		momentumMoveAction.setVelocityX(velocityX);
 		momentumMoveAction.setVelocityY(velocityY);
 		return momentumMoveAction;
+	}
+
+	/**
+	 * @param eatObject
+	 * @param eatAmount
+	 * @param eatCount
+	 * @param eatInterval
+	 * @param moveSpeed
+	 * @return action
+	 */
+	public static EatAction foreverEat(int eatAmount, int eatCount) {
+		final ForeverEatAction action = Actions.action(ForeverEatAction.class);
+		action.setEatAmount(eatAmount);
+		action.setEatCount(eatCount);
+		action.setEatInterval(1);
+		return action;
+	}
+
+	/**
+	 * @return action
+	 */
+	public static KeepLandingOnSquareAction keepLandingOnSquare() {
+		final KeepLandingOnSquareAction action = Actions.action(KeepLandingOnSquareAction.class);
+		return action;
 	}
 }

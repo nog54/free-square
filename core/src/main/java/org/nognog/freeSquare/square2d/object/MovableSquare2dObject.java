@@ -58,7 +58,9 @@ public class MovableSquare2dObject extends Square2dObject {
 			@Override
 			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
 				final float deceleration = 200;
-				MovableSquare2dObject.this.addAction(Square2dActions.momentumMove(deceleration, velocityX, velocityY));
+				if (MovableSquare2dObject.this.isPerformingPriorityAction() == false) {
+					MovableSquare2dObject.this.setPriorityAction(Square2dActions.momentumMove(deceleration, velocityX, velocityY));
+				}
 			}
 		});
 	}
@@ -71,6 +73,9 @@ public class MovableSquare2dObject extends Square2dObject {
 			if (action instanceof MomentumMoveAction) {
 				this.removeAction(action);
 			}
+		}
+		if (this.getPriorityAction() instanceof MomentumMoveAction) {
+			this.setPriorityAction(null);
 		}
 	}
 

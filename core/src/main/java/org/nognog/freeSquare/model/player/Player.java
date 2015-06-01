@@ -24,8 +24,8 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.persist.PersistItemClass;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
+import org.nognog.freeSquare.square2d.CombineSquare2dReadFailureException;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.exception.CombineSquare2dReadFailureException;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;

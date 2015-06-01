@@ -43,13 +43,16 @@ public class FlyingLifeObject extends LifeObject {
 
 	@Override
 	public Vector2 nextTargetPosition() {
+		if (this.getSquare() == null) {
+			return null;
+		}
 		final float x = MathUtils.random(0, this.getSquare().getWidth());
 		final float y = MathUtils.random(0, this.getSquare().getHeight());
 		return new Vector2(x, y);
 	}
 
 	@Override
-	protected EatableObject getEasyReachableNearestEatableLandingObject() {
+	public EatableObject getEasyReachableNearestEatableLandingObject() {
 		EatableObject result = null;
 		float resultDistance = 0;
 		for (Square2dObject object : this.getSquare().getObjects()) {

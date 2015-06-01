@@ -40,7 +40,6 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Json;
@@ -61,15 +60,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 
 	private Life life;
 
-	private Action upDownRoutineAction;
-	private boolean isEnabledUpDownRoutineAction;
-
-	protected FreeRunningAction freeRunningAction = null;
-	private boolean isEnabledFreeRun;
-
-	protected SequenceAction currectTryingMoveAndEatAction;
-	protected EatAction currentEatAction;
-	protected Action setFreeRunModeAction;
+	protected FreeRunningAction freeRunningAction;
 
 	private StopTimeGenerator stopTime;
 
@@ -107,17 +98,16 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 
 	private void setupLifeType(LifeObjectType type) {
 		this.life = new Life(type.getFamily());
-		this.isEnabledFreeRun = true;
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
-		this.upDownRoutineAction = createUpDownAction();
-		this.getIcon().addAction(this.upDownRoutineAction);
-		this.isEnabledUpDownRoutineAction = true;
+		this.getIcon().addAction(LifeObject.createUpDownAction());
 		final Image frame = new Image(frameTexture);
 		frame.setWidth(this.getIcon().getWidth());
 		frame.setHeight(this.getIcon().getHeight());
 		this.getIcon().addActor(frame);
-
+		this.addAction(Square2dActions.foreverEat(this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT_EAT_OBJECT));
+		this.freeRunningAction = Square2dActions.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
+		this.addAction(this.freeRunningAction);
 		this.addListener(new ActorGestureListener() {
 
 			@Override
@@ -216,113 +206,15 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		return this.stopTime;
 	}
 
-	/**
-	 * @return true if up-down routine is enable
-	 */
-	public boolean isEnabledUpDownRoutine() {
-		return this.isEnabledUpDownRoutineAction;
-	}
-
-	/**
-	 * @param enable
-	 */
-	public void setEnableUpDownRoutine(boolean enable) {
-		if (this.isEnabledUpDownRoutineAction == enable) {
-			return;
-		}
-		if (enable) {
-			this.resumePausingAction(this.upDownRoutineAction);
-		} else {
-			this.pauseAction(this.upDownRoutineAction);
-		}
-		this.isEnabledUpDownRoutineAction = enable;
-	}
-
-	/**
-	 * @param enable
-	 * 
-	 */
-	public void setEnableFreeRun(boolean enable) {
-		if (this.isEnabledFreeRun == enable) {
-			return;
-		}
-		if (enable) {
-			this.resumePausingAction(this.freeRunningAction);
-		} else {
-			this.pauseAction(this.freeRunningAction);
-		}
-		this.isEnabledFreeRun = enable;
-	}
-
-	/**
-	 * @return true if free run is enabled.
-	 */
-	public boolean isEnabledFreeRun() {
-		return this.isEnabledFreeRun;
-	}
-
 	@Override
 	public void setSquare(Square2d square) {
 		super.setSquare(square);
-		if (this.freeRunningAction == null) {
-			this.freeRunningAction = Square2dActions.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
-			this.addAction(this.freeRunningAction);
-		}
-	}
-
-	@Override
-	public void act(float delta) {
-		final EatableObject nearestEatableLandingObject = this.getEasyReachableNearestEatableLandingObject();
-		if (nearestEatableLandingObject != null) {
-			if (this.isMovingToTargetObject() && (nearestEatableLandingObject != this.currentEatAction.getEatObject())) {
-				this.changeEatTargetTo(nearestEatableLandingObject);
-			} else if (!this.isMovingToTargetObject()) {
-				this.setEatAction(nearestEatableLandingObject);
-			}
-		} else {
-			if (this.isMovingToTargetObject()) {
-				this.currentEatAction.requestForceFinish();
-			}
-		}
-		super.act(delta);
-	}
-
-	abstract protected EatableObject getEasyReachableNearestEatableLandingObject();
-
-	private void setEatAction(EatableObject eatObject) {
-		final boolean wasEnabledFreeRun = this.isEnabledFreeRun();
-		this.setEnableFreeRun(false);
-		EatAction eatAction = Square2dActions.eat(eatObject, this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT);
-		this.setFreeRunModeAction = new Action() {
-			@Override
-			public boolean act(float delta) {
-				LifeObject.this.currectTryingMoveAndEatAction = null;
-				LifeObject.this.currentEatAction = null;
-				LifeObject.this.setFreeRunModeAction = null;
-				LifeObject.this.setEnableFreeRun(wasEnabledFreeRun);
-				return true;
-			}
-		};
-
-		this.currectTryingMoveAndEatAction = Actions.sequence(eatAction, this.setFreeRunModeAction);
-		this.currentEatAction = eatAction;
-		this.addAction(this.currectTryingMoveAndEatAction);
-	}
-
-	private void changeEatTargetTo(EatableObject newEatObject) {
-		this.currentEatAction.setEatObject(newEatObject);
-	}
-
-	private boolean isMovingToTargetObject() {
-		return this.currectTryingMoveAndEatAction != null && this.currentEatAction != null && this.setFreeRunModeAction != null;
 	}
 
 	/**
-	 * reset target position of free running.
+	 * @return the nearest eatable object
 	 */
-	public void resetFreeRunningTargetPosition() {
-		this.freeRunningAction.resetTargetPosition();
-	}
+	public abstract EatableObject getEasyReachableNearestEatableLandingObject();
 
 	@Override
 	public void notify(SquareEvent event) {

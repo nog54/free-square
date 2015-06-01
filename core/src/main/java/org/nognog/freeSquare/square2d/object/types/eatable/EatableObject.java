@@ -15,15 +15,14 @@
 package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import org.nognog.freeSquare.square2d.Direction;
+import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -37,9 +36,6 @@ public class EatableObject extends MovableSquare2dObject implements LandObject {
 	private int originTextureRegionHeight;
 	private int originTextureRegionArea;
 	private int amount;
-
-	private float lastTouchDownX;
-	private float lastTouchDownY;
 
 	private EatableObject() {
 		super();
@@ -67,37 +63,7 @@ public class EatableObject extends MovableSquare2dObject implements LandObject {
 		this.originTextureRegionWidth = this.getIconMainImageTextureRegion().getRegionWidth();
 		this.originTextureRegionHeight = this.getIconMainImageTextureRegion().getRegionHeight();
 		this.originTextureRegionArea = this.originTextureRegionWidth * this.originTextureRegionHeight;
-		this.addListener(new ActorGestureListener() {
-
-			@Override
-			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				EatableObject.this.setLastTouchDownX(EatableObject.this.getX());
-				EatableObject.this.setLastTouchDownY(EatableObject.this.getY());
-			}
-
-		});
-	}
-
-	/**
-	 * @param x
-	 */
-	protected void setLastTouchDownX(float x) {
-		this.lastTouchDownX = x;
-	}
-
-	/**
-	 * @param y
-	 */
-	protected void setLastTouchDownY(float y) {
-		this.lastTouchDownY = y;
-	}
-
-	@Override
-	public void act(float delta) {
-		if (!this.isBeingTouched() && !this.isLandingOnSquare() && !this.isMovingWithMomentum()) {
-			this.setPosition(this.lastTouchDownX, this.lastTouchDownY);
-		}
-		super.act(delta);
+		this.addAction(Square2dActions.keepLandingOnSquare());
 	}
 
 	private TextureRegion getIconMainImageTextureRegion() {

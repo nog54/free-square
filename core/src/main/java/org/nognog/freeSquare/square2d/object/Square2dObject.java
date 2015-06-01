@@ -16,12 +16,12 @@ package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.model.SelfValidatable;
 import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.model.square.SquareEventListener;
+import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -29,11 +29,13 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 /**
  * @author goshi 2014/12/03
@@ -49,15 +51,12 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 
 	private boolean enableAction = true;
 
-	private boolean lockAddAction = false;
-	private Array<Action> pausingActions;
+	private Action priorityAction;
 
 	private boolean isBeingTouched = false;
 	private boolean isLongPressedInLastTouch = false;
 
 	protected Square2dObject() {
-		// used by json
-		this.pausingActions = new Array<>();
 		this.addListener(new ActorGestureListener() {
 			private boolean lastTouchCallLongPress;
 
@@ -140,17 +139,16 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.logicalHeight);
 	}
-	
 
 	@Override
 	public Actor hit(float x, float y, boolean touchable) {
 		final Actor superResult = super.hit(x, y, touchable);
-		if(superResult == this){
+		if (superResult == this) {
 			return null;
 		}
 		return superResult;
 	}
-	
+
 	@Override
 	public void setSquare(Square2d square) {
 		if (this.square != null && square != null) {
@@ -247,26 +245,103 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 */
 	@Override
 	public void addAction(Action action) {
-		if (this.lockAddAction == true) {
-			return;
-		}
 		if (this.containsAction(action)) {
 			return;
 		}
 		super.addAction(action);
 	}
 
+	/**
+	 * @param action
+	 */
+	public void setPriorityAction(Action action) {
+		if (action != null) {
+			action.setActor(this);
+		}
+		this.priorityAction = action;
+	}
+
+	/**
+	 * clear priority action
+	 */
+	public void clearPriorityAction() {
+		this.setPriorityAction(null);
+	}
+
+	/**
+	 * @return the priority action
+	 */
+	public Action getPriorityAction() {
+		return this.priorityAction;
+	}
+
+	/**
+	 * @return true if acting priority action.
+	 */
+	public boolean isPerformingPriorityAction() {
+		return this.priorityAction != null;
+	}
+
 	@Override
-	public void act(float delta) {
-		if (!this.isEnabledAction() || this.isBeingTouched()) {
+	public final void act(float delta) {
+		if (this.isBeingTouched || !this.isEnabledAction()) {
 			return;
 		}
-		final float yBeforeAct = this.getY();
-		super.act(delta);
-		final float yAfterAct = this.getY();
-		if (yBeforeAct != yAfterAct) {
-			this.square.notify(new UpdateSquareObjectEvent(this));
+		if (this.priorityAction == null) {
+			this.actActions(delta);
+			return;
 		}
+		final Array<Action> normalActions = new Array<>(this.getActions());
+		this.getActions().clear();
+		this.getActions().add(this.priorityAction);
+		this.actActions(delta);
+		if (this.finishedPriorityAction()) {
+			this.priorityAction = null;
+		}
+		this.getActions().clear();
+		this.getActions().addAll(normalActions);
+	}
+
+	private void actActions(float delta) {
+		try {
+			this.actChildren(delta);
+			this.actMyself(delta);
+		} catch (InterruptOtherActionException e) {
+			// TODO
+		}
+	}
+
+	private void actMyself(float delta) {
+		Array<Action> actions = this.getActions();
+		if (actions.size > 0) {
+			final Stage stage = this.getStage();
+			if (stage != null && stage.getActionsRequestRendering())
+				Gdx.graphics.requestRendering();
+			for (int i = 0; i < actions.size; i++) {
+				Action action = actions.get(i);
+				if (action.act(delta) && i < actions.size) {
+					Action current = actions.get(i);
+					int actionIndex = current == action ? i : actions.indexOf(action, true);
+					if (actionIndex != -1) {
+						actions.removeIndex(actionIndex);
+						action.setActor(null);
+						i--;
+					}
+				}
+			}
+		}
+	}
+
+	private void actChildren(float delta) {
+		final SnapshotArray<Actor> children = this.getChildren();
+		Actor[] actors = children.begin();
+		for (int i = 0, n = children.size; i < n; i++)
+			actors[i].act(delta);
+		children.end();
+	}
+
+	private boolean finishedPriorityAction() {
+		return !this.getActions().contains(this.priorityAction, true);
 	}
 
 	/**
@@ -320,68 +395,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	/**
-	 * 
-	 */
-	public void clearAllPausingActions() {
-		for (Action pausingAction : this.pausingActions) {
-			pausingAction.setActor(null);
-		}
-		this.pausingActions.clear();
-	}
-
-	/**
-	 * @param action
-	 */
-	public void pauseAction(Action action) {
-		if (action == null) {
-			return;
-		}
-		if (this.getActions().removeValue(action, true) == true) {
-			this.pausingActions.add(action);
-		}
-	}
-
-	/**
-	 * @return paused actions.
-	 */
-	public Array<Action> pauseAllPerformingActions() {
-		Array<Action> bePausedActions = new Array<>();
-		bePausedActions.addAll(this.getActions());
-		for (Action performingAction : bePausedActions) {
-			this.pauseAction(performingAction);
-		}
-		return bePausedActions;
-	}
-
-	/**
-	 * @param actions
-	 * @return paused actions.
-	 */
-	public Array<Action> pausePerformingActionsExcept(Action... actions) {
-		if (actions == null) {
-			return this.pauseAllPerformingActions();
-		}
-		Array<Action> bePausedActions = new Array<>(this.getActions());
-		Array<Action> exceptActions = new Array<>(actions);
-		for (Action performingAction : bePausedActions) {
-			if (exceptActions.contains(performingAction, true)) {
-				bePausedActions.removeValue(performingAction, true);
-				continue;
-			}
-			this.pauseAction(performingAction);
-		}
-		return bePausedActions;
-	}
-
-	/**
-	 * @param action
-	 * @return true if action is pausing-action.
-	 */
-	public boolean isPausingAction(Action action) {
-		return this.pausingActions.contains(action, true);
-	}
-
-	/**
 	 * @param action
 	 * @return true if action is performing-action.
 	 */
@@ -394,56 +407,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 * @return true if action is performing-action or pausing-action.
 	 */
 	public boolean containsAction(Action action) {
-		return this.getActions().contains(action, true) || this.pausingActions.contains(action, true);
-	}
-
-	/**
-	 * @param actions
-	 */
-	public void resumePausingAction(Array<Action> actions) {
-		Action[] actionsArray = actions.toArray(Action.class);
-		this.resumePausingAction(actionsArray);
-	}
-
-	/**
-	 * @param actions
-	 */
-	public void resumePausingAction(Action... actions) {
-		if (actions == null) {
-			return;
-		}
-		if (this.isLockingAddAction()) {
-			return;
-		}
-		for (int i = 0; i < actions.length; i++) {
-			if (actions[i] == null) {
-				continue;
-			}
-			if (this.pausingActions.removeValue(actions[i], true) == true) {
-				this.getActions().add(actions[i]);
-			}
-		}
-	}
-
-	/**
-	 * @return true if lock add-action.
-	 */
-	public boolean isLockingAddAction() {
-		return this.lockAddAction;
-	}
-
-	/**
-	 * 
-	 */
-	public void lockAddAction() {
-		this.lockAddAction = true;
-	}
-
-	/**
-	 * 
-	 */
-	public void unlockAddAction() {
-		this.lockAddAction = false;
+		return this.getActions().contains(action, true) || this.priorityAction == action;
 	}
 
 	@Override

@@ -33,16 +33,14 @@ public class EatAction extends Action {
 	/**
 	 * keep eating while eatObject amount is not zero.
 	 */
-	public static final int UNTIL_RUN_OUT = -1;
+	public static final int UNTIL_RUN_OUT_EAT_OBJECT = -1;
 	private EatableObject eatObject;
 	private int eatAmount;
-	private int eatCount = UNTIL_RUN_OUT;
+	private int eatCount = UNTIL_RUN_OUT_EAT_OBJECT;
 	private float eatInterval;
 
 	private float timeFromLastEat = 0;
 	private int executedCount = 0;
-
-	private boolean isRequestedForceFinish = false;
 
 	/**
 	 * 
@@ -121,18 +119,14 @@ public class EatAction extends Action {
 		this.eatInterval = eatInterval;
 	}
 
-	private LifeObject getEater() {
+	protected LifeObject getEater() {
 		return (LifeObject) this.actor;
 	}
 
 	@Override
 	public boolean act(float delta) {
-		if (this.isRequestedForceFinish) {
-			return true;
-		}
-
-		LifeObject eater = this.getEater();
-		if (this.eatCount != UNTIL_RUN_OUT && this.executedCount >= this.eatCount) {
+		final LifeObject eater = this.getEater();
+		if (this.eatCount != UNTIL_RUN_OUT_EAT_OBJECT && this.executedCount >= this.eatCount) {
 			return true;
 		}
 		if (this.eatObject.getSquare() == null || eater.getSquare() != this.eatObject.getSquare()) {
@@ -166,7 +160,7 @@ public class EatAction extends Action {
 		if (this.eatObject.getAmount() == 0) {
 			return true;
 		}
-		if (this.eatCount != UNTIL_RUN_OUT && this.executedCount >= this.eatCount) {
+		if (this.eatCount != UNTIL_RUN_OUT_EAT_OBJECT && this.executedCount >= this.eatCount) {
 			return true;
 		}
 		return false;
@@ -239,15 +233,7 @@ public class EatAction extends Action {
 
 	@Override
 	public void restart() {
-		this.isRequestedForceFinish = false;
 		super.restart();
-	}
-
-	/**
-	 * 
-	 */
-	public void requestForceFinish() {
-		this.isRequestedForceFinish = true;
 	}
 
 	@Override

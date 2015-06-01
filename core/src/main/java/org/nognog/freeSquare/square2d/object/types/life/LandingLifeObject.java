@@ -18,20 +18,17 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.action.ExcludeExtenalInputAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Json;
 
@@ -60,38 +57,18 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		this.setupType(type);
 		this.setLife(new Life(type.getFamily()));
 	}
-
+	
 	@Override
-	public void act(float delta) {
-		if (!this.isBeingTouched() && !LandingLifeObject.this.isLandingOnSquare() && this.isOnlyFreeRunning()) {
-			LandingLifeObject.this.goToSquareNearestVertex();
-		}
-		super.act(delta);
-	}
-
-	/**
-	 * @return
-	 */
-	private boolean isOnlyFreeRunning() {
-		if (this.getActions().size != 1) {
-			return false;
-		}
-		if (this.freeRunningAction == null) {
-			return false;
-		}
-		return this.getActions().get(0) == this.freeRunningAction;
-	}
-
-	protected void goToSquareNearestVertex() {
-		final Vertex nearestSquareVertex = this.getNearestSquareVertex();
-		final Action moveToNearestSquareVertexAction = Actions.moveTo(nearestSquareVertex.x, nearestSquareVertex.y, 0.5f, Interpolation.pow2);
-		final Action notifyUpdateEventAction = Square2dActions.fireEventAction(this, new UpdateSquareObjectEvent(this));
-		final ExcludeExtenalInputAction goToSquareNearestVertexAction = Square2dActions.excludeObjectOtherAction(Actions.sequence(moveToNearestSquareVertexAction, notifyUpdateEventAction));
-		this.addAction(goToSquareNearestVertexAction);
+	protected void setupType(Square2dObjectType<?> type) {
+		this.addAction(Square2dActions.keepLandingOnSquare());
+		super.setupType(type);
 	}
 
 	@Override
 	public Vector2 nextTargetPosition() {
+		if (this.getSquare() == null) {
+			return null;
+		}
 		final float thisX = this.getX();
 		final float thisY = this.getY();
 		final float theta = MathUtils.random(0, 2 * (float) Math.PI);
@@ -167,7 +144,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	@Override
 	public void notify(SquareEvent event) {
 		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
-			this.resetFreeRunningTargetPosition();
+			this.freeRunningAction.resetTargetPosition();
 		}
 		super.notify(event);
 	}
@@ -182,7 +159,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	}
 
 	@Override
-	protected EatableObject getEasyReachableNearestEatableLandingObject() {
+	public EatableObject getEasyReachableNearestEatableLandingObject() {
 		EatableObject result = null;
 		float resultDistance = Float.MAX_VALUE;
 		for (Square2dObject object : this.getSquare().getObjects()) {

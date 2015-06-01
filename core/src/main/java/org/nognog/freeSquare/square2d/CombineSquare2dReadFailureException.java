@@ -12,9 +12,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.exception;
+package org.nognog.freeSquare.square2d;
 
-import org.nognog.freeSquare.square2d.Square2d;
 
 /**
  * @author goshi 2015/03/24

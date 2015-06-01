@@ -17,18 +17,17 @@ package org.nognog.freeSquare.square2d.object.types.life;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import mockit.NonStrictExpectations;
+import mockit.Verifications;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.utils.Json;
@@ -96,9 +95,8 @@ public class LandingLifeObjectTest {
 		}
 	}
 
-	@SuppressWarnings({ "null", "boxing" })
 	@Test
-	public final void testGoToSquareNearestVertex() {
+	public final void testBackToSquareNearestVertexIfNotOn() {
 		for (LifeObjectType type : LifeObjectTypeManager.getInstance().getAllTypes()) {
 			LandingLifeObject object = null;
 			try {
@@ -106,25 +104,58 @@ public class LandingLifeObjectTest {
 			} catch (ClassCastException e) {
 				continue;
 			}
-			try {
-				object.goToSquareNearestVertex();
-				fail();
-			} catch (NullPointerException e) {
-				// ok
-			}
-			SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-			Vertex[] vertices = square.getVertices();
-			final float x = (vertices[1].x + vertices[3].x) / 2;
-			final float y = (vertices[0].y + vertices[2].y) / 2;
-			square.addSquareObject(object, x, y);
-			Vertex nearestVertex = object.getNearestSquareVertex();
-			object.goToSquareNearestVertex();
-			assertThat(object.getX(), is(not(nearestVertex.x)));
-			assertThat(object.getY(), is(not(nearestVertex.y)));
-			object.act(Float.MAX_VALUE);
-			// assertThat(object.getX(), is(nearestVertex.x)); TODO
-			// assertThat(object.getY(), is(nearestVertex.y));
+			final SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
+			square.addSquareObject(object);
+			this.testBackToSquareFrom(square.getLeftEndX() - 1, square.getBottomEndY() - 1, object);
+			this.testBackToSquareFrom(square.getLeftEndX() - 1, square.getTopEndY() + 1, object);
+			this.testBackToSquareFrom(square.getRightEndX() + 1, square.getBottomEndY() - 1, object);
+			this.testBackToSquareFrom(square.getRightEndX() + 1, square.getTopEndY() + 1, object);
 		}
 	}
 
+	/**
+	 * 
+	 */
+	@SuppressWarnings({ "boxing", "unused" })
+	private void testBackToSquareFrom(float x, float y, final LandingLifeObject object) {
+		new NonStrictExpectations(object) {
+			{
+				object.notify((SquareEvent) any);
+			}
+		};
+		object.setPosition(x, y);
+		final Vertex nearestVertex = object.getNearestSquareVertex();
+		assertThat(object.getX(), is(not(nearestVertex.x)));
+		assertThat(object.getY(), is(not(nearestVertex.y)));
+		assertThat(object.isLandingOnSquare(), is(false));
+
+		object.act(0); // set a return action here
+		assertThat(object.isPerformingPriorityAction(), is(true));
+
+		object.act(0); // not move here
+		assertThat(object.getX(), is(not(nearestVertex.x)));
+		assertThat(object.getY(), is(not(nearestVertex.y)));
+		assertThat(object.isLandingOnSquare(), is(false));
+
+		object.act(Float.MAX_VALUE); // perform the return action
+		assertThat(object.getX(), is(nearestVertex.x));
+		assertThat(object.getY(), is(nearestVertex.y));
+		assertThat(object.isLandingOnSquare(), is(true));
+		assertThat(object.isPerformingPriorityAction(), is(true));
+		// notify event still remains
+
+		new Verifications() {
+			{
+				object.notify((SquareEvent) any);
+				times = 0;
+			}
+		};
+		object.act(0);
+		new Verifications() {
+			{
+				object.notify((SquareEvent) any);
+				times = 1;
+			}
+		};
+	}
 }
