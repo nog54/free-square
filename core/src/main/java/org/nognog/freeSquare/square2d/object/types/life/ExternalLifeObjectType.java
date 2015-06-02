@@ -41,6 +41,51 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	private transient Class<?> squareObjectClass;
 	private transient Texture texture;
 
+	private static final Json.Serializer<ExternalLifeObjectType> serializer = new Json.Serializer<ExternalLifeObjectType>() {
+
+		@Override
+		@SuppressWarnings({ "rawtypes", "synthetic-access", "boxing" })
+		public void write(Json json, ExternalLifeObjectType object, Class knownType) {
+			json.writeObjectStart();
+			json.writeType(ExternalLifeObjectType.class);
+			json.writeValue("family", object.family, object.family.getClass()); //$NON-NLS-1$
+			json.writeValue("texturePath", object.texturePath); //$NON-NLS-1$
+			json.writeValue("moveSpeed", object.moveSpeed); //$NON-NLS-1$
+			json.writeValue("eatAmountPerSec", object.eatAmountPerSec); //$NON-NLS-1$
+			json.writeValue("squareObjectClassName", object.squareObjectClassName); //$NON-NLS-1$
+			json.writeObjectEnd();
+		}
+
+		@Override
+		@SuppressWarnings({ "rawtypes", "synthetic-access" })
+		public ExternalLifeObjectType read(Json json, JsonValue jsonData, Class type) {
+
+			final Family.OriginalFamily family = json.readValue("family", Family.OriginalFamily.class, jsonData); //$NON-NLS-1$
+			final ExternalLifeObjectTypeDictionary dictionary = LifeObjectTypeManager.getInstance().getDictionary();
+			if (dictionary != null) {
+				for (ExternalLifeObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
+					if (family.getName().equals(alreadyExistsType.getFamily().getName())) {
+						return alreadyExistsType;
+					}
+				}
+			}
+			ExternalLifeObjectType result = new ExternalLifeObjectType();
+			result.family = family;
+			result.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
+			result.texture = new Texture(result.texturePath);
+			result.moveSpeed = json.readValue("moveSpeed", Float.class, jsonData).floatValue(); //$NON-NLS-1$
+			result.eatAmountPerSec = json.readValue("eatAmountPerSec", Integer.class, jsonData).intValue(); //$NON-NLS-1$
+			result.squareObjectClassName = json.readValue("squareObjectClassName", String.class, jsonData); //$NON-NLS-1$
+			try {
+				result.squareObjectClass = Class.forName(result.squareObjectClassName);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+			return result;
+		}
+	};
+
 	private ExternalLifeObjectType() {
 	}
 
@@ -76,6 +121,13 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 		return this.texture;
 	}
 
+	/**
+	 * @return texture path
+	 */
+	public String getTexturePath() {
+		return this.texturePath;
+	}
+
 	@Override
 	public float getLogicalWidth() {
 		return 100;
@@ -89,6 +141,13 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	@Override
 	public Class<?> getSquareObjectClass() {
 		return this.squareObjectClass;
+	}
+
+	/**
+	 * @return the name that square object class
+	 */
+	public String getSquareObjetClassName() {
+		return this.squareObjectClassName;
 	}
 
 	@Override
@@ -123,53 +182,10 @@ public class ExternalLifeObjectType implements LifeObjectType, ExternalSquare2dO
 	}
 
 	/**
-	 * @param json
+	 * @return serializer
 	 */
-	public static void addExternalLifeObjectTypeSerializerTo(Json json) {
-		json.setSerializer(ExternalLifeObjectType.class, new Json.Serializer<ExternalLifeObjectType>() {
-
-			@Override
-			@SuppressWarnings({ "rawtypes", "synthetic-access", "boxing" })
-			public void write(@SuppressWarnings("hiding") Json json, ExternalLifeObjectType object, Class knownType) {
-				json.writeObjectStart();
-				json.writeType(ExternalLifeObjectType.class);
-				json.writeValue("family", object.family, object.family.getClass()); //$NON-NLS-1$
-				json.writeValue("texturePath", object.texturePath); //$NON-NLS-1$
-				json.writeValue("moveSpeed", object.moveSpeed); //$NON-NLS-1$
-				json.writeValue("eatAmountPerSec", object.eatAmountPerSec); //$NON-NLS-1$
-				json.writeValue("squareObjectClassName", object.squareObjectClassName); //$NON-NLS-1$
-				json.writeObjectEnd();
-			}
-
-			@Override
-			@SuppressWarnings({ "rawtypes", "synthetic-access" })
-			public ExternalLifeObjectType read(@SuppressWarnings("hiding") Json json, JsonValue jsonData, Class type) {
-
-				final Family.OriginalFamily family = json.readValue("family", Family.OriginalFamily.class, jsonData); //$NON-NLS-1$
-				final ExternalLifeObjectTypeDictionary dictionary = LifeObjectTypeManager.getInstance().getDictionary();
-				if (dictionary != null) {
-					for (ExternalLifeObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
-						if (family.getName().equals(alreadyExistsType.getFamily().getName())) {
-							return alreadyExistsType;
-						}
-					}
-				}
-				ExternalLifeObjectType result = new ExternalLifeObjectType();
-				result.family = family;
-				result.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
-				result.texture = new Texture(result.texturePath);
-				result.moveSpeed = json.readValue("moveSpeed", Float.class, jsonData).floatValue(); //$NON-NLS-1$
-				result.eatAmountPerSec = json.readValue("eatAmountPerSec", Integer.class, jsonData).intValue(); //$NON-NLS-1$
-				result.squareObjectClassName = json.readValue("squareObjectClassName", String.class, jsonData); //$NON-NLS-1$
-				try {
-					result.squareObjectClass = Class.forName(result.squareObjectClassName);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-				return result;
-			}
-		});
+	public static Json.Serializer<ExternalLifeObjectType> getExternalLifeObjectTypeSerializer() {
+		return serializer;
 	}
 
 }

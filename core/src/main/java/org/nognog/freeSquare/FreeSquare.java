@@ -25,8 +25,14 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.persist.PersistItems;
 import org.nognog.freeSquare.persist.PersistManager;
+import org.nognog.freeSquare.square2d.CombinePoint;
+import org.nognog.freeSquare.square2d.CombinePointSerializer;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
+import org.nognog.freeSquare.square2d.CombineSquare2dSerializer;
+import org.nognog.freeSquare.square2d.CombinedVertexSerializer;
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.VertexSerializer;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
@@ -117,9 +123,12 @@ public class FreeSquare extends ApplicationAdapter {
 	}
 
 	private static void setupSerializers(Json json) {
-		CombineSquare2d.addCombineSquare2dSerializerTo(json);
-		ExternalLifeObjectType.addExternalLifeObjectTypeSerializerTo(json);
-		ExternalOtherObjectType.addExternalOtherObjectTypeSerializerTo(json);
+		json.setSerializer(Vertex.class, VertexSerializer.getInstance());
+		json.setSerializer(CombineSquare2d.class, CombineSquare2dSerializer.getInstance());
+		json.setSerializer(CombinePoint.class, CombinePointSerializer.getInstance());
+		json.setSerializer(CombinePoint.CombinedVertex.class, CombinedVertexSerializer.getInstance());
+		json.setSerializer(ExternalLifeObjectType.class, ExternalLifeObjectType.getExternalLifeObjectTypeSerializer());
+		json.setSerializer(ExternalOtherObjectType.class, ExternalOtherObjectType.getExternalOtherObjectTypeSerializer());
 	}
 
 	/**
@@ -371,11 +380,11 @@ public class FreeSquare extends ApplicationAdapter {
 			OtherObjectTypeManager.getInstance().setDictionary(externalOtherObjectDictionary);
 		}
 	}
-	
+
 	/**
 	 * clear external type
 	 */
-	public static void clearExternalSquare2dObjectType(){
+	public static void clearExternalSquare2dObjectType() {
 		PersistItems.EXTERNAL_LIFE_OBJECT_TYPES.save(new ExternalLifeObjectTypeDictionary());
 		PersistItems.EXTERNAL_OTHER_OBJECT_TYPES.save(new ExternalOtherObjectTypeDictionary());
 	}

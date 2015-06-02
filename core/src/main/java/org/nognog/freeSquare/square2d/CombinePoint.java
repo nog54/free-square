@@ -14,46 +14,13 @@
 
 package org.nognog.freeSquare.square2d;
 
-import org.nognog.freeSquare.persist.PersistManager;
-
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2015/02/15
  */
 @SuppressWarnings("javadoc")
 public class CombinePoint {
-	static {
-		Json json = PersistManager.getUseJson();
-		json.setSerializer(CombinePoint.class, new Json.Serializer<CombinePoint>() {
-
-			@Override
-			@SuppressWarnings({ "hiding", "rawtypes" })
-			public void write(Json json, CombinePoint object, Class knownType) {
-				json.writeObjectStart();
-				json.writeFields(object);
-				json.writeObjectEnd();
-			}
-
-			@Override
-			@SuppressWarnings({ "hiding", "rawtypes", "unchecked" })
-			public CombinePoint read(Json json, JsonValue jsonData, Class type) {
-				final Vertex actualVertex = json.readValue("actualVertex", Vertex.class, jsonData); //$NON-NLS-1$
-				final Array<CombinedVertex> combinedVertices = json.readValue("combinedVertices", Array.class, CombinedVertex.class, jsonData); //$NON-NLS-1$
-				if (combinedVertices.size < 1) {
-					throw new RuntimeException("failed to read CombinePoint"); //$NON-NLS-1$
-				}
-				CombinePoint result = new CombinePoint(actualVertex, combinedVertices.get(0).square, combinedVertices.get(0).vertex);
-				for (int i = 1; i < combinedVertices.size; i++) {
-					result.addCombinedVertex(combinedVertices.get(i));
-				}
-				return result;
-
-			}
-		});
-	}
 	public final Vertex actualVertex;
 	public final Array<CombinedVertex> combinedVertices;
 
@@ -107,33 +74,7 @@ public class CombinePoint {
 		return sb.append(this.actualVertex).append(" | ").append(this.combinedVertices).toString(); //$NON-NLS-1$
 	}
 
-	static class CombinedVertex {
-		static {
-			Json json = PersistManager.getUseJson();
-			json.setSerializer(CombinedVertex.class, new Json.Serializer<CombinedVertex>() {
-
-				@Override
-				@SuppressWarnings({ "hiding", "rawtypes" })
-				public void write(Json json, CombinedVertex object, Class knownType) {
-					json.writeObjectStart();
-					json.writeFields(object);
-					json.writeObjectEnd();
-				}
-
-				@Override
-				@SuppressWarnings({ "hiding", "rawtypes", })
-				public CombinedVertex read(Json json, JsonValue jsonData, Class type) {
-					final Square2d square = json.readValue("square", Square2d.class, jsonData); //$NON-NLS-1$
-					final Vertex saveVertex = json.readValue("vertex", Vertex.class, jsonData); //$NON-NLS-1$
-					for (Vertex vertex : square.getVertices()) {
-						if (vertex.equals(saveVertex)) {
-							return new CombinedVertex(square, vertex);
-						}
-					}
-					return null;
-				}
-			});
-		}
+	public static class CombinedVertex {
 		public final Square2d square;
 		public final Vertex vertex;
 

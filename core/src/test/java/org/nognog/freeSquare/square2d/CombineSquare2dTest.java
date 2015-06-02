@@ -36,7 +36,11 @@ public class CombineSquare2dTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		CombineSquare2d.addCombineSquare2dSerializerTo(PersistManager.getUseJson());
+		Json json = PersistManager.getUseJson();
+		json.setSerializer(Vertex.class, VertexSerializer.getInstance());
+		json.setSerializer(CombineSquare2d.class, CombineSquare2dSerializer.getInstance());
+		json.setSerializer(CombinePoint.class, CombinePointSerializer.getInstance());
+		json.setSerializer(CombinePoint.CombinedVertex.class, CombinedVertexSerializer.getInstance());
 	}
 
 	private final void testReadWrite(Square2d combineSquare) {

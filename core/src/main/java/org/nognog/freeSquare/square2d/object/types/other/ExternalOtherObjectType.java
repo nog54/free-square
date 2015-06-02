@@ -31,8 +31,40 @@ public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2
 
 	private transient Texture texture;
 
+	private static final Json.Serializer<ExternalOtherObjectType> serializer = new Json.Serializer<ExternalOtherObjectType>() {
+
+		@Override
+		@SuppressWarnings({ "rawtypes", "synthetic-access" })
+		public void write(Json json, ExternalOtherObjectType object, Class knownType) {
+			json.writeObjectStart();
+			json.writeType(ExternalOtherObjectType.class);
+			json.writeValue("name", object.name); //$NON-NLS-1$
+			json.writeValue("texturePath", object.texturePath); //$NON-NLS-1$
+			json.writeObjectEnd();
+		}
+
+		@Override
+		@SuppressWarnings({ "rawtypes", "synthetic-access" })
+		public ExternalOtherObjectType read(Json json, JsonValue jsonData, Class type) {
+
+			final String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
+			final ExternalOtherObjectTypeDictionary dictionary = OtherObjectTypeManager.getInstance().getDictionary();
+			if (dictionary != null) {
+				for (ExternalOtherObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
+					if (name.equals(alreadyExistsType.getName())) {
+						return alreadyExistsType;
+					}
+				}
+			}
+			ExternalOtherObjectType result = new ExternalOtherObjectType();
+			result.name = name;
+			result.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
+			result.texture = new Texture(result.texturePath);
+			return result;
+		}
+	};
+
 	private ExternalOtherObjectType() {
-		// used by json
 	}
 
 	/**
@@ -81,41 +113,9 @@ public class ExternalOtherObjectType implements OtherObjectType, ExternalSquare2
 	}
 
 	/**
-	 * @param json
+	 * @return serializer
 	 */
-	public static void addExternalOtherObjectTypeSerializerTo(Json json) {
-		json.setSerializer(ExternalOtherObjectType.class, new Json.Serializer<ExternalOtherObjectType>() {
-
-			@Override
-			@SuppressWarnings({ "rawtypes", "synthetic-access" })
-			public void write(@SuppressWarnings("hiding") Json json, ExternalOtherObjectType object, Class knownType) {
-				json.writeObjectStart();
-				json.writeType(ExternalOtherObjectType.class);
-				json.writeValue("name", object.name); //$NON-NLS-1$
-				json.writeValue("texturePath", object.texturePath); //$NON-NLS-1$
-				json.writeObjectEnd();
-			}
-
-			@Override
-			@SuppressWarnings({ "rawtypes", "synthetic-access" })
-			public ExternalOtherObjectType read(@SuppressWarnings("hiding") Json json, JsonValue jsonData, Class type) {
-
-				final String name = json.readValue("name", String.class, jsonData); //$NON-NLS-1$
-				final ExternalOtherObjectTypeDictionary dictionary = OtherObjectTypeManager.getInstance().getDictionary();
-				if (dictionary != null) {
-					for (ExternalOtherObjectType alreadyExistsType : dictionary.getAllExternalObjectType()) {
-						if (name.equals(alreadyExistsType.getName())) {
-							return alreadyExistsType;
-						}
-					}
-				}
-				ExternalOtherObjectType result = new ExternalOtherObjectType();
-				result.name = name;
-				result.texturePath = json.readValue("texturePath", String.class, jsonData); //$NON-NLS-1$
-				result.texture = new Texture(result.texturePath);
-				return result;
-			}
-		});
+	public static Json.Serializer<ExternalOtherObjectType> getExternalOtherObjectTypeSerializer() {
+		return serializer;
 	}
-
 }
