@@ -16,10 +16,10 @@ package org.nognog.freeSquare.square2d.object.types.other;
 
 import java.lang.reflect.Constructor;
 
+import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.Colors;
-import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -32,14 +32,17 @@ import com.badlogic.gdx.graphics.Texture;
  * @author goshi 2015/04/23
  */
 public enum PreparedOtherObjectType implements OtherObjectType {
-	;
+	/**
+	 * 
+	 */
+	MOCK_RIKI("はりぼてリキ", Resources.rikiPath, 100); //$NON-NLS-1$
 
 	private PreparedOtherObjectType(String name, String texturePath, float logicalWidth) {
-		this(name, texturePath, logicalWidth, EatableObject.class);
+		this(name, texturePath, logicalWidth, Square2dObject.class);
 	}
 
 	private PreparedOtherObjectType(String name, String texturePath, float logicalWidth, Color color) {
-		this(name, texturePath, logicalWidth, color, EatableObject.class);
+		this(name, texturePath, logicalWidth, color, Square2dObject.class);
 	}
 
 	private <T extends Square2dObject> PreparedOtherObjectType(String name, String texturePath, float logicalWidth, Class<T> klass) {
@@ -56,7 +59,7 @@ public enum PreparedOtherObjectType implements OtherObjectType {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends EatableObject> PreparedOtherObjectType(OtherObjectType type, String name, float logicalWidth, Color color) {
+	private <T extends Square2dObject> PreparedOtherObjectType(OtherObjectType type, String name, float logicalWidth, Color color) {
 		this(name, type.getTexture(), logicalWidth, color, (Class<T>) type.getSquareObjectClass());
 	}
 

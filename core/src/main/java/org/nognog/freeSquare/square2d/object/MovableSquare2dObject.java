@@ -27,22 +27,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 public class MovableSquare2dObject extends Square2dObject {
 
 	/**
-	 * 
-	 */
-	public MovableSquare2dObject() {
-		super();
-		this.addListener();
-	}
-
-	/**
 	 * @param type
 	 */
 	public MovableSquare2dObject(Square2dObjectType<?> type) {
 		super(type);
-		this.addListener();
+		this.setupMomentumMoveListener();
 	}
 
-	private void addListener() {
+	private void setupMomentumMoveListener() {
 		this.addListener(new ActorGestureListener() {
 
 			@Override

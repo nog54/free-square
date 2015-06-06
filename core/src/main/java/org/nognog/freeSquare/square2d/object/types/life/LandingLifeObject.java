@@ -16,13 +16,11 @@ package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.math.Intersector;
@@ -30,21 +28,17 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.utils.Json;
 
 /**
  * @author goshi 2015/01/11
  */
 public class LandingLifeObject extends LifeObject implements LandObject {
 
-	private LandingLifeObject() {
-		super();
-		this.addListener(new ActorGestureListener() {
-			@Override
-			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
-			}
-		});
+	/**
+	 * @param life
+	 */
+	public LandingLifeObject(Life life) {
+		this(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life), life);
 	}
 
 	/**
@@ -53,15 +47,22 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	 * @param generator
 	 */
 	public LandingLifeObject(LifeObjectType type) {
-		this();
-		this.setupType(type);
-		this.setLife(new Life(type.getFamily()));
+		this(type, new Life(type.getFamily()));
 	}
-	
-	@Override
-	protected void setupType(Square2dObjectType<?> type) {
+
+	/**
+	 * @param type
+	 * @param life
+	 */
+	private LandingLifeObject(LifeObjectType type, Life life) {
+		super(type, life);
+		this.addListener(new ActorGestureListener() {
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
+			}
+		});
 		this.addAction(Square2dActions.keepLandingOnSquare());
-		super.setupType(type);
 	}
 
 	@Override
@@ -147,15 +148,6 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 			this.freeRunningAction.resetTargetPosition();
 		}
 		super.notify(event);
-	}
-
-	@Override
-	public void write(Json json) {
-		if (!this.isLandingOnSquare()) {
-			Vector2 randomPointOnSquare = Square2dUtils.getRandomPointOn(this.getSquare());
-			this.setPosition(randomPointOnSquare.x, randomPointOnSquare.y);
-		}
-		super.write(json);
 	}
 
 	@Override

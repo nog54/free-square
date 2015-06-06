@@ -15,19 +15,15 @@
 package org.nognog.freeSquare.square2d.object.types.life;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import mockit.NonStrictExpectations;
-import mockit.Verifications;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
-import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
-import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 
 import com.badlogic.gdx.utils.Json;
@@ -37,20 +33,25 @@ import com.badlogic.gdx.utils.Json;
  */
 @SuppressWarnings({ "static-method", "javadoc" })
 @RunWith(GdxTestRunner.class)
-public class LandingLifeObjectTest {
+public class FlyingLifeObjectTest {
 
 	@BeforeClass
-	public static void setupClass() {
-		PersistManager.getUseJson().setSerializer(LandingLifeObject.class, LandingLifeObjectSerializer.getInstance());
+	public static void beforeClass() {
+		PersistManager.getUseJson().setSerializer(FlyingLifeObject.class, FlyingLifeObjectSerializer.getInstance());
+	}
+	
+	@AfterClass
+	public static void afterClass(){
+		PersistManager.getUseJson().setSerializer(FlyingLifeObject.class, null);
 	}
 
 	@SuppressWarnings("boxing")
 	@Test
 	public final void testIsValid() {
 		for (LifeObjectType type : LifeObjectTypeManager.getInstance().getAllTypes()) {
-			LandingLifeObject object = null;
+			FlyingLifeObject object = null;
 			try {
-				object = (LandingLifeObject) type.create();
+				object = (FlyingLifeObject) type.create();
 			} catch (ClassCastException e) {
 				continue;
 			}
@@ -67,7 +68,7 @@ public class LandingLifeObjectTest {
 
 			object.setPosition(square.getVertex1().x, square.getVertex1().y - 1);
 
-			final boolean expected3 = false;
+			final boolean expected3 = true;
 			final boolean actual3 = object.isValid();
 			assertThat(actual3, is(expected3));
 		}
@@ -78,9 +79,9 @@ public class LandingLifeObjectTest {
 	public final void testWrite() {
 		Json json = PersistManager.getUseJson();
 		for (LifeObjectType type : LifeObjectTypeManager.getInstance().getAllTypes()) {
-			LandingLifeObject object = null;
+			FlyingLifeObject object = null;
 			try {
-				object = (LandingLifeObject) type.create();
+				object = (FlyingLifeObject) type.create();
 			} catch (ClassCastException e) {
 				continue;
 			}
@@ -88,7 +89,7 @@ public class LandingLifeObjectTest {
 			square.addSquareObject(object);
 
 			String jsonString = json.toJson(object);
-			LandingLifeObject deserializedObject = json.fromJson(object.getClass(), jsonString);
+			FlyingLifeObject deserializedObject = json.fromJson(object.getClass(), jsonString);
 			assertThat(object, is(deserializedObject));
 
 			final boolean actual1 = object.getLife() == deserializedObject.getLife();
@@ -100,71 +101,8 @@ public class LandingLifeObjectTest {
 			object.setY(square.getBottomEndY() - 1);
 			assertThat(object.isLandingOnSquare(), is(false));
 			jsonString = json.toJson(object);
-			assertThat(object.isLandingOnSquare(), is(true));
+			assertThat(object.isLandingOnSquare(), is(false));
 		}
 	}
 
-	@Test
-	public final void testBackToSquareNearestVertexIfNotOn() {
-		for (LifeObjectType type : LifeObjectTypeManager.getInstance().getAllTypes()) {
-			LandingLifeObject object = null;
-			try {
-				object = (LandingLifeObject) type.create();
-			} catch (ClassCastException e) {
-				continue;
-			}
-			final SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-			square.addSquareObject(object);
-			this.testBackToSquareFrom(square.getLeftEndX() - 1, square.getBottomEndY() - 1, object);
-			this.testBackToSquareFrom(square.getLeftEndX() - 1, square.getTopEndY() + 1, object);
-			this.testBackToSquareFrom(square.getRightEndX() + 1, square.getBottomEndY() - 1, object);
-			this.testBackToSquareFrom(square.getRightEndX() + 1, square.getTopEndY() + 1, object);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	@SuppressWarnings({ "boxing", "unused" })
-	private void testBackToSquareFrom(float x, float y, final LandingLifeObject object) {
-		new NonStrictExpectations(object) {
-			{
-				object.notify((SquareEvent) any);
-			}
-		};
-		object.setPosition(x, y);
-		final Vertex nearestVertex = object.getNearestSquareVertex();
-		assertThat(object.getX(), is(not(nearestVertex.x)));
-		assertThat(object.getY(), is(not(nearestVertex.y)));
-		assertThat(object.isLandingOnSquare(), is(false));
-
-		object.act(0); // set a return action here
-		assertThat(object.isPerformingPriorityAction(), is(true));
-
-		object.act(0); // not move here
-		assertThat(object.getX(), is(not(nearestVertex.x)));
-		assertThat(object.getY(), is(not(nearestVertex.y)));
-		assertThat(object.isLandingOnSquare(), is(false));
-
-		object.act(Float.MAX_VALUE); // perform the return action
-		assertThat(object.getX(), is(nearestVertex.x));
-		assertThat(object.getY(), is(nearestVertex.y));
-		assertThat(object.isLandingOnSquare(), is(true));
-		assertThat(object.isPerformingPriorityAction(), is(true));
-		// notify event still remains
-
-		new Verifications() {
-			{
-				object.notify((SquareEvent) any);
-				times = 0;
-			}
-		};
-		object.act(0);
-		new Verifications() {
-			{
-				object.notify((SquareEvent) any);
-				times = 1;
-			}
-		};
-	}
 }

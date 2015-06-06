@@ -29,7 +29,6 @@ import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.Gdx;
@@ -42,8 +41,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * @author goshi 2014/12/31
@@ -64,40 +61,13 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 
 	private StopTimeGenerator stopTime;
 
-	protected LifeObject() {
-		super();
-	}
-
-	/**
-	 * @param life
-	 */
-	public LifeObject(Life life) {
-		this(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life), life);
-	}
-
 	/**
 	 * @param type
+	 * @param life
 	 */
-	public LifeObject(LifeObjectType type) {
-		this(type, new Life(type.getFamily()));
-	}
-
-	private LifeObject(LifeObjectType type, Life life) {
-		this();
-		this.setupType(type);
+	public LifeObject(LifeObjectType type, Life life) {
+		super(type);
 		this.life = life;
-	}
-
-	@Override
-	protected void setupType(Square2dObjectType<?> type) {
-		super.setupType(type);
-		if (type instanceof LifeObjectType) {
-			this.setupLifeType((LifeObjectType) type);
-		}
-	}
-
-	private void setupLifeType(LifeObjectType type) {
-		this.life = new Life(type.getFamily());
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
 		this.getIcon().addAction(LifeObject.createUpDownAction());
@@ -109,7 +79,6 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		this.freeRunningAction = Square2dActions.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
 		this.addAction(this.freeRunningAction);
 		this.addListener(new ActorGestureListener() {
-
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if (this.isTripleTapped(count)) {
@@ -126,7 +95,6 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			private boolean isTripleTapped(int count) {
 				return count == 3;
 			}
-
 		});
 	}
 
@@ -168,10 +136,6 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	 */
 	public Life getLife() {
 		return this.life;
-	}
-
-	protected void setLife(Life life) {
-		this.life = life;
 	}
 
 	/**
@@ -236,24 +200,25 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	 */
 	public static LifeObject create(Life life) {
 		LifeObject newInstance = LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life).create();
-		newInstance.setLife(life);
+		newInstance.life = life;
 		return newInstance;
 	}
 
 	@Override
-	public void write(Json json) {
-		json.writeField(this, "life"); //$NON-NLS-1$
-		json.writeType(this.getClass());
-		json.writeValue("positionX", Float.valueOf(this.getX())); //$NON-NLS-1$
-		json.writeValue("positionY", Float.valueOf(this.getY())); //$NON-NLS-1$
+	public boolean equals(Object object) {
+		if (object instanceof LifeObject) {
+			return this.equals((LifeObject) object);
+		}
+		return super.equals(object);
 	}
 
-	@Override
-	public void read(Json json, JsonValue jsonData) {
-		json.readField(this, "life", jsonData); //$NON-NLS-1$
-		this.setupType(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(this.life));
-		this.setX(json.readValue("positionX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
-		this.setY(json.readValue("positionY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
+	/**
+	 * @param object
+	 * @return true if object has same position, type, and life.
+	 */
+	public boolean equals(LifeObject object) {
+		final boolean isSamePosition = this.getX() == object.getX() && this.getY() == object.getY();
+		return isSamePosition && this.getType().equals(object.getType()) && this.getLife().equals(object.getLife());
 	}
 
 }

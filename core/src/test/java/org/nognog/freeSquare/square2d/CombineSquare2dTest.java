@@ -19,12 +19,14 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.FlyingLifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.PreparedLifeObjectType;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 
@@ -36,11 +38,20 @@ public class CombineSquare2dTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Json json = PersistManager.getUseJson();
+		final Json json = PersistManager.getUseJson();
 		json.setSerializer(Vertex.class, VertexSerializer.getInstance());
 		json.setSerializer(CombineSquare2d.class, CombineSquare2dSerializer.getInstance());
 		json.setSerializer(CombinePoint.class, CombinePointSerializer.getInstance());
 		json.setSerializer(CombinePoint.CombinedVertex.class, CombinedVertexSerializer.getInstance());
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		final Json json = PersistManager.getUseJson();
+		json.setSerializer(Vertex.class, null);
+		json.setSerializer(CombineSquare2d.class, null);
+		json.setSerializer(CombinePoint.class, null);
+		json.setSerializer(CombinePoint.CombinedVertex.class, null);
 	}
 
 	private final void testReadWrite(Square2d combineSquare) {

@@ -33,21 +33,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SnapshotArray;
 
 /**
  * @author goshi 2014/12/03
  */
-public class Square2dObject extends Group implements SquareObject<Square2d>, SquareEventListener, SelfValidatable, Json.Serializable {
+public class Square2dObject extends Group implements SquareObject<Square2d>, SquareEventListener, SelfValidatable {
 
-	private Square2dObjectType<?> type;
-	private float logicalWidth;
-	private float logicalHeight;
+	private final Square2dObjectType<?> type;
+	private final float logicalWidth;
+	private final float logicalHeight;
 	private Square2d square;
 
-	private Square2dObjectIcon icon;
+	private final Square2dObjectIcon icon;
 
 	private boolean enableAction = true;
 
@@ -56,7 +54,28 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private boolean isBeingTouched = false;
 	private boolean isLongPressedInLastTouch = false;
 
-	protected Square2dObject() {
+	/**
+	 * @param type
+	 */
+	public Square2dObject(Square2dObjectType<?> type) {
+		this.type = type;
+		final Texture texture = type.getTexture();
+		final Image mainIconImage = new Image(texture);
+		this.logicalWidth = type.getLogicalWidth();
+		this.logicalHeight = mainIconImage.getHeight() * (this.getLogicalWidth() / texture.getWidth());
+		mainIconImage.setWidth(this.logicalWidth);
+		mainIconImage.setHeight(this.logicalHeight);
+		this.icon = new Square2dObjectIcon(mainIconImage);
+		this.icon.setX(-this.icon.getWidth() / 2);
+		this.icon.setY(-this.icon.getHeight() / 8);
+		this.addActor(this.icon);
+		this.setColor(type.getColor());
+		this.setWidth(this.logicalWidth);
+		this.setHeight(this.logicalHeight);
+		this.setupListeners();
+	}
+
+	private void setupListeners() {
 		this.addListener(new ActorGestureListener() {
 			private boolean lastTouchCallLongPress;
 
@@ -107,37 +126,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 				return false;
 			}
 		});
-	}
-
-	/**
-	 * @param type
-	 */
-	public Square2dObject(Square2dObjectType<?> type) {
-		this();
-		this.setupType(type);
-	}
-
-	protected void setupType(Square2dObjectType<?> type) {
-		if (type == null) {
-			return;
-		}
-		if (this.type != null) {
-			throw new RuntimeException("type is already setted"); //$NON-NLS-1$
-		}
-		this.type = type;
-		final Texture texture = type.getTexture();
-		final Image mainIconImage = new Image(texture);
-		this.logicalWidth = type.getLogicalWidth();
-		this.logicalHeight = mainIconImage.getHeight() * (this.getLogicalWidth() / texture.getWidth());
-		mainIconImage.setWidth(this.logicalWidth);
-		mainIconImage.setHeight(this.logicalHeight);
-		this.icon = new Square2dObjectIcon(mainIconImage);
-		this.icon.setX(-this.icon.getWidth() / 2);
-		this.icon.setY(-this.icon.getHeight() / 8);
-		this.addActor(this.icon);
-		this.setColor(type.getColor());
-		this.setWidth(this.logicalWidth);
-		this.setHeight(this.logicalHeight);
 	}
 
 	@Override
@@ -429,22 +417,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 */
 	public boolean equals(Square2dObject obj) {
 		return this.type == obj.type && this.getX() == obj.getX() && this.getY() == obj.getY();
-	}
-
-	@Override
-	public void write(Json json) {
-		json.writeType(this.getClass());
-		json.writeField(this, "type"); //$NON-NLS-1$
-		json.writeValue("positionX", Float.valueOf(this.getX())); //$NON-NLS-1$
-		json.writeValue("positionY", Float.valueOf(this.getY())); //$NON-NLS-1$
-	}
-
-	@Override
-	public void read(Json json, JsonValue jsonData) {
-		Square2dObjectType<?> readType = json.readValue("type", Square2dObjectType.class, jsonData); //$NON-NLS-1$
-		this.setupType(readType);
-		this.setX(json.readValue("positionX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
-		this.setY(json.readValue("positionY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 	}
 
 	@Override

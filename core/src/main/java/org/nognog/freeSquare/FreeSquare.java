@@ -33,8 +33,16 @@ import org.nognog.freeSquare.square2d.CombinedVertexSerializer;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.VertexSerializer;
+import org.nognog.freeSquare.square2d.object.Square2dObject;
+import org.nognog.freeSquare.square2d.object.Square2dObjectSerializer;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectSerializer;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.ExternalLifeObjectTypeDictionary;
+import org.nognog.freeSquare.square2d.object.types.life.FlyingLifeObject;
+import org.nognog.freeSquare.square2d.object.types.life.FlyingLifeObjectSerializer;
+import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
+import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObjectSerializer;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectType;
 import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectTypeDictionary;
@@ -129,6 +137,10 @@ public class FreeSquare extends ApplicationAdapter {
 		json.setSerializer(CombinePoint.CombinedVertex.class, CombinedVertexSerializer.getInstance());
 		json.setSerializer(ExternalLifeObjectType.class, ExternalLifeObjectType.getExternalLifeObjectTypeSerializer());
 		json.setSerializer(ExternalOtherObjectType.class, ExternalOtherObjectType.getExternalOtherObjectTypeSerializer());
+		json.setSerializer(Square2dObject.class, Square2dObjectSerializer.getInstance());
+		json.setSerializer(LandingLifeObject.class, LandingLifeObjectSerializer.getInstance());
+		json.setSerializer(FlyingLifeObject.class, FlyingLifeObjectSerializer.getInstance());
+		json.setSerializer(EatableObject.class, EatableObjectSerializer.getInstance());
 	}
 
 	/**

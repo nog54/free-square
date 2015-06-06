@@ -21,13 +21,22 @@ import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Verifications;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
+import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectSerializer;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.eatable.PreparedEatableObjectType;
+import org.nognog.freeSquare.square2d.object.types.life.FlyingLifeObject;
+import org.nognog.freeSquare.square2d.object.types.life.FlyingLifeObjectSerializer;
+import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
+import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObjectSerializer;
+import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
 
@@ -39,9 +48,25 @@ import com.badlogic.gdx.utils.Json;
 @RunWith(GdxTestRunner.class)
 public class Square2dObjectTest {
 
+	@BeforeClass
+	public static void beforeClass() {
+		PersistManager.getUseJson().setSerializer(Square2dObject.class, Square2dObjectSerializer.getInstance());
+		PersistManager.getUseJson().setSerializer(EatableObject.class, EatableObjectSerializer.getInstance());
+		PersistManager.getUseJson().setSerializer(LandingLifeObject.class, LandingLifeObjectSerializer.getInstance());
+		PersistManager.getUseJson().setSerializer(FlyingLifeObject.class, FlyingLifeObjectSerializer.getInstance());
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		PersistManager.getUseJson().setSerializer(Square2dObject.class, null);
+		PersistManager.getUseJson().setSerializer(EatableObject.class, null);
+		PersistManager.getUseJson().setSerializer(LandingLifeObject.class, null);
+		PersistManager.getUseJson().setSerializer(FlyingLifeObject.class, null);
+	}
+
 	@Mocked
 	private Action mockAction;
-	
+
 	@Injectable
 	private SimpleSquare2d mockSquare;
 
@@ -156,18 +181,38 @@ public class Square2dObjectTest {
 
 	@Test
 	public final void testReadWrite() {
-		Json json = PersistManager.getUseJson();
+		boolean testSquare2dObject = false;
+		boolean testEatableObject = false;
+		boolean testLandingLifeObject = false;
+		boolean testFlyingLifeObject = false;
 		for (Square2dObjectType type : AllSquare2dObjectTypeManager.getAllPreparedTypes()) {
-			this.serializeAndDeserialize(json, type);
+			final Class squareObjectClass = type.getSquareObjectClass();
+			if (squareObjectClass == Square2dObject.class) {
+				testSquare2dObject = true;
+			}
+			if (squareObjectClass == EatableObject.class) {
+				testEatableObject = true;
+			}
+			if (squareObjectClass == LandingLifeObject.class) {
+				testLandingLifeObject = true;
+			}
+			if (squareObjectClass == FlyingLifeObject.class) {
+				testFlyingLifeObject = true;
+			}
+			this.serializeAndDeserialize(type);
 		}
+
+		final boolean testAllSquare2dObjectType = testSquare2dObject && testEatableObject && testLandingLifeObject && testFlyingLifeObject;
+		assertThat(testAllSquare2dObjectType, is(true));
 	}
 
-	private void serializeAndDeserialize(Json json, Square2dObjectType type) {
-		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
-		Square2dObject object = type.create();
+	private void serializeAndDeserialize(Square2dObjectType type) {
+		final Json json = PersistManager.getUseJson();
+		final SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
+		final Square2dObject object = type.create();
 		square.addSquareObject(object);
 		String jsonString = json.toJson(object);
-		Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
+		final Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
 		assertThat(object, is(deserializedObject));
 	}
 

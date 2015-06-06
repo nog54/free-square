@@ -119,4 +119,19 @@ public class Life implements SelfValidatable, Nameable {
 		sb.append("name :").append(this.name).append(System.getProperty("line.separator")).append(this.status); //$NON-NLS-1$ //$NON-NLS-2$
 		return sb.toString();
 	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Life) {
+			final Life life = (Life) object;
+			return this.name.equals(life.name) && this.family.equals(life.family) && this.status.equals(life.status);
+		}
+		return super.equals(object);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
 }

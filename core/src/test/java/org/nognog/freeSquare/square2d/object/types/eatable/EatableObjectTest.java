@@ -17,6 +17,8 @@ package org.nognog.freeSquare.square2d.object.types.eatable;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nognog.freeSquare.GdxTestRunner;
@@ -29,9 +31,6 @@ import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
-import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
-import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectType;
-import org.nognog.freeSquare.square2d.object.types.eatable.EatableObjectTypeManager;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.type.Square2dType;
 
@@ -44,6 +43,16 @@ import com.badlogic.gdx.utils.Json;
 @SuppressWarnings({ "static-method", "javadoc" })
 @RunWith(GdxTestRunner.class)
 public class EatableObjectTest {
+
+	@BeforeClass
+	public static void beforeClass() {
+		PersistManager.getUseJson().setSerializer(EatableObject.class, EatableObjectSerializer.getInstance());
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		PersistManager.getUseJson().setSerializer(EatableObject.class, null);
+	}
 
 	@SuppressWarnings("boxing")
 	@Test

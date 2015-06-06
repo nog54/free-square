@@ -26,19 +26,26 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class FlyingLifeObject extends LifeObject {
 
-	private FlyingLifeObject() {
-		super();
+	/**
+	 * @param life
+	 */
+	public FlyingLifeObject(Life life) {
+		this(LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life), life);
 	}
 
 	/**
 	 * @param type
-	 * @param moveSpeed
-	 * @param generator
 	 */
 	public FlyingLifeObject(LifeObjectType type) {
-		this();
-		this.setupType(type);
-		this.setLife(new Life(type.getFamily()));
+		this(type, new Life(type.getFamily()));
+	}
+
+	/**
+	 * @param type
+	 * @param life
+	 */
+	private FlyingLifeObject(LifeObjectType type, Life life) {
+		super(type, life);
 	}
 
 	@Override
