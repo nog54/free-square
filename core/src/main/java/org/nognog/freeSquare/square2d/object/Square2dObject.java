@@ -202,14 +202,14 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.square == null) {
 			return false;
 		}
-		return this.square.containsPosition(this.getX(), this.getY());
+		return this.square.contains(this.getX(), this.getY());
 	}
 
 	/**
 	 * @return true if this is landing on vertex
 	 */
 	public boolean isLandingOnVertex() {
-		return this.square.isVertexPosition(this.getX(), this.getY());
+		return this.square.isOnVertexPoint(this.getX(), this.getY());
 	}
 
 	/**

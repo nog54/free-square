@@ -239,13 +239,13 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private boolean isCombinableWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetsCombineVertex) {
-		if (!this.contains(thisCombineVertex)) {
+		if (!this.hasVertex(thisCombineVertex)) {
 			return false;
 		}
 		if (this.contains(targetSquare) || targetSquare == this) {
 			return false;
 		}
-		if (!targetSquare.contains(targetsCombineVertex)) {
+		if (!targetSquare.hasVertex(targetsCombineVertex)) {
 			return false;
 		}
 		if (!this.isValidEvenIfCombinedWith(thisCombineVertex, targetSquare, targetsCombineVertex)) {
@@ -582,7 +582,7 @@ public class CombineSquare2d extends Square2d {
 			if (!(object instanceof LandObject)) {
 				continue;
 			}
-			if (square.containsPosition(object.getX() - square.getX(), object.getY() - square.getY())) {
+			if (square.contains(object.getX() - square.getX(), object.getY() - square.getY())) {
 				result.add(object);
 			}
 		}
@@ -688,7 +688,7 @@ public class CombineSquare2d extends Square2d {
 		final CombinePoint[] separateTargetCombinePoints = this.getCombinePointOf(separateTarget);
 		final Array<CombinePoint> recessedCombinePoints = new Array<>();
 		for (CombinePoint combinePoint : separateTargetCombinePoints) {
-			if (this.contains(combinePoint.actualVertex)) {
+			if (this.hasVertex(combinePoint.actualVertex)) {
 				continue;
 			}
 			final Edge onlineEdge = CombineSquare2dUtils.getNearestSufficientlyCloseEdge(combinePoint.actualVertex, result);

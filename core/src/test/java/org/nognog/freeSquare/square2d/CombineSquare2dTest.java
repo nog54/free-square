@@ -182,13 +182,13 @@ public class CombineSquare2dTest {
 			for (CombinePoint combinePoint : combinePoints) {
 				if (combinePoint.combinedVertices.size == 1) {
 					size1Counter++;
-					assertThat(combineSquare.contains(combinePoint.actualVertex), is(true));
+					assertThat(combineSquare.hasVertex(combinePoint.actualVertex), is(true));
 				}
 				if (combinePoint.combinedVertices.size == 2) {
 					size2Counter++;
 					assertThat(combinePoint.getVertexOf(base), is(notNullValue()));
 					assertThat(combinePoint.getVertexOf(appendSquare1), is(notNullValue()));
-					assertThat(combineSquare.contains(combinePoint.actualVertex), is(false));
+					assertThat(combineSquare.hasVertex(combinePoint.actualVertex), is(false));
 				}
 				if (combinePoint.getVertexOf(base) == base.getVertex1()) {
 					containsBaseVertex1Counter++;

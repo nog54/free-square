@@ -100,33 +100,70 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 * @param vertex
 	 * @return true if contains vertex.
 	 */
-	public boolean contains(Vertex vertex) {
+	public boolean hasVertex(Vertex vertex) {
 		return Square2dUtils.contains(this.getVertices(), vertex);
 	}
 
 	/**
 	 * @param x
 	 * @param y
-	 * @return true if (x, y) is contained in Square.
+	 * @return true if (x, y) is in square. (true even if (x, y) is on square
+	 *         edge)
 	 */
-	public boolean containsPosition(float x, float y) {
-		if (this.isVertexPosition(x, y)) {
-			return true;
-		}
+	public boolean contains(float x, float y) {
 		final Polygon p = Square2dUtils.createPolygon(this.getVertices());
-		return p.contains(x, y);
+		final boolean contains = p.contains(x, y);
+		if (contains) {
+			return contains;
+		}
+		return this.isOnEdgePoint(x, y);
 	}
 
 	/**
 	 * @param x
 	 * @param y
-	 * @return true if (x, y) is vertex position.
+	 * @return true if (x, y) is vertex point.
 	 */
-	public boolean isVertexPosition(float x, float y) {
+	public boolean isOnVertexPoint(float x, float y) {
 		for (Vertex vertex : this.getVertices()) {
 			if (vertex.equals(x, y)) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @return true if (x, y) is on square edge
+	 */
+	public boolean isOnEdgePoint(float x, float y) {
+		Vertex[] vertices = this.getVertices();
+		for (int i = 0; i < vertices.length; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[(i + 1) % vertices.length];
+			final Vertex leftVertex, rightVertex;
+			if (v1.x < v2.x) {
+				leftVertex = v1;
+				rightVertex = v2;
+			} else {
+				leftVertex = v2;
+				rightVertex = v1;
+			}
+			if (rightVertex.x < x || leftVertex.x > x) {
+				continue;
+			}
+			final double a = ((double) rightVertex.y - leftVertex.y) / ((double) rightVertex.x - leftVertex.x);
+			final double b = leftVertex.y - a * leftVertex.x;
+
+			final float compareY = (float) (a * x + b);
+			final float ulp = Math.ulp(compareY);
+
+			if (compareY - ulp <= y && y <= compareY + ulp) {
+				return true;
+			}
+
 		}
 		return false;
 	}
@@ -418,7 +455,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		for (Square2dObject object : allSquare2dObject) {
 			Vector2 stageCoordinateObjectPosition = object.getParent().localToStageCoordinates(new Vector2(object.getX(), object.getY()));
 			Vector2 thisCoordinateObjectPosition = this.stageToLocalCoordinates(stageCoordinateObjectPosition);
-			if (this.containsPosition(thisCoordinateObjectPosition.x, thisCoordinateObjectPosition.y)) {
+			if (this.contains(thisCoordinateObjectPosition.x, thisCoordinateObjectPosition.y)) {
 				result.add(object);
 			}
 		}

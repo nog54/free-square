@@ -79,9 +79,12 @@ public class SimpleSquare2dTest {
 	public final void testDrawBatchFloat() {
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		square.addActor(this.mockObject1);
-		new NonStrictExpectations(){{
-			mockBatch.getTransformMatrix();result = new Matrix4();
-		}};
+		new NonStrictExpectations() {
+			{
+				mockBatch.getTransformMatrix();
+				result = new Matrix4();
+			}
+		};
 		square.getSquareImage().setZIndex(1);
 		square.draw(mockBatch, 0);
 
@@ -162,20 +165,25 @@ public class SimpleSquare2dTest {
 	}
 
 	@Test
-	public final void testContainsInSquareArea() {
+	public final void testContains() {
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		boolean expected1 = true;
 		Vertex[] vertices = square.getVertices();
-		boolean actual1 = square.containsPosition(vertices[0].x, vertices[0].y);
+		boolean actual1 = square.contains(vertices[0].x, vertices[0].y);
 		assertThat(actual1, is(expected1));
 
 		boolean expected2 = true;
-		boolean actual2 = square.containsPosition(vertices[0].x, (vertices[1].y + vertices[2].y) / 2);
+		boolean actual2 = square.contains(vertices[0].x, (vertices[1].y + vertices[2].y) / 2);
 		assertThat(actual2, is(expected2));
 
-		boolean expected3 = false;
-		boolean actual3 = square.containsPosition(vertices[0].x, Math.nextAfter(vertices[0].y, Float.NEGATIVE_INFINITY));
+		boolean expected3 = true;
+		// allow error up to ulp
+		boolean actual3 = square.contains(vertices[0].x, vertices[0].y - Math.ulp(vertices[0].y));
 		assertThat(actual3, is(expected3));
+
+		boolean expected4 = false;
+		boolean actual4 = square.contains(vertices[0].x, vertices[0].y - Math.ulp(vertices[0].y) * 2);
+		assertThat(actual4, is(expected4));
 	}
 
 	@Test
@@ -197,21 +205,31 @@ public class SimpleSquare2dTest {
 		square.notifyObservers(event);
 		square.addSquareObserver(listener2);
 		square.notifyObservers(event);
-		
-		new Verifications(){{
-			listener1.notify(event); times = 2;
-			listener2.notify(event); times = 1;
-			listener3.notify(event); times = 2;
-		}};
+
+		new Verifications() {
+			{
+				listener1.notify(event);
+				times = 2;
+				listener2.notify(event);
+				times = 1;
+				listener3.notify(event);
+				times = 2;
+			}
+		};
 
 		square.removeSquareObserver(listener1);
 		square.notifyObservers(event);
 
-		new Verifications(){{
-			listener1.notify(event); times = 2;
-			listener2.notify(event); times = 2;
-			listener3.notify(event); times = 3;
-		}};
+		new Verifications() {
+			{
+				listener1.notify(event);
+				times = 2;
+				listener2.notify(event);
+				times = 2;
+				listener3.notify(event);
+				times = 3;
+			}
+		};
 	}
 
 	@Test
@@ -246,6 +264,28 @@ public class SimpleSquare2dTest {
 		assertThat(actual6, is(expected6));
 		assertThat(actual7, is(expected7));
 		assertThat(actual8, is(expected8));
+	}
+
+	@Test
+	public void testIsOnEdge() {
+		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
+		final Vertex[] vertices = square.getVertices();
+		for (Vertex vertex : vertices) {
+			assertThat(square.isOnEdgePoint(vertex.x, vertex.y), is(true));
+		}
+
+		for (int i = 0; i < vertices.length - 1; i++) {
+			final Vertex v1 = vertices[i];
+			final Vertex v2 = vertices[i + 1];
+			for (int division = 3; division <= 100; division++) {
+				final float checkX1 = v1.x + (v2.x - v1.x) / division;
+				final float checkY1 = v1.y + (v2.y - v1.y) / division;
+				assertThat(square.isOnEdgePoint(checkX1, checkY1), is(true));
+				final float checkX2 = (v1.x + v2.x) / division;
+				final float checkY2 = (v1.y + v2.y) / division;
+				assertThat(square.isOnEdgePoint(checkX2, checkY2), is(false));
+			}
+		}
 	}
 
 }

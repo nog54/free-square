@@ -15,12 +15,10 @@
 package org.nognog.freeSquare.square2d.action;
 
 import org.nognog.freeSquare.square2d.Direction;
-import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -132,15 +130,8 @@ public class EatAction extends Action {
 		if (this.eatObject.getSquare() == null || eater.getSquare() != this.eatObject.getSquare()) {
 			return true;
 		}
-		if (this.actor instanceof LandingLifeObject) {
-			Vertex[] vertices = ((LandingLifeObject) this.actor).getSquare().getVertices();
-			for (int i = 0; i < vertices.length; i++) {
-				final Vertex v1 = vertices[i];
-				final Vertex v2 = vertices[(i + 1) % vertices.length];
-				if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, eater.getX(), eater.getY(), this.eatObject.getX(), this.eatObject.getY(), null)) {
-					return true;
-				}
-			}
+		if (eater instanceof LandingLifeObject && !((LandingLifeObject) eater).canGoStraightTo(this.eatObject)) {
+			return true;
 		}
 
 		this.timeFromLastEat += delta;

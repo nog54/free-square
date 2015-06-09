@@ -79,7 +79,7 @@ public class CombinePoint {
 		public final Vertex vertex;
 
 		CombinedVertex(Square2d square, Vertex vertex) {
-			if (!square.contains(vertex)) {
+			if (!square.hasVertex(vertex)) {
 				throw new IllegalArgumentException();
 			}
 			this.square = square;

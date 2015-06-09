@@ -41,7 +41,7 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		this.addCaptureListener(new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				if (SimpleSquare2d.this.containsPosition(x, y) || this.isTouchingSquareObject(x, y)) {
+				if (SimpleSquare2d.this.contains(x, y) || this.isTouchingSquareObject(x, y)) {
 					return false;
 				}
 				event.stop();
@@ -97,7 +97,7 @@ public class SimpleSquare2d extends Square2d implements Json.Serializable {
 		}
 		if (touchable && this.getTouchable() != Touchable.enabled)
 			return null;
-		if (this.containsPosition(x, y)) {
+		if (this.contains(x, y)) {
 			return this;
 		}
 		return null;

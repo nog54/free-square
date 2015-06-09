@@ -45,7 +45,7 @@ public class HopSquare extends SimpleSquare2d {
 
 			@Override
 			public void tap(InputEvent event, float x, float y, int pointer, int button) {
-				if (this.target.containsPosition(x, y)) {
+				if (this.target.contains(x, y)) {
 					Action squareHopAction = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 					this.target.getSquareImage().addAction(squareHopAction);
 					for (Square2dObject object : this.target.getAllLandingSquareObjectsOnStage()) {

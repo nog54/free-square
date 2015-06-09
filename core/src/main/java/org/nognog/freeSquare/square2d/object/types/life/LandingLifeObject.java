@@ -102,7 +102,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		final double moveY = calcSmallerAbsYThanTrueValueY(moveDistance, theta);
 		final float targetPositionX = addWithRoundToSmallerAbs(thisX, moveX);
 		final float targetPositionY = addWithRoundToSmallerAbs(thisY, moveY);
-		if (!this.getSquare().containsPosition(targetPositionX, targetPositionY)) {
+		if (!this.getSquare().contains(targetPositionX, targetPositionY)) {
 			return new Vector2(thisX, thisY);
 		}
 		return new Vector2(targetPositionX, targetPositionY);
@@ -114,7 +114,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		final double moveY = calcSmallerAbsYThanTrueValueY(tryMoveDistance, theta);
 		final float targetPositionX = addWithRoundToSmallerAbs(thisX, moveX);
 		final float targetPositionY = addWithRoundToSmallerAbs(thisY, moveY);
-		if (this.getSquare().containsPosition(targetPositionX, targetPositionY)) {
+		if (this.getSquare().contains(targetPositionX, targetPositionY)) {
 			return false;
 		}
 		return true;
@@ -166,15 +166,28 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		return result;
 	}
 
-	private boolean canGoStraightTo(Square2dObject object) {
+	/**
+	 * @param object
+	 * @return true if this can go straight to object
+	 */
+	public boolean canGoStraightTo(Square2dObject object) {
 		Vertex[] vertices = this.getSquare().getVertices();
 		for (int i = 0; i < vertices.length; i++) {
 			final Vertex v1 = vertices[i];
 			final Vertex v2 = vertices[(i + 1) % vertices.length];
-			if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, this.getX(), this.getY(), object.getX(), object.getY(), null)) {
+			final Vector2 intersectPoint = new Vector2();
+			if (Intersector.intersectSegments(v1.x, v1.y, v2.x, v2.y, this.getX(), this.getY(), object.getX(), object.getY(), intersectPoint)) {
+				if (isSufficientNear(object.getX(), intersectPoint.x) && isSufficientNear(object.getY(), intersectPoint.y)) {
+					return true;
+				}
 				return false;
 			}
 		}
 		return true;
+	}
+
+	private static boolean isSufficientNear(final float a, final float b) {
+		final float ulpA = Math.ulp(a);
+		return (a - ulpA) <= b && b <= (a + ulpA);
 	}
 }
