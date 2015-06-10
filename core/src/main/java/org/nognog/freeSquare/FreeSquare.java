@@ -49,6 +49,7 @@ import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectType
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
 import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;

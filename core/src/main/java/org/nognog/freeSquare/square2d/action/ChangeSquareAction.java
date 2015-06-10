@@ -22,11 +22,11 @@ import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSqu
 import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_IN;
 import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_OUT;
 
-import org.nognog.freeSquare.activity.MainActivity;
-import org.nognog.freeSquare.activity.MainActivityInputProcessor;
+import org.nognog.freeSquare.activity.main.MainActivity;
+import org.nognog.freeSquare.activity.main.MainActivityInputProcessor;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.gdx.util.camera.Camera;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -113,7 +113,7 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performStartPhase() {
-		final Group stageRoot = this.activity.getFreeSquare().getStage().getRoot();
+		final Group stageRoot = this.activity.getStage().getRoot();
 		for (Action stageRootAction : stageRoot.getActions()) {
 			if (stageRootAction instanceof ChangeSquareAction) {
 				if (((ChangeSquareAction) stageRootAction).phase != START) {
@@ -126,14 +126,14 @@ public class ChangeSquareAction extends Action {
 		if (this.activity.getSquare() == null) {
 			this.zoomInTargetValue = 1;
 		} else {
-			this.zoomInTargetValue = this.activity.getFreeSquare().getCamera().getZoom();
+			this.zoomInTargetValue = this.activity.getCamera().getZoom();
 		}
 		this.phase = ZOOM_OUT;
 		return;
 	}
 
 	private void performZoomOut(float delta) {
-		Camera camera = this.activity.getFreeSquare().getCamera();
+		Camera camera = this.activity.getCamera();
 		camera.setZoom(MathUtils.clamp(camera.getZoom() + delta * zoomSpeed, this.activity.getMinZoom(), this.activity.getMaxZoom()));
 		if (camera.getZoom() == this.activity.getMaxZoom()) {
 			this.phase = SLIDE_OUT;
@@ -147,7 +147,7 @@ public class ChangeSquareAction extends Action {
 		}
 
 		this.moveCamera(delta, this.direction);
-		final Camera camera = this.activity.getFreeSquare().getCamera();
+		final Camera camera = this.activity.getCamera();
 		final float viewingWidth = camera.getViewportWidth() * camera.getZoom();
 		final float viewingHeight = camera.getViewportHeight() * camera.getZoom();
 		final boolean completeSlideOut = (camera.getX() + viewingWidth / 2 < this.activity.getSquare().getLeftEndX()) || (camera.getX() - viewingWidth / 2 > this.activity.getSquare().getRightEndX())
@@ -160,7 +160,7 @@ public class ChangeSquareAction extends Action {
 	private void performSetSquare() {
 		boolean beforeSquareIsNull = this.activity.getSquare() == null;
 		this.activity.setSquare(this.square);
-		final Camera camera = this.activity.getFreeSquare().getCamera();
+		final Camera camera = this.activity.getCamera();
 		if (beforeSquareIsNull) {
 			camera.setZoom(this.activity.getMaxZoom());
 		}
@@ -184,7 +184,7 @@ public class ChangeSquareAction extends Action {
 
 	private void performSlideIn(float delta) {
 		this.moveCamera(delta, this.direction);
-		final Camera camera = this.activity.getFreeSquare().getCamera();
+		final Camera camera = this.activity.getCamera();
 		final boolean slideInEnd = (this.direction == Direction.DOWN && camera.getY() <= this.square.getCenterY()) || (this.direction == Direction.UP && camera.getY() >= this.square.getCenterY())
 				|| (this.direction == Direction.LEFT && camera.getX() <= this.square.getCenterX()) || (this.direction == Direction.RIGHT && camera.getX() >= this.square.getCenterX());
 		if (slideInEnd) {
@@ -194,7 +194,7 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performZoomIn(float delta) {
-		Camera camera = this.activity.getFreeSquare().getCamera();
+		Camera camera = this.activity.getCamera();
 		camera.zoom(-delta * zoomSpeed);
 		if (camera.getZoom() < this.zoomInTargetValue) {
 			camera.setZoom(this.zoomInTargetValue);
@@ -203,14 +203,14 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performEndPhase() {
-		this.activity.getFreeSquare().getStage().getRoot().setTouchable(Touchable.enabled);
+		this.activity.getStage().getRoot().setTouchable(Touchable.enabled);
 		((MainActivityInputProcessor) this.activity.getInputProcesser()).enable();
 	}
 
 	private void moveCamera(float delta, Direction moveDirection) {
 		final float speedX = getMoveX(moveDirection);
 		final float speedY = getMoveY(moveDirection);
-		Camera camera = this.activity.getFreeSquare().getCamera();
+		Camera camera = this.activity.getCamera();
 		camera.move(speedX * delta, speedY * delta);
 	}
 

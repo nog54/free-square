@@ -21,7 +21,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.status.Status;

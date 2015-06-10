@@ -24,7 +24,7 @@ import mockit.Verifications;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;

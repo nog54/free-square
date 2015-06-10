@@ -23,7 +23,7 @@ import mockit.Verifications;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;

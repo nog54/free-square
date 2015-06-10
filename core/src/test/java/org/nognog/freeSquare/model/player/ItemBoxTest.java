@@ -24,7 +24,7 @@ import mockit.Verifications;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nognog.freeSquare.GdxTestRunner;
+import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.item.Item;
 
 @SuppressWarnings({ "javadoc", "static-method", "rawtypes", "boxing", "unused" })

@@ -14,7 +14,7 @@
 
 package org.nognog.freeSquare.square2d.action;
 
-import org.nognog.freeSquare.activity.MainActivity;
+import org.nognog.freeSquare.activity.main.MainActivity;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;

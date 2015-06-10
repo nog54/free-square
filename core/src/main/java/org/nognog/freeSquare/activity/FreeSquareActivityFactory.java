@@ -17,6 +17,8 @@ package org.nognog.freeSquare.activity;
 import java.lang.reflect.InvocationTargetException;
 
 import org.nognog.freeSquare.FreeSquare;
+import org.nognog.freeSquare.activity.initialize.InitializeActivity;
+import org.nognog.freeSquare.activity.main.MainActivity;
 
 import com.badlogic.gdx.utils.ObjectMap;
 

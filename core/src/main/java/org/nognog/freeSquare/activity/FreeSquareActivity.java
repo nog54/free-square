@@ -16,7 +16,7 @@ package org.nognog.freeSquare.activity;
 
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.model.square.SquareEventListener;
-import org.nognog.util.graphic2d.camera.CameraObserver;
+import org.nognog.gdx.util.camera.CameraObserver;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -40,7 +40,7 @@ public abstract class FreeSquareActivity extends Group implements CameraObserver
 	/**
 	 * @return freeSquare
 	 */
-	public FreeSquare getFreeSquare() {
+	protected FreeSquare getFreeSquare() {
 		return this.freeSquare;
 	}
 
