@@ -14,7 +14,6 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.Settings;
 import org.nognog.freeSquare.model.SimpleDrawable;
 import org.nognog.freeSquare.model.item.Item;
@@ -22,8 +21,9 @@ import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.types.other.DictionaryObserver;
 import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,8 +48,8 @@ public class ItemList extends ScrollPane implements CameraObserver, DictionaryOb
 	public ItemList(Camera camera, BitmapFont font) {
 		super(createList(font));
 		this.setupOverscroll(0, 0, 0);
-		this.setWidth(camera.viewportWidth / Settings.getGoldenRatio());
-		this.setHeight(camera.viewportHeight / 2);
+		this.setWidth(camera.getViewportWidth() / Settings.getGoldenRatio());
+		this.setHeight(camera.getViewportHeight() / 2);
 		this.getWidget().addListener(new ActorGestureListener() {
 
 			private List<Item<?, ?>> list = ItemList.this.getList();
@@ -108,7 +108,7 @@ public class ItemList extends ScrollPane implements CameraObserver, DictionaryOb
 		list.setSelectedIndex(-1);
 		return list;
 	}
-	
+
 	private static Item<?, ?>[] getAllItems() {
 		final Item<?, ?>[] allSquare2dObjectItems = Square2dObjectItem.toSquare2dObjectItem(AllSquare2dObjectTypeManager.getAllTypes());
 		final Item<?, ?>[] allSquareItems = Square2dItem.getAllItems();
@@ -139,12 +139,12 @@ public class ItemList extends ScrollPane implements CameraObserver, DictionaryOb
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
-		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
+		final float newX = camera.getX() + currentCameraZoom * (camera.getViewportWidth() / 2 - this.getWidth());
+		final float newY = camera.getY() - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}
-	
+
 	@Override
 	public void updateDictionary() {
 		this.getList().setItems(getAllItems());
@@ -153,6 +153,5 @@ public class ItemList extends ScrollPane implements CameraObserver, DictionaryOb
 	protected void selectedItemTapped(Item<?, ?> tappedItem) {
 		// default is empty.
 	}
-
 
 }

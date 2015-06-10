@@ -27,10 +27,9 @@ import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
+import org.nognog.util.graphic2d.camera.Camera;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -123,13 +122,13 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 
 	@Override
 	protected void cameraMoved() {
-		final float oldX = this.mainActivity.getStage().getCamera().position.x;
-		final float oldY = this.mainActivity.getStage().getCamera().position.y;
-		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
-		final float afterX = this.mainActivity.getStage().getCamera().position.x;
-		final float afterY = this.mainActivity.getStage().getCamera().position.y;
+		final float oldX = this.mainActivity.getFreeSquare().getCamera().getX();
+		final float oldY = this.mainActivity.getFreeSquare().getCamera().getY();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
+		final float afterX = this.mainActivity.getFreeSquare().getCamera().getX();
+		final float afterY = this.mainActivity.getFreeSquare().getCamera().getY();
 		this.fetchingActor.moveBy(afterX - oldX, afterY - oldY);
-		this.mainActivity.getFreeSquare().notifyCameraObservers();
+		this.mainActivity.getCamera().notifyCameraObservers();
 	}
 
 	@Override
@@ -143,7 +142,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			Square2d putSquare = (Square2d) putTargetFetchingActor;
 			this.putSquareAndTakeOutItemIfSuccess(putSquare, this.fetchingItem.getItem());
 		}
-		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
 		this.mainActivity.showPlayerItemList();
 	}
 
@@ -176,7 +175,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 
 	@Override
 	protected void selectedItemTapped(PossessedItem<?> tappedItem, int count) {
-		if(tappedItem == null){
+		if (tappedItem == null) {
 			return;
 		}
 		if (this.mainActivity.getSquare() != null) {
@@ -187,7 +186,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			if (tappedItem.getItem() instanceof Square2dItem) {
 				Square2d putSquare = ((Square2dItem) tappedItem.getItem()).createSquare2d();
 				this.putSquareAndTakeOutItemIfSuccess(putSquare, tappedItem.getItem());
-				this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+				this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
 				this.mainActivity.showSquareOnly();
 			}
 		}
@@ -196,9 +195,9 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	@Override
 	public void updateCamera(Camera camera) {
 		super.updateCamera(camera);
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
-		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
+		final float currentCameraZoom = camera.getZoom();
+		final float newX = camera.getX() + currentCameraZoom * (camera.getViewportWidth() / 2 - this.getWidth());
+		final float newY = camera.getY() - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}

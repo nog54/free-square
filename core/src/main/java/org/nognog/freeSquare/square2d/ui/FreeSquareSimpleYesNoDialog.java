@@ -14,7 +14,9 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.FreeSquare;
+import org.nognog.util.graphic2d.camera.Camera;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /**
  * @author goshi 2015/05/05
@@ -22,20 +24,21 @@ import org.nognog.freeSquare.FreeSquare;
 public abstract class FreeSquareSimpleYesNoDialog extends FreeSquareSimpleDialog {
 
 	/**
-	 * @param freeSquare
+	 * @param camera
+	 * @param font
 	 * @param text
 	 */
-	public FreeSquareSimpleYesNoDialog(FreeSquare freeSquare, String text) {
-		super(freeSquare); 
+	public FreeSquareSimpleYesNoDialog(Camera camera, BitmapFont font, String text) {
+		super(camera, font);
 		this.setText(text);
 		this.setLeftButtonText("Yes"); //$NON-NLS-1$
 		this.setRightButtonText("No"); //$NON-NLS-1$
-		this.setListener(new SimpleDialogListener() {	
+		this.setListener(new SimpleDialogListener() {
 			@Override
 			public void rightButtonClicked() {
 				FreeSquareSimpleYesNoDialog.this.no();
 			}
-			
+
 			@Override
 			public void leftButtonClicked() {
 				FreeSquareSimpleYesNoDialog.this.yes();
@@ -44,7 +47,7 @@ public abstract class FreeSquareSimpleYesNoDialog extends FreeSquareSimpleDialog
 	}
 
 	protected abstract void yes();
-	
+
 	protected abstract void no();
 
 }

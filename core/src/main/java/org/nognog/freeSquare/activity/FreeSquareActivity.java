@@ -14,9 +14,9 @@
 
 package org.nognog.freeSquare.activity;
 
-import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.model.square.SquareEventListener;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Group;

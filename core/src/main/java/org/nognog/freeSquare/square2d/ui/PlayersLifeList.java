@@ -25,10 +25,9 @@ import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
+import org.nognog.util.graphic2d.camera.Camera;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -94,11 +93,11 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	protected void cameraMoved() {
 		final float oldX = this.mainActivity.getStage().getCamera().position.x;
 		final float oldY = this.mainActivity.getStage().getCamera().position.y;
-		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
 		final float afterX = this.mainActivity.getStage().getCamera().position.x;
 		final float afterY = this.mainActivity.getStage().getCamera().position.y;
 		this.fetchingActor.moveBy(afterX - oldX, afterY - oldY);
-		this.mainActivity.getFreeSquare().notifyCameraObservers();
+		this.mainActivity.getCamera().notifyCameraObservers();
 	}
 
 	@Override
@@ -117,7 +116,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 		} else {
 			this.mainActivity.getSquare().removeSquareObject(putTargetFetchingActor);
 		}
-		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver();
+		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
 		this.mainActivity.showPlayersLifeList();
 	}
 
@@ -129,9 +128,9 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	@Override
 	public void updateCamera(Camera camera) {
 		super.updateCamera(camera);
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x + currentCameraZoom * (camera.viewportWidth / 2 - this.getWidth());
-		final float newY = camera.position.y - currentCameraZoom * this.getHeight();
+		final float currentCameraZoom = camera.getZoom();
+		final float newX = camera.getX() + currentCameraZoom * (camera.getViewportWidth() / 2 - this.getWidth());
+		final float newY = camera.getY() - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}

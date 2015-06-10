@@ -16,9 +16,9 @@ package org.nognog.freeSquare.activity;
 
 import net.dermetfan.gdx.scenes.scene2d.ui.FileChooser;
 
-import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.Messages;
+import org.nognog.freeSquare.ObservableOrthographicCamera;
 import org.nognog.freeSquare.model.Nameable;
 import org.nognog.freeSquare.model.item.Item;
 import org.nognog.freeSquare.model.life.Life;
@@ -59,11 +59,11 @@ import org.nognog.freeSquare.square2d.ui.PlayersItemList;
 import org.nognog.freeSquare.square2d.ui.PlayersLifeList;
 import org.nognog.freeSquare.square2d.ui.PlayersSquareList;
 import org.nognog.freeSquare.square2d.ui.SimpleDialog.SimpleDialogListener;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -256,7 +256,7 @@ public class MainActivity extends FreeSquareActivity {
 			}
 		};
 		this.fileChooser = new FreeSquareFileChooser(freeSquare.getCamera(), font, listener);
-		this.dialog = new FreeSquareSimpleDialog(freeSquare);
+		this.dialog = new FreeSquareSimpleDialog(freeSquare.getCamera(), font);
 	}
 
 	/**
@@ -352,16 +352,16 @@ public class MainActivity extends FreeSquareActivity {
 			throw new IllegalArgumentException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
 		}
 		final Square2d convertTarget = this.square;
-		final float cameraX = this.getFreeSquare().getCamera().position.x;
-		final float cameraY = this.getFreeSquare().getCamera().position.y;
+		final float cameraX = this.getFreeSquare().getCamera().getX();
+		final float cameraY = this.getFreeSquare().getCamera().getY();
 		this.setSquare(null);
 		final CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
 		combineSquare.startCreateSimpleTextureAsyncIfNotStart();
 		combineSquare.startSetupSeparatableSquaresAsyncIfNotStart();
 		this.player.replaceSquare(convertTarget, combineSquare);
 		this.setSquare(combineSquare);
-		this.getFreeSquare().getCamera().position.x = cameraX;
-		this.getFreeSquare().getCamera().position.y = cameraY;
+		this.getFreeSquare().getCamera().setX(cameraX);
+		this.getFreeSquare().getCamera().setY(cameraY);
 	}
 
 	/**
@@ -399,8 +399,8 @@ public class MainActivity extends FreeSquareActivity {
 			}
 		}
 		this.player.notifyPlayerObservers();
-		this.getFreeSquare().getCamera().position.x = (this.getVisibleRangeLowerLeft().x + this.getVisibleRangeUpperRight().x) / 2;
-		this.getFreeSquare().getCamera().position.y = (this.getVisibleRangeLowerLeft().y + this.getVisibleRangeUpperRight().y) / 2;
+		this.getFreeSquare().getCamera().setX((this.getVisibleRangeLowerLeft().x + this.getVisibleRangeUpperRight().x) / 2);
+		this.getFreeSquare().getCamera().setY((this.getVisibleRangeLowerLeft().y + this.getVisibleRangeUpperRight().y) / 2);
 	}
 
 	/**
@@ -706,36 +706,54 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	/**
+	 * @param notifyIfChanged
 	 * 
 	 */
-	public void adjustCameraZoomAndPositionIfRangeOver() {
+	public void adjustCameraZoomAndPositionIfRangeOver(boolean notifyIfChanged) {
+		if (notifyIfChanged == false) {
+			this.adjustCameraZoomAndPositionIfRangeOver();
+		}
+		final ObservableOrthographicCamera camera = this.getFreeSquare().getCamera();
+		final float oldZoom = camera.getZoom();
+		final float oldX = camera.getX();
+		final float oldY = camera.getX();
+
+		this.adjustCameraZoomAndPositionIfRangeOver();
+
+		final float newZoom = camera.getZoom();
+		final float newX = camera.getX();
+		final float newY = camera.getX();
+		if (oldZoom != newZoom || oldX != newX || oldY != newY) {
+			camera.notifyCameraObservers();
+		}
+	}
+
+	private void adjustCameraZoomAndPositionIfRangeOver() {
 		if (this.square == null) {
 			return;
 		}
 		final float minZoom = this.getMinZoom();
 		final float maxZoom = this.getMaxZoom();
-		final OrthographicCamera camera = (OrthographicCamera) this.getFreeSquare().getCamera();
-		camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
-		final float minViewableWidth = camera.viewportWidth * minZoom;
-		final float minViewableHeight = camera.viewportHeight * minZoom;
+		final ObservableOrthographicCamera camera = this.getFreeSquare().getCamera();
+		camera.setZoom(MathUtils.clamp(camera.getZoom(), minZoom, maxZoom));
+		final float minViewableWidth = camera.getViewportWidth() * minZoom;
+		final float minViewableHeight = camera.getViewportHeight() * minZoom;
 
 		float squareWidth = this.square.getWidth();
 		float squareHeight = this.square.getHeight();
 		if (minViewableWidth > squareWidth + minViewableWidth / 2f || minViewableHeight > squareHeight + minViewableHeight / 2f) {
-			camera.position.x = this.square.getX() + squareWidth / 2;
-			camera.position.y = this.square.getY() + squareHeight / 2;
+			camera.setX(this.square.getX() + squareWidth / 2);
+			camera.setY(this.square.getY() + squareHeight / 2);
 			return;
 		}
-		final float viewingWidth = camera.viewportWidth * camera.zoom;
-		final float viewingHeight = camera.viewportHeight * camera.zoom;
-
+		final float viewingWidth = camera.getViewportWidth() * camera.getZoom();
+		final float viewingHeight = camera.getViewportHeight() * camera.getZoom();
 		final float minCameraPositionX = this.getVisibleRangeLowerLeft().x + viewingWidth / 2f;
 		final float maxCameraPositionX = this.getVisibleRangeUpperRight().x - viewingWidth / 2f;
 		final float minCameraPositionY = this.getVisibleRangeLowerLeft().y + viewingHeight / 2f;
 		final float maxCameraPositionY = this.getVisibleRangeUpperRight().y - viewingHeight / 2f;
-		camera.position.x = MathUtils.clamp(camera.position.x, minCameraPositionX, maxCameraPositionX);
-		camera.position.y = MathUtils.clamp(camera.position.y, minCameraPositionY, maxCameraPositionY);
-
+		camera.setX(MathUtils.clamp(camera.getX(), minCameraPositionX, maxCameraPositionX));
+		camera.setY(MathUtils.clamp(camera.getY(), minCameraPositionY, maxCameraPositionY));
 	}
 
 	/**
@@ -749,6 +767,13 @@ public class MainActivity extends FreeSquareActivity {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @return camera
+	 */
+	public ObservableOrthographicCamera getCamera() {
+		return this.getFreeSquare().getCamera();
 	}
 
 	/**
@@ -766,9 +791,9 @@ public class MainActivity extends FreeSquareActivity {
 		if (this.square == null) {
 			return 1f;
 		}
-		final OrthographicCamera camera = (OrthographicCamera) this.getFreeSquare().getCamera();
-		final float fitSquareWidthZoom = this.square.getWidth() / camera.viewportWidth;
-		final float fitSquareHeightZoom = this.square.getHeight() / camera.viewportHeight;
+		final Camera camera = this.getFreeSquare().getCamera();
+		final float fitSquareWidthZoom = this.square.getWidth() / camera.getViewportWidth();
+		final float fitSquareHeightZoom = this.square.getHeight() / camera.getViewportHeight();
 		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
 		return maxZoom;
 	}
@@ -854,7 +879,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (this.cameraVelocityX == 0) {
 			return;
 		}
-		this.getFreeSquare().getCamera().position.x += delta * this.cameraVelocityX;
+		this.getFreeSquare().getCamera().move(delta * this.cameraVelocityX, 0);
 		if (Math.abs(this.cameraVelocityX) < cameraDeceleration) {
 			this.cameraVelocityX = 0;
 			return;
@@ -867,7 +892,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (this.cameraVelocityY == 0) {
 			return;
 		}
-		this.getFreeSquare().getCamera().position.y += delta * this.cameraVelocityY;
+		this.getFreeSquare().getCamera().move(0, delta * this.cameraVelocityY);
 		if (Math.abs(this.cameraVelocityY) < cameraDeceleration) {
 			this.cameraVelocityY = 0;
 			return;
@@ -882,7 +907,7 @@ public class MainActivity extends FreeSquareActivity {
 	public void setCameraVelocityX(float velocityX) {
 		this.cameraVelocityX = velocityX;
 	}
-	
+
 	/**
 	 * @param velocityY
 	 */

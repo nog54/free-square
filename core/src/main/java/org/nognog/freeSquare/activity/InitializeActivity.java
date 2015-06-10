@@ -17,9 +17,9 @@ package org.nognog.freeSquare.activity;
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.ui.FreeSquareSimpleYesNoDialog;
+import org.nognog.util.graphic2d.camera.Camera;
 
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 
 /**
  * @author goshi 2015/04/24
@@ -34,7 +34,7 @@ public class InitializeActivity extends FreeSquareActivity {
 		super(freeSquare);
 
 		final String message = "Create New Player?"; //$NON-NLS-1$
-		this.yesNoDialog = new FreeSquareSimpleYesNoDialog(freeSquare, message) {
+		this.yesNoDialog = new FreeSquareSimpleYesNoDialog(freeSquare.getCamera(), freeSquare.getFont(), message) {
 
 			@Override
 			public void yes() {

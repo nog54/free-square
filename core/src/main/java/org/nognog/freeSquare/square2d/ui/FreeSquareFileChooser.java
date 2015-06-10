@@ -20,10 +20,10 @@ import net.dermetfan.gdx.scenes.scene2d.ui.FileChooser.Listener;
 import net.dermetfan.gdx.scenes.scene2d.ui.ListFileChooser;
 import net.dermetfan.gdx.scenes.scene2d.ui.ListFileChooser.Style;
 
-import org.nognog.freeSquare.CameraObserver;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -49,8 +49,8 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 	 * @param listener
 	 */
 	public FreeSquareFileChooser(Camera camera, BitmapFont font, Listener listener) {
-		final float width = camera.viewportWidth;
-		final float height = camera.viewportHeight;
+		final float width = camera.getViewportWidth();
+		final float height = camera.getViewportHeight();
 		this.setSize(width, height);
 		this.chooser = new ListFileChooser(createFileChooserStyle(font), listener);
 		this.chooser.setSize(width, height);
@@ -79,7 +79,8 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 					if (currentlySelected.isDirectory()) {
 						this.getFileChooser().setDirectory(currentlySelected);
 					} else {
-						for (@SuppressWarnings("hiding") EventListener listener : this.getFileChooser().getChooseButton().getListeners()) {
+						for (@SuppressWarnings("hiding")
+						EventListener listener : this.getFileChooser().getChooseButton().getListeners()) {
 							if (listener instanceof ClickListener) {
 								((ClickListener) listener).clicked(event, x, y);
 							}
@@ -104,8 +105,8 @@ public class FreeSquareFileChooser extends Group implements CameraObserver {
 	@Override
 	public void updateCamera(Camera camera) {
 		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - currentCameraZoom * (camera.viewportWidth / 2);
-		final float newY = camera.position.y + currentCameraZoom * (camera.viewportHeight / 2 - this.getHeight());
+		final float newX = camera.getX() - currentCameraZoom * (camera.getViewportWidth() / 2);
+		final float newY = camera.getY() + currentCameraZoom * (camera.getViewportHeight() / 2 - this.getHeight());
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}

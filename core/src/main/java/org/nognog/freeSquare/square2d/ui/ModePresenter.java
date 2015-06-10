@@ -14,10 +14,9 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.CameraObserver;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -38,8 +37,8 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 	 * @param font
 	 */
 	public ModePresenter(Camera camera, BitmapFont font) {
-		final float width = camera.viewportWidth / 2;
-		final float height = camera.viewportWidth / 8;
+		final float width = camera.getViewportWidth() / 2;
+		final float height = camera.getViewportWidth() / 8;
 		TextureRegionDrawable upTexture = UiUtils.getPlaneTextureRegionDrawable((int) width, (int) height, ColorUtils.carrot);
 		TextureRegionDrawable downTexture = UiUtils.getPlaneTextureRegionDrawable((int) width, (int) height, ColorUtils.pampkin);
 		TextButtonStyle buttonStyle = new TextButtonStyle(upTexture, downTexture, downTexture, font);
@@ -70,9 +69,9 @@ public abstract class ModePresenter extends Group implements CameraObserver {
 
 	@Override
 	public void updateCamera(Camera camera) {
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - currentCameraZoom * (camera.viewportWidth / 2);
-		final float newY = camera.position.y + currentCameraZoom * (camera.viewportHeight / 2 - this.getHeight());
+		final float currentCameraZoom = camera.getZoom();
+		final float newX = camera.getX() - currentCameraZoom * (camera.getViewportWidth() / 2);
+		final float newY = camera.getY() + currentCameraZoom * (camera.getViewportHeight() / 2 - this.getHeight());
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}

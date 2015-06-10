@@ -14,10 +14,10 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.CameraObserver;
 import org.nognog.freeSquare.model.player.Player;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -38,7 +38,7 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 	protected T1 fetchingItem;
 	protected T2 fetchingActor;
 
-	private OrthographicCamera moveCamera;
+	private Camera moveCamera;
 
 	protected boolean requestedMoveCameraToLeft;
 	protected boolean requestedMoveCameraToRight;
@@ -99,20 +99,20 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 		this.requestedMoveCameraToUp = false;
 		// origin is top left corner
 		final Vector2 actorStageCoordinatePosition = actor.localToStageCoordinates(new Vector2(actor.getOriginX(), actor.getOriginY()));
-		final float cameraLeftEnd = this.moveCamera.position.x - this.moveCamera.viewportWidth / 2 * this.moveCamera.zoom;
-		final float cameraRightEnd = this.moveCamera.position.x + this.moveCamera.viewportWidth / 2 * this.moveCamera.zoom;
-		final float cameraBottomEnd = this.moveCamera.position.y - this.moveCamera.viewportHeight / 2 * this.moveCamera.zoom;
-		final float cameraTopEnd = this.moveCamera.position.y + this.moveCamera.viewportHeight / 2 * this.moveCamera.zoom;
-		if (actorStageCoordinatePosition.x <= cameraLeftEnd + cameraMoveThresholdBase * this.moveCamera.zoom) {
+		final float cameraLeftEnd = this.moveCamera.getX() - this.moveCamera.getViewportWidth() / 2 * this.moveCamera.getZoom();
+		final float cameraRightEnd = this.moveCamera.getX() + this.moveCamera.getViewportWidth() / 2 * this.moveCamera.getZoom();
+		final float cameraBottomEnd = this.moveCamera.getY() - this.moveCamera.getViewportHeight() / 2 * this.moveCamera.getZoom();
+		final float cameraTopEnd = this.moveCamera.getY() + this.moveCamera.getViewportHeight() / 2 * this.moveCamera.getZoom();
+		if (actorStageCoordinatePosition.x <= cameraLeftEnd + cameraMoveThresholdBase * this.moveCamera.getZoom()) {
 			this.requestedMoveCameraToLeft = true;
 		}
-		if (actorStageCoordinatePosition.x >= cameraRightEnd - cameraMoveThresholdBase * this.moveCamera.zoom) {
+		if (actorStageCoordinatePosition.x >= cameraRightEnd - cameraMoveThresholdBase * this.moveCamera.getZoom()) {
 			this.requestedMoveCameraToRight = true;
 		}
-		if (actorStageCoordinatePosition.y <= cameraBottomEnd + cameraMoveThresholdBase * this.moveCamera.zoom) {
+		if (actorStageCoordinatePosition.y <= cameraBottomEnd + cameraMoveThresholdBase * this.moveCamera.getZoom()) {
 			this.requestedMoveCameraToDown = true;
 		}
-		if (actorStageCoordinatePosition.y >= cameraTopEnd - cameraMoveThresholdBase * this.moveCamera.zoom) {
+		if (actorStageCoordinatePosition.y >= cameraTopEnd - cameraMoveThresholdBase * this.moveCamera.getZoom()) {
 			this.requestedMoveCameraToUp = true;
 		}
 	}
@@ -164,6 +164,6 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 
 	@Override
 	public void updateCamera(Camera camera) {
-		this.moveCamera = (OrthographicCamera) camera;
+		this.moveCamera = camera;
 	}
 }

@@ -14,11 +14,9 @@
 
 package org.nognog.freeSquare.square2d.ui;
 
-import org.nognog.freeSquare.CameraObserver;
-import org.nognog.freeSquare.FreeSquare;
+import org.nognog.util.graphic2d.camera.Camera;
+import org.nognog.util.graphic2d.camera.CameraObserver;
 
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -32,13 +30,11 @@ public class FreeSquareSimpleDialog extends SimpleDialog implements CameraObserv
 	private static final TextureRegionDrawable softClearBelizeHoleDrawable = UiUtils.getPlaneTextureRegionDrawable(1, 1, ColorUtils.softClearBelizeHole);
 
 	/**
-	 * @param freeSquare
-	 * @param text
-	 * @param leftButtonText
-	 * @param rightButtonText
+	 * @param camera
+	 * @param font
 	 */
-	public FreeSquareSimpleDialog(FreeSquare freeSquare) {
-		this(freeSquare, "", "", "", createButtonStyle(freeSquare.getFont())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public FreeSquareSimpleDialog(Camera camera, BitmapFont font) {
+		this(camera.getViewportWidth(), camera.getViewportHeight(), "", "", "", font, createButtonStyle(font)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -47,8 +43,8 @@ public class FreeSquareSimpleDialog extends SimpleDialog implements CameraObserv
 	 * @param leftButtonText
 	 * @param rightButtonText
 	 */
-	private FreeSquareSimpleDialog(FreeSquare freeSquare, String text, String leftButtonText, String rightButtonText, TextButtonStyle buttonStyle) {
-		super(freeSquare.getCamera().viewportWidth, freeSquare.getCamera().viewportHeight, text, freeSquare.getFont(), leftButtonText, rightButtonText, buttonStyle, buttonStyle);
+	private FreeSquareSimpleDialog(float width, float height, String text, String leftButtonText, String rightButtonText, BitmapFont font, TextButtonStyle buttonStyle) {
+		super(width, height, text, font, leftButtonText, rightButtonText, buttonStyle, buttonStyle);
 	}
 
 	/**
@@ -61,11 +57,10 @@ public class FreeSquareSimpleDialog extends SimpleDialog implements CameraObserv
 
 	@Override
 	public void updateCamera(Camera camera) {
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
-		final float newX = camera.position.x - currentCameraZoom * (camera.viewportWidth / 2);
-		final float newY = camera.position.y + currentCameraZoom * (camera.viewportHeight / 2 - this.getHeight());
+		final float currentCameraZoom = camera.getZoom();
+		final float newX = camera.getX() - currentCameraZoom * (camera.getViewportWidth() / 2);
+		final float newY = camera.getY() + currentCameraZoom * (camera.getViewportHeight() / 2 - this.getHeight());
 		this.setPosition(newX, newY);
 		this.setScale(currentCameraZoom);
 	}
-
 }

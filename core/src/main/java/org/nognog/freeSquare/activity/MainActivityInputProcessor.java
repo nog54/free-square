@@ -15,6 +15,7 @@
 package org.nognog.freeSquare.activity;
 
 import org.nognog.freeSquare.FreeSquare;
+import org.nognog.freeSquare.ObservableOrthographicCamera;
 import org.nognog.freeSquare.square2d.Square2d;
 
 import com.badlogic.gdx.InputAdapter;
@@ -35,7 +36,7 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 	private boolean isEnable = false;
 
 	protected boolean isLastLongPressed;
-	
+
 	/**
 	 * @param activity
 	 */
@@ -89,7 +90,7 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 	private GestureListener createFreeSquareGestureListener(final MainActivity activity) {
 		final FreeSquare freeSquare = activity.getFreeSquare();
 		final GestureListener listener = new GestureDetector.GestureAdapter() {
-			
+
 			private float initialScale = 1;
 			private Actor lastTouchDownActor;
 
@@ -117,14 +118,14 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
-				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
-				final float currentZoom = camera.zoom;
+				final ObservableOrthographicCamera camera = freeSquare.getCamera();
+				final float currentZoom = camera.getZoom();
 				final float cameraMoveX = -deltaX * currentZoom;
 				final float cameraMoveY = deltaY * currentZoom;
-				camera.translate(cameraMoveX, cameraMoveY, 0);
-				activity.adjustCameraZoomAndPositionIfRangeOver();
+				camera.move(cameraMoveX, cameraMoveY);
+				activity.adjustCameraZoomAndPositionIfRangeOver(false);
+				camera.notifyCameraObservers();
 				activity.getStage().cancelTouchFocus(activity.getSquare());
-				activity.getFreeSquare().notifyCameraObservers();
 				return true;
 			}
 
@@ -135,11 +136,11 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				}
 				final float ratio = initialDistance / distance;
 				final float nextZoom = this.initialScale * ratio;
-				final OrthographicCamera camera = (OrthographicCamera) freeSquare.getStage().getCamera();
-				camera.zoom = nextZoom;
-				activity.adjustCameraZoomAndPositionIfRangeOver();
+				final ObservableOrthographicCamera camera = freeSquare.getCamera();
+				camera.setZoom(nextZoom);
+				activity.adjustCameraZoomAndPositionIfRangeOver(false);
 				activity.getStage().cancelTouchFocus(activity.getSquare());
-				freeSquare.notifyCameraObservers();
+				camera.notifyCameraObservers();
 				return true;
 			}
 

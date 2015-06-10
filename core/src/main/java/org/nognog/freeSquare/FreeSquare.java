@@ -55,11 +55,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.TextInputListener;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -68,6 +67,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class FreeSquare extends ApplicationAdapter {
 	private Stage stage;
+	private ObservableOrthographicCamera camera;
 	private FreeSquareActivity currentActivity;
 	private FreeSquareActivityFactory activityFactory;
 
@@ -76,8 +76,6 @@ public class FreeSquare extends ApplicationAdapter {
 	private int logicalCameraWidth;
 	private int logicalCameraHeight;
 
-	private Array<CameraObserver> cameraObservers;
-
 	private BitmapFont font;
 	private PlayLog playlog;
 	private Player player;
@@ -85,11 +83,11 @@ public class FreeSquare extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-		this.cameraObservers = new Array<>();
 		this.logicalCameraWidth = Settings.getDefaultLogicalCameraWidth();
 		this.logicalCameraHeight = Settings.getDefaultLogicalCameraHeight();
 		this.font = FontUtil.createMPlusFont(Settings.getFontSize());
 		this.stage = new Stage(new FitViewport(this.logicalCameraWidth, this.logicalCameraHeight));
+		this.camera = new ObservableOrthographicCamera((OrthographicCamera) this.stage.getCamera());
 		this.setupPersistItems();
 		final float timeFromLastRun = this.getTimeFromLastRun();
 		this.actLongTime(timeFromLastRun);
@@ -148,7 +146,7 @@ public class FreeSquare extends ApplicationAdapter {
 	 */
 	public void setActivity(FreeSquareActivity activity) {
 		if (this.currentActivity != null) {
-			this.removeCameraObserver(this.currentActivity);
+			this.camera.removeCameraObserver(this.currentActivity);
 			this.currentActivity.pause();
 		}
 		this.multiplexer.clear();
@@ -161,7 +159,7 @@ public class FreeSquare extends ApplicationAdapter {
 		}
 		this.multiplexer.addProcessor(this.stage);
 		this.currentActivity = activity;
-		this.addCameraObserver(this.currentActivity);
+		this.camera.addCameraObserver(this.currentActivity);
 		this.currentActivity.resume();
 	}
 
@@ -182,8 +180,8 @@ public class FreeSquare extends ApplicationAdapter {
 	/**
 	 * @return stage camera
 	 */
-	public Camera getCamera() {
-		return this.stage.getCamera();
+	public ObservableOrthographicCamera getCamera() {
+		return this.camera;
 	}
 
 	/**
@@ -424,31 +422,6 @@ public class FreeSquare extends ApplicationAdapter {
 	 */
 	public FreeSquareActivityFactory getActivityFactory() {
 		return this.activityFactory;
-	}
-
-	/**
-	 * @param observer
-	 */
-	public void addCameraObserver(CameraObserver observer) {
-		if (!this.cameraObservers.contains(observer, true)) {
-			this.cameraObservers.add(observer);
-		}
-	}
-
-	/**
-	 * @param observer
-	 */
-	public void removeCameraObserver(CameraObserver observer) {
-		this.cameraObservers.removeValue(observer, true);
-	}
-
-	/**
-	 * notify all camera observers
-	 */
-	public void notifyCameraObservers() {
-		for (int i = 0; i < this.cameraObservers.size; i++) {
-			this.cameraObservers.get(i).updateCamera(this.stage.getCamera());
-		}
 	}
 
 	/**

@@ -12,9 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare;
-
-import com.badlogic.gdx.graphics.Camera;
+package org.nognog.util.graphic2d.camera;
 
 /**
  * @author goshi 2015/01/23
