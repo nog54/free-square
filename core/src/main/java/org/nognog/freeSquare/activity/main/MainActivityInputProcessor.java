@@ -164,9 +164,9 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 					}
 					return false;
 				}
-				final int beforeShowingUICount = activity.getViewableUICount();
+				final int beforeShowingUICount = activity.getVisibleActorCount();
 				activity.showSquareOnly();
-				final int afterShowingUICount = activity.getViewableUICount();
+				final int afterShowingUICount = activity.getVisibleActorCount();
 				if (beforeShowingUICount == afterShowingUICount) {
 					Vector2 menuPosition = activity.getStage().screenToStageCoordinates(new Vector2(x, y));
 					activity.showMenu(menuPosition.x, menuPosition.y);

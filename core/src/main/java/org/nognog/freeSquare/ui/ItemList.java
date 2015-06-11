@@ -28,7 +28,6 @@ import org.nognog.gdx.util.ui.ImageIncludedItemList;
 import org.nognog.gdx.util.ui.UiUtils;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -141,7 +140,7 @@ public class ItemList extends ScrollPane implements CameraObserver, DictionaryOb
 
 	@Override
 	public void updateCamera(Camera camera) {
-		final float currentCameraZoom = ((OrthographicCamera) camera).zoom;
+		final float currentCameraZoom = camera.getZoom();
 		final float newX = camera.getX() + currentCameraZoom * (camera.getViewportWidth() / 2 - this.getWidth());
 		final float newY = camera.getY() - currentCameraZoom * this.getHeight();
 		this.setPosition(newX, newY);

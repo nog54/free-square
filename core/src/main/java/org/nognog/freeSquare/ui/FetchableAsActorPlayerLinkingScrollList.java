@@ -18,7 +18,6 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.CameraObserver;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -37,8 +36,6 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 
 	protected T1 fetchingItem;
 	protected T2 fetchingActor;
-
-	private Camera moveCamera;
 
 	protected boolean requestedMoveCameraToLeft;
 	protected boolean requestedMoveCameraToRight;
@@ -66,6 +63,8 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 	protected abstract void fetchingActorMoved();
 
 	protected abstract void putFetchingActor(T2 putTargetFetchingActor);
+
+	protected abstract Camera getMoveCamera();
 
 	protected abstract void cameraMoved();
 
@@ -97,22 +96,23 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 		this.requestedMoveCameraToRight = false;
 		this.requestedMoveCameraToDown = false;
 		this.requestedMoveCameraToUp = false;
+		final Camera moveCamera = this.getMoveCamera();
 		// origin is top left corner
 		final Vector2 actorStageCoordinatePosition = actor.localToStageCoordinates(new Vector2(actor.getOriginX(), actor.getOriginY()));
-		final float cameraLeftEnd = this.moveCamera.getX() - this.moveCamera.getViewportWidth() / 2 * this.moveCamera.getZoom();
-		final float cameraRightEnd = this.moveCamera.getX() + this.moveCamera.getViewportWidth() / 2 * this.moveCamera.getZoom();
-		final float cameraBottomEnd = this.moveCamera.getY() - this.moveCamera.getViewportHeight() / 2 * this.moveCamera.getZoom();
-		final float cameraTopEnd = this.moveCamera.getY() + this.moveCamera.getViewportHeight() / 2 * this.moveCamera.getZoom();
-		if (actorStageCoordinatePosition.x <= cameraLeftEnd + cameraMoveThresholdBase * this.moveCamera.getZoom()) {
+		final float cameraLeftEnd = moveCamera.getX() - moveCamera.getViewportWidth() / 2 * moveCamera.getZoom();
+		final float cameraRightEnd = moveCamera.getX() + moveCamera.getViewportWidth() / 2 * moveCamera.getZoom();
+		final float cameraBottomEnd = moveCamera.getY() - moveCamera.getViewportHeight() / 2 * moveCamera.getZoom();
+		final float cameraTopEnd = moveCamera.getY() + moveCamera.getViewportHeight() / 2 * moveCamera.getZoom();
+		if (actorStageCoordinatePosition.x <= cameraLeftEnd + cameraMoveThresholdBase * moveCamera.getZoom()) {
 			this.requestedMoveCameraToLeft = true;
 		}
-		if (actorStageCoordinatePosition.x >= cameraRightEnd - cameraMoveThresholdBase * this.moveCamera.getZoom()) {
+		if (actorStageCoordinatePosition.x >= cameraRightEnd - cameraMoveThresholdBase * moveCamera.getZoom()) {
 			this.requestedMoveCameraToRight = true;
 		}
-		if (actorStageCoordinatePosition.y <= cameraBottomEnd + cameraMoveThresholdBase * this.moveCamera.getZoom()) {
+		if (actorStageCoordinatePosition.y <= cameraBottomEnd + cameraMoveThresholdBase * moveCamera.getZoom()) {
 			this.requestedMoveCameraToDown = true;
 		}
-		if (actorStageCoordinatePosition.y >= cameraTopEnd - cameraMoveThresholdBase * this.moveCamera.getZoom()) {
+		if (actorStageCoordinatePosition.y >= cameraTopEnd - cameraMoveThresholdBase * moveCamera.getZoom()) {
 			this.requestedMoveCameraToUp = true;
 		}
 	}
@@ -135,35 +135,30 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 		if (this.fetchingActor == null) {
 			return;
 		}
-		final OrthographicCamera camera = (OrthographicCamera) this.getStage().getCamera();
-		final float moveAmount = camera.zoom * cameraMoveAmountBase;
+		final Camera camera = this.getMoveCamera();
+		final float moveAmount = camera.getZoom() * cameraMoveAmountBase;
 		if (this.requestedMoveCameraToRight) {
-			camera.position.x += moveAmount;
+			camera.move(moveAmount, 0);
 			this.fetchingActor.moveBy(moveAmount, 0);
 			this.totalActMoveXFromLastPan += moveAmount;
 		}
 		if (this.requestedMoveCameraToLeft) {
-			camera.position.x -= moveAmount;
+			camera.move(-moveAmount, 0);
 			this.fetchingActor.moveBy(-moveAmount, 0);
 			this.totalActMoveXFromLastPan -= moveAmount;
 		}
 		if (this.requestedMoveCameraToUp) {
-			camera.position.y += moveAmount;
+			camera.move(0, moveAmount);
 			this.fetchingActor.moveBy(0, moveAmount);
 			this.totalActMoveYFromLastPan += moveAmount;
 		}
 		if (this.requestedMoveCameraToDown) {
-			camera.position.y -= moveAmount;
+			camera.move(0, -moveAmount);
 			this.fetchingActor.moveBy(0, -moveAmount);
 			this.totalActMoveYFromLastPan -= moveAmount;
 		}
 		if (this.requestedMoveCameraToDown || this.requestedMoveCameraToUp || this.requestedMoveCameraToLeft || this.requestedMoveCameraToRight) {
 			this.cameraMoved();
 		}
-	}
-
-	@Override
-	public void updateCamera(Camera camera) {
-		this.moveCamera = camera;
 	}
 }

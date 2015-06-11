@@ -192,8 +192,12 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	}
 
 	@Override
+	protected Camera getMoveCamera() {
+		return this.mainActivity.getCamera();
+	}
+
+	@Override
 	public void updateCamera(Camera camera) {
-		super.updateCamera(camera);
 		final float currentCameraZoom = camera.getZoom();
 		final float newX = camera.getX() + currentCameraZoom * (camera.getViewportWidth() / 2 - this.getWidth());
 		final float newY = camera.getY() - currentCameraZoom * this.getHeight();

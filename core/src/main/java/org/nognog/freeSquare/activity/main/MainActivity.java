@@ -486,6 +486,7 @@ public class MainActivity extends FreeSquareActivity {
 	public void showSquareOnly() {
 		this.hideAll();
 		this.enableSquare();
+		this.setSeparateSquareMode(false);
 	}
 
 	/**
@@ -533,6 +534,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (!this.getChildren().contains(actor, true)) {
 			this.addActor(actor);
 		}
+		actor.setVisible(true);
 		actor.toFront();
 		if (actor instanceof CameraObserver) {
 			this.addChildCameraObserver((CameraObserver) actor);
@@ -543,7 +545,7 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	private void hide(Actor actor) {
-		this.removeActor(actor);
+		actor.setVisible(false);
 		if (actor instanceof CameraObserver) {
 			this.removeChildCameraObserver((CameraObserver) actor);
 		}
@@ -761,10 +763,10 @@ public class MainActivity extends FreeSquareActivity {
 	/**
 	 * @return count of showing UIs
 	 */
-	public int getViewableUICount() {
+	public int getVisibleActorCount() {
 		int result = 0;
 		for (Actor child : this.getChildren()) {
-			if (child.getColor().a != 0) {
+			if (child.isVisible()) {
 				result++;
 			}
 		}
@@ -873,34 +875,22 @@ public class MainActivity extends FreeSquareActivity {
 	 * @param delta
 	 */
 	private void calcCameraMomentum(float delta) {
-		this.calcCameraMomentumX(delta);
-		this.calcCameraMomentumY(delta);
-	}
-
-	private void calcCameraMomentumX(float delta) {
-		if (this.cameraVelocityX == 0) {
+		if (this.cameraVelocityX == 0 && this.cameraVelocityY == 0) {
 			return;
 		}
-		this.getFreeSquare().getCamera().move(delta * this.cameraVelocityX, 0);
+		this.getFreeSquare().getCamera().moveAndNotifyObservers(delta * this.cameraVelocityX, delta * this.cameraVelocityY);
 		if (Math.abs(this.cameraVelocityX) < cameraDeceleration) {
 			this.cameraVelocityX = 0;
-			return;
+		} else {
+			final float signum = Math.signum(this.cameraVelocityX);
+			this.cameraVelocityX += -signum * cameraDeceleration;
 		}
-		final float signum = Math.signum(this.cameraVelocityX);
-		this.cameraVelocityX += -signum * cameraDeceleration;
-	}
-
-	private void calcCameraMomentumY(float delta) {
-		if (this.cameraVelocityY == 0) {
-			return;
-		}
-		this.getFreeSquare().getCamera().move(0, delta * this.cameraVelocityY);
 		if (Math.abs(this.cameraVelocityY) < cameraDeceleration) {
 			this.cameraVelocityY = 0;
-			return;
+		} else {
+			final float signum = Math.signum(this.cameraVelocityY);
+			this.cameraVelocityY += -signum * cameraDeceleration;
 		}
-		final float signum = Math.signum(this.cameraVelocityY);
-		this.cameraVelocityY += -signum * cameraDeceleration;
 	}
 
 	/**
