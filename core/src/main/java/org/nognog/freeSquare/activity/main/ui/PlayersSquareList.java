@@ -24,6 +24,7 @@ import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateSquareEvent;
 import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
 import org.nognog.gdx.util.camera.Camera;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -150,7 +151,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 	}
 
 	@Override
-	protected Camera getMoveCamera() {
+	protected ObservableOrthographicCamera getMoveCamera() {
 		return this.mainActivity.getCamera();
 	}
 

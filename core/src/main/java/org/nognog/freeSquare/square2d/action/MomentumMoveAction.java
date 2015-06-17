@@ -14,6 +14,9 @@
 
 package org.nognog.freeSquare.square2d.action;
 
+import org.nognog.gdx.util.Movable;
+
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 
 /**
@@ -21,7 +24,11 @@ import com.badlogic.gdx.scenes.scene2d.Action;
  */
 public class MomentumMoveAction extends Action {
 
+	private Movable movable;
+
 	private float deceleration;
+	private float decelerationX;
+	private float decelerationY;
 	private float velocityX;
 	private float velocityY;
 
@@ -32,14 +39,16 @@ public class MomentumMoveAction extends Action {
 	}
 
 	/**
+	 * @param movable
 	 * @param deceleration
 	 * @param velocityX
 	 * @param velocityY
 	 */
-	public MomentumMoveAction(float deceleration, float velocityX, float velocityY) {
-		this.deceleration = deceleration;
+	public MomentumMoveAction(Movable movable, float deceleration, float velocityX, float velocityY) {
+		this.movable = movable;
 		this.velocityX = velocityX;
 		this.velocityY = velocityY;
+		this.setDeceleration(deceleration);
 	}
 
 	@Override
@@ -63,26 +72,28 @@ public class MomentumMoveAction extends Action {
 		if (this.velocityX == 0) {
 			return;
 		}
-		this.actor.moveBy(delta * this.velocityX, 0);
-		if (Math.abs(this.velocityX) < this.deceleration) {
+		this.movable.move(delta * this.velocityX, 0);
+		final float decreaseAmountX = Math.abs(this.deceleration * delta * MathUtils.cos(MathUtils.atan2(this.velocityY, this.velocityX)));
+		if (Math.abs(this.velocityX) < decreaseAmountX) {
 			this.velocityX = 0;
 			return;
 		}
 		final float signum = Math.signum(this.velocityX);
-		this.velocityX += -signum * this.deceleration;
+		this.velocityX += -signum * decreaseAmountX;
 	}
 
 	private void calcCameraMomentumY(float delta) {
 		if (this.velocityY == 0) {
 			return;
 		}
-		this.actor.moveBy(0, delta * this.velocityY);
-		if (Math.abs(this.velocityY) < this.deceleration) {
+		this.movable.move(0, delta * this.velocityY);
+		final float decreateAmountY = Math.abs(this.deceleration * delta * MathUtils.sin(MathUtils.atan2(this.velocityY, this.velocityX)));
+		if (Math.abs(this.velocityY) < decreateAmountY) {
 			this.velocityY = 0;
 			return;
 		}
 		final float signum = Math.signum(this.velocityY);
-		this.velocityY += -signum * this.deceleration;
+		this.velocityY += -signum * decreateAmountY;
 	}
 
 	/**
@@ -93,11 +104,28 @@ public class MomentumMoveAction extends Action {
 	}
 
 	/**
+	 * @return the decelerationX
+	 */
+	public float getDecelerationX() {
+		return this.decelerationX;
+	}
+
+	/**
+	 * @return the decelerationY
+	 */
+	public float getDecelerationY() {
+		return this.decelerationY;
+	}
+
+	/**
 	 * @param deceleration
 	 *            the deceleration to set
 	 */
 	public void setDeceleration(float deceleration) {
 		this.deceleration = deceleration;
+		final float theta = MathUtils.atan2(this.velocityY, this.velocityX);
+		this.decelerationX = Math.abs(this.deceleration * MathUtils.cos(theta));
+		this.decelerationY = Math.abs(this.deceleration * MathUtils.sin(theta));
 	}
 
 	/**
@@ -113,6 +141,7 @@ public class MomentumMoveAction extends Action {
 	 */
 	public void setVelocityX(float velocityX) {
 		this.velocityX = velocityX;
+		this.setDeceleration(this.deceleration);
 	}
 
 	/**
@@ -128,6 +157,31 @@ public class MomentumMoveAction extends Action {
 	 */
 	public void setVelocityY(float velocityY) {
 		this.velocityY = velocityY;
+		this.setDeceleration(this.deceleration);
+	}
+
+	/**
+	 * @param velocityX
+	 * @param velocityY
+	 */
+	public void setVelocity(float velocityX, float velocityY) {
+		this.velocityX = velocityX;
+		this.velocityY = velocityY;
+		this.setDeceleration(this.deceleration);
+	}
+
+	/**
+	 * @return the movable
+	 */
+	public Movable getMovable() {
+		return this.movable;
+	}
+
+	/**
+	 * @param movable the movable to set
+	 */
+	public void setMovable(Movable movable) {
+		this.movable = movable;
 	}
 
 }

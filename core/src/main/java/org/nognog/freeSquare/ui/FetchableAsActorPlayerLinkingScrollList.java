@@ -17,6 +17,7 @@ package org.nognog.freeSquare.ui;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.CameraObserver;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -64,7 +65,7 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 
 	protected abstract void putFetchingActor(T2 putTargetFetchingActor);
 
-	protected abstract Camera getMoveCamera();
+	protected abstract ObservableOrthographicCamera getMoveCamera();
 
 	protected abstract void cameraMoved();
 
@@ -135,25 +136,25 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 		if (this.fetchingActor == null) {
 			return;
 		}
-		final Camera camera = this.getMoveCamera();
+		final ObservableOrthographicCamera camera = this.getMoveCamera();
 		final float moveAmount = camera.getZoom() * cameraMoveAmountBase;
 		if (this.requestedMoveCameraToRight) {
-			camera.move(moveAmount, 0);
+			camera.move(moveAmount, 0, false);
 			this.fetchingActor.moveBy(moveAmount, 0);
 			this.totalActMoveXFromLastPan += moveAmount;
 		}
 		if (this.requestedMoveCameraToLeft) {
-			camera.move(-moveAmount, 0);
+			camera.move(-moveAmount, 0, false);
 			this.fetchingActor.moveBy(-moveAmount, 0);
 			this.totalActMoveXFromLastPan -= moveAmount;
 		}
 		if (this.requestedMoveCameraToUp) {
-			camera.move(0, moveAmount);
+			camera.move(0, moveAmount, false);
 			this.fetchingActor.moveBy(0, moveAmount);
 			this.totalActMoveYFromLastPan += moveAmount;
 		}
 		if (this.requestedMoveCameraToDown) {
-			camera.move(0, -moveAmount);
+			camera.move(0, -moveAmount, false);
 			this.fetchingActor.moveBy(0, -moveAmount);
 			this.totalActMoveYFromLastPan -= moveAmount;
 		}

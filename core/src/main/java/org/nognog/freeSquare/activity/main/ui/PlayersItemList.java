@@ -22,6 +22,8 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.player.PossessedItem;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.Square2dEvent;
+import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
@@ -29,6 +31,7 @@ import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
 import org.nognog.gdx.util.camera.Camera;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -103,6 +106,27 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 		}
 	}
 
+	private void addSquare2dObjectTemporary(Square2dObject pannedSquareObject, float x, float y, Item<?, ?> item) {
+		pannedSquareObject.setEnabledAction(false);
+		Vector2 squareCoodinateXY = this.mainActivity.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
+		this.mainActivity.getSquare().addSquareObject(pannedSquareObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
+	}
+
+	private void addSquare2dTemporary(Square2d pannedSquare, float x, float y, Item<?, ?> item) {
+		final Vector2 stageCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
+		final float squareX = stageCoodinateXY.x - (pannedSquare.getMostLeftVertex().x + pannedSquare.getMostRightVertex().x) / 2;
+		final float squareY = stageCoodinateXY.y - (pannedSquare.getMostTopVertex().y + pannedSquare.getMostBottomVertex().y) / 2;
+		pannedSquare.setPosition(squareX, squareY);
+		if (this.mainActivity.getSquare() != null) {
+			if (!(this.mainActivity.getSquare() instanceof CombineSquare2d)) {
+				this.mainActivity.convertThisSquareToCombineSquare2d();
+			}
+			this.mainActivity.getSquare().addActorForce(pannedSquare);
+		} else {
+			this.mainActivity.getStage().addActor(pannedSquare);
+		}
+	}
+
 	@Override
 	protected boolean isFetchingMovableActor() {
 		return !this.fetchingActorIsBeingEaten();
@@ -134,42 +158,47 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	protected void putFetchingActor(Actor putTargetFetchingActor) {
 		if (putTargetFetchingActor instanceof Square2dObject) {
 			Square2dObject putSquareObject = (Square2dObject) putTargetFetchingActor;
-			if (this.mainActivity.putSquareObject(putSquareObject)) {
-				this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(putSquareObject.getType()));
-			}
+			this.putSquare2dObjectAndTakeOutItemIfSuccess(putSquareObject);
 		} else if (putTargetFetchingActor instanceof Square2d) {
 			Square2d putSquare = (Square2d) putTargetFetchingActor;
 			this.putSquareAndTakeOutItemIfSuccess(putSquare, this.fetchingItem.getItem());
 		}
 		this.mainActivity.adjustCameraZoomAndPositionIfRangeOver(false);
-		this.mainActivity.showPlayerItemList();
+		this.mainActivity.showPlayersItemList();
 	}
 
-	private void addSquare2dObjectTemporary(Square2dObject pannedSquareObject, float x, float y, Item<?, ?> item) {
-		pannedSquareObject.setEnabledAction(false);
-		Vector2 squareCoodinateXY = this.mainActivity.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
-		this.mainActivity.getSquare().addSquareObject(pannedSquareObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
-	}
-
-	private void addSquare2dTemporary(Square2d pannedSquare, float x, float y, Item<?, ?> item) {
-		final Vector2 stageCoodinateXY = this.getWidget().localToStageCoordinates(new Vector2(x, y));
-		final float squareX = stageCoodinateXY.x - (pannedSquare.getMostLeftVertex().x + pannedSquare.getMostRightVertex().x) / 2;
-		final float squareY = stageCoodinateXY.y - (pannedSquare.getMostTopVertex().y + pannedSquare.getMostBottomVertex().y) / 2;
-		pannedSquare.setPosition(squareX, squareY);
-		if (this.mainActivity.getSquare() != null) {
-			if (!(this.mainActivity.getSquare() instanceof CombineSquare2d)) {
-				this.mainActivity.convertThisSquareToCombineSquare2d();
-			}
-			this.mainActivity.getSquare().addActorForce(pannedSquare);
-		} else {
-			this.mainActivity.getStage().addActor(pannedSquare);
+	private void putSquare2dObjectAndTakeOutItemIfSuccess(Square2dObject putSquareObject) {
+		if (this.putSquare2dObject(putSquareObject)) {
+			this.getPlayer().takeOutItem(Square2dObjectItem.getInstance(putSquareObject.getType()));
 		}
+	}
+
+	/**
+	 * @param putObject
+	 * @return true if success
+	 */
+	private boolean putSquare2dObject(Square2dObject putObject) {
+		if (putObject.isLandingOnSquare()) {
+			putObject.setEnabledAction(true);
+			final Square2dEvent event = new AddObjectEvent(putObject);
+			event.addExceptObserver(putObject);
+			this.mainActivity.getSquare().notifyObservers(event);
+			return true;
+		}
+		if (this.mainActivity.getSquare() != null) {
+			this.mainActivity.getSquare().removeSquareObject(putObject);
+		}
+		return false;
 	}
 
 	private void putSquareAndTakeOutItemIfSuccess(Square2d addSquare, Item<?, ?> item) {
-		if (this.mainActivity.putSquare2d(addSquare)) {
+		if (this.pubSquare2d(addSquare)) {
 			this.mainActivity.getPlayer().takeOutItem(item);
 		}
+	}
+
+	private boolean pubSquare2d(Square2d addSquare) {
+		return this.mainActivity.putSquare2d(addSquare);
 	}
 
 	@Override
@@ -192,7 +221,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	}
 
 	@Override
-	protected Camera getMoveCamera() {
+	protected ObservableOrthographicCamera getMoveCamera() {
 		return this.mainActivity.getCamera();
 	}
 

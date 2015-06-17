@@ -126,6 +126,7 @@ public class Player implements Nameable, PersistItemClass, ItemBoxObserver, Json
 			return;
 		}
 		this.lifes.set(oldLifeIndex, newLife);
+		this.notifyPlayerObservers();
 	}
 
 	/**
@@ -164,6 +165,7 @@ public class Player implements Nameable, PersistItemClass, ItemBoxObserver, Json
 			return;
 		}
 		this.squares.set(oldSquareIndex, newSquare);
+		this.notifyPlayerObservers();
 	}
 
 	/**
@@ -211,6 +213,7 @@ public class Player implements Nameable, PersistItemClass, ItemBoxObserver, Json
 	 */
 	public int putItem(Item<?, ?> item) {
 		final int quantity = this.itemBox.putItem(item);
+		this.notifyPlayerObservers();
 		return quantity;
 	}
 
@@ -220,6 +223,7 @@ public class Player implements Nameable, PersistItemClass, ItemBoxObserver, Json
 	 */
 	public int takeOutItem(Item<?, ?> item) {
 		final int quantity = this.itemBox.takeOutItem(item);
+		this.notifyPlayerObservers();
 		return quantity;
 	}
 

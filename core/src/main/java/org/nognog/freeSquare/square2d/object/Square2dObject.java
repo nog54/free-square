@@ -20,6 +20,7 @@ import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.gdx.util.Movable;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -38,7 +39,7 @@ import com.badlogic.gdx.utils.SnapshotArray;
 /**
  * @author goshi 2014/12/03
  */
-public class Square2dObject extends Group implements SquareObject<Square2d>, SquareEventListener, SelfValidatable {
+public class Square2dObject extends Group implements SquareObject<Square2d>, SquareEventListener, Movable, SelfValidatable {
 
 	private final Square2dObjectType<?> type;
 	private final float logicalWidth;
@@ -396,6 +397,21 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 */
 	public boolean containsAction(Action action) {
 		return this.getActions().contains(action, true) || this.priorityAction == action;
+	}
+
+	@Override
+	public void move(float x, float y) {
+		this.moveBy(x, y);
+	}
+
+	@Override
+	public void moveX(float x) {
+		this.moveBy(x, 0);
+	}
+
+	@Override
+	public void moveY(float y) {
+		this.moveBy(0, y);
 	}
 
 	@Override

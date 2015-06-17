@@ -15,6 +15,8 @@
 package org.nognog.freeSquare.activity.main;
 
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.action.MomentumMoveAction;
+import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
@@ -91,11 +93,25 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 
 			private float initialScale = 1;
 			private Actor lastTouchDownActor;
+			private MomentumMoveAction cameraMomentumMoveAction;
+
+			private boolean activityIsActingCameraMomentumMoveAction() {
+				if (this.cameraMomentumMoveAction == null || this.cameraMomentumMoveAction.getActor() == null) {
+					return false;
+				}
+				return activity.getActions().contains(this.cameraMomentumMoveAction, true);
+			}
 
 			@Override
 			public boolean touchDown(float x, float y, int pointer, int button) {
-				activity.setCameraVelocityX(0);
-				activity.setCameraVelocityY(0);
+				if (this.activityIsActingCameraMomentumMoveAction() == false) {
+					this.cameraMomentumMoveAction = null;
+				}
+				if (this.cameraMomentumMoveAction != null) {
+					this.cameraMomentumMoveAction.setVelocityX(0);
+					this.cameraMomentumMoveAction.setVelocityY(0);
+				}
+
 				Vector2 worldPosition = activity.getStage().getViewport().unproject(new Vector2(x, y));
 				this.lastTouchDownActor = activity.getStage().hit(worldPosition.x, worldPosition.y, true);
 				Camera camera = activity.getCamera();
@@ -120,7 +136,7 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				final float currentZoom = camera.getZoom();
 				final float cameraMoveX = -deltaX * currentZoom;
 				final float cameraMoveY = deltaY * currentZoom;
-				camera.move(cameraMoveX, cameraMoveY);
+				camera.move(cameraMoveX, cameraMoveY, false);
 				activity.adjustCameraZoomAndPositionIfRangeOver(false);
 				camera.notifyCameraObservers();
 				activity.getStage().cancelTouchFocus(activity.getSquare());
@@ -135,7 +151,7 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				final float ratio = initialDistance / distance;
 				final float nextZoom = this.initialScale * ratio;
 				final ObservableOrthographicCamera camera = activity.getCamera();
-				camera.setZoom(nextZoom);
+				camera.setZoom(nextZoom, false);
 				activity.adjustCameraZoomAndPositionIfRangeOver(false);
 				activity.getStage().cancelTouchFocus(activity.getSquare());
 				camera.notifyCameraObservers();
@@ -150,8 +166,14 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 				if (!this.isLastTouchBackGround()) {
 					return false;
 				}
-				activity.setCameraVelocityX(-velocityX);
-				activity.setCameraVelocityY(velocityY);
+				if (this.activityIsActingCameraMomentumMoveAction()) {
+					this.cameraMomentumMoveAction.setVelocityX(-velocityX);
+					this.cameraMomentumMoveAction.setVelocityY(velocityY);
+				} else {
+					final float deceleration = 2000;
+					this.cameraMomentumMoveAction = Square2dActions.momentumMove(activity.getCamera(), deceleration, -velocityX, velocityY);
+					activity.addAction(this.cameraMomentumMoveAction);
+				}
 				return false;
 			}
 
@@ -187,5 +209,4 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 		};
 		return listener;
 	}
-
 }

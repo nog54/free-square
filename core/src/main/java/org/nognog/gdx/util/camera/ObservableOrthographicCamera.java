@@ -1,6 +1,8 @@
 
 package org.nognog.gdx.util.camera;
 
+import org.nognog.gdx.util.Movable;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /** Copyright 2015 Goshi Noguchi (noggon54@gmail.com)
@@ -22,7 +24,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
  * 
  * @author goshi 2015/06/09
  */
-public class ObservableOrthographicCamera extends ObservableCamera {
+public class ObservableOrthographicCamera extends ObservableCamera implements Movable {
 	private final OrthographicCamera baseCamera;
 
 	/**
@@ -35,8 +37,17 @@ public class ObservableOrthographicCamera extends ObservableCamera {
 
 	@Override
 	public void move(float x, float y) {
-		this.baseCamera.position.x += x;
-		this.baseCamera.position.y += y;
+		this.move(x, y, true);
+	}
+
+	@Override
+	public void moveX(float x) {
+		this.move(x, 0, true);
+	}
+
+	@Override
+	public void moveY(float y) {
+		this.move(0, y, true);
 	}
 
 	/**
@@ -44,27 +55,30 @@ public class ObservableOrthographicCamera extends ObservableCamera {
 	 * 
 	 * @param x
 	 * @param y
+	 * @param notifyObservers
 	 */
-	public void moveAndNotifyObservers(float x, float y) {
-		this.move(x, y);
-		if (x != 0 || y != 0) {
+	public void move(float x, float y, boolean notifyObservers) {
+		this.baseCamera.position.x += x;
+		this.baseCamera.position.y += y;
+		if (notifyObservers && (x != 0 || y != 0)) {
 			this.notifyCameraObservers();
 		}
 	}
 
 	@Override
 	public void zoom(float x) {
-		this.baseCamera.zoom += x;
+		this.zoom(x, true);
 	}
 
 	/**
 	 * zoom camera and notify if x != 0
 	 * 
 	 * @param x
+	 * @param notifyObservers
 	 */
-	public void zoomAndNotifyObservers(float x) {
-		this.zoom(x);
-		if (x != 0) {
+	public void zoom(float x, boolean notifyObservers) {
+		this.baseCamera.zoom += x;
+		if (notifyObservers && x != 0) {
 			this.notifyCameraObservers();
 		}
 	}
@@ -96,67 +110,75 @@ public class ObservableOrthographicCamera extends ObservableCamera {
 
 	@Override
 	public void setX(float x) {
-		this.baseCamera.position.x = x;
+		this.setX(x, true);
 	}
 
 	/**
 	 * @param x
+	 * @param notifyObservers
 	 */
-	public void setXAndNotify(float x) {
+	public void setX(float x, boolean notifyObservers) {
 		if (this.getX() == x) {
 			return;
 		}
-		this.setX(x);
-		this.notifyCameraObservers();
+		this.baseCamera.position.x = x;
+		if (notifyObservers) {
+			this.notifyCameraObservers();
+		}
 	}
 
 	@Override
 	public void setY(float y) {
-		this.baseCamera.position.y = y;
+		this.setY(y, true);
 	}
 
 	/**
 	 * @param y
+	 * @param notifyObservers
 	 */
-	public void setYAndNotify(float y) {
+	public void setY(float y, boolean notifyObservers) {
 		if (this.getY() == y) {
 			return;
 		}
-		this.setY(y);
-		this.notifyCameraObservers();
+		this.baseCamera.position.y = y;
+		if (notifyObservers) {
+			this.notifyCameraObservers();
+		}
 	}
 
 	@Override
 	public void setZoom(float zoom) {
-		this.baseCamera.zoom = zoom;
+		this.setZoom(zoom, true);
 	}
 
 	/**
 	 * @param zoom
+	 * @param notifyObservers
 	 */
-	public void setZoomAndNotify(float zoom) {
+	public void setZoom(float zoom, boolean notifyObservers) {
 		if (this.getZoom() == zoom) {
 			return;
 		}
-		this.setZoom(zoom);
+		this.baseCamera.zoom = zoom;
 		this.notifyCameraObservers();
 	}
 
 	@Override
 	public void setPosition(float x, float y) {
-		this.setX(x);
-		this.setY(y);
+		this.setPosition(x, y, true);
 	}
 
 	/**
 	 * @param x
 	 * @param y
+	 * @param notifyObservers
 	 */
-	public void setPositionAndNotify(float x, float y) {
+	public void setPosition(float x, float y, boolean notifyObservers) {
 		if (this.getX() == x && this.getY() == y) {
 			return;
 		}
-		this.setPosition(x, y);
+		this.baseCamera.position.x = x;
+		this.baseCamera.position.y = y;
 		this.notifyCameraObservers();
 	}
 

@@ -34,11 +34,9 @@ import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
-import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
@@ -77,15 +75,11 @@ import com.badlogic.gdx.utils.Array;
  * @author goshi 2015/04/13
  */
 public class MainActivity extends FreeSquareActivity {
-	private static final float cameraDeceleration = 20;
-
-	private static final int ratioOfMenuButtonWidthToCameraWidth = 4;
+	static final float cameraDeceleration = 2000;
+	static final int ratioOfMenuButtonWidthToCameraWidth = 4;
 
 	private Player player;
 	private Square2d square;
-
-	private float cameraVelocityX;
-	private float cameraVelocityY;
 
 	private MainActivityInputProcessor inputProcessor;
 
@@ -111,6 +105,7 @@ public class MainActivity extends FreeSquareActivity {
 		this.initializeWidgets();
 		this.inputProcessor = new MainActivityInputProcessor(this);
 		this.setPlayer(freeSquare.getPlayer());
+		this.hideAllUIsExceptForSquare();
 	}
 
 	private void initializeWidgets() {
@@ -121,7 +116,7 @@ public class MainActivity extends FreeSquareActivity {
 			@Override
 			public void up() {
 				MainActivity.this.hideMenu();
-				MainActivity.this.showPlayerItemList();
+				MainActivity.this.showPlayersItemList();
 			}
 
 			@Override
@@ -262,35 +257,6 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	/**
-	 * @return the playerItemList
-	 */
-	public PlayersItemList getPlayerItemList() {
-
-		return this.playersItemList;
-	}
-
-	/**
-	 * @return the playersLifeList
-	 */
-	public PlayersLifeList getPlayersLifeList() {
-		return this.playersLifeList;
-	}
-
-	/**
-	 * @return the playersSquareList
-	 */
-	public PlayersSquareList getPlayersSquareList() {
-		return this.playersSquareList;
-	}
-
-	/**
-	 * @return the itemList
-	 */
-	public ItemList getItemList() {
-		return this.itemList;
-	}
-
-	/**
 	 * @param player
 	 */
 	public void setPlayer(Player player) {
@@ -336,6 +302,8 @@ public class MainActivity extends FreeSquareActivity {
 			((CombineSquare2d) this.square).setHighlightSeparatableSquare(enable);
 			if (enable) {
 				this.showModePresenter(Messages.getString("separate", "mode")); //$NON-NLS-1$ //$NON-NLS-2$
+				this.square.getColor().a = 1;
+				this.square.setTouchable(Touchable.enabled);
 			} else {
 				this.hideModePresenter();
 			}
@@ -343,27 +311,23 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	/**
-	 * 
+	 * convert square to combineSquare2d
 	 */
 	public void convertThisSquareToCombineSquare2d() {
-		if (this.square instanceof CombineSquare2d || this.square == null) {
-			return;
-		}
-
 		if (!(this.square instanceof SimpleSquare2d)) {
-			throw new IllegalArgumentException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
+			throw new IllegalStateException("convert failure : not support no-SimpleSquare2d yet"); //$NON-NLS-1$
 		}
 		final Square2d convertTarget = this.square;
-		final float cameraX = this.getFreeSquare().getCamera().getX();
-		final float cameraY = this.getFreeSquare().getCamera().getY();
+		final float cameraX = this.getCamera().getX();
+		final float cameraY = this.getCamera().getY();
 		this.setSquare(null);
 		final CombineSquare2d combineSquare = new CombineSquare2d(convertTarget);
 		combineSquare.startCreateSimpleTextureAsyncIfNotStart();
 		combineSquare.startSetupSeparatableSquaresAsyncIfNotStart();
 		this.player.replaceSquare(convertTarget, combineSquare);
 		this.setSquare(combineSquare);
-		this.getFreeSquare().getCamera().setX(cameraX);
-		this.getFreeSquare().getCamera().setY(cameraY);
+		this.getCamera().setX(cameraX, false);
+		this.getCamera().setY(cameraY, false);
 	}
 
 	/**
@@ -401,8 +365,8 @@ public class MainActivity extends FreeSquareActivity {
 			}
 		}
 		this.player.notifyPlayerObservers();
-		this.getFreeSquare().getCamera().setX((this.getVisibleRangeLowerLeft().x + this.getVisibleRangeUpperRight().x) / 2);
-		this.getFreeSquare().getCamera().setY((this.getVisibleRangeLowerLeft().y + this.getVisibleRangeUpperRight().y) / 2);
+		this.getCamera().setX((this.getVisibleRangeLowerLeft().x + this.getVisibleRangeUpperRight().x) / 2, false);
+		this.getCamera().setY((this.getVisibleRangeLowerLeft().y + this.getVisibleRangeUpperRight().y) / 2, false);
 	}
 
 	/**
@@ -416,11 +380,7 @@ public class MainActivity extends FreeSquareActivity {
 			return true;
 		}
 		this.getSquare().removeActorForce(putSquare);
-		final boolean isSuccessCombine = this.combineSquare(putSquare);
-		if (isSuccessCombine) {
-			this.getPlayer().notifyPlayerObservers();
-		}
-		return isSuccessCombine;
+		return this.combineSquare(putSquare);
 	}
 
 	private boolean combineSquare(Square2d combineSquare) {
@@ -463,38 +423,20 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	/**
-	 * @param putObject
-	 * @return true if success
-	 */
-	public boolean putSquareObject(Square2dObject putObject) {
-		if (putObject.isLandingOnSquare()) {
-			putObject.setEnabledAction(true);
-			final Square2dEvent event = new AddObjectEvent(putObject);
-			event.addExceptObserver(putObject);
-			this.getSquare().notifyObservers(event);
-			return true;
-		}
-		if (this.getSquare() != null) {
-			this.getSquare().removeSquareObject(putObject);
-		}
-		return false;
-	}
-
-	/**
 	 * show square
 	 */
 	public void showSquareOnly() {
-		this.hideAll();
+		this.hideAllUIsExceptForSquare();
 		this.enableSquare();
 		this.setSeparateSquareMode(false);
 	}
 
 	/**
-	 * hide all
+	 * hide all actor except for square
 	 */
-	public void hideAll() {
+	private void hideAllUIsExceptForSquare() {
 		this.hideMenu();
-		this.hidePlayerItemList();
+		this.hidePlayersItemList();
 		this.hidePlayersLifeList();
 		this.hidePlayersSquareList();
 		this.hideItemList();
@@ -520,16 +462,6 @@ public class MainActivity extends FreeSquareActivity {
 		this.square.setTouchable(Touchable.disabled);
 	}
 
-	/**
-	 * @return true if square is enabled.
-	 */
-	public boolean isEnablingSquare() {
-		if (this.square == null) {
-			return false;
-		}
-		return this.square.getTouchable() == Touchable.enabled;
-	}
-
 	private void show(Actor actor) {
 		if (!this.getChildren().contains(actor, true)) {
 			this.addActor(actor);
@@ -538,7 +470,7 @@ public class MainActivity extends FreeSquareActivity {
 		actor.toFront();
 		if (actor instanceof CameraObserver) {
 			this.addChildCameraObserver((CameraObserver) actor);
-			((CameraObserver) actor).updateCamera(this.getFreeSquare().getCamera());
+			((CameraObserver) actor).updateCamera(this.getCamera());
 		}
 		this.getFreeSquare().getStage().cancelTouchFocus();
 		this.disableSquare();
@@ -573,14 +505,14 @@ public class MainActivity extends FreeSquareActivity {
 	/**
 	 * show player item list.
 	 */
-	public void showPlayerItemList() {
+	public void showPlayersItemList() {
 		this.show(this.playersItemList);
 	}
 
 	/**
 	 * hide player item list
 	 */
-	public void hidePlayerItemList() {
+	public void hidePlayersItemList() {
 		this.hide(this.playersItemList);
 	}
 
@@ -634,9 +566,7 @@ public class MainActivity extends FreeSquareActivity {
 	public void showModePresenter(String text) {
 		this.show(this.modePresenter);
 		this.modePresenter.setText(text);
-		this.modePresenter.updateCamera(this.getFreeSquare().getCamera());
-		this.square.getColor().a = 1;
-		this.square.setTouchable(Touchable.enabled);
+		this.modePresenter.updateCamera(this.getCamera());
 	}
 
 	/**
@@ -716,8 +646,9 @@ public class MainActivity extends FreeSquareActivity {
 	public void adjustCameraZoomAndPositionIfRangeOver(boolean notifyIfChanged) {
 		if (notifyIfChanged == false) {
 			this.adjustCameraZoomAndPositionIfRangeOver();
+			return;
 		}
-		final ObservableOrthographicCamera camera = this.getFreeSquare().getCamera();
+		final ObservableOrthographicCamera camera = this.getCamera();
 		final float oldZoom = camera.getZoom();
 		final float oldX = camera.getX();
 		final float oldY = camera.getX();
@@ -738,16 +669,16 @@ public class MainActivity extends FreeSquareActivity {
 		}
 		final float minZoom = this.getMinZoom();
 		final float maxZoom = this.getMaxZoom();
-		final ObservableOrthographicCamera camera = this.getFreeSquare().getCamera();
-		camera.setZoom(MathUtils.clamp(camera.getZoom(), minZoom, maxZoom));
+		final ObservableOrthographicCamera camera = this.getCamera();
+		camera.setZoom(MathUtils.clamp(camera.getZoom(), minZoom, maxZoom), false);
 		final float minViewableWidth = camera.getViewportWidth() * minZoom;
 		final float minViewableHeight = camera.getViewportHeight() * minZoom;
 
 		float squareWidth = this.square.getWidth();
 		float squareHeight = this.square.getHeight();
 		if (minViewableWidth > squareWidth + minViewableWidth / 2f || minViewableHeight > squareHeight + minViewableHeight / 2f) {
-			camera.setX(this.square.getX() + squareWidth / 2);
-			camera.setY(this.square.getY() + squareHeight / 2);
+			camera.setX(this.square.getX() + squareWidth / 2, false);
+			camera.setY(this.square.getY() + squareHeight / 2, false);
 			return;
 		}
 		final float viewingWidth = camera.getViewportWidth() * camera.getZoom();
@@ -756,8 +687,8 @@ public class MainActivity extends FreeSquareActivity {
 		final float maxCameraPositionX = this.getVisibleRangeUpperRight().x - viewingWidth / 2f;
 		final float minCameraPositionY = this.getVisibleRangeLowerLeft().y + viewingHeight / 2f;
 		final float maxCameraPositionY = this.getVisibleRangeUpperRight().y - viewingHeight / 2f;
-		camera.setX(MathUtils.clamp(camera.getX(), minCameraPositionX, maxCameraPositionX));
-		camera.setY(MathUtils.clamp(camera.getY(), minCameraPositionY, maxCameraPositionY));
+		camera.setX(MathUtils.clamp(camera.getX(), minCameraPositionX, maxCameraPositionX), false);
+		camera.setY(MathUtils.clamp(camera.getY(), minCameraPositionY, maxCameraPositionY), false);
 	}
 
 	/**
@@ -795,7 +726,7 @@ public class MainActivity extends FreeSquareActivity {
 		if (this.square == null) {
 			return 1f;
 		}
-		final Camera camera = this.getFreeSquare().getCamera();
+		final Camera camera = this.getCamera();
 		final float fitSquareWidthZoom = this.square.getWidth() / camera.getViewportWidth();
 		final float fitSquareHeightZoom = this.square.getHeight() / camera.getViewportHeight();
 		final float maxZoom = Math.max(1, Math.max(fitSquareWidthZoom, fitSquareHeightZoom));
@@ -804,7 +735,7 @@ public class MainActivity extends FreeSquareActivity {
 
 	@Override
 	public void notify(SquareEvent event) {
-		if (event instanceof CollectObjectRequestEvent) {
+		if (event instanceof CollectObjectRequestEvent && this.square != null) {
 			final Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
 			if (collectRequestedObject instanceof LifeObject) {
 				this.player.addLife(((LifeObject) collectRequestedObject).getLife());
@@ -843,7 +774,7 @@ public class MainActivity extends FreeSquareActivity {
 	@Override
 	public void updateCamera(Camera camera) {
 		for (int i = 0; i < this.childCameraObserver.size; i++) {
-			this.childCameraObserver.get(i).updateCamera(this.getFreeSquare().getCamera());
+			this.childCameraObserver.get(i).updateCamera(this.getCamera());
 		}
 	}
 
@@ -854,12 +785,16 @@ public class MainActivity extends FreeSquareActivity {
 
 	@Override
 	public void pause() {
-		this.hideAll();
+		this.hideAllUIsExceptForSquare();
 	}
 
 	@Override
 	public void act(float delta) {
-		this.calcCameraMomentum(delta);
+		this.actExceptForSquare(delta);
+	}
+
+	private void actExceptForSquare(float delta) {
+		// Player has this.square. So this.square is acted with Player
 		final int oldSquareIndex = this.getChildren().indexOf(this.square, true);
 		final Square2d temporaryRemovedSquare = this.square;
 		if (oldSquareIndex != -1) {
@@ -869,42 +804,6 @@ public class MainActivity extends FreeSquareActivity {
 		if (oldSquareIndex != -1 && this.square == temporaryRemovedSquare) {
 			this.getChildren().insert(oldSquareIndex, this.square);
 		}
-	}
-
-	/**
-	 * @param delta
-	 */
-	private void calcCameraMomentum(float delta) {
-		if (this.cameraVelocityX == 0 && this.cameraVelocityY == 0) {
-			return;
-		}
-		this.getFreeSquare().getCamera().moveAndNotifyObservers(delta * this.cameraVelocityX, delta * this.cameraVelocityY);
-		if (Math.abs(this.cameraVelocityX) < cameraDeceleration) {
-			this.cameraVelocityX = 0;
-		} else {
-			final float signum = Math.signum(this.cameraVelocityX);
-			this.cameraVelocityX += -signum * cameraDeceleration;
-		}
-		if (Math.abs(this.cameraVelocityY) < cameraDeceleration) {
-			this.cameraVelocityY = 0;
-		} else {
-			final float signum = Math.signum(this.cameraVelocityY);
-			this.cameraVelocityY += -signum * cameraDeceleration;
-		}
-	}
-
-	/**
-	 * @param velocityX
-	 */
-	public void setCameraVelocityX(float velocityX) {
-		this.cameraVelocityX = velocityX;
-	}
-
-	/**
-	 * @param velocityY
-	 */
-	public void setCameraVelocityY(float velocityY) {
-		this.cameraVelocityY = velocityY;
 	}
 
 	/**

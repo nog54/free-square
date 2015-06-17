@@ -27,6 +27,7 @@ import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
 import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
 import org.nognog.gdx.util.camera.Camera;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -127,7 +128,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	}
 	
 	@Override
-	protected Camera getMoveCamera() {
+	protected ObservableOrthographicCamera getMoveCamera() {
 		return this.mainActivity.getCamera();
 	}
 

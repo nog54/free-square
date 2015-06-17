@@ -183,7 +183,9 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			this.player.removeObserver(this);
 		}
 		this.player = player;
-		this.player.addObserver(this);
+		if (this.player != null) {
+			this.player.addObserver(this);
+		}
 	}
 
 	protected void selectedItemTapped(T tappedItem, int count) {

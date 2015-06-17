@@ -27,6 +27,7 @@ import org.nognog.freeSquare.activity.main.MainActivityInputProcessor;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.gdx.util.camera.Camera;
+import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -133,8 +134,8 @@ public class ChangeSquareAction extends Action {
 	}
 
 	private void performZoomOut(float delta) {
-		Camera camera = this.activity.getCamera();
-		camera.setZoom(MathUtils.clamp(camera.getZoom() + delta * zoomSpeed, this.activity.getMinZoom(), this.activity.getMaxZoom()));
+		ObservableOrthographicCamera camera = this.activity.getCamera();
+		camera.setZoom(MathUtils.clamp(camera.getZoom() + delta * zoomSpeed, this.activity.getMinZoom(), this.activity.getMaxZoom()), false);
 		if (camera.getZoom() == this.activity.getMaxZoom()) {
 			this.phase = SLIDE_OUT;
 		}
@@ -160,23 +161,23 @@ public class ChangeSquareAction extends Action {
 	private void performSetSquare() {
 		boolean beforeSquareIsNull = this.activity.getSquare() == null;
 		this.activity.setSquare(this.square);
-		final Camera camera = this.activity.getCamera();
+		final ObservableOrthographicCamera camera = this.activity.getCamera();
 		if (beforeSquareIsNull) {
-			camera.setZoom(this.activity.getMaxZoom());
+			camera.setZoom(this.activity.getMaxZoom(), false);
 		}
 		if (this.square == null) {
-			camera.setPosition(0, 0);
+			camera.setPosition(0, 0, false);
 			this.phase = END;
 			return;
 		}
 		if (this.direction == Direction.UP) {
-			camera.setPosition(this.square.getCenterX(), this.square.getBottomEndY() - camera.getViewportHeight() * camera.getZoom());
+			camera.setPosition(this.square.getCenterX(), this.square.getBottomEndY() - camera.getViewportHeight() * camera.getZoom(), false);
 		} else if (this.direction == Direction.DOWN) {
-			camera.setPosition(this.square.getCenterX(), this.square.getTopEndY() + camera.getViewportHeight() * camera.getZoom());
+			camera.setPosition(this.square.getCenterX(), this.square.getTopEndY() + camera.getViewportHeight() * camera.getZoom(), false);
 		} else if (this.direction == Direction.RIGHT) {
-			camera.setPosition(this.square.getLeftEndX() - camera.getViewportWidth() * camera.getZoom(), this.square.getCenterY());
+			camera.setPosition(this.square.getLeftEndX() - camera.getViewportWidth() * camera.getZoom(), this.square.getCenterY(), false);
 		} else if (this.direction == Direction.LEFT) {
-			camera.setPosition(this.square.getRightEndX() + camera.getViewportWidth() * camera.getZoom(), this.square.getCenterY());
+			camera.setPosition(this.square.getRightEndX() + camera.getViewportWidth() * camera.getZoom(), this.square.getCenterY(), false);
 		}
 		this.zoomInTargetValue = MathUtils.clamp(this.zoomInTargetValue, this.activity.getMinZoom(), this.activity.getMaxZoom());
 		this.phase = SLIDE_IN;
@@ -184,20 +185,20 @@ public class ChangeSquareAction extends Action {
 
 	private void performSlideIn(float delta) {
 		this.moveCamera(delta, this.direction);
-		final Camera camera = this.activity.getCamera();
+		final ObservableOrthographicCamera camera = this.activity.getCamera();
 		final boolean slideInEnd = (this.direction == Direction.DOWN && camera.getY() <= this.square.getCenterY()) || (this.direction == Direction.UP && camera.getY() >= this.square.getCenterY())
 				|| (this.direction == Direction.LEFT && camera.getX() <= this.square.getCenterX()) || (this.direction == Direction.RIGHT && camera.getX() >= this.square.getCenterX());
 		if (slideInEnd) {
-			camera.setPosition(this.square.getCenterX(), this.square.getCenterY());
+			camera.setPosition(this.square.getCenterX(), this.square.getCenterY(), false);
 			this.phase = ZOOM_IN;
 		}
 	}
 
 	private void performZoomIn(float delta) {
-		Camera camera = this.activity.getCamera();
-		camera.zoom(-delta * zoomSpeed);
+		ObservableOrthographicCamera camera = this.activity.getCamera();
+		camera.zoom(-delta * zoomSpeed, false);
 		if (camera.getZoom() < this.zoomInTargetValue) {
-			camera.setZoom(this.zoomInTargetValue);
+			camera.setZoom(this.zoomInTargetValue, false);
 			this.phase = END;
 		}
 	}
@@ -210,8 +211,7 @@ public class ChangeSquareAction extends Action {
 	private void moveCamera(float delta, Direction moveDirection) {
 		final float speedX = getMoveX(moveDirection);
 		final float speedY = getMoveY(moveDirection);
-		Camera camera = this.activity.getCamera();
-		camera.move(speedX * delta, speedY * delta);
+		this.activity.getCamera().move(speedX * delta, speedY * delta, false);
 	}
 
 	private static float getMoveX(Direction direction) {

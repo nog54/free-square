@@ -82,7 +82,6 @@ public class FlickButtonController extends Group {
 	}
 
 	private TextButton createMenuTextButton(String text, float x, float y, Color up, Color down) {
-
 		TextureRegionDrawable upTexture = getPlaneTextureRegionDrawable(up);
 		TextureRegionDrawable downTexture = getPlaneTextureRegionDrawable(down);
 		TextButtonStyle buttonStyle = new TextButtonStyle(upTexture, downTexture, downTexture, this.font);

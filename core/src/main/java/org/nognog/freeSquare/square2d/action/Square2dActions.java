@@ -20,6 +20,7 @@ import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
+import org.nognog.gdx.util.Movable;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -188,16 +189,17 @@ public class Square2dActions {
 	}
 
 	/**
+	 * @param target 
 	 * @param deceleration
 	 * @param velocityX
 	 * @param velocityY
 	 * @return momentum move action
 	 */
-	public static MomentumMoveAction momentumMove(float deceleration, float velocityX, float velocityY) {
+	public static MomentumMoveAction momentumMove(Movable target, float deceleration, float velocityX, float velocityY) {
 		final MomentumMoveAction momentumMoveAction = Actions.action(MomentumMoveAction.class);
 		momentumMoveAction.setDeceleration(deceleration);
-		momentumMoveAction.setVelocityX(velocityX);
-		momentumMoveAction.setVelocityY(velocityY);
+		momentumMoveAction.setVelocity(velocityX, velocityY);
+		momentumMoveAction.setMovable(target);
 		return momentumMoveAction;
 	}
 
