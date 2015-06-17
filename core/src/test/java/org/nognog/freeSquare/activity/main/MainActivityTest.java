@@ -42,7 +42,7 @@ import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.action.ChangeSquareAction;
+import org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.Square2dObject;

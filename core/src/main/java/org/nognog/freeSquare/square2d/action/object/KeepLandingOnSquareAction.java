@@ -12,9 +12,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.action;
+package org.nognog.freeSquare.square2d.action.object;
 
 import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.action.Square2dActions;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 

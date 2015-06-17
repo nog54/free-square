@@ -12,15 +12,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.action;
+package org.nognog.freeSquare.square2d.action.activity;
 
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.END;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SET_SQUARE;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_IN;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_OUT;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.START;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_IN;
-import static org.nognog.freeSquare.square2d.action.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_OUT;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.END;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.SET_SQUARE;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_IN;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.SLIDE_OUT;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.START;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_IN;
+import static org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction.ChangeSquareActionPhase.ZOOM_OUT;
 
 import org.nognog.freeSquare.activity.main.MainActivity;
 import org.nognog.freeSquare.activity.main.MainActivityInputProcessor;

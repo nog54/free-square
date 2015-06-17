@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.action;
+package org.nognog.freeSquare.square2d.action.object;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -48,7 +48,7 @@ public class FreeRunningAction extends RepeatAction {
 	 * 
 	 * @param action
 	 */
-	void setMoveActionDelayActionSequence(SequenceAction action) {
+	public void setMoveActionDelayActionSequence(SequenceAction action) {
 		this.setAction(action);
 	}
 

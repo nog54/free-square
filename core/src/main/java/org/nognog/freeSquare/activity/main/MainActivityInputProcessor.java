@@ -15,8 +15,8 @@
 package org.nognog.freeSquare.activity.main;
 
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.action.MomentumMoveAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.object.MomentumMoveAction;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 

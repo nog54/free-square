@@ -14,8 +14,8 @@
 
 package org.nognog.freeSquare.square2d.object;
 
-import org.nognog.freeSquare.square2d.action.MomentumMoveAction;
 import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.object.MomentumMoveAction;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
