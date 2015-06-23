@@ -20,6 +20,7 @@ import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
+import org.nognog.freeSquare.square2d.action.PrioritizableAction;
 import org.nognog.gdx.util.Movable;
 
 import com.badlogic.gdx.Gdx;
@@ -45,13 +46,12 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private final float logicalWidth;
 	private final float logicalHeight;
 	private Square2d square;
-
 	private final Square2dObjectIcon icon;
 
+	private final Array<PrioritizableAction> mainActions;
+	private ActionPriorityTable actionPriorityTable;
+
 	private boolean enableAction = true;
-
-	private Action priorityAction;
-
 	private boolean isBeingTouched = false;
 	private boolean isLongPressedInLastTouch = false;
 
@@ -70,10 +70,24 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.icon.setX(-this.icon.getWidth() / 2);
 		this.icon.setY(-this.icon.getHeight() / 8);
 		this.addActor(this.icon);
+		this.mainActions = new Array<>();
+		this.setActionPriorityTable(Square2dObjectActionPriorityTable.getInstance());
 		this.setColor(type.getColor());
 		this.setWidth(this.logicalWidth);
 		this.setHeight(this.logicalHeight);
 		this.setupListeners();
+	}
+
+	protected void setActionPriorityTable(ActionPriorityTable table) {
+		this.actionPriorityTable = table;
+	}
+
+	protected ActionPriorityTable getActionPriorityTable() {
+		return this.actionPriorityTable;
+	}
+
+	private void setupActionPriorityOf(PrioritizableAction action) {
+		action.setPriority(this.actionPriorityTable.getPriority(action.getClass()));
 	}
 
 	private void setupListeners() {
@@ -228,47 +242,42 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	/**
-	 * through if action is pausing-action.
-	 * 
 	 * @param action
 	 */
-	@Override
-	public void addAction(Action action) {
-		if (this.containsAction(action)) {
-			return;
-		}
-		super.addAction(action);
+	public void addMainAction(PrioritizableAction action) {
+		action.setActor(this);
+		this.setupActionPriorityOf(action);
+		this.mainActions.add(action);
+		this.mainActions.sort(PrioritizableAction.Comparator.getInstance());
 	}
 
 	/**
 	 * @param action
 	 */
-	public void setPriorityAction(Action action) {
-		if (action != null) {
-			action.setActor(this);
-		}
-		this.priorityAction = action;
+	public void removeMainAction(PrioritizableAction action) {
+		this.mainActions.removeValue(action, true);
+		action.setActor(null);
+	}
+	
+	/**
+	 * @return
+	 */
+	protected Array<PrioritizableAction> getMainActions() {
+		return this.mainActions;
 	}
 
 	/**
-	 * clear priority action
+	 * @param action
 	 */
-	public void clearPriorityAction() {
-		this.setPriorityAction(null);
+	public void addSubAction(Action action) {
+		this.addAction(action);
 	}
 
 	/**
-	 * @return the priority action
+	 * @param action
 	 */
-	public Action getPriorityAction() {
-		return this.priorityAction;
-	}
-
-	/**
-	 * @return true if acting priority action.
-	 */
-	public boolean isPerformingPriorityAction() {
-		return this.priorityAction != null;
+	public void removeSubAction(Action action) {
+		this.removeAction(action);
 	}
 
 	@Override
@@ -276,31 +285,35 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		if (this.isBeingTouched || !this.isEnabledAction()) {
 			return;
 		}
-		if (this.priorityAction == null) {
-			this.actActions(delta);
-			return;
-		}
-		final Array<Action> normalActions = new Array<>(this.getActions());
-		this.getActions().clear();
-		this.getActions().add(this.priorityAction);
-		this.actActions(delta);
-		if (this.finishedPriorityAction()) {
-			this.priorityAction = null;
-		}
-		this.getActions().clear();
-		this.getActions().addAll(normalActions);
-	}
-
-	private void actActions(float delta) {
-		try {
-			this.actChildren(delta);
-			this.actMyself(delta);
-		} catch (InterruptOtherActionException e) {
-			// TODO
-		}
+		this.actChildren(delta);
+		this.actMyself(delta);
 	}
 
 	private void actMyself(float delta) {
+		this.actSubActions(delta);
+		this.actMainActions(delta);
+	}
+
+	/**
+	 * @param delta
+	 */
+	private void actMainActions(float delta) {
+		for (int i = 0; i < this.mainActions.size; i++) {
+			final PrioritizableAction action = this.mainActions.get(i);
+			if (action.isPerformableState()) {
+				final boolean isFinished = action.act(delta);
+				if (isFinished) {
+					this.mainActions.removeValue(action, true);
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * @param delta
+	 */
+	private void actSubActions(float delta) {
 		Array<Action> actions = this.getActions();
 		if (actions.size > 0) {
 			final Stage stage = this.getStage();
@@ -327,10 +340,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		for (int i = 0, n = children.size; i < n; i++)
 			actors[i].act(delta);
 		children.end();
-	}
-
-	private boolean finishedPriorityAction() {
-		return !this.getActions().contains(this.priorityAction, true);
 	}
 
 	/**
@@ -389,14 +398,6 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 */
 	public boolean isPerformingAction(Action action) {
 		return this.getActions().contains(action, true);
-	}
-
-	/**
-	 * @param action
-	 * @return true if action is performing-action or pausing-action.
-	 */
-	public boolean containsAction(Action action) {
-		return this.getActions().contains(action, true) || this.priorityAction == action;
 	}
 
 	@Override

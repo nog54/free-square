@@ -14,28 +14,31 @@
 
 package org.nognog.freeSquare.square2d.action.object;
 
-import org.nognog.freeSquare.square2d.object.InterruptOtherActionException;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 /**
  * @author goshi 2015/05/31
  */
-public class ForeverEatAction extends EatAction {
+public class ForeverTryToEatAction extends EatAction {
 
-	private final InterruptOtherActionException interruptException = new InterruptOtherActionException(this, false);
+	private EatableObject currentTarget;
 
 	@Override
 	public boolean act(float delta) {
-		final LifeObject eater = this.getEater();
-		final EatableObject nearestEatableLandingObject = eater.getEasyReachableNearestEatableLandingObject();
-		if (nearestEatableLandingObject == null) {
+		if (this.currentTarget == null) {
 			return false;
 		}
-		this.setEatObject(nearestEatableLandingObject);
-		if (super.act(delta) == false) {
-			throw this.interruptException;
-		}
+		this.setEatObject(this.currentTarget);
+		super.act(delta);
 		return false;
 	}
+
+	@Override
+	public boolean isPerformableState() {
+		final LifeObject eater = this.getEater();
+		this.currentTarget = eater.getEasyReachableNearestEatableLandingObject();
+		return this.currentTarget != null;
+	}
+
 }

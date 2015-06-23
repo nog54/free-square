@@ -21,7 +21,7 @@ import org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction;
 import org.nognog.freeSquare.square2d.action.object.DelayNextStopTimeAction;
 import org.nognog.freeSquare.square2d.action.object.EatAction;
 import org.nognog.freeSquare.square2d.action.object.FireEventAction;
-import org.nognog.freeSquare.square2d.action.object.ForeverEatAction;
+import org.nognog.freeSquare.square2d.action.object.ForeverTryToEatAction;
 import org.nognog.freeSquare.square2d.action.object.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.object.KeepLandingOnSquareAction;
 import org.nognog.freeSquare.square2d.action.object.MomentumMoveAction;
@@ -42,8 +42,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 /**
  * @author goshi 2014/12/23
  */
-public class Square2dActions {
-	private Square2dActions() {
+public class Square2dActionUtlls {
+	private Square2dActionUtlls() {
 	}
 
 	/**
@@ -224,8 +224,8 @@ public class Square2dActions {
 	 * @param moveSpeed
 	 * @return action
 	 */
-	public static EatAction foreverEat(int eatAmount, int eatCount) {
-		final ForeverEatAction action = Actions.action(ForeverEatAction.class);
+	public static EatAction foreverTryToEat(int eatAmount, int eatCount) {
+		final ForeverTryToEatAction action = Actions.action(ForeverTryToEatAction.class);
 		action.setEatAmount(eatAmount);
 		action.setEatCount(eatCount);
 		action.setEatInterval(1);

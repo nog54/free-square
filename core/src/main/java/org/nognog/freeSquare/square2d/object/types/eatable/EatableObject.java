@@ -15,7 +15,7 @@
 package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import org.nognog.freeSquare.square2d.Direction;
-import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
@@ -44,7 +44,7 @@ public class EatableObject extends MovableSquare2dObject implements LandObject {
 		this.originTextureRegionWidth = this.getIconMainImageTextureRegion().getRegionWidth();
 		this.originTextureRegionHeight = this.getIconMainImageTextureRegion().getRegionHeight();
 		this.originTextureRegionArea = this.originTextureRegionWidth * this.originTextureRegionHeight;
-		this.addAction(Square2dActions.keepLandingOnSquare());
+		this.addMainAction(Square2dActionUtlls.keepLandingOnSquare());
 	}
 
 	private TextureRegion getIconMainImageTextureRegion() {

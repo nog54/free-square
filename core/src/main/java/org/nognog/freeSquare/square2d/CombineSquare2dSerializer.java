@@ -107,8 +107,8 @@ public class CombineSquare2dSerializer implements Json.Serializer<CombineSquare2
 	private static void appendSquares(final CombineSquare2d baseSquare, final Array<Square2d> combineSquares, final Array<Vertex> combineVertices1, final Array<Vertex> combineVertices2) {
 		for (int i = 0; i < combineSquares.size; i++) {
 			final Square2d beCombineSquare = combineSquares.get(i);
-			final Vertex combineVertex1 = CombineSquare2dUtils.getSameValueVertex(combineVertices1.get(i), baseSquare.getVertices());
-			final Vertex combineVertex2 = CombineSquare2dUtils.getSameValueVertex(combineVertices2.get(i), beCombineSquare.getVertices());
+			final Vertex combineVertex1 = CombineSquare2dUtils.getVertexHavingSameValue(combineVertices1.get(i), baseSquare.getVertices());
+			final Vertex combineVertex2 = CombineSquare2dUtils.getVertexHavingSameValue(combineVertices2.get(i), beCombineSquare.getVertices());
 			final boolean isCombineSuccess = baseSquare.combine(combineVertex1, beCombineSquare, combineVertex2);
 			if (isCombineSuccess) {
 				combineSquares.removeValue(beCombineSquare, true);

@@ -14,15 +14,15 @@
 
 package org.nognog.freeSquare.square2d.action.object;
 
+import org.nognog.freeSquare.square2d.action.AbstractPrioritizableAction;
 import org.nognog.gdx.util.Movable;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Action;
 
 /**
  * @author goshi 2015/05/24
  */
-public class MomentumMoveAction extends Action {
+public class MomentumMoveAction extends AbstractPrioritizableAction {
 
 	private Movable movable;
 
@@ -178,10 +178,16 @@ public class MomentumMoveAction extends Action {
 	}
 
 	/**
-	 * @param movable the movable to set
+	 * @param movable
+	 *            the movable to set
 	 */
 	public void setMovable(Movable movable) {
 		this.movable = movable;
+	}
+
+	@Override
+	public boolean isPerformableState() {
+		return true;
 	}
 
 }

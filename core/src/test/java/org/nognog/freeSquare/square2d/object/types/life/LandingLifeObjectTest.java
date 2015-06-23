@@ -137,26 +137,16 @@ public class LandingLifeObjectTest {
 		assertThat(object.getX(), is(not(nearestVertex.x)));
 		assertThat(object.getY(), is(not(nearestVertex.y)));
 		assertThat(object.isLandingOnSquare(), is(false));
-
-		object.act(0); // set a return action here
-		assertThat(object.isPerformingPriorityAction(), is(true));
-
-		object.act(0); // not move here
-		assertThat(object.getX(), is(not(nearestVertex.x)));
-		assertThat(object.getY(), is(not(nearestVertex.y)));
-		assertThat(object.isLandingOnSquare(), is(false));
-
+		
 		object.act(Float.MAX_VALUE); // perform the return action
 		assertThat(object.getX(), is(nearestVertex.x));
 		assertThat(object.getY(), is(nearestVertex.y));
 		assertThat(object.isLandingOnSquare(), is(true));
-		assertThat(object.isPerformingPriorityAction(), is(true));
-		// notify event still remains
 
 		new Verifications() {
 			{
 				object.notify((SquareEvent) any);
-				times = 0;
+				times = 1;
 			}
 		};
 		object.act(0);

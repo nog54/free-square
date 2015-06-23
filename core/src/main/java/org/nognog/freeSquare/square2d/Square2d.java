@@ -44,9 +44,9 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	protected Array<Square2dObject> objects = new Array<>();
 	protected Array<SquareEventListener> observers = new Array<>();
 
-	private boolean drawEdge;
+	private boolean requestedDrawEdge;
 
-	private boolean isRequestedDrawOrderUpdate = false;
+	private boolean requestedDrawOrderUpdate = false;
 
 	// cache
 	private transient Vector2 stageCoordinatesPosition;
@@ -476,13 +476,13 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (this.isRequestedDrawOrderUpdate) {
+		if (this.requestedDrawOrderUpdate) {
 			this.getChildren().sort(actorComparator);
-			this.isRequestedDrawOrderUpdate = false;
+			this.requestedDrawOrderUpdate = false;
 		}
 		super.draw(batch, parentAlpha);
 
-		if (this.drawEdge) {
+		if (this.requestedDrawEdge) {
 			this.drawEdge(batch);
 		}
 	}
@@ -491,14 +491,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 * @param enable
 	 */
 	public void setDrawEdge(boolean enable) {
-		this.drawEdge = enable;
+		this.requestedDrawEdge = enable;
 	}
 
 	/**
 	 * @return true if draw edge
 	 */
 	public boolean isDrawEdge() {
-		return this.drawEdge;
+		return this.requestedDrawEdge;
 	}
 
 	protected void drawEdge(Batch batch) {
@@ -569,15 +569,15 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	}
 
 	protected void requestDrawOrderUpdate() {
-		this.isRequestedDrawOrderUpdate = true;
+		this.requestedDrawOrderUpdate = true;
 	}
 
 	protected void cancelRequestDrawOrderUpdate() {
-		this.isRequestedDrawOrderUpdate = false;
+		this.requestedDrawOrderUpdate = false;
 	}
 
 	protected boolean isRequestedDrawOrderUpdate() {
-		return this.isRequestedDrawOrderUpdate;
+		return this.requestedDrawOrderUpdate;
 	}
 
 	/**

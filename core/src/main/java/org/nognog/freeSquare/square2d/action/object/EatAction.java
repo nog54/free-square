@@ -15,18 +15,18 @@
 package org.nognog.freeSquare.square2d.action.object;
 
 import org.nognog.freeSquare.square2d.Direction;
+import org.nognog.freeSquare.square2d.action.AbstractPrioritizableAction;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 import org.nognog.freeSquare.square2d.object.types.life.LandingLifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 /**
  * @author goshi 2015/02/01
  */
-public class EatAction extends Action {
+public class EatAction extends AbstractPrioritizableAction {
 
 	/**
 	 * keep eating while eatObject amount is not zero.
@@ -231,6 +231,11 @@ public class EatAction extends Action {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		return sb.append("eat to ").append(this.eatObject).append(" action").toString(); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Override
+	public boolean isPerformableState() {
+		return true;
 	}
 
 }

@@ -36,7 +36,7 @@ import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
@@ -343,7 +343,7 @@ public class MainActivity extends FreeSquareActivity {
 	 * @param direction
 	 */
 	public void setSquareWithAction(Square2d setSquare, Direction direction) {
-		this.addAction(Square2dActions.changeSquare(this, setSquare, direction));
+		this.addAction(Square2dActionUtlls.changeSquare(this, setSquare, direction));
 	}
 
 	/**

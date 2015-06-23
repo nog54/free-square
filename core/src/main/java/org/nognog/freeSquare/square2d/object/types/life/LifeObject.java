@@ -19,7 +19,7 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.action.object.EatAction;
 import org.nognog.freeSquare.square2d.action.object.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.object.StopTimeGenerator;
@@ -28,6 +28,7 @@ import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatObjectEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
+import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
@@ -75,9 +76,9 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		frame.setWidth(this.getIcon().getWidth());
 		frame.setHeight(this.getIcon().getHeight());
 		this.getIcon().addActor(frame);
-		this.addAction(Square2dActions.foreverEat(this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT_EAT_OBJECT));
-		this.freeRunningAction = Square2dActions.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
-		this.addAction(this.freeRunningAction);
+		this.addMainAction(Square2dActionUtlls.foreverTryToEat(this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT_EAT_OBJECT));
+		this.freeRunningAction = Square2dActionUtlls.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
+		this.addMainAction(this.freeRunningAction);
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
@@ -101,9 +102,9 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	private static Action createUpDownAction() {
 		final float degree = 5;
 		final float cycleTime = 4;
-		Action foreverRotate = Square2dActions.foreverRotate(degree, cycleTime, Interpolation.sine);
+		Action foreverRotate = Square2dActionUtlls.foreverRotate(degree, cycleTime, Interpolation.sine);
 		final float upDownAmount = 5;
-		Action foreverUpDown = Square2dActions.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
+		Action foreverUpDown = Square2dActionUtlls.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
 		return Actions.parallel(foreverRotate, foreverUpDown);
 	}
 
@@ -183,6 +184,9 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	@Override
 	public void notify(SquareEvent event) {
 		super.notify(event);
+		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
+			this.freeRunningAction.resetTargetPosition();
+		}
 		if (event instanceof EatObjectEvent && ((EatObjectEvent) event).getEater() == this) {
 			this.freeRunningAction.setMoveSpeed(LifeObject.toMoveSpeed(this));
 		}

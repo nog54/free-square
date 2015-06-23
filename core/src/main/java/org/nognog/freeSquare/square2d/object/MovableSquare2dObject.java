@@ -14,7 +14,8 @@
 
 package org.nognog.freeSquare.square2d.object;
 
-import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.PrioritizableAction;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.action.object.MomentumMoveAction;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -50,9 +51,8 @@ public class MovableSquare2dObject extends Square2dObject {
 			@Override
 			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
 				final float deceleration = 2000;
-				if (MovableSquare2dObject.this.isPerformingPriorityAction() == false) {
-					MovableSquare2dObject.this.setPriorityAction(Square2dActions.momentumMove(MovableSquare2dObject.this, deceleration, velocityX, velocityY));
-				}
+				PrioritizableAction action = Square2dActionUtlls.momentumMove(MovableSquare2dObject.this, deceleration, velocityX, velocityY);
+				MovableSquare2dObject.this.addMainAction(action);
 			}
 		});
 	}
@@ -61,13 +61,10 @@ public class MovableSquare2dObject extends Square2dObject {
 	 * 
 	 */
 	public void clearMomentumAction() {
-		for (Action action : this.getActions().<Action> toArray(Action.class)) {
+		for (PrioritizableAction action : this.getMainActions()) {
 			if (action instanceof MomentumMoveAction) {
-				this.removeAction(action);
+				this.removeMainAction(action);
 			}
-		}
-		if (this.getPriorityAction() instanceof MomentumMoveAction) {
-			this.setPriorityAction(null);
 		}
 	}
 

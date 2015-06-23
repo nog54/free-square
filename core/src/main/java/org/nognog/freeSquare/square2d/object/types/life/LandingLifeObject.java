@@ -15,9 +15,8 @@
 package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.model.life.Life;
-import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Vertex;
-import org.nognog.freeSquare.square2d.action.Square2dActions;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
@@ -62,7 +61,7 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 				LandingLifeObject.this.notify(new UpdateSquareObjectEvent(LandingLifeObject.this));
 			}
 		});
-		this.addAction(Square2dActions.keepLandingOnSquare());
+		this.addMainAction(Square2dActionUtlls.keepLandingOnSquare());
 	}
 
 	@Override
@@ -140,14 +139,6 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 	@Override
 	public boolean isValid() {
 		return this.isLandingOnSquare();
-	}
-
-	@Override
-	public void notify(SquareEvent event) {
-		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
-			this.freeRunningAction.resetTargetPosition();
-		}
-		super.notify(event);
 	}
 
 	@Override

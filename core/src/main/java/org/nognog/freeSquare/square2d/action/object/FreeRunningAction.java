@@ -14,6 +14,8 @@
 
 package org.nognog.freeSquare.square2d.action.object;
 
+import org.nognog.freeSquare.square2d.action.PrioritizableAction;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
@@ -22,7 +24,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 /**
  * @author goshi 2015/01/29
  */
-public class FreeRunningAction extends RepeatAction {
+public class FreeRunningAction extends RepeatAction implements PrioritizableAction {
+
+	private int priority;
 
 	/**
 	 * 
@@ -95,6 +99,21 @@ public class FreeRunningAction extends RepeatAction {
 			name = name.substring(dotIndex + 1);
 		if (name.endsWith("Action"))name = name.substring(0, name.length() - 6); //$NON-NLS-1$
 		return name;
+	}
+
+	@Override
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	@Override
+	public int getPriority() {
+		return this.priority;
+	}
+
+	@Override
+	public boolean isPerformableState() {
+		return true;
 	}
 
 }

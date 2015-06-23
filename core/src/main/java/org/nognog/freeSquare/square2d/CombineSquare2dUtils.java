@@ -124,10 +124,10 @@ public class CombineSquare2dUtils {
 		if (theta1 == 0 || theta2 == 0) {
 			return true;
 		}
-		return isSufficientlySameSlope(theta1, theta2);
+		return canBeRegardedAsSameSlope(theta1, theta2);
 	}
 
-	private static boolean isSufficientlySameSlope(float theta1, float theta2) {
+	private static boolean canBeRegardedAsSameSlope(float theta1, float theta2) {
 		float absoluteErrorRadian = Math.abs(theta1 - theta2);
 		return absoluteErrorRadian < regardAsSufficientlySameRadianThreashold;
 	}
@@ -135,13 +135,14 @@ public class CombineSquare2dUtils {
 	/**
 	 * @param vertices
 	 * @param insertVertex
-	 * @return unchange area insert index. if not exists, return -1.
+	 * @return index to insert without change of square area. if not
+	 *         exists, return -1.
 	 */
-	public static int getUnchangeSquareAreaIndexEvenIfInsert(Vertex[] vertices, Vertex insertVertex) {
+	public static int getIndexToInsertWithoutChangeOfSquareArea(Vertex[] vertices, Vertex insertVertex) {
 		for (int i = 1; i <= vertices.length; i++) {
 			Edge edge1 = new Edge(insertVertex, vertices[i % vertices.length]);
 			Edge edge2 = new Edge(vertices[i - 1], insertVertex);
-			if (isSufficientlySameSlope(edge1.getTheta(), edge2.getTheta())) {
+			if (canBeRegardedAsSameSlope(edge1.getTheta(), edge2.getTheta())) {
 				return i % vertices.length;
 			}
 		}
@@ -181,7 +182,7 @@ public class CombineSquare2dUtils {
 	 * @param vertices
 	 * @return edge under vertex. may be null.
 	 */
-	public static Edge[] getOnlineEdge(Vertex checkVertex, Vertex[] vertices) {
+	public static Edge[] getOnliningEdge(Vertex checkVertex, Vertex[] vertices) {
 		Array<Edge> result = new Array<>();
 		for (int i = 0; i < vertices.length; i++) {
 			final Vertex v1 = vertices[i];
@@ -200,7 +201,7 @@ public class CombineSquare2dUtils {
 	 * @return edge under vertex. may be null.
 	 */
 	public static Edge getNearestSufficientlyCloseEdge(Vertex checkVertex, Array<Vertex> vertices) {
-		return getNearestSufficientlyCloseEdge(checkVertex, vertices.<Vertex> toArray(Vertex.class));
+		return getNearestSufficientlyClosedEdge(checkVertex, vertices.<Vertex> toArray(Vertex.class));
 	}
 
 	/**
@@ -208,7 +209,7 @@ public class CombineSquare2dUtils {
 	 * @param vertices
 	 * @return edge under vertex. may be null.
 	 */
-	public static Edge getNearestSufficientlyCloseEdge(Vertex checkVertex, Vertex[] vertices) {
+	public static Edge getNearestSufficientlyClosedEdge(Vertex checkVertex, Vertex[] vertices) {
 		Vertex minV1 = null;
 		Vertex minV2 = null;
 		float minR = Float.MAX_VALUE;
@@ -233,7 +234,7 @@ public class CombineSquare2dUtils {
 	 * @param vertices
 	 * @return same value vertex
 	 */
-	public static Vertex getSameValueVertex(Vertex findVertex, Vertex[] vertices) {
+	public static Vertex getVertexHavingSameValue(Vertex findVertex, Vertex[] vertices) {
 		for (Vertex vertex : vertices) {
 			if (vertex.equals(findVertex)) {
 				return vertex;

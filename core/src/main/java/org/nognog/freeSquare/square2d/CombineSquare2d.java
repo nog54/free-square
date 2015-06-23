@@ -56,9 +56,9 @@ public class CombineSquare2d extends Square2d {
 	private Future<Array<Square2d>> separatableSquaresFuture;
 
 	// cache
-	private transient Array<Square2d> separatableIfNotExistsObjectSquares;
+	private transient Array<Square2d> separatableSquares;
 	private transient Array<SimpleSquare2d> allSeparableChildSimpleSquare2d;
-	private transient SimpleSquare2d[] allOrderedCombiningSimpleSquare2d;
+	private transient SimpleSquare2d[] allCombinedAndOrderedSimpleSquare2d;
 	private transient Square2d[] allNotCombiningSquare2d;
 	private transient Texture simpleTexture;
 
@@ -83,7 +83,7 @@ public class CombineSquare2d extends Square2d {
 		for (Square2dObject object : base.getObjects()) {
 			this.addSquareObject(object, object.getX(), object.getY(), false);
 		}
-		this.separatableIfNotExistsObjectSquares = new Array<>();
+		this.separatableSquares = new Array<>();
 	}
 
 	@Override
@@ -282,7 +282,7 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private void clearSeparableSquareCache() {
-		this.separatableIfNotExistsObjectSquares = null;
+		this.separatableSquares = null;
 		this.allSeparableChildSimpleSquare2d = null;
 	}
 
@@ -324,7 +324,7 @@ public class CombineSquare2d extends Square2d {
 					result[i] = new Vertex(thisPolygonVertices[j]);
 					sameVertexCounter++;
 					if (sameVertexCounter == Math.min(thisPolygonVertices.length, result.length)) {
-						if (largerVertexPolygonContainsSmallerVertexPolygonCentroid(thisPolygonVertices, result)) {
+						if (thisPolygonVertices.length == result.length || containsCenrtoidOfSmallerVertexPolygonInLargerVertexPolygon(thisPolygonVertices, result)) {
 							return null;
 						}
 					}
@@ -341,22 +341,19 @@ public class CombineSquare2d extends Square2d {
 		return new Vertex(x, y);
 	}
 
-	private static boolean largerVertexPolygonContainsSmallerVertexPolygonCentroid(final Vertex[] vertices1, final Vertex[] vertices2) {
-		if (vertices1.length == vertices2.length) {
-			return true;
-		}
-		final Vertex[] smallerVerticesPolygon, largetVerticesPolygon;
+	private static boolean containsCenrtoidOfSmallerVertexPolygonInLargerVertexPolygon(final Vertex[] vertices1, final Vertex[] vertices2) {
+		final Vertex[] smallerVerticesPolygon, largerVerticesPolygon;
 		if (vertices1.length < vertices2.length) {
 			smallerVerticesPolygon = vertices1;
-			largetVerticesPolygon = vertices2;
+			largerVerticesPolygon = vertices2;
 		} else {
 			smallerVerticesPolygon = vertices2;
-			largetVerticesPolygon = vertices1;
+			largerVerticesPolygon = vertices1;
 		}
 		final float[] smallerVerticesArray = Square2dUtils.toFloatArray(smallerVerticesPolygon);
 		final Vector2 smallerVerticesPolygonCentroid = new Vector2();
 		GeometryUtils.polygonCentroid(smallerVerticesArray, 0, smallerVerticesArray.length, smallerVerticesPolygonCentroid);
-		return Square2dUtils.createPolygon(largetVerticesPolygon).contains(smallerVerticesPolygonCentroid.x, smallerVerticesPolygonCentroid.y);
+		return Square2dUtils.createPolygon(largerVerticesPolygon).contains(smallerVerticesPolygonCentroid.x, smallerVerticesPolygonCentroid.y);
 	}
 
 	private void addSquare(Square2d square, float x, float y) {
@@ -419,11 +416,11 @@ public class CombineSquare2d extends Square2d {
 			if (square instanceof SimpleSquare2d) {
 				allCombiningSimpleSquare2d.add((SimpleSquare2d) square);
 			} else if (square instanceof CombineSquare2d) {
-				allCombiningSimpleSquare2d.addAll(((CombineSquare2d) square).allOrderedCombiningSimpleSquare2d);
+				allCombiningSimpleSquare2d.addAll(((CombineSquare2d) square).allCombinedAndOrderedSimpleSquare2d);
 			}
 		}
 		allCombiningSimpleSquare2d.sort(actorComparator);
-		this.allOrderedCombiningSimpleSquare2d = allCombiningSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
+		this.allCombinedAndOrderedSimpleSquare2d = allCombiningSimpleSquare2d.<SimpleSquare2d> toArray(SimpleSquare2d.class);
 		Array<Square2d> allOrderedNotCombiningSquare2d = new Array<>();
 
 		for (Actor child : this.getChildren()) {
@@ -507,7 +504,7 @@ public class CombineSquare2d extends Square2d {
 	 * @return all simple square2d
 	 */
 	public SimpleSquare2d[] getOrderedSimpleSquare2d() {
-		return this.allOrderedCombiningSimpleSquare2d;
+		return this.allCombinedAndOrderedSimpleSquare2d;
 	}
 
 	/**
@@ -608,7 +605,7 @@ public class CombineSquare2d extends Square2d {
 		if (separateTargetCombinePoints.length == 0) {
 			return null;
 		}
-		if (this.validateThatAllSquaresAfterSeparateLinkToBaseSquare(separateTarget) == false) {
+		if (this.hasUnlinkedSquareIfSeparate(separateTarget)) {
 			return null;
 		}
 		final Vertex[] singleVertices = getSingleCombineVertices(separateTargetCombinePoints);
@@ -618,56 +615,58 @@ public class CombineSquare2d extends Square2d {
 		return this.getVerticesThatAfterSeparateBuriedSquare(separateTarget);
 	}
 
-	private boolean validateThatAllSquaresAfterSeparateLinkToBaseSquare(Square2d separateTarget) {
+	private boolean hasUnlinkedSquareIfSeparate(Square2d separateTarget) {
 		if (this.squares.contains(separateTarget, true) && this.squares.size == 2) {
-			return true;
+			return false;
 		}
-		Array<Square2d> linkToBaseSquares = new Array<>(new Square2d[] { this.base });
+		final Array<Square2d> linkToBaseSquares = new Array<>(new Square2d[] { this.base });
 		while (true) {
-			boolean isAdded = findAndAddSquareThatLinkToBaseSquareFromCurrentLinkToBaseSquares(separateTarget, linkToBaseSquares);
-			if (isAdded == false) {
+			final Array<Square2d> findedSquares = this.searchSquareLinkingToBaseEvenIfSeparate(separateTarget, linkToBaseSquares);
+			if (findedSquares.size == 0) {
 				break;
 			}
+			linkToBaseSquares.addAll(findedSquares);
 			if (linkToBaseSquares.size == this.squares.size - 1) {
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
-	private boolean findAndAddSquareThatLinkToBaseSquareFromCurrentLinkToBaseSquares(Square2d separateTarget, Array<Square2d> linkToBaseSquares) {
-		boolean result = false;
-		for (Square2d validateSquare : this.squares) {
-			if (validateSquare == separateTarget || linkToBaseSquares.contains(validateSquare, true)) {
+	private Array<Square2d> searchSquareLinkingToBaseEvenIfSeparate(Square2d separateTarget, Array<Square2d> knownLinkedToBaseSquares) {
+		final Array<Square2d> result = new Array<>();
+		final Array<Square2d> linkToBaseSquares = new Array<>(knownLinkedToBaseSquares);
+		for (Square2d checkSquare : this.squares) {
+			if (checkSquare == separateTarget || linkToBaseSquares.contains(checkSquare, true)) {
 				continue;
 			}
-			final Vertex[] validateSquareVertices = this.getOrderedActualVertices(validateSquare).<Vertex> toArray(Vertex.class);
-			final CombinePoint[] validateSquareCombinePoints = this.getCombinePointOf(validateSquare);
-			boolean validateSquareIsCombinedWithVertices = false;
-			int closeToOtherSquareVertexCount = 0;
+			final Vertex[] checkSquareVertices = this.getOrderedActualVertices(checkSquare).<Vertex> toArray(Vertex.class);
+			final CombinePoint[] checkSquaresCombinePoint = this.getCombinePointOf(checkSquare);
+			boolean combineAtVertices = false;
+			int closedToOtherSquareVertexCounter = 0;
 			for (Square2d compareSquare : linkToBaseSquares) {
 				final Vertex[] compareSquareVertices = this.getOrderedActualVertices(compareSquare).<Vertex> toArray(Vertex.class);
-				closeToOtherSquareVertexCount += countSufficientlyCloseVertex(validateSquareVertices, compareSquareVertices);
-				closeToOtherSquareVertexCount += countSufficientlyCloseVertex(compareSquareVertices, validateSquareVertices);
-				for (CombinePoint compareSquareCombinePoint : this.getCombinePointOf(compareSquare)) {
-					if (contains(compareSquareCombinePoint, validateSquareCombinePoints)) {
-						validateSquareIsCombinedWithVertices = true;
-						closeToOtherSquareVertexCount--;
+				closedToOtherSquareVertexCounter += countSufficientlyClosedToSquareVertex(checkSquareVertices, compareSquareVertices);
+				closedToOtherSquareVertexCounter += countSufficientlyClosedToSquareVertex(compareSquareVertices, checkSquareVertices);
+				for (CombinePoint compareSquaresCombinePoint : this.getCombinePointOf(compareSquare)) {
+					if (contains(compareSquaresCombinePoint, checkSquaresCombinePoint)) {
+						combineAtVertices = true;
+						closedToOtherSquareVertexCounter--;
 					}
 				}
 			}
-			if (validateSquareIsCombinedWithVertices && closeToOtherSquareVertexCount > 1) {
-				linkToBaseSquares.add(validateSquare);
-				result = true;
+			if (combineAtVertices && closedToOtherSquareVertexCounter > 1) {
+				result.add(checkSquare);
+				linkToBaseSquares.add(checkSquare);
 			}
 		}
 		return result;
 	}
 
-	private static int countSufficientlyCloseVertex(final Vertex[] validateVertices, final Vertex[] squareVertices) {
+	private static int countSufficientlyClosedToSquareVertex(final Vertex[] checkVertices, final Vertex[] squareVertices) {
 		int result = 0;
-		for (Vertex validateSquareVertex : validateVertices) {
-			if (CombineSquare2dUtils.getNearestSufficientlyCloseEdge(validateSquareVertex, squareVertices) != null) {
+		for (Vertex checkVertex : checkVertices) {
+			if (CombineSquare2dUtils.getNearestSufficientlyClosedEdge(checkVertex, squareVertices) != null) {
 				result++;
 			}
 		}
@@ -765,8 +764,8 @@ public class CombineSquare2d extends Square2d {
 		if (onlineSeparateTargetVertices.size == 1) {
 			return 1;
 		}
-		final int validateIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(0), true) + 1) % orderedSeparateTargetActualVertices.size;
-		if ((orderedSeparateTargetActualVertices.get(validateIndex) == onlineSeparateTargetVertices.get(1))) {
+		final int checkIndex = (orderedSeparateTargetActualVertices.indexOf(onlineSeparateTargetVertices.get(0), true) + 1) % orderedSeparateTargetActualVertices.size;
+		if ((orderedSeparateTargetActualVertices.get(checkIndex) == onlineSeparateTargetVertices.get(1))) {
 			return -1;
 		}
 		return 1;
@@ -835,8 +834,8 @@ public class CombineSquare2d extends Square2d {
 
 	private static Edge getSameOnlineEdge(Array<Vertex> allVertices, Vertex vertex1, Vertex vertex2) {
 		final Vertex[] searchVertices = allVertices.<Vertex> toArray(Vertex.class);
-		final Edge[] vertex1OnlineEdges = CombineSquare2dUtils.getOnlineEdge(vertex1, searchVertices);
-		final Edge[] vertex2OnlineEdges = CombineSquare2dUtils.getOnlineEdge(vertex2, searchVertices);
+		final Edge[] vertex1OnlineEdges = CombineSquare2dUtils.getOnliningEdge(vertex1, searchVertices);
+		final Edge[] vertex2OnlineEdges = CombineSquare2dUtils.getOnliningEdge(vertex2, searchVertices);
 		for (Edge vertex1OnlineEdge : vertex1OnlineEdges) {
 			for (Edge vertex2OnlineEdge : vertex2OnlineEdges) {
 				if (vertex1OnlineEdge.equals(vertex2OnlineEdge)) {
@@ -876,8 +875,8 @@ public class CombineSquare2d extends Square2d {
 			return false;
 		}
 
-		if (this.separatableIfNotExistsObjectSquares != null) {
-			return this.separatableIfNotExistsObjectSquares.contains(square, true);
+		if (this.separatableSquares != null) {
+			return this.separatableSquares.contains(square, true);
 		}
 
 		return this.getVerticesThatAfterSeparate(square) != null;
@@ -887,19 +886,19 @@ public class CombineSquare2d extends Square2d {
 	 * @return separatable squares.
 	 */
 	public Square2d[] getSeparatableSquares() {
-		if (this.separatableIfNotExistsObjectSquares == null) {
+		if (this.separatableSquares == null) {
 			this.setupSeparatableSquares();
 		}
-		if (this.separatableIfNotExistsObjectSquares == null) {
+		if (this.separatableSquares == null) {
 			return new Square2d[0];
 		}
-		return this.separatableIfNotExistsObjectSquares.<Square2d> toArray(Square2d.class);
+		return this.separatableSquares.<Square2d> toArray(Square2d.class);
 	}
 
 	private void setupSeparatableSquares() {
 		this.startSetupSeparatableSquaresAsyncIfNotStart();
 		try {
-			this.separatableIfNotExistsObjectSquares = this.separatableSquaresFuture.get();
+			this.separatableSquares = this.separatableSquaresFuture.get();
 			this.setupAllSeparatableChildSimpleSquare2d();
 			this.separatableSquaresFuture = null;
 		} catch (InterruptedException | ExecutionException e) {
@@ -908,12 +907,12 @@ public class CombineSquare2d extends Square2d {
 	}
 
 	private void setupAllSeparatableChildSimpleSquare2d() {
-		if (this.separatableIfNotExistsObjectSquares == null) {
+		if (this.separatableSquares == null) {
 			return;
 		}
 		this.allSeparableChildSimpleSquare2d = new Array<>();
-		for (Square2d separatableSquare : this.separatableIfNotExistsObjectSquares) {
-			for (SimpleSquare2d childSimpleSquare : this.allOrderedCombiningSimpleSquare2d) {
+		for (Square2d separatableSquare : this.separatableSquares) {
+			for (SimpleSquare2d childSimpleSquare : this.allCombinedAndOrderedSimpleSquare2d) {
 				if (separatableSquare == childSimpleSquare || (separatableSquare instanceof CombineSquare2d) && ((CombineSquare2d) separatableSquare).contains(childSimpleSquare)) {
 					this.allSeparableChildSimpleSquare2d.add(childSimpleSquare);
 				}
@@ -960,7 +959,7 @@ public class CombineSquare2d extends Square2d {
 			square.setY(oldY);
 		}
 		if (this.highlightSeparatableSquare) {
-			for (Square2d separatableSquare : this.separatableIfNotExistsObjectSquares) {
+			for (Square2d separatableSquare : this.separatableSquares) {
 				separatableSquare.drawEdge(batch);
 			}
 		}
@@ -1042,8 +1041,8 @@ public class CombineSquare2d extends Square2d {
 			if (!this.squares.contains((Square2d) actor, true)) {
 				return false;
 			}
-			boolean isSuccessSeparate = this.separate((Square2d) actor);
-			if (!isSuccessSeparate) {
+			final boolean separated = this.separate((Square2d) actor);
+			if (separated == false) {
 				throw new IllegalArgumentException(actor.getName() + "is not separable."); //$NON-NLS-1$
 			}
 			return true;
