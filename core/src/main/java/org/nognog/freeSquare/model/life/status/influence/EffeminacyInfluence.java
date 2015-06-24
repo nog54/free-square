@@ -12,22 +12,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life.status;
+package org.nognog.freeSquare.model.life.status.influence;
+
+import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2015/02/08
  */
-public class ClamInfluence extends StatusInfluence {
+public class EffeminacyInfluence extends SingleStatusInfluence<EffeminacyInfluence> {
 
 	/**
-	 * @param influencePerAmount
+	 * @param amount
 	 */
-	public ClamInfluence(double influencePerAmount) {
-		super(influencePerAmount);
+	public EffeminacyInfluence(double amount) {
+		super(amount);
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int amount) {
-		targetStatus.addClam(amount * this.getInfluencePerAmount());
+	public void applyTo(Status target, int amount) {
+		target.addEffeminacy(amount * this.getAmount());
+	}
+
+	@Override
+	public EffeminacyInfluence createScaledInfluence(double scale) {
+		return new EffeminacyInfluence(this.getAmount() * scale);
 	}
 }

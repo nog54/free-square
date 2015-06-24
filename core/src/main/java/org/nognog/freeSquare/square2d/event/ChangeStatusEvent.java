@@ -12,25 +12,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.square2d.object.types.eatable;
+package org.nognog.freeSquare.square2d.event;
 
-import org.nognog.freeSquare.model.food.Taste;
 import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
-import org.nognog.freeSquare.square2d.object.Square2dObjectType;
+import org.nognog.freeSquare.square2d.Square2dEvent;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 /**
- * @author goshi 2015/02/08
+ * @author goshi 2015/02/02
  */
-@SuppressWarnings("javadoc")
-public interface EatableObjectType extends Square2dObjectType<EatableObject> {
+public class ChangeStatusEvent extends Square2dEvent {
+	private final LifeObject changedObject;
+	private final StatusInfluence influence;
 
-	int getQuantity();
+	/**
+	 * @param changedObject
+	 * @param influence 
+	 * @param createScaledInfluence
+	 */
+	public ChangeStatusEvent(LifeObject changedObject, StatusInfluence influence) {
+		this.changedObject = changedObject;
+		this.influence = influence;
+	}
 
-	Taste[] getTaste();
-	
-	StatusInfluence getStatusInfluence();
+	/**
+	 * @return the object
+	 */
+	public LifeObject getChangedObject() {
+		return this.changedObject;
+	}
 
-	void applyStatusInfluenceTo(LifeObject target, int eatAmount);
-
+	/**
+	 * @return influence
+	 */
+	public StatusInfluence getInfluences() {
+		return this.influence;
+	}
 }

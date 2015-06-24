@@ -12,22 +12,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life.status;
+package org.nognog.freeSquare.model.life.status.influence;
+
+import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2015/02/08
  */
-public class DefianceInfluence extends StatusInfluence {
+public class ConditionInfluence extends SingleStatusInfluence<ConditionInfluence> {
 
 	/**
-	 * @param influencePerAmount
+	 * @param amount
 	 */
-	public DefianceInfluence(double influencePerAmount) {
-		super(influencePerAmount);
+	public ConditionInfluence(double amount) {
+		super(amount);
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int amount) {
-		targetStatus.addDefiance(amount * this.getInfluencePerAmount());
+	public void applyTo(Status target, int amount) {
+		target.addCommunication(amount * this.getAmount());
+	}
+
+	@Override
+	public ConditionInfluence createScaledInfluence(double scale) {
+		return new ConditionInfluence(this.getAmount() * scale);
 	}
 }

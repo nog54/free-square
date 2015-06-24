@@ -12,33 +12,49 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life.status;
+package org.nognog.freeSquare.model.life.status.influence;
+
+import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2015/02/08
+ * @param <T> extended class
  */
-public abstract class StatusInfluence {
-	private final double influencePerAmount;
+public abstract class SingleStatusInfluence<T extends SingleStatusInfluence<T>> {
+	private final double amount;
 
 	/**
 	 * @param type
 	 * @param amount
 	 */
-	public StatusInfluence(double amount) {
-		this.influencePerAmount = amount;
+	public SingleStatusInfluence(double amount) {
+		this.amount = amount;
 	}
 
 	/**
 	 * @return the amount
 	 */
-	public double getInfluencePerAmount() {
-		return this.influencePerAmount;
+	public double getAmount() {
+		return this.amount;
 	}
 
 	/**
-	 * @param targetStatus
-	 * @param eatAmount
+	 * @param target
 	 */
-	public abstract void applyTo(Status targetStatus, int eatAmount);
+	public void applyTo(Status target) {
+		this.applyTo(target, 1);
+	}
+
+	/**
+	 * @param target
+	 * @param times
+	 */
+	public abstract void applyTo(Status target, int times);
+	
+	/**
+	 * @param scale
+	 * @return scaled influence
+	 */
+	public abstract T createScaledInfluence(double scale);
 
 }

@@ -16,6 +16,9 @@ package org.nognog.freeSquare.square2d.object.types.eatable;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
+import mockit.Mocked;
+import mockit.Verifications;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,10 +28,12 @@ import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.status.Status;
-import org.nognog.freeSquare.model.life.status.StatusInfluence;
+import org.nognog.freeSquare.model.life.status.influence.SingleStatusInfluence;
+import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
+import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
@@ -61,9 +66,11 @@ public class EatableObjectTest {
 		SimpleSquare2d square = Square2dType.GRASSY_SQUARE1_MEDIUM.create();
 		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			EatableObject object = type.create();
+			object.setSquare(square);
 			Vector2 randomPoint = Square2dUtils.getRandomPointOn(square);
 			object.setPosition(randomPoint.x, randomPoint.y);
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
+			eater.setSquare(square);
 			final int baseAmount = object.getAmount();
 			final int amount1 = 5, amount2 = 10, amount3 = 15, amount4 = 20;
 			object.eatenBy(eater, amount1, Direction.DOWN);
@@ -72,16 +79,16 @@ public class EatableObjectTest {
 			object.eatenBy(eater, amount4, Direction.LEFT);
 			assertThat(object.getAmount(), is(Math.max(0, baseAmount - (amount1 + amount2 + amount3 + amount4))));
 			Status expectedStatus = new Status();
-			for (StatusInfluence statusInfluence : type.getStatusInfluences()) {
+			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
 				statusInfluence.applyTo(expectedStatus, 5);
 			}
-			for (StatusInfluence statusInfluence : type.getStatusInfluences()) {
+			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
 				statusInfluence.applyTo(expectedStatus, 10);
 			}
-			for (StatusInfluence statusInfluence : type.getStatusInfluences()) {
+			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
 				statusInfluence.applyTo(expectedStatus, 15);
 			}
-			for (StatusInfluence statusInfluence : type.getStatusInfluences()) {
+			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
 				statusInfluence.applyTo(expectedStatus, 20);
 			}
 			assertThat(eater.getLife().getStatus(), is(expectedStatus));
@@ -93,10 +100,12 @@ public class EatableObjectTest {
 
 	@SuppressWarnings("boxing")
 	@Test
-	public final void testResurrection() {
+	public final void testResurrection(@Mocked final Square2d square) {
 		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
 			EatableObject object = type.create();
+			object.setSquare(square);
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
+			eater.setSquare(square);
 			final int baseAmount = object.getAmount();
 			final int amount1 = 5, amount2 = 10, amount3 = 15, amount4 = 20;
 			object.eatenBy(eater, amount1, Direction.DOWN);
@@ -109,12 +118,28 @@ public class EatableObjectTest {
 		}
 	}
 
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "unused" })
 	@Test
-	public final void testIsBeingEaten() {
+	public final void testEatenBy(@Mocked final Square2d square) {
+		int counter = 0;
 		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
+			counter++;
 			EatableObject object = type.create();
 			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
+			try {
+				object.eatenBy(eater, 0, Direction.DOWN);
+				fail();
+			} catch (IllegalStateException e) {
+				// pass
+			}
+			object.setSquare(square);
+			try {
+				object.eatenBy(eater, 0, Direction.DOWN);
+				fail();
+			} catch (IllegalStateException e) {
+				// pass
+			}
+			eater.setSquare(square);
 			object.eatenBy(eater, 0, Direction.DOWN);
 			assertThat(object.isBeingEaten(), is(false));
 			object.eatenBy(eater, 1, Direction.DOWN);
@@ -123,7 +148,13 @@ public class EatableObjectTest {
 			assertThat(object.isBeingEaten(), is(true));
 			object.resurrection();
 			assertThat(object.isBeingEaten(), is(false));
+			final int expectedNotifyTimes = counter;
+			new Verifications() {
+				{
+					square.notifyEventListeners((SquareEvent) any);
+					times = expectedNotifyTimes;
+				}
+			};
 		}
 	}
-
 }

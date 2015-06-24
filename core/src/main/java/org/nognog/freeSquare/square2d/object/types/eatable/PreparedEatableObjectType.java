@@ -14,15 +14,15 @@
 
 package org.nognog.freeSquare.square2d.object.types.eatable;
 
-import static org.nognog.freeSquare.model.life.status.StatusInfluences.agility;
+import static org.nognog.freeSquare.model.life.status.influence.InfluencesUtils.agility;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.food.Food;
 import org.nognog.freeSquare.model.food.Taste;
-import org.nognog.freeSquare.model.life.status.StatusInfluence;
+import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
+import org.nognog.freeSquare.model.life.status.influence.SingleStatusInfluence;
 import org.nognog.freeSquare.square2d.object.types.Colors;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
@@ -53,39 +53,39 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 
 	BLACK_SESAME_TOFU(Food.BLACK_SESAME_TOFU, TOFU, Colors.LIGHT_GRAY), ;
 
-	private PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, StatusInfluence... influences) {
-		this(bindFood, texturePath, logicalWidth, EatableObject.class, influences);
+	private PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, texturePath, logicalWidth, EatableObject.class, singleInfluences);
 	}
 
-	private PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Color color, StatusInfluence... influences) {
-		this(bindFood, texturePath, logicalWidth, color, EatableObject.class, influences);
+	private PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Color color, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, texturePath, logicalWidth, color, EatableObject.class, singleInfluences);
 	}
 
-	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Class<T> klass, StatusInfluence... influences) {
-		this(bindFood, texturePath, logicalWidth, Colors.WHITE, klass, influences);
+	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Class<T> klass, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, texturePath, logicalWidth, Colors.WHITE, klass, singleInfluences);
 	}
 
-	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Color color, Class<T> klass, StatusInfluence... influences) {
-		this(bindFood, new Texture(texturePath), logicalWidth, color, klass, influences);
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, EatableObjectType type, Color color, StatusInfluence... influences) {
-		this(bindFood, type.getTexture(), type.getLogicalWidth(), color, (Class<T>) type.getSquareObjectClass(), influences);
+	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, String texturePath, float logicalWidth, Color color, Class<T> klass, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, new Texture(texturePath), logicalWidth, color, klass, singleInfluences);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, EatableObjectType type, float logicalWidth, Color color, StatusInfluence... influences) {
-		this(bindFood, type.getTexture(), logicalWidth, color, (Class<T>) type.getSquareObjectClass(), influences);
+	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, EatableObjectType type, Color color, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, type.getTexture(), type.getLogicalWidth(), color, (Class<T>) type.getSquareObjectClass(), singleInfluences);
 	}
 
-	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, Texture texture, float logicalWidth, Color color, Class<T> klass, StatusInfluence... influences) {
+	@SuppressWarnings("unchecked")
+	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, EatableObjectType type, float logicalWidth, Color color, SingleStatusInfluence<?>... singleInfluences) {
+		this(bindFood, type.getTexture(), logicalWidth, color, (Class<T>) type.getSquareObjectClass(), singleInfluences);
+	}
+
+	private <T extends EatableObject> PreparedEatableObjectType(Food bindFood, Texture texture, float logicalWidth, Color color, Class<T> klass, SingleStatusInfluence<?>... singleInfluences) {
 		this.bindFood = bindFood;
 		this.texture = texture;
 		this.logicalWidth = logicalWidth;
 		this.color = color;
 		this.klass = klass;
-		this.influences = influences;
+		this.influence = new StatusInfluence(singleInfluences);
 	}
 
 	private final Class<?> klass;
@@ -93,7 +93,7 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 	private final Texture texture;
 	private final float logicalWidth;
 	private final Color color;
-	private final StatusInfluence[] influences;
+	private final StatusInfluence influence;
 
 	@Override
 	public Class<?> getSquareObjectClass() {
@@ -147,15 +147,13 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 	}
 
 	@Override
-	public StatusInfluence[] getStatusInfluences() {
-		return Arrays.copyOf(this.influences, this.influences.length);
+	public StatusInfluence getStatusInfluence() {
+		return this.influence;
 	}
 
 	@Override
 	public void applyStatusInfluenceTo(LifeObject eater, int eatAmount) {
-		for (StatusInfluence influence : this.influences) {
-			influence.applyTo(eater.getLife().getStatus(), eatAmount);
-		}
+		this.influence.applyTo(eater.getLife().getStatus(), eatAmount);
 	}
 
 }

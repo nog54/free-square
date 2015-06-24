@@ -12,22 +12,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life.status;
+package org.nognog.freeSquare.model.life.status.influence;
+
+import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2015/02/08
  */
-public class StressInfluence extends StatusInfluence {
+public class FortitudeInfluence extends SingleStatusInfluence<FortitudeInfluence> {
 
 	/**
-	 * @param influencePerAmount
+	 * @param amount
 	 */
-	public StressInfluence(double influencePerAmount) {
-		super(influencePerAmount);
+	public FortitudeInfluence(double amount) {
+		super(amount);
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int amount) {
-		targetStatus.addStress(amount * this.getInfluencePerAmount());
+	public void applyTo(Status target, int amount) {
+		target.addFortitude(amount * this.getAmount());
+	}
+
+	@Override
+	public FortitudeInfluence createScaledInfluence(double scale) {
+		return new FortitudeInfluence(this.getAmount() * scale);
 	}
 }
