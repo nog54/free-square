@@ -52,11 +52,6 @@ public interface Square<T extends SquareObject<?>> extends Nameable {
 	/**
 	 * @param event
 	 */
-	void notifyObservers(SquareEvent event);
-
-	/**
-	 * @param event
-	 */
-	void notify(SquareEvent event);
+	void notifyEventListeners(SquareEvent event);
 
 }

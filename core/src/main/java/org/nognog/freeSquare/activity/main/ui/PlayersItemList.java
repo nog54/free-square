@@ -139,7 +139,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	@Override
 	protected void fetchingActorMoved() {
 		if (this.fetchingActor instanceof Square2dObject && this.mainActivity.getSquare() != null) {
-			this.mainActivity.getSquare().notify(new UpdateSquareObjectEvent());
+			this.mainActivity.getSquare().notifyEventListeners(new UpdateSquareObjectEvent((Square2dObject) this.fetchingActor));
 		}
 	}
 
@@ -182,7 +182,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 			putObject.setEnabledAction(true);
 			final Square2dEvent event = new AddObjectEvent(putObject);
 			event.addExceptObserver(putObject);
-			this.mainActivity.getSquare().notifyObservers(event);
+			this.mainActivity.getSquare().notifyEventListeners(event);
 			return true;
 		}
 		if (this.mainActivity.getSquare() != null) {

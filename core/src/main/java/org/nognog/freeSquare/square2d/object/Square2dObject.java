@@ -363,7 +363,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	@Override
-	public void notify(SquareEvent event) {
+	public void eventOccured(SquareEvent event) {
 		// overridden by sub class
 	}
 

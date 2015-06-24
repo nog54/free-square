@@ -39,14 +39,14 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/02/15
  */
-public abstract class Square2d extends Group implements Square<Square2dObject>, SimpleDrawable {
+public abstract class Square2d extends Group implements Square<Square2dObject>, SimpleDrawable, SquareEventListener {
 
-	protected Array<Square2dObject> objects = new Array<>();
-	protected Array<SquareEventListener> observers = new Array<>();
+	protected Array<Square2dObject> objects;
+	protected Array<SquareEventListener> squareEventListeners;
 
 	private boolean requestedDrawEdge;
 
-	private boolean requestedDrawOrderUpdate = false;
+	private boolean requestedDrawOrderUpdate;
 
 	// cache
 	private transient Vector2 stageCoordinatesPosition;
@@ -95,6 +95,12 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			return 0;
 		}
 	};
+
+	protected Square2d() {
+		this.objects = new Array<>();
+		this.squareEventListeners = new Array<>();
+		this.squareEventListeners.add(this);
+	}
 
 	/**
 	 * @param vertex
@@ -359,7 +365,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		object.setSquare(this);
 		object.setPosition(x, y);
 		if (notifyObserver) {
-			this.notifyObservers(new AddObjectEvent(object));
+			this.notifyEventListeners(new AddObjectEvent(object));
 		}
 		this.addSquareObserver(object);
 		this.objects.add(object);
@@ -372,7 +378,6 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 */
 	@Override
 	public boolean removeSquareObject(Square2dObject object) {
-		this.objects.removeValue(object, true);
 		return this.removeSquareObject(object, true);
 	}
 
@@ -386,14 +391,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 			return false;
 		}
 		if (notifyObserver) {
-			this.notifyObservers(new RemoveObjectEvent(object, object));
+			this.notifyEventListeners(new RemoveObjectEvent(object, object));
 		}
 		super.removeActor(object);
 		object.setSquare(null);
 		this.removeSquareObserver(object);
 		this.objects.removeValue(object, true);
 		if (notifyObserver) {
-			this.notifyObservers(new RemoveObjectEvent(object));
+			this.notifyEventListeners(new RemoveObjectEvent(object));
 		}
 		return true;
 
@@ -522,10 +527,10 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	@Override
 	public void addSquareObserver(SquareEventListener observer) {
-		if (this.observers.contains(observer, true)) {
+		if (this.squareEventListeners.contains(observer, true)) {
 			return;
 		}
-		this.observers.add(observer);
+		this.squareEventListeners.add(observer);
 	}
 
 	/**
@@ -539,32 +544,35 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 
 	@Override
 	public void removeSquareObserver(SquareEventListener observer) {
-		this.observers.removeValue(observer, true);
+		if (observer == this) {
+			return;
+		}
+		this.squareEventListeners.removeValue(observer, true);
 	}
 
 	@Override
-	public void notify(SquareEvent event) {
+	public void eventOccured(SquareEvent event) {
 		if (event instanceof UpdateSquareObjectEvent) {
 			this.requestDrawOrderUpdate();
 		}
 	}
 
 	@Override
-	public void notifyObservers(SquareEvent event) {
+	public void notifyEventListeners(SquareEvent event) {
 		if (!(event instanceof Square2dEvent)) {
 			return;
 		}
 		Square2dEvent square2dEvent = (Square2dEvent) event;
 		SquareEventListener notifyTarget = square2dEvent.getTargetObserver();
-		if (notifyTarget != null && this.observers.contains(notifyTarget, true)) {
-			notifyTarget.notify(square2dEvent);
+		if (notifyTarget != null && this.squareEventListeners.contains(notifyTarget, true)) {
+			notifyTarget.eventOccured(square2dEvent);
 			return;
 		}
-		for (int i = 0; i < this.observers.size; i++) {
-			if (square2dEvent.getExceptObservers().contains(this.observers.get(i), true)) {
+		for (int i = 0; i < this.squareEventListeners.size; i++) {
+			if (square2dEvent.getExceptObservers().contains(this.squareEventListeners.get(i), true)) {
 				continue;
 			}
-			this.observers.get(i).notify(square2dEvent);
+			this.squareEventListeners.get(i).eventOccured(square2dEvent);
 		}
 	}
 

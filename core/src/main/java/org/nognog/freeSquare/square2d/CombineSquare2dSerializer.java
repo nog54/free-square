@@ -109,7 +109,7 @@ public class CombineSquare2dSerializer implements Json.Serializer<CombineSquare2
 			final Square2d beCombineSquare = combineSquares.get(i);
 			final Vertex combineVertex1 = CombineSquare2dUtils.getVertexHavingSameValue(combineVertices1.get(i), baseSquare.getVertices());
 			final Vertex combineVertex2 = CombineSquare2dUtils.getVertexHavingSameValue(combineVertices2.get(i), beCombineSquare.getVertices());
-			final boolean isCombineSuccess = baseSquare.combine(combineVertex1, beCombineSquare, combineVertex2);
+			final boolean isCombineSuccess = baseSquare.combineWith(combineVertex1, beCombineSquare, combineVertex2);
 			if (isCombineSuccess) {
 				combineSquares.removeValue(beCombineSquare, true);
 				combineVertices1.removeIndex(i);
@@ -126,7 +126,7 @@ public class CombineSquare2dSerializer implements Json.Serializer<CombineSquare2
 				for (Vertex beCombinedSquareVertex : beCombinedSquare.getVertices()) {
 					final Vertex afterBeCombinedSquareVertex = CombineSquare2d.calculateAfterCombineTargetVertex(beCombinedSquareVertex, combineVertices1.get(i), combineVertices2.get(i));
 					final Vertex sufficientlyCloseVertex = CombineSquare2dUtils.getSufficientlyCloseVertex(afterBeCombinedSquareVertex, baseSquare.getVertices());
-					final boolean isCombineSuccess = baseSquare.combine(sufficientlyCloseVertex, beCombinedSquare, beCombinedSquareVertex);
+					final boolean isCombineSuccess = baseSquare.combineWith(sufficientlyCloseVertex, beCombinedSquare, beCombinedSquareVertex);
 					if (isCombineSuccess) {
 						combineSquares.removeValue(beCombinedSquare, true);
 						combineVertices1.removeIndex(i);

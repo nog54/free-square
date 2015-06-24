@@ -21,7 +21,6 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.square2d.event.UpdateSquareEvent;
 import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
@@ -103,9 +102,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 
 	@Override
 	protected void fetchingActorMoved() {
-		if (this.mainActivity.getSquare() != null) {
-			this.mainActivity.getSquare().notify(new UpdateSquareEvent());
-		}
+		// nothing to do
 	}
 
 	@Override

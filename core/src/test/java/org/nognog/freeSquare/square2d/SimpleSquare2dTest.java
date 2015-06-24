@@ -92,7 +92,7 @@ public class SimpleSquare2dTest {
 		final int actual1 = square.getSquareImage().getZIndex();
 		assertThat(actual1, is(expected1));
 
-		square.notify(new UpdateSquareObjectEvent());
+		square.eventOccured(new UpdateSquareObjectEvent());
 		square.draw(mockBatch, 0);
 
 		final int expected2 = 0;
@@ -202,31 +202,31 @@ public class SimpleSquare2dTest {
 		final Square2dEvent event = new Square2dEvent();
 		square.addSquareObserver(listener1);
 		square.addSquareObserver(listener3);
-		square.notifyObservers(event);
+		square.notifyEventListeners(event);
 		square.addSquareObserver(listener2);
-		square.notifyObservers(event);
+		square.notifyEventListeners(event);
 
 		new Verifications() {
 			{
-				listener1.notify(event);
+				listener1.eventOccured(event);
 				times = 2;
-				listener2.notify(event);
+				listener2.eventOccured(event);
 				times = 1;
-				listener3.notify(event);
+				listener3.eventOccured(event);
 				times = 2;
 			}
 		};
 
 		square.removeSquareObserver(listener1);
-		square.notifyObservers(event);
+		square.notifyEventListeners(event);
 
 		new Verifications() {
 			{
-				listener1.notify(event);
+				listener1.eventOccured(event);
 				times = 2;
-				listener2.notify(event);
+				listener2.eventOccured(event);
 				times = 2;
-				listener3.notify(event);
+				listener3.eventOccured(event);
 				times = 3;
 			}
 		};

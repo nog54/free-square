@@ -49,7 +49,7 @@ public class KeepLandingOnSquareAction extends AbstractPrioritizableAction {
 		if (this.actionToGotoNearestVertexOfSquare.act(delta) == true) {
 			this.actionToGotoNearestVertexOfSquare = null;
 			final Square2dObject object = (Square2dObject) this.getActor();
-			object.notify(new UpdateSquareObjectEvent(object));
+			object.eventOccured(new UpdateSquareObjectEvent(object));
 		}
 		return false;
 	}

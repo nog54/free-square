@@ -395,7 +395,7 @@ public class MainActivity extends FreeSquareActivity {
 				final Vector2 stageCoordinatesBaseSquareVertex = stageCoordinatesBaseSquareVertices[i];
 				final float r = Square2dUtils.toVertex(stageCoordinatesAddSquareVertex).calculateR(Square2dUtils.toVertex(stageCoordinatesBaseSquareVertex));
 				if (CombineSquare2dUtils.regardAsSufficientlyCloseThreshold * 2 > r) {
-					final boolean isSuccess = baseSquare.combine(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
+					final boolean isSuccess = baseSquare.combineWith(baseSquare.getVertices()[i], combineSquare, addSquareVertex);
 					if (isSuccess) {
 						baseSquare.startCreateSimpleTextureAsyncIfNotStart();
 						baseSquare.startSetupSeparatableSquaresAsyncIfNotStart();
@@ -734,7 +734,7 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	@Override
-	public void notify(SquareEvent event) {
+	public void eventOccured(SquareEvent event) {
 		if (event instanceof CollectObjectRequestEvent && this.square != null) {
 			final Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
 			if (collectRequestedObject instanceof LifeObject) {

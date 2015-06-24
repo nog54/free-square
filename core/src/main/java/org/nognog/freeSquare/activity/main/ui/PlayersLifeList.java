@@ -104,7 +104,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected void fetchingActorMoved() {
-		this.mainActivity.getSquare().notify(new UpdateSquareObjectEvent());
+		this.mainActivity.getSquare().notifyEventListeners(new UpdateSquareObjectEvent(this.fetchingActor));
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 			putTargetFetchingActor.setEnabledAction(true);
 			Square2dEvent event = new AddObjectEvent(putTargetFetchingActor);
 			event.addExceptObserver(putTargetFetchingActor);
-			this.mainActivity.getSquare().notifyObservers(event);
+			this.mainActivity.getSquare().notifyEventListeners(event);
 		} else {
 			this.mainActivity.getSquare().removeSquareObject(putTargetFetchingActor);
 		}
@@ -126,7 +126,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	protected void selectedItemLongPressed(Life longPressedItem, float x, float y) {
 		this.mainActivity.inputName(longPressedItem, Messages.getString("lifeNameInput")); //$NON-NLS-1$ 
 	}
-	
+
 	@Override
 	protected ObservableOrthographicCamera getMoveCamera() {
 		return this.mainActivity.getCamera();

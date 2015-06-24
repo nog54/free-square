@@ -83,13 +83,13 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if (this.isTripleTapped(count)) {
-					LifeObject.this.getSquare().notifyObservers(new CollectObjectRequestEvent(LifeObject.this));
+					LifeObject.this.getSquare().notifyEventListeners(new CollectObjectRequestEvent(LifeObject.this));
 				}
 			}
 
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
-				LifeObject.this.getSquare().notifyObservers(new RenameRequestEvent(LifeObject.this.getLife()));
+				LifeObject.this.getSquare().notifyEventListeners(new RenameRequestEvent(LifeObject.this.getLife()));
 				return true;
 			}
 
@@ -128,7 +128,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			return 0;
 		}
 		final int actuallyEatAmount = eatObject.eatenBy(this, amount, eatDirection);
-		this.getSquare().notifyObservers(new EatObjectEvent(this, eatObject, actuallyEatAmount));
+		this.getSquare().notifyEventListeners(new EatObjectEvent(this, eatObject, actuallyEatAmount));
 		return actuallyEatAmount;
 	}
 
@@ -182,8 +182,8 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	public abstract EatableObject getEasyReachableNearestEatableLandingObject();
 
 	@Override
-	public void notify(SquareEvent event) {
-		super.notify(event);
+	public void eventOccured(SquareEvent event) {
+		super.eventOccured(event);
 		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
 			this.freeRunningAction.resetTargetPosition();
 		}

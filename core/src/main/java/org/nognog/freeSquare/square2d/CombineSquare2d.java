@@ -226,7 +226,7 @@ public class CombineSquare2d extends Square2d {
 	 * @param targetsCombineVertex
 	 * @return true if success
 	 */
-	public boolean combine(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetsCombineVertex) {
+	public boolean combineWith(Vertex thisCombineVertex, Square2d targetSquare, Vertex targetsCombineVertex) {
 		if (!this.isCombinableWith(thisCombineVertex, targetSquare, targetsCombineVertex)) {
 			return false;
 		}
@@ -235,6 +235,7 @@ public class CombineSquare2d extends Square2d {
 		this.mergeCombinePoints(combinedPoints.<CombinePoint> toArray(CombinePoint.class));
 		this.addSquare(targetSquare, thisCombineVertex.x - targetsCombineVertex.x, thisCombineVertex.y - targetsCombineVertex.y);
 		this.clearSeparableSquareCache();
+		this.notifyEventListeners(new UpdateSquareEvent(this));
 		return true;
 	}
 
@@ -366,7 +367,7 @@ public class CombineSquare2d extends Square2d {
 			square.removeSquareObject(object, false);
 			this.addSquareObject(object, object.getX() + squarePositionDiffX, object.getY() + squarePositionDiffY, false);
 		}
-		this.addSquareObservers(square.observers.<SquareEventListener> toArray(SquareEventListener.class));
+		this.addSquareObservers(square.squareEventListeners.<SquareEventListener> toArray(SquareEventListener.class));
 		this.disposeSimpleTexture();
 		this.calculateBorder();
 		this.requestDrawOrderUpdate();
@@ -566,7 +567,7 @@ public class CombineSquare2d extends Square2d {
 		this.removeSquare(separateTarget);
 		this.combineInfo.removeCombineInfo(separateTarget);
 		this.clearSeparableSquareCache();
-		this.notifyObservers(new UpdateSquareEvent(this));
+		this.notifyEventListeners(new UpdateSquareEvent(this));
 		return true;
 	}
 
