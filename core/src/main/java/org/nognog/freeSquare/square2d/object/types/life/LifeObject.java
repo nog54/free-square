@@ -29,6 +29,7 @@ import org.nognog.freeSquare.square2d.action.object.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
 import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
+import org.nognog.freeSquare.square2d.event.EatEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
@@ -130,6 +131,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			return 0;
 		}
 		final int actuallyEatAmount = eatObject.eatenBy(this, amount, eatDirection);
+		this.getSquare().notifyEventListeners(new EatEvent(this, eatObject, actuallyEatAmount));
 		return actuallyEatAmount;
 	}
 
