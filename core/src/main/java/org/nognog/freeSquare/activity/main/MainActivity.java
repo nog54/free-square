@@ -29,6 +29,7 @@ import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.model.square.SquareEvent;
+import org.nognog.freeSquare.model.square.SquareEventListener;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.CombineSquare2dUtils;
 import org.nognog.freeSquare.square2d.Direction;
@@ -74,7 +75,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/04/13
  */
-public class MainActivity extends FreeSquareActivity {
+public class MainActivity extends FreeSquareActivity implements CameraObserver, SquareEventListener {
 	static final float cameraDeceleration = 2000;
 	static final int ratioOfMenuButtonWidthToCameraWidth = 4;
 

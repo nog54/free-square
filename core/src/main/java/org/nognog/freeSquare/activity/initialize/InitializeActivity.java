@@ -16,8 +16,6 @@ package org.nognog.freeSquare.activity.initialize;
 
 import org.nognog.freeSquare.FreeSquare;
 import org.nognog.freeSquare.activity.FreeSquareActivity;
-import org.nognog.freeSquare.model.square.SquareEvent;
-import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.ui.CameraFitSimpleYesNoDialog;
 
 import com.badlogic.gdx.InputProcessor;
@@ -49,16 +47,6 @@ public class InitializeActivity extends FreeSquareActivity {
 			}
 		};
 		this.addActor(this.yesNoDialog);
-	}
-
-	@Override
-	public void updateCamera(Camera camera) {
-		// nothing
-	}
-
-	@Override
-	public void handleEvent(SquareEvent event) {
-		// nothing
 	}
 
 	@Override

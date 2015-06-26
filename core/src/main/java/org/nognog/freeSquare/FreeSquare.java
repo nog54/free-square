@@ -49,6 +49,7 @@ import org.nognog.freeSquare.square2d.object.types.other.ExternalOtherObjectType
 import org.nognog.freeSquare.square2d.object.types.other.OtherObjectTypeManager;
 import org.nognog.freeSquare.util.font.FontUtil;
 import org.nognog.freeSquare.util.square2d.AllSquare2dObjectTypeManager;
+import org.nognog.gdx.util.camera.CameraObserver;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -147,7 +148,9 @@ public class FreeSquare extends ApplicationAdapter {
 	 */
 	public void setActivity(FreeSquareActivity activity) {
 		if (this.currentActivity != null) {
-			this.camera.removeCameraObserver(this.currentActivity);
+			if (this.currentActivity instanceof CameraObserver) {
+				this.camera.removeCameraObserver((CameraObserver) this.currentActivity);
+			}
 			this.currentActivity.pause();
 		}
 		this.multiplexer.clear();
@@ -160,7 +163,9 @@ public class FreeSquare extends ApplicationAdapter {
 		}
 		this.multiplexer.addProcessor(this.stage);
 		this.currentActivity = activity;
-		this.camera.addCameraObserver(this.currentActivity);
+		if (this.currentActivity instanceof CameraObserver) {
+			this.camera.addCameraObserver((CameraObserver) this.currentActivity);
+		}
 		this.currentActivity.resume();
 	}
 
