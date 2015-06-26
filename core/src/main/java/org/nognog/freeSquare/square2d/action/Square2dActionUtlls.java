@@ -28,6 +28,8 @@ import org.nognog.freeSquare.square2d.action.object.MomentumMoveAction;
 import org.nognog.freeSquare.square2d.action.object.MoveToNextTargetPositionAction;
 import org.nognog.freeSquare.square2d.action.object.MoveToSquareObjectAction;
 import org.nognog.freeSquare.square2d.action.object.MoveToTargetPositionAction;
+import org.nognog.freeSquare.square2d.action.object.SleepAction;
+import org.nognog.freeSquare.square2d.action.object.SleepPolicy;
 import org.nognog.freeSquare.square2d.action.object.StopTimeGenerator;
 import org.nognog.freeSquare.square2d.action.object.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -202,7 +204,7 @@ public class Square2dActionUtlls {
 	}
 
 	/**
-	 * @param target 
+	 * @param target
 	 * @param deceleration
 	 * @param velocityX
 	 * @param velocityY
@@ -237,6 +239,26 @@ public class Square2dActionUtlls {
 	 */
 	public static KeepLandingOnSquareAction keepLandingOnSquare() {
 		final KeepLandingOnSquareAction action = Actions.action(KeepLandingOnSquareAction.class);
+		return action;
+	}
+
+	/**
+	 * @param sleepTime
+	 * @return action
+	 */
+	public static SleepAction sleep(float sleepTime) {
+		final SleepAction action = Actions.action(SleepAction.class);
+		action.setPolicy(SleepPolicy.FIX_TIME);
+		action.setDesiredSleepTime(sleepTime);
+		return action;
+	}
+
+	/**
+	 * @return action
+	 */
+	public static SleepAction sleepUntilCompleteRecovery() {
+		final SleepAction action = Actions.action(SleepAction.class);
+		action.setPolicy(SleepPolicy.COMPLETE_RECOVERY);
 		return action;
 	}
 }

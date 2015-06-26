@@ -29,8 +29,8 @@ public class StressInfluence extends SingleStatusInfluence<StressInfluence> {
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int amount) {
-		targetStatus.addStress(amount * this.getAmount());
+	public void applyTo(Status target, int amount) {
+		target.addStress(amount * this.getAmount());
 	}
 
 	@Override

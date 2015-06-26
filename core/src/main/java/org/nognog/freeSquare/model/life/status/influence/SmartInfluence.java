@@ -29,8 +29,8 @@ public class SmartInfluence extends SingleStatusInfluence<SmartInfluence> {
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int times) {
-		targetStatus.addSmart(times * this.getAmount());
+	public void applyTo(Status target, int times) {
+		target.addSmart(times * this.getAmount());
 	}
 
 	@Override

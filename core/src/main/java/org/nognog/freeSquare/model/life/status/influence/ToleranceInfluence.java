@@ -29,8 +29,8 @@ public class ToleranceInfluence extends SingleStatusInfluence<ToleranceInfluence
 	}
 
 	@Override
-	public void applyTo(Status targetStatus, int times) {
-		targetStatus.addTolerance(times * this.getAmount());
+	public void applyTo(Status target, int times) {
+		target.addTolerance(times * this.getAmount());
 	}
 
 	@Override

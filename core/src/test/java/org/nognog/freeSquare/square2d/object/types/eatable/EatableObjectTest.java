@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import mockit.Mocked;
+import mockit.NonStrictExpectations;
 import mockit.Verifications;
 
 import org.junit.AfterClass;
@@ -28,13 +29,14 @@ import org.nognog.GdxTestRunner;
 import org.nognog.freeSquare.model.life.Family;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.model.life.status.Status;
-import org.nognog.freeSquare.model.life.status.influence.SingleStatusInfluence;
+import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.persist.PersistManager;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.SimpleSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Square2dUtils;
+import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.type.Square2dType;
@@ -79,18 +81,13 @@ public class EatableObjectTest {
 			object.eatenBy(eater, amount4, Direction.LEFT);
 			assertThat(object.getAmount(), is(Math.max(0, baseAmount - (amount1 + amount2 + amount3 + amount4))));
 			Status expectedStatus = new Status();
-			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
-				statusInfluence.applyTo(expectedStatus, 5);
-			}
-			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
-				statusInfluence.applyTo(expectedStatus, 10);
-			}
-			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
-				statusInfluence.applyTo(expectedStatus, 15);
-			}
-			for (SingleStatusInfluence<?> statusInfluence : type.getStatusInfluence().getSingleInfluences()) {
-				statusInfluence.applyTo(expectedStatus, 20);
-			}
+			StatusInfluence<?> statusInfluence = type.getStatusInfluence();
+
+			statusInfluence.applyTo(expectedStatus, 5);
+			statusInfluence.applyTo(expectedStatus, 10);
+			statusInfluence.applyTo(expectedStatus, 15);
+			statusInfluence.applyTo(expectedStatus, 20);
+
 			assertThat(eater.getLife().getStatus(), is(expectedStatus));
 			String jsonString = json.toJson(object);
 			Square2dObject deserializedObject = json.fromJson(object.getClass(), jsonString);
@@ -120,12 +117,15 @@ public class EatableObjectTest {
 
 	@SuppressWarnings({ "boxing", "unused" })
 	@Test
-	public final void testEatenBy(@Mocked final Square2d square) {
-		int counter = 0;
+	public final void testEatenBy(@Mocked("notifyEventListeners(SquareEvent)") final Square2d square) {
 		for (EatableObjectType type : EatableObjectTypeManager.getInstance().getAllTypes()) {
-			counter++;
-			EatableObject object = type.create();
-			LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
+			final EatableObject object = type.create();
+			final LifeObject eater = LifeObject.create(new Life(Family.Prepared.RIKI));
+			new NonStrictExpectations(eater) {
+				{
+					eater.handleEvent((ChangeStatusEvent) any);
+				}
+			};
 			try {
 				object.eatenBy(eater, 0, Direction.DOWN);
 				fail();
@@ -148,11 +148,12 @@ public class EatableObjectTest {
 			assertThat(object.isBeingEaten(), is(true));
 			object.resurrection();
 			assertThat(object.isBeingEaten(), is(false));
-			final int expectedNotifyTimes = counter;
 			new Verifications() {
 				{
 					square.notifyEventListeners((SquareEvent) any);
-					times = expectedNotifyTimes;
+					times = 0;
+					eater.handleEvent((ChangeStatusEvent) any);
+					times = 1;
 				}
 			};
 		}

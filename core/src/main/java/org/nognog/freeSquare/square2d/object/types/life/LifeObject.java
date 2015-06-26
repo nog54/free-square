@@ -16,6 +16,8 @@ package org.nognog.freeSquare.square2d.object.types.life;
 
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.life.Life;
+import org.nognog.freeSquare.model.life.status.Status;
+import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
@@ -25,8 +27,8 @@ import org.nognog.freeSquare.square2d.action.object.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.object.StopTimeGenerator;
 import org.nognog.freeSquare.square2d.action.object.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
-import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
+import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
@@ -176,18 +178,30 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	}
 
 	/**
+	 * @param influence
+	 */
+	public void applyStatusInfluence(StatusInfluence<?> influence) {
+		influence.applyTo(this.life.getStatus());
+		this.handleEvent(new ChangeStatusEvent(this, influence));
+	}
+
+	/**
 	 * @return the nearest eatable object
 	 */
 	public abstract EatableObject getEasyReachableNearestEatableLandingObject();
 
 	@Override
-	public void eventOccured(SquareEvent event) {
-		super.eventOccured(event);
+	public void handleEvent(SquareEvent event) {
+		super.handleEvent(event);
 		if (event instanceof UpdateSquareObjectEvent && ((UpdateSquareObjectEvent) event).getUpdatedObject() == this) {
 			this.freeRunningAction.resetTargetPosition();
 		}
 		if (event instanceof ChangeStatusEvent && ((ChangeStatusEvent) event).getChangedObject() == this) {
 			this.freeRunningAction.setMoveSpeed(LifeObject.toMoveSpeed(this));
+			final double tiredness = this.getLife().getStatus().getTiredness();
+			if (tiredness == Status.StatusRange.TIREDNESS.getMax()) {
+				this.addMainAction(Square2dActionUtlls.sleepUntilCompleteRecovery());
+			}
 		}
 		if (event instanceof AddObjectEvent) {
 			Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);

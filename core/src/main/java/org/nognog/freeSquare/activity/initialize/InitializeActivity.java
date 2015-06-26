@@ -57,7 +57,7 @@ public class InitializeActivity extends FreeSquareActivity {
 	}
 
 	@Override
-	public void eventOccured(SquareEvent event) {
+	public void handleEvent(SquareEvent event) {
 		// nothing
 	}
 

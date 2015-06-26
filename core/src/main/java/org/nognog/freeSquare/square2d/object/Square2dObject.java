@@ -258,7 +258,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 		this.mainActions.removeValue(action, true);
 		action.setActor(null);
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -363,7 +363,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	}
 
 	@Override
-	public void eventOccured(SquareEvent event) {
+	public void handleEvent(SquareEvent event) {
 		// overridden by sub class
 	}
 

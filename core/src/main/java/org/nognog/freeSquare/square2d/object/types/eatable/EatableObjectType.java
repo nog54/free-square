@@ -17,7 +17,6 @@ package org.nognog.freeSquare.square2d.object.types.eatable;
 import org.nognog.freeSquare.model.food.Taste;
 import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
 import org.nognog.freeSquare.square2d.object.Square2dObjectType;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 /**
  * @author goshi 2015/02/08
@@ -29,8 +28,6 @@ public interface EatableObjectType extends Square2dObjectType<EatableObject> {
 
 	Taste[] getTaste();
 	
-	StatusInfluence getStatusInfluence();
-
-	void applyStatusInfluenceTo(LifeObject target, int eatAmount);
+	StatusInfluence<?> getStatusInfluence();
 
 }

@@ -14,56 +14,110 @@
 
 package org.nognog.freeSquare.square2d.action.object;
 
+import org.nognog.freeSquare.model.life.status.influence.InfluencesUtils;
+import org.nognog.freeSquare.model.life.status.influence.TirednessInfluence;
 import org.nognog.freeSquare.square2d.action.AbstractPrioritizableAction;
+import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 /**
  * @author goshi 2015/06/17
  */
 public class SleepAction extends AbstractPrioritizableAction {
 
-	private float sleepTime;
+	private static final double tirednessRecoveryPointPerMinute = 0.1f;
+	private static final int secondsPerMinute = 60;
+
+	private float desiredSleepTime; // use if policy is FIX_TIME
+
+	private float sleepedTime;
+
+	private SleepPolicy policy = SleepPolicy.FIX_TIME;
 
 	/**
 	 * 
 	 */
 	public SleepAction() {
-
 	}
 
 	/**
 	 * @param sleepTime
 	 */
 	public SleepAction(float sleepTime) {
-		this.sleepTime = sleepTime;
+		this.desiredSleepTime = sleepTime;
 	}
 
 	@Override
 	public boolean act(float delta) {
-		this.sleepTime -= delta;
-		if (this.sleepTime <= 0) {
-			this.sleepTime = 0;
-			return true;
+		final int oldSleepedTimeMinutes = ((int) this.sleepedTime) % secondsPerMinute;
+		this.sleepedTime += delta;
+		final int newSleepedTimeMinutes = ((int) this.sleepedTime) % secondsPerMinute;
+
+		final LifeObject sleeper = this.getSleeper();
+		if (oldSleepedTimeMinutes != newSleepedTimeMinutes) {
+			final int differenceOfMinutes = newSleepedTimeMinutes - oldSleepedTimeMinutes;
+			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(differenceOfMinutes * tirednessRecoveryPointPerMinute);
+			sleeper.applyStatusInfluence(tirednessInfluence);
 		}
+
+		if (this.policy == SleepPolicy.FIX_TIME) {
+			if (this.sleepedTime >= this.desiredSleepTime) {
+				return true;
+			}
+		}
+		if (this.policy == SleepPolicy.COMPLETE_RECOVERY) {
+			if (sleeper.getLife().getStatus().getTiredness() == 0) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
 	/**
-	 * @return the sleep time
+	 * @return
 	 */
-	public float getSleepTime() {
-		return this.sleepTime;
+	private LifeObject getSleeper() {
+		return (LifeObject) this.getActor();
 	}
 
 	/**
-	 * @param sleepTime
+	 * @return the desired sleep time
 	 */
-	public void setSleepTime(float sleepTime) {
-		this.sleepTime = sleepTime;
+	public float getDesiredSleepTime() {
+		return this.desiredSleepTime;
+	}
+
+	/**
+	 * @param desiredSleepTime
+	 */
+	public void setDesiredSleepTime(float desiredSleepTime) {
+		this.desiredSleepTime = desiredSleepTime;
+	}
+
+	/**
+	 * @param policy
+	 */
+	public void setPolicy(SleepPolicy policy) {
+		this.policy = policy;
+	}
+
+	/**
+	 * @return the policy
+	 */
+	public SleepPolicy getPolicy() {
+		return this.policy;
 	}
 
 	@Override
 	public boolean isPerformableState() {
 		return true;
+	}
+
+	@Override
+	public void restart() {
+		this.sleepedTime = 0;
+		this.desiredSleepTime = 0;
+		this.policy = SleepPolicy.FIX_TIME;
 	}
 
 }

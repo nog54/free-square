@@ -14,9 +14,9 @@
 
 package org.nognog.freeSquare.square2d.object.types.eatable;
 
+import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
-import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
@@ -70,9 +70,9 @@ public class EatableObject extends MovableSquare2dObject implements LandObject {
 		}
 		final int eatenAmount = (this.amount > eatAmount) ? eatAmount : this.amount;
 		this.amount -= eatenAmount;
-		this.getEatableObjectType().applyStatusInfluenceTo(eater, eatenAmount);
-		this.getSquare().notifyEventListeners(new ChangeStatusEvent(eater, this.getEatableObjectType().getStatusInfluence().createScaledInfluence(eatenAmount)));
-
+		final StatusInfluence<?> statusInfluence = this.getEatableObjectType().getStatusInfluence().createScaledInfluence(eatenAmount);
+		eater.applyStatusInfluence(statusInfluence);
+		
 		if (this.amount == 0) {
 			this.getSquare().removeSquareObject(this);
 			return this.amount;

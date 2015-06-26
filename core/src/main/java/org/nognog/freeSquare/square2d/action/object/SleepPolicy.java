@@ -12,31 +12,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life.status.influence;
-
-import org.nognog.freeSquare.model.life.status.Status;
+package org.nognog.freeSquare.square2d.action.object;
 
 /**
  * @author goshi 2015/06/26
- * @param <T> 
  */
-public interface StatusInfluence<T extends StatusInfluence<T>> {
-
-	/**
-	 * @param status
-	 */
-	void applyTo(Status status);
-
-	/**
-	 * @param status
-	 * @param times
-	 */
-	void applyTo(Status status, int times);
-
-	/**
-	 * @param scale
-	 * @return scaled influence
-	 */
-	public T createScaledInfluence(double scale);
-
+@SuppressWarnings("javadoc")
+public enum SleepPolicy {
+	FIX_TIME, COMPLETE_RECOVERY;
 }

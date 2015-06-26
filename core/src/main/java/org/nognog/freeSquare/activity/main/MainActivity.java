@@ -734,7 +734,7 @@ public class MainActivity extends FreeSquareActivity {
 	}
 
 	@Override
-	public void eventOccured(SquareEvent event) {
+	public void handleEvent(SquareEvent event) {
 		if (event instanceof CollectObjectRequestEvent && this.square != null) {
 			final Square2dObject collectRequestedObject = ((CollectObjectRequestEvent) event).getCollectRequestedObject();
 			if (collectRequestedObject instanceof LifeObject) {

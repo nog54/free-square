@@ -551,7 +551,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	}
 
 	@Override
-	public void eventOccured(SquareEvent event) {
+	public void handleEvent(SquareEvent event) {
 		if (event instanceof UpdateSquareObjectEvent) {
 			this.requestDrawOrderUpdate();
 		}
@@ -565,14 +565,14 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 		Square2dEvent square2dEvent = (Square2dEvent) event;
 		SquareEventListener notifyTarget = square2dEvent.getTargetObserver();
 		if (notifyTarget != null && this.squareEventListeners.contains(notifyTarget, true)) {
-			notifyTarget.eventOccured(square2dEvent);
+			notifyTarget.handleEvent(square2dEvent);
 			return;
 		}
 		for (int i = 0; i < this.squareEventListeners.size; i++) {
 			if (square2dEvent.getExceptObservers().contains(this.squareEventListeners.get(i), true)) {
 				continue;
 			}
-			this.squareEventListeners.get(i).eventOccured(square2dEvent);
+			this.squareEventListeners.get(i).handleEvent(square2dEvent);
 		}
 	}
 

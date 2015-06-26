@@ -71,7 +71,7 @@ public class FireEventAction extends Action {
 
 	@Override
 	public boolean act(float delta) {
-		this.eventListener.eventOccured(this.event);
+		this.eventListener.handleEvent(this.event);
 		return true;
 	}
 

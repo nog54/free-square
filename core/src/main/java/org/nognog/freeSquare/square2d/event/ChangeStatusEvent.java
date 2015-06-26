@@ -23,14 +23,14 @@ import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
  */
 public class ChangeStatusEvent extends Square2dEvent {
 	private final LifeObject changedObject;
-	private final StatusInfluence influence;
+	private final StatusInfluence<?> influence;
 
 	/**
 	 * @param changedObject
 	 * @param influence 
 	 * @param createScaledInfluence
 	 */
-	public ChangeStatusEvent(LifeObject changedObject, StatusInfluence influence) {
+	public ChangeStatusEvent(LifeObject changedObject, StatusInfluence<?> influence) {
 		this.changedObject = changedObject;
 		this.influence = influence;
 	}
@@ -45,7 +45,7 @@ public class ChangeStatusEvent extends Square2dEvent {
 	/**
 	 * @return influence
 	 */
-	public StatusInfluence getInfluences() {
+	public StatusInfluence<?> getInfluences() {
 		return this.influence;
 	}
 }

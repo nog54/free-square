@@ -873,7 +873,7 @@ public class MainActivityTest {
 
 	/**
 	 * Test method for
-	 * {@link org.nognog.freeSquare.activity.main.MainActivity#eventOccured(org.nognog.freeSquare.model.square.SquareEvent)}
+	 * {@link org.nognog.freeSquare.activity.main.MainActivity#handleEvent(org.nognog.freeSquare.model.square.SquareEvent)}
 	 * .
 	 * 
 	 * @param square2d
@@ -896,7 +896,7 @@ public class MainActivityTest {
 				result = lifeOfLifeObject;
 			}
 		};
-		activity.eventOccured(new CollectObjectRequestEvent(square2dObject));
+		activity.handleEvent(new CollectObjectRequestEvent(square2dObject));
 		new Verifications() {
 			{
 				activity.getPlayer().putItem((Item<?, ?>) any);
@@ -906,7 +906,7 @@ public class MainActivityTest {
 
 		activity.setSquare(square2d);
 
-		activity.eventOccured(new CollectObjectRequestEvent(square2dObject));
+		activity.handleEvent(new CollectObjectRequestEvent(square2dObject));
 		new Verifications() {
 			{
 				activity.getPlayer().putItem((Item<?, ?>) any);
@@ -915,7 +915,7 @@ public class MainActivityTest {
 				times = 1;
 			}
 		};
-		activity.eventOccured(new CollectObjectRequestEvent(lifeObject));
+		activity.handleEvent(new CollectObjectRequestEvent(lifeObject));
 		new Verifications() {
 			{
 				activity.getPlayer().addLife(lifeOfLifeObject);

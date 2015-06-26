@@ -18,9 +18,10 @@ import org.nognog.freeSquare.model.life.status.Status;
 
 /**
  * @author goshi 2015/02/08
- * @param <T> extended class
+ * @param <T>
+ *            extended class
  */
-public abstract class SingleStatusInfluence<T extends SingleStatusInfluence<T>> {
+public abstract class SingleStatusInfluence<T extends SingleStatusInfluence<T>> implements StatusInfluence<T> {
 	private final double amount;
 
 	/**
@@ -38,23 +39,9 @@ public abstract class SingleStatusInfluence<T extends SingleStatusInfluence<T>> 
 		return this.amount;
 	}
 
-	/**
-	 * @param target
-	 */
+	@Override
 	public void applyTo(Status target) {
 		this.applyTo(target, 1);
 	}
-
-	/**
-	 * @param target
-	 * @param times
-	 */
-	public abstract void applyTo(Status target, int times);
-	
-	/**
-	 * @param scale
-	 * @return scaled influence
-	 */
-	public abstract T createScaledInfluence(double scale);
 
 }

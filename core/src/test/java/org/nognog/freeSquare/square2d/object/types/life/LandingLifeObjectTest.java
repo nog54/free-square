@@ -129,7 +129,7 @@ public class LandingLifeObjectTest {
 	private void testBackToSquareFrom(float x, float y, final LandingLifeObject object) {
 		new NonStrictExpectations(object) {
 			{
-				object.eventOccured((SquareEvent) any);
+				object.handleEvent((SquareEvent) any);
 			}
 		};
 		object.setPosition(x, y);
@@ -145,14 +145,14 @@ public class LandingLifeObjectTest {
 
 		new Verifications() {
 			{
-				object.eventOccured((SquareEvent) any);
+				object.handleEvent((SquareEvent) any);
 				times = 1;
 			}
 		};
 		object.act(0);
 		new Verifications() {
 			{
-				object.eventOccured((SquareEvent) any);
+				object.handleEvent((SquareEvent) any);
 				times = 1;
 			}
 		};

@@ -23,5 +23,5 @@ public interface SquareEventListener {
 	 * 
 	 * @param event
 	 */
-	void eventOccured(SquareEvent event);
+	void handleEvent(SquareEvent event);
 }

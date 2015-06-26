@@ -138,4 +138,11 @@ public class InfluencesUtils {
 		return new ToleranceInfluence(amount);
 	}
 
+	/**
+	 * @param amount
+	 * @return new instance
+	 */
+	public static TirednessInfluence tiredness(double amount) {
+		return new TirednessInfluence(amount);
+	}
 }

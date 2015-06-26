@@ -25,6 +25,7 @@ import org.nognog.freeSquare.model.SelfValidatable;
 public class Status implements SelfValidatable {
 
 	private int age; // 年
+	private double tiredness; // 疲労
 	private double condition; // コンディション
 	private double hunger; // 空腹度
 	private double power; // 力
@@ -43,65 +44,29 @@ public class Status implements SelfValidatable {
 	private double effeminacy; // 女らしさ
 	private double gift; // 個体値
 
-	private static final int MIN_AGE = 0;
-	private static final int MAX_AGE = 1000;
-	private static final double MIN_CONDITION = 0;
-	private static final double MAX_CONDITION = 100;
-	private static final double MIN_HUNGER = 0;
-	private static final double MAX_HUNGER = 100;
-	private static final double MIN_POWER = 0;
-	private static final double MAX_POWER = 1000;
-	private static final double MIN_AGILITY = 0;
-	private static final double MAX_AGILITY = 1000;
-	private static final double MIN_FLEXIBILITY = 0;
-	private static final double MAX_FLEXIBILITY = 1000;
-	private static final double MIN_FORTITUDE = 0;
-	private static final double MAX_FORTITUDE = 1000;
-	private static final double MIN_KNOWLEDGE = 0;
-	private static final double MAX_KNOWLEDGE = 1000;
-	private static final double MIN_SMART = 0;
-	private static final double MAX_SMART = 1000;
-	private static final double MIN_CURIOSITY = 0;
-	private static final double MAX_CURIOSITY = 100;
-	private static final double MIN_COMMUNICATION = 0;
-	private static final double MAX_COMMUNICATION = 100;
-	private static final double MIN_TOLERANCE = 0;
-	private static final double MAX_TOLERANCE = 100;
-	private static final double MIN_DEFIANCE = 0;
-	private static final double MAX_DEFIANCE = 100;
-	private static final double MIN_CALM = 0;
-	private static final double MAX_CALM = 100;
-	private static final double MIN_STRESS = 0;
-	private static final double MAX_STRESS = 100;
-	private static final double MIN_MASCULINITY = 0;
-	private static final double MAX_MASCULINITY = 100;
-	private static final double MIN_EFFEMINACY = 0;
-	private static final double MAX_EFFEMINACY = 100;
-	private static final double MIN_GIFT = 0;
-	private static final double MAX_GIFT = 100;
-
 	/**
 	 * 全てのステータス値を０で初期化
 	 */
 	public Status() {
-		this.age = MIN_AGE;
-		this.agility = MIN_AGILITY;
-		this.calm = MIN_CALM;
-		this.communication = MIN_COMMUNICATION;
-		this.condition = MIN_CONDITION;
-		this.curiosity = MIN_CURIOSITY;
-		this.defiance = MIN_DEFIANCE;
-		this.effeminacy = MIN_EFFEMINACY;
-		this.flexibility = MIN_FLEXIBILITY;
-		this.fortitude = MIN_FORTITUDE;
-		this.gift = MIN_GIFT;
-		this.hunger = MIN_GIFT;
-		this.knowledge = MIN_KNOWLEDGE;
-		this.masculinity = MIN_MASCULINITY;
-		this.power = MIN_POWER;
-		this.smart = MIN_SMART;
-		this.stress = MIN_STRESS;
-		this.tolerance = MIN_TOLERANCE;
+		this.age = (int) StatusRange.AGE.getMin();
+		this.agility = StatusRange.AGILITY.getMin();
+		this.calm = StatusRange.CALM.getMin();
+		this.communication = StatusRange.COMMUNICATION.getMin();
+		this.condition = StatusRange.CONDITION.getMin();
+		this.curiosity = StatusRange.CURIOSITY.getMin();
+		this.defiance = StatusRange.DEFIANCE.getMin();
+		this.effeminacy = StatusRange.EFFEMINACY.getMin();
+		this.flexibility = StatusRange.FLEXIBILITY.getMin();
+		this.fortitude = StatusRange.FORTITUDE.getMin();
+		this.gift = StatusRange.GIFT.getMin();
+		this.hunger = StatusRange.GIFT.getMin();
+		this.knowledge = StatusRange.KNOWLEDGE.getMin();
+		this.masculinity = StatusRange.MASCULINITY.getMin();
+		this.power = StatusRange.POWER.getMin();
+		this.smart = StatusRange.SMART.getMin();
+		this.stress = StatusRange.STRESS.getMin();
+		this.tiredness = StatusRange.TIREDNESS.getMin();
+		this.tolerance = StatusRange.TOLERANCE.getMin();
 	}
 
 	/**
@@ -117,7 +82,7 @@ public class Status implements SelfValidatable {
 	 * 年を加える
 	 */
 	public void addAge() {
-		if (this.age == MAX_AGE) {
+		if (this.age == StatusRange.AGE.getMax()) {
 			return;
 		}
 		this.age++;
@@ -129,8 +94,11 @@ public class Status implements SelfValidatable {
 	 * @param addend
 	 */
 	public void addAge(int addend) {
-		if (this.age + addend > MAX_AGE) {
-			this.age = MAX_AGE;
+		if (addend < 0) {
+			throw new IllegalArgumentException("You can't turn the clock back."); //$NON-NLS-1$
+		}
+		if (this.age + addend > StatusRange.AGE.getMax()) {
+			this.age = (int) StatusRange.AGE.getMax();
 			return;
 		}
 		this.age += addend;
@@ -152,12 +120,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addCondition(double addend) {
 		final double result = this.condition + addend;
-		if (result > MAX_CONDITION) {
-			this.condition = MAX_CONDITION;
+		if (result > StatusRange.CONDITION.getMax()) {
+			this.condition = StatusRange.CONDITION.getMax();
 			return;
 		}
-		if (result < MIN_CONDITION) {
-			this.condition = MIN_CONDITION;
+		if (result < StatusRange.CONDITION.getMin()) {
+			this.condition = StatusRange.CONDITION.getMin();
 			return;
 		}
 		this.condition = result;
@@ -179,12 +147,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addHunger(double addend) {
 		final double result = this.hunger + addend;
-		if (result > MAX_HUNGER) {
-			this.hunger = MAX_HUNGER;
+		if (result > StatusRange.HUNGER.getMax()) {
+			this.hunger = StatusRange.HUNGER.getMax();
 			return;
 		}
-		if (result < MIN_HUNGER) {
-			this.hunger = MIN_HUNGER;
+		if (result < StatusRange.HUNGER.getMin()) {
+			this.hunger = StatusRange.HUNGER.getMin();
 			return;
 		}
 		this.hunger = result;
@@ -206,12 +174,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addPower(double addend) {
 		final double result = this.power + addend;
-		if (result > MAX_POWER) {
-			this.power = MAX_POWER;
+		if (result > StatusRange.POWER.getMax()) {
+			this.power = StatusRange.POWER.getMax();
 			return;
 		}
-		if (result < MIN_POWER) {
-			this.power = MIN_POWER;
+		if (result < StatusRange.POWER.getMin()) {
+			this.power = StatusRange.POWER.getMin();
 			return;
 		}
 		this.power = result;
@@ -233,12 +201,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addAgility(double addend) {
 		final double result = this.agility + addend;
-		if (result > MAX_AGILITY) {
-			this.agility = MAX_AGILITY;
+		if (result > StatusRange.AGILITY.getMax()) {
+			this.agility = StatusRange.AGILITY.getMax();
 			return;
 		}
-		if (result < MIN_AGILITY) {
-			this.agility = MIN_AGILITY;
+		if (result < StatusRange.AGILITY.getMin()) {
+			this.agility = StatusRange.AGILITY.getMin();
 			return;
 		}
 		this.agility = result;
@@ -260,12 +228,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addFlexibility(double addend) {
 		final double result = this.flexibility + addend;
-		if (result > MAX_FLEXIBILITY) {
-			this.flexibility = MAX_FLEXIBILITY;
+		if (result > StatusRange.FLEXIBILITY.getMax()) {
+			this.flexibility = StatusRange.FLEXIBILITY.getMax();
 			return;
 		}
-		if (result < MIN_FLEXIBILITY) {
-			this.flexibility = MIN_FLEXIBILITY;
+		if (result < StatusRange.FLEXIBILITY.getMin()) {
+			this.flexibility = StatusRange.FLEXIBILITY.getMin();
 			return;
 		}
 		this.flexibility = result;
@@ -287,12 +255,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addFortitude(double addend) {
 		final double result = this.fortitude + addend;
-		if (result > MAX_FORTITUDE) {
-			this.fortitude = MAX_FORTITUDE;
+		if (result > StatusRange.FORTITUDE.getMax()) {
+			this.fortitude = StatusRange.FORTITUDE.getMax();
 			return;
 		}
-		if (result < MIN_FORTITUDE) {
-			this.fortitude = MIN_FORTITUDE;
+		if (result < StatusRange.FORTITUDE.getMin()) {
+			this.fortitude = StatusRange.FORTITUDE.getMin();
 			return;
 		}
 		this.fortitude = result;
@@ -314,12 +282,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addKnowledge(double addend) {
 		final double result = this.knowledge + addend;
-		if (result > MAX_KNOWLEDGE) {
-			this.knowledge = MAX_KNOWLEDGE;
+		if (result > StatusRange.KNOWLEDGE.getMax()) {
+			this.knowledge = StatusRange.KNOWLEDGE.getMax();
 			return;
 		}
-		if (result < MIN_KNOWLEDGE) {
-			this.knowledge = MIN_KNOWLEDGE;
+		if (result < StatusRange.KNOWLEDGE.getMin()) {
+			this.knowledge = StatusRange.KNOWLEDGE.getMin();
 			return;
 		}
 		this.knowledge = result;
@@ -341,12 +309,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addSmart(double addend) {
 		final double result = this.smart + addend;
-		if (result > MAX_SMART) {
-			this.smart = MAX_SMART;
+		if (result > StatusRange.SMART.getMax()) {
+			this.smart = StatusRange.SMART.getMax();
 			return;
 		}
-		if (result < MIN_SMART) {
-			this.smart = MIN_SMART;
+		if (result < StatusRange.SMART.getMin()) {
+			this.smart = StatusRange.SMART.getMin();
 			return;
 		}
 		this.smart = result;
@@ -368,12 +336,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addCuriosity(double addend) {
 		final double result = this.curiosity + addend;
-		if (result > MAX_CURIOSITY) {
-			this.curiosity = MAX_CURIOSITY;
+		if (result > StatusRange.CURIOSITY.getMax()) {
+			this.curiosity = StatusRange.CURIOSITY.getMax();
 			return;
 		}
-		if (result < MIN_CURIOSITY) {
-			this.curiosity = MIN_CURIOSITY;
+		if (result < StatusRange.CURIOSITY.getMin()) {
+			this.curiosity = StatusRange.CURIOSITY.getMin();
 			return;
 		}
 		this.curiosity = result;
@@ -395,12 +363,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addCommunication(double addend) {
 		final double result = this.communication + addend;
-		if (result > MAX_COMMUNICATION) {
-			this.communication = MAX_COMMUNICATION;
+		if (result > StatusRange.COMMUNICATION.getMax()) {
+			this.communication = StatusRange.COMMUNICATION.getMax();
 			return;
 		}
-		if (result < MIN_COMMUNICATION) {
-			this.communication = MIN_COMMUNICATION;
+		if (result < StatusRange.COMMUNICATION.getMin()) {
+			this.communication = StatusRange.COMMUNICATION.getMin();
 			return;
 		}
 		this.communication = result;
@@ -422,12 +390,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addTolerance(double addend) {
 		final double result = this.tolerance + addend;
-		if (result > MAX_TOLERANCE) {
-			this.tolerance = MAX_TOLERANCE;
+		if (result > StatusRange.TOLERANCE.getMax()) {
+			this.tolerance = StatusRange.TOLERANCE.getMax();
 			return;
 		}
-		if (result < MIN_TOLERANCE) {
-			this.tolerance = MIN_TOLERANCE;
+		if (result < StatusRange.TOLERANCE.getMin()) {
+			this.tolerance = StatusRange.TOLERANCE.getMin();
 			return;
 		}
 		this.tolerance = result;
@@ -449,12 +417,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addDefiance(double addend) {
 		final double result = this.defiance + addend;
-		if (result > MAX_DEFIANCE) {
-			this.defiance = MAX_DEFIANCE;
+		if (result > StatusRange.DEFIANCE.getMax()) {
+			this.defiance = StatusRange.DEFIANCE.getMax();
 			return;
 		}
-		if (result < MIN_DEFIANCE) {
-			this.defiance = MIN_DEFIANCE;
+		if (result < StatusRange.DEFIANCE.getMin()) {
+			this.defiance = StatusRange.DEFIANCE.getMin();
 			return;
 		}
 		this.defiance = result;
@@ -476,12 +444,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addClam(double addend) {
 		final double result = this.calm + addend;
-		if (result > MAX_CALM) {
-			this.calm = MAX_CALM;
+		if (result > StatusRange.CALM.getMax()) {
+			this.calm = StatusRange.CALM.getMax();
 			return;
 		}
-		if (result < MIN_CALM) {
-			this.calm = MIN_CALM;
+		if (result < StatusRange.CALM.getMin()) {
+			this.calm = StatusRange.CALM.getMin();
 			return;
 		}
 		this.calm = result;
@@ -503,12 +471,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addStress(double addend) {
 		final double result = this.stress + addend;
-		if (result > MAX_STRESS) {
-			this.stress = MAX_STRESS;
+		if (result > StatusRange.STRESS.getMax()) {
+			this.stress = StatusRange.STRESS.getMax();
 			return;
 		}
-		if (result < MIN_STRESS) {
-			this.stress = MIN_STRESS;
+		if (result < StatusRange.STRESS.getMin()) {
+			this.stress = StatusRange.STRESS.getMin();
 			return;
 		}
 		this.stress = result;
@@ -530,12 +498,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addMasculinity(double addend) {
 		final double result = this.masculinity + addend;
-		if (result > MAX_MASCULINITY) {
-			this.masculinity = MAX_MASCULINITY;
+		if (result > StatusRange.MASCULINITY.getMax()) {
+			this.masculinity = StatusRange.MASCULINITY.getMax();
 			return;
 		}
-		if (result < MIN_MASCULINITY) {
-			this.masculinity = MIN_MASCULINITY;
+		if (result < StatusRange.MASCULINITY.getMin()) {
+			this.masculinity = StatusRange.MASCULINITY.getMin();
 			return;
 		}
 		this.masculinity = result;
@@ -557,12 +525,12 @@ public class Status implements SelfValidatable {
 	 */
 	public void addEffeminacy(double addend) {
 		final double result = this.effeminacy + addend;
-		if (result > MAX_EFFEMINACY) {
-			this.effeminacy = MAX_EFFEMINACY;
+		if (result > StatusRange.EFFEMINACY.getMax()) {
+			this.effeminacy = StatusRange.EFFEMINACY.getMax();
 			return;
 		}
-		if (result < MIN_EFFEMINACY) {
-			this.effeminacy = MIN_EFFEMINACY;
+		if (result < StatusRange.EFFEMINACY.getMin()) {
+			this.effeminacy = StatusRange.EFFEMINACY.getMin();
 			return;
 		}
 		this.effeminacy = result;
@@ -584,78 +552,52 @@ public class Status implements SelfValidatable {
 	 */
 	public void addGift(double addend) {
 		final double result = this.gift + addend;
-		if (result > MAX_GIFT) {
-			this.gift = MAX_GIFT;
+		if (result > StatusRange.GIFT.getMax()) {
+			this.gift = StatusRange.GIFT.getMax();
 			return;
 		}
-		if (result < MIN_GIFT) {
-			this.gift = MIN_GIFT;
+		if (result < StatusRange.GIFT.getMin()) {
+			this.gift = StatusRange.GIFT.getMin();
 			return;
 		}
 		this.gift = result;
 	}
 
-	@Override
-	public boolean isValid() {
-		if (!isRange(this.age, MIN_AGE, MAX_AGE)) {
-			return false;
-		}
-		if (!isRange(this.agility, MIN_AGILITY, MAX_AGILITY)) {
-			return false;
-		}
-		if (!isRange(this.calm, MIN_CALM, MAX_CALM)) {
-			return false;
-		}
-		if (!isRange(this.communication, MIN_COMMUNICATION, MAX_COMMUNICATION)) {
-			return false;
-		}
-		if (!isRange(this.condition, MIN_CONDITION, MAX_CONDITION)) {
-			return false;
-		}
-		if (!isRange(this.curiosity, MIN_CURIOSITY, MAX_CURIOSITY)) {
-			return false;
-		}
-		if (!isRange(this.defiance, MIN_DEFIANCE, MAX_DEFIANCE)) {
-			return false;
-		}
-		if (!isRange(this.effeminacy, MIN_EFFEMINACY, MAX_EFFEMINACY)) {
-			return false;
-		}
-		if (!isRange(this.flexibility, MIN_FLEXIBILITY, MAX_FLEXIBILITY)) {
-			return false;
-		}
-		if (!isRange(this.fortitude, MIN_FORTITUDE, MAX_FORTITUDE)) {
-			return false;
-		}
-		if (!isRange(this.gift, MIN_GIFT, MAX_GIFT)) {
-			return false;
-		}
-		if (!isRange(this.hunger, MIN_HUNGER, MAX_HUNGER)) {
-			return false;
-		}
-		if (!isRange(this.knowledge, MIN_KNOWLEDGE, MAX_KNOWLEDGE)) {
-			return false;
-		}
-		if (!isRange(this.masculinity, MIN_MASCULINITY, MAX_MASCULINITY)) {
-			return false;
-		}
-		if (!isRange(this.power, MIN_POWER, MAX_POWER)) {
-			return false;
-		}
-		if (!isRange(this.smart, MIN_SMART, MAX_SMART)) {
-			return false;
-		}
-		if (!isRange(this.stress, MIN_STRESS, MAX_STRESS)) {
-			return false;
-		}
-		if (!isRange(this.tolerance, MIN_TOLERANCE, MAX_TOLERANCE)) {
-			return false;
-		}
-		return true;
+	/**
+	 * 敏捷性を返す
+	 * 
+	 * @return tiredness
+	 */
+	public double getTiredness() {
+		return this.tiredness;
 	}
 
-	private static boolean isRange(double value, double min, double max) {
-		return (value >= min) && (value <= max);
+	/**
+	 * 疲労にaddendを加えます
+	 * 
+	 * @param addend
+	 */
+	public void addTiredness(double addend) {
+		final double result = this.tiredness + addend;
+		if (result > StatusRange.TIREDNESS.getMax()) {
+			this.tiredness = StatusRange.TIREDNESS.getMax();
+			return;
+		}
+		if (result < StatusRange.TIREDNESS.getMin()) {
+			this.tiredness = StatusRange.TIREDNESS.getMin();
+			return;
+		}
+		this.tiredness = result;
+	}
+
+	@Override
+	public boolean isValid() {
+		return StatusRange.AGE.includes(this.age) && StatusRange.AGILITY.includes(this.agility) && StatusRange.CALM.includes(this.calm) && StatusRange.COMMUNICATION.includes(this.communication)
+				&& StatusRange.CONDITION.includes(this.condition) && StatusRange.CURIOSITY.includes(this.curiosity) && StatusRange.DEFIANCE.includes(this.defiance)
+				&& StatusRange.EFFEMINACY.includes(this.effeminacy) && StatusRange.FLEXIBILITY.includes(this.flexibility) && StatusRange.FORTITUDE.includes(this.fortitude)
+				&& StatusRange.GIFT.includes(this.gift) && StatusRange.HUNGER.includes(this.hunger) && StatusRange.KNOWLEDGE.includes(this.knowledge)
+				&& StatusRange.MASCULINITY.includes(this.masculinity) && StatusRange.POWER.includes(this.power) && StatusRange.SMART.includes(this.smart) && StatusRange.STRESS.includes(this.stress)
+				&& StatusRange.TOLERANCE.includes(this.tolerance) && StatusRange.TIREDNESS.includes(this.tiredness);
 	}
 
 	@Override
@@ -700,7 +642,38 @@ public class Status implements SelfValidatable {
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
 		return super.hashCode();
+	}
+
+	@SuppressWarnings("javadoc")
+	public static enum StatusRange {
+		AGE(0, 1000), TIREDNESS(0, 100), CONDITION(0, 100), HUNGER(0, 100), POWER(0, 1000),
+
+		AGILITY(0, 1000), FLEXIBILITY(0, 1000), FORTITUDE(0, 1000), KNOWLEDGE(0, 1000), SMART(0, 1000),
+
+		CURIOSITY(0, 100), COMMUNICATION(0, 100), TOLERANCE(0, 100), DEFIANCE(0, 100), CALM(0, 100),
+
+		STRESS(0, 100), MASCULINITY(0, 100), EFFEMINACY(0, 100), GIFT(0, 100);
+
+		private final double min;
+		private final double max;
+
+		private StatusRange(double min, double max) {
+			this.min = min;
+			this.max = max;
+		}
+
+		public double getMin() {
+			return this.min;
+		}
+
+		public double getMax() {
+			return this.max;
+		}
+
+		public boolean includes(double value) {
+			return (value >= this.min) && (value <= this.max);
+		}
+
 	}
 }

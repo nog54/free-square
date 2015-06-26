@@ -17,26 +17,24 @@ package org.nognog.freeSquare.model.life.status.influence;
 import org.nognog.freeSquare.model.life.status.Status;
 
 /**
- * @author goshi 2015/06/26
- * @param <T> 
+ * @author goshi 2015/02/08
  */
-public interface StatusInfluence<T extends StatusInfluence<T>> {
+public class TirednessInfluence extends SingleStatusInfluence<TirednessInfluence> {
 
 	/**
-	 * @param status
+	 * @param amount
 	 */
-	void applyTo(Status status);
+	public TirednessInfluence(double amount) {
+		super(amount);
+	}
 
-	/**
-	 * @param status
-	 * @param times
-	 */
-	void applyTo(Status status, int times);
+	@Override
+	public void applyTo(Status target, int times) {
+		target.addTiredness(times * this.getAmount());
+	}
 
-	/**
-	 * @param scale
-	 * @return scaled influence
-	 */
-	public T createScaledInfluence(double scale);
-
+	@Override
+	public TirednessInfluence createScaledInfluence(double scale) {
+		return new TirednessInfluence(this.getAmount() * scale);
+	}
 }

@@ -12,7 +12,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License. */
 
-package org.nognog.freeSquare.model.life;
+package org.nognog.freeSquare.model.life.status;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -730,6 +730,44 @@ public class StatusTest {
 		final double addend3 = 50000;
 		status.addGift(addend3);
 		final double actual3 = status.getGift();
+		final double expected3 = 100;
+		assertThat(actual3, is(expected3));
+	}
+
+	/**
+	 * test of getGift
+	 */
+	@Test
+	public void testGetTiredNess() {
+		final Status status = new Status();
+		final double actual = status.getTiredness();
+
+		final double expected = 0;
+		assertThat(actual, is(expected));
+	}
+
+	/**
+	 * test of addGift
+	 */
+	@Test
+	public void testAddTiredness() {
+		final Status status = new Status();
+
+		final double addend1 = 15;
+		status.addTiredness(addend1);
+		final double actual1 = status.getTiredness();
+		final double expected1 = addend1;
+		assertThat(actual1, is(expected1));
+
+		final double addend2 = -30;
+		status.addTiredness(addend2);
+		final double actual2 = status.getTiredness();
+		final double expected2 = 0;
+		assertThat(actual2, is(expected2));
+
+		final double addend3 = 50000;
+		status.addTiredness(addend3);
+		final double actual3 = status.getTiredness();
 		final double expected3 = 100;
 		assertThat(actual3, is(expected3));
 	}

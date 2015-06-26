@@ -21,10 +21,9 @@ import java.lang.reflect.Constructor;
 import org.nognog.freeSquare.Resources;
 import org.nognog.freeSquare.model.food.Food;
 import org.nognog.freeSquare.model.food.Taste;
-import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
+import org.nognog.freeSquare.model.life.status.influence.MultipleStatusInfluence;
 import org.nognog.freeSquare.model.life.status.influence.SingleStatusInfluence;
 import org.nognog.freeSquare.square2d.object.types.Colors;
-import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -85,7 +84,7 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 		this.logicalWidth = logicalWidth;
 		this.color = color;
 		this.klass = klass;
-		this.influence = new StatusInfluence(singleInfluences);
+		this.influence = new MultipleStatusInfluence(singleInfluences);
 	}
 
 	private final Class<?> klass;
@@ -93,7 +92,7 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 	private final Texture texture;
 	private final float logicalWidth;
 	private final Color color;
-	private final StatusInfluence influence;
+	private final MultipleStatusInfluence influence;
 
 	@Override
 	public Class<?> getSquareObjectClass() {
@@ -147,13 +146,8 @@ public enum PreparedEatableObjectType implements EatableObjectType {
 	}
 
 	@Override
-	public StatusInfluence getStatusInfluence() {
+	public MultipleStatusInfluence getStatusInfluence() {
 		return this.influence;
-	}
-
-	@Override
-	public void applyStatusInfluenceTo(LifeObject eater, int eatAmount) {
-		this.influence.applyTo(eater.getLife().getStatus(), eatAmount);
 	}
 
 }
