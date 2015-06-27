@@ -80,7 +80,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 
 	@Override
 	protected void beginFetchActor(float x, float y, LifeObject beFetchedActor, Life beFetchedItem) {
-		beFetchedActor.setEnabledAction(false);
+		beFetchedActor.setEnableAction(false);
 		Vector2 squareCoodinateXY = this.mainActivity.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
 		this.mainActivity.getSquare().addSquareObject(beFetchedActor, squareCoodinateXY.x, squareCoodinateXY.y, false);
 		this.mainActivity.showSquareOnly();
@@ -111,7 +111,7 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	protected void putFetchingActor(LifeObject putTargetFetchingActor) {
 		if (putTargetFetchingActor.isValid()) {
 			this.mainActivity.getPlayer().removeLife(putTargetFetchingActor.getLife());
-			putTargetFetchingActor.setEnabledAction(true);
+			putTargetFetchingActor.setEnableAction(true);
 			Square2dEvent event = new AddObjectEvent(putTargetFetchingActor);
 			event.addExceptObserver(putTargetFetchingActor);
 			this.mainActivity.getSquare().notifyEventListeners(event);

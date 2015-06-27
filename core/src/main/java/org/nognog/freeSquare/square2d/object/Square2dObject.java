@@ -345,7 +345,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	/**
 	 * @param enableIndependentAction
 	 */
-	public void setEnabledAction(boolean enableIndependentAction) {
+	public void setEnableAction(boolean enableIndependentAction) {
 		this.enableAction = enableIndependentAction;
 	}
 

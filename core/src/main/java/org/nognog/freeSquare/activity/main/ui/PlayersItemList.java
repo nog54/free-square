@@ -107,7 +107,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	}
 
 	private void addSquare2dObjectTemporary(Square2dObject pannedSquareObject, float x, float y, Item<?, ?> item) {
-		pannedSquareObject.setEnabledAction(false);
+		pannedSquareObject.setEnableAction(false);
 		Vector2 squareCoodinateXY = this.mainActivity.getSquare().stageToLocalCoordinates(this.getWidget().localToStageCoordinates(new Vector2(x, y)));
 		this.mainActivity.getSquare().addSquareObject(pannedSquareObject, squareCoodinateXY.x, squareCoodinateXY.y, false);
 	}
@@ -179,7 +179,7 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	 */
 	private boolean putSquare2dObject(Square2dObject putObject) {
 		if (putObject.isLandingOnSquare()) {
-			putObject.setEnabledAction(true);
+			putObject.setEnableAction(true);
 			final Square2dEvent event = new AddObjectEvent(putObject);
 			event.addExceptObserver(putObject);
 			this.mainActivity.getSquare().notifyEventListeners(event);
