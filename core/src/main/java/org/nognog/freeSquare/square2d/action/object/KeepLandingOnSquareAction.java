@@ -64,6 +64,13 @@ public class KeepLandingOnSquareAction extends AbstractPrioritizableAction {
 	@Override
 	public boolean isPerformableState() {
 		final Square2dObject object = (Square2dObject) this.getActor();
-		return object.getSquare() != null && object.isLandingOnSquare() == false;
+		return object.isBeingTouched() == false && object.getSquare() != null && object.isLandingOnSquare() == false;
+	}
+	
+	/**
+	 * reset action to go to square vertex
+	 */
+	public void resetActionToGoToNearestVertexOfSquare(){
+		this.actionToGotoNearestVertexOfSquare = null;
 	}
 }

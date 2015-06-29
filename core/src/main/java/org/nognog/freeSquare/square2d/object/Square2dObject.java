@@ -21,6 +21,8 @@ import org.nognog.freeSquare.model.square.SquareObject;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.PrioritizableAction;
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
+import org.nognog.freeSquare.square2d.action.object.DoNothingAction;
 import org.nognog.gdx.util.Movable;
 
 import com.badlogic.gdx.Gdx;
@@ -93,12 +95,17 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	private void setupListeners() {
 		this.addListener(new ActorGestureListener() {
 			private boolean lastTouchCallLongPress;
+			private DoNothingAction doNothingAction;
 
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				Square2dObject.this.isBeingTouched = true;
 				this.lastTouchCallLongPress = false;
+				if (this.doNothingAction == null) {
+					this.doNothingAction = Square2dActionUtlls.doNothing();
+				}
+				Square2dObject.this.addMainAction(this.doNothingAction);
 				event.stop();
 			}
 
@@ -107,6 +114,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 				Square2dObject.this.isBeingTouched = false;
 				Square2dObject.this.isLongPressedInLastTouch = this.lastTouchCallLongPress;
+				Square2dObject.this.removeMainAction(this.doNothingAction);
 				event.stop();
 			}
 
@@ -245,6 +253,9 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 * @param action
 	 */
 	public void addMainAction(PrioritizableAction action) {
+		if (action == null || this.mainActions.contains(action, true)) {
+			return;
+		}
 		action.setActor(this);
 		this.setupActionPriorityOf(action);
 		this.mainActions.add(action);
@@ -255,6 +266,9 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 	 * @param action
 	 */
 	public void removeMainAction(PrioritizableAction action) {
+		if (action == null || this.mainActions.contains(action, true) == false) {
+			return;
+		}
 		this.mainActions.removeValue(action, true);
 		action.setActor(null);
 	}
@@ -282,7 +296,7 @@ public class Square2dObject extends Group implements SquareObject<Square2d>, Squ
 
 	@Override
 	public final void act(float delta) {
-		if (this.isBeingTouched || !this.isEnabledAction()) {
+		if (!this.isEnabledAction()) {
 			return;
 		}
 		this.actChildren(delta);

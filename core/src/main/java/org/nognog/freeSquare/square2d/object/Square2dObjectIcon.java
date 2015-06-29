@@ -14,7 +14,14 @@
 
 package org.nognog.freeSquare.square2d.object;
 
+import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
@@ -22,6 +29,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
  */
 public class Square2dObjectIcon extends Group {
 	private final Image mainImage;
+	private boolean enableUpDown = false;
+
+	private Action upDownAction;
 
 	Square2dObjectIcon(Image mainIcon) {
 		if (mainIcon == null) {
@@ -32,6 +42,7 @@ public class Square2dObjectIcon extends Group {
 		this.setWidth(mainIcon.getWidth());
 		this.setHeight(mainIcon.getHeight());
 		this.setOriginX(this.getWidth() / 2);
+
 	}
 
 	/**
@@ -39,5 +50,42 @@ public class Square2dObjectIcon extends Group {
 	 */
 	public Image getMainImage() {
 		return this.mainImage;
+	}
+
+	/**
+	 * @param color
+	 */
+	public void setChildrenColor(Color color) {
+		for (Actor actor : this.getChildren()) {
+			actor.setColor(color);
+		}
+	}
+
+	private static Action createUpDownAction() {
+		final float degree = 5;
+		final float cycleTime = 4;
+		Action foreverRotate = Square2dActionUtlls.foreverRotate(degree, cycleTime, Interpolation.sine);
+		final float upDownAmount = 5;
+		Action foreverUpDown = Square2dActionUtlls.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
+		return Actions.parallel(foreverRotate, foreverUpDown);
+	}
+
+	/**
+	 * @param enable
+	 */
+	public void setEnableUpDown(boolean enable) {
+		if (this.enableUpDown == enable) {
+			return;
+		}
+		this.enableUpDown = enable;
+		if (this.enableUpDown) {
+			if (this.upDownAction == null) {
+				this.upDownAction = createUpDownAction();
+				this.upDownAction.setActor(this);
+			}
+			this.getActions().add(this.upDownAction);
+			return;
+		}
+		this.getActions().removeValue(this.upDownAction, true);
 	}
 }

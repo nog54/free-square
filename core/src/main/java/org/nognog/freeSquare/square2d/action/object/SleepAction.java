@@ -59,17 +59,25 @@ public class SleepAction extends AbstractPrioritizableAction {
 			sleeper.applyStatusInfluence(tirednessInfluence);
 		}
 
-		if (this.policy == SleepPolicy.FIX_TIME) {
-			if (this.sleepedTime >= this.desiredSleepTime) {
-				return true;
-			}
-		}
-		if (this.policy == SleepPolicy.COMPLETE_RECOVERY) {
-			if (sleeper.getLife().getStatus().getTiredness() == 0) {
-				return true;
-			}
+		if (this.satisfiesEndCondition()) {
+			sleeper.wakeUp();
+			return true;
 		}
 
+		return false;
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean satisfiesEndCondition() {
+		final LifeObject sleeper = this.getSleeper();
+		if (this.policy == SleepPolicy.FIX_TIME && this.sleepedTime >= this.desiredSleepTime) {
+			return true;
+		}
+		if (this.policy == SleepPolicy.COMPLETE_RECOVERY && sleeper.getLife().getStatus().getTiredness() == 0) {
+			return true;
+		}
 		return false;
 	}
 

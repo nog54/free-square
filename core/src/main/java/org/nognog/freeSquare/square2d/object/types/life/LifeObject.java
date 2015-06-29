@@ -21,14 +21,15 @@ import org.nognog.freeSquare.model.life.status.influence.StatusInfluence;
 import org.nognog.freeSquare.model.square.SquareEvent;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
+import org.nognog.freeSquare.square2d.action.PrioritizableAction;
 import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
 import org.nognog.freeSquare.square2d.action.object.EatAction;
 import org.nognog.freeSquare.square2d.action.object.FreeRunningAction;
+import org.nognog.freeSquare.square2d.action.object.SleepAction;
 import org.nognog.freeSquare.square2d.action.object.StopTimeGenerator;
 import org.nognog.freeSquare.square2d.action.object.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
-import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -36,6 +37,7 @@ import org.nognog.freeSquare.square2d.object.MovableSquare2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
@@ -60,6 +62,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 	};
 
 	private Life life;
+	private boolean isSleeping;
 
 	protected FreeRunningAction freeRunningAction;
 
@@ -74,7 +77,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		this.life = life;
 		this.stopTime = defaultStopTimeGenerator;
 		this.setOriginY(0);
-		this.getIcon().addAction(LifeObject.createUpDownAction());
+		this.getIcon().setEnableUpDown(true);
 		final Image frame = new Image(frameTexture);
 		frame.setWidth(this.getIcon().getWidth());
 		frame.setHeight(this.getIcon().getHeight());
@@ -86,7 +89,13 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				if (this.isTripleTapped(count)) {
-					LifeObject.this.getSquare().notifyEventListeners(new CollectObjectRequestEvent(LifeObject.this));
+					if (LifeObject.this.isSleeping()) {
+						LifeObject.this.wakeUp();
+					} else {
+						LifeObject.this.sleep(5);
+					}
+					// LifeObject.this.getSquare().notifyEventListeners(new
+					// CollectObjectRequestEvent(LifeObject.this));
 				}
 			}
 
@@ -100,15 +109,6 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 				return count == 3;
 			}
 		});
-	}
-
-	private static Action createUpDownAction() {
-		final float degree = 5;
-		final float cycleTime = 4;
-		Action foreverRotate = Square2dActionUtlls.foreverRotate(degree, cycleTime, Interpolation.sine);
-		final float upDownAmount = 5;
-		Action foreverUpDown = Square2dActionUtlls.foreverUpdown(upDownAmount, cycleTime / 2, Interpolation.pow5);
-		return Actions.parallel(foreverRotate, foreverUpDown);
 	}
 
 	/**
@@ -202,10 +202,10 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			this.freeRunningAction.setMoveSpeed(LifeObject.toMoveSpeed(this));
 			final double tiredness = this.getLife().getStatus().getTiredness();
 			if (tiredness == Status.StatusRange.TIREDNESS.getMax()) {
-				this.addMainAction(Square2dActionUtlls.sleepUntilCompleteRecovery());
+				this.sleep();
 			}
 		}
-		if (event instanceof AddObjectEvent) {
+		if (event instanceof AddObjectEvent && this.isSleeping() == false) {
 			Action up = Actions.moveBy(0, 30, 0.25f, Interpolation.pow3);
 			Action down = Actions.moveBy(0, -30, 0.25f, Interpolation.pow3);
 			Action hop = Actions.sequence(up, down);
@@ -240,4 +240,56 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		return isSamePosition && this.getType().equals(object.getType()) && this.getLife().equals(object.getLife());
 	}
 
+	/**
+	 * @return true if this is sleeping
+	 */
+	public boolean isSleeping() {
+		return this.isSleeping;
+	}
+
+	/**
+	 * sleep until complete recovery
+	 */
+	public void sleep() {
+		if (this.isSleeping == true) {
+			return;
+		}
+		this.sleep(Square2dActionUtlls.sleepUntilCompleteRecovery());
+	}
+
+	/**
+	 * sleep during sleepTime
+	 * 
+	 * @param sleepTime
+	 */
+	public void sleep(int sleepTime) {
+		if (this.isSleeping == true) {
+			return;
+		}
+		this.sleep(Square2dActionUtlls.sleep(sleepTime));
+	}
+
+	private void sleep(SleepAction sleepAction) {
+		this.isSleeping = true;
+		this.getIcon().setChildrenColor(Color.GRAY);
+		this.getIcon().setEnableUpDown(false);
+		this.addMainAction(sleepAction);
+	}
+
+	/**
+	 * wake up from sleep
+	 */
+	public void wakeUp() {
+		if (this.isSleeping == false) {
+			return;
+		}
+		for (PrioritizableAction mainAction : this.getMainActions()) {
+			if (mainAction instanceof SleepAction) {
+				this.removeMainAction(mainAction);
+			}
+		}
+		this.isSleeping = false;
+		this.getIcon().setChildrenColor(Color.WHITE);
+		this.getIcon().setEnableUpDown(true);
+	}
 }

@@ -19,6 +19,7 @@ import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction;
 import org.nognog.freeSquare.square2d.action.object.DelayNextStopTimeAction;
+import org.nognog.freeSquare.square2d.action.object.DoNothingAction;
 import org.nognog.freeSquare.square2d.action.object.EatAction;
 import org.nognog.freeSquare.square2d.action.object.FireEventAction;
 import org.nognog.freeSquare.square2d.action.object.ForeverTryToEatAction;
@@ -259,6 +260,14 @@ public class Square2dActionUtlls {
 	public static SleepAction sleepUntilCompleteRecovery() {
 		final SleepAction action = Actions.action(SleepAction.class);
 		action.setPolicy(SleepPolicy.COMPLETE_RECOVERY);
+		return action;
+	}
+
+	/**
+	 * @return action
+	 */
+	public static DoNothingAction doNothing() {
+		final DoNothingAction action = Actions.action(DoNothingAction.class);
 		return action;
 	}
 }

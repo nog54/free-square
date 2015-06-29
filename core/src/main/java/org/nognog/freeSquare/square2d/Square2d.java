@@ -454,7 +454,7 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	 * 
 	 * @return all landing object
 	 */
-	public Array<Square2dObject> getAllLandingSquareObjectsOnStage() {
+	public Array<Square2dObject> getAllLandingSquareObjects() {
 		Array<Square2dObject> allSquare2dObject = getAllSquare2dObject(this.getStage().getRoot());
 		Array<Square2dObject> result = new Array<>();
 		for (Square2dObject object : allSquare2dObject) {

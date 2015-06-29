@@ -17,7 +17,7 @@ package org.nognog.freeSquare.square2d.object.types.life;
 import org.nognog.freeSquare.model.life.Life;
 import org.nognog.freeSquare.square2d.Vertex;
 import org.nognog.freeSquare.square2d.action.Square2dActionUtlls;
-import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
+import org.nognog.freeSquare.square2d.action.object.KeepLandingOnSquareAction;
 import org.nognog.freeSquare.square2d.object.LandObject;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
@@ -32,6 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  * @author goshi 2015/01/11
  */
 public class LandingLifeObject extends LifeObject implements LandObject {
+
+	protected final KeepLandingOnSquareAction keepLandingOnSquare;
 
 	/**
 	 * @param life
@@ -57,11 +59,12 @@ public class LandingLifeObject extends LifeObject implements LandObject {
 		super(type, life);
 		this.addListener(new ActorGestureListener() {
 			@Override
-			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				LandingLifeObject.this.handleEvent(new UpdateSquareObjectEvent(LandingLifeObject.this));
+			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				LandingLifeObject.this.keepLandingOnSquare.resetActionToGoToNearestVertexOfSquare();
 			}
 		});
-		this.addMainAction(Square2dActionUtlls.keepLandingOnSquare());
+		this.keepLandingOnSquare = Square2dActionUtlls.keepLandingOnSquare();
+		this.addMainAction(this.keepLandingOnSquare);
 	}
 
 	@Override

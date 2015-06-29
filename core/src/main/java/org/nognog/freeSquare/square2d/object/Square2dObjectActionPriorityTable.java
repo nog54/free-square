@@ -15,6 +15,7 @@
 package org.nognog.freeSquare.square2d.object;
 
 import org.nognog.freeSquare.square2d.action.PrioritizableAction;
+import org.nognog.freeSquare.square2d.action.object.DoNothingAction;
 import org.nognog.freeSquare.square2d.action.object.ForeverTryToEatAction;
 import org.nognog.freeSquare.square2d.action.object.FreeRunningAction;
 import org.nognog.freeSquare.square2d.action.object.KeepLandingOnSquareAction;
@@ -46,13 +47,16 @@ public class Square2dObjectActionPriorityTable implements ActionPriorityTable {
 
 		FREE_RUNNING(FreeRunningAction.class, 0),
 
-		FOREVER_TRY_TO_EAT(ForeverTryToEatAction.class, 7),
+		FOREVER_TRY_TO_EAT(ForeverTryToEatAction.class, 6),
+		
+		DO_NOTHING(DoNothingAction.class, 7), 
 
 		SLEEP(SleepAction.class, 8),
 
 		KEEP_LANDING(KeepLandingOnSquareAction.class, 9),
 
-		MOMENTUM_MOVE(MomentumMoveAction.class, 10), ;
+		MOMENTUM_MOVE(MomentumMoveAction.class, 10),;
+
 
 		private Class<? extends PrioritizableAction> klass;
 		private int priority;

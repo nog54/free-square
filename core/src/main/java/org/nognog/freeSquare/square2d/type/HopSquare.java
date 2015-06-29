@@ -48,7 +48,7 @@ public class HopSquare extends SimpleSquare2d {
 				if (this.target.contains(x, y)) {
 					Action squareHopAction = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 					this.target.getSquareImage().addAction(squareHopAction);
-					for (Square2dObject object : this.target.getAllLandingSquareObjectsOnStage()) {
+					for (Square2dObject object : this.target.getAllLandingSquareObjects()) {
 						Action objectHopAction = Actions.sequence(Actions.moveBy(0, hopAmount, hopTime / 2), Actions.moveBy(0, -hopAmount, hopTime / 2));
 						object.getIcon().addAction(objectHopAction);
 					}

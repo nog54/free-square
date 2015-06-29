@@ -36,8 +36,11 @@ public class MovableSquare2dObject extends Square2dObject {
 	}
 
 	private void setupMomentumMoveListener() {
-		this.addListener(new ActorGestureListener() {
-
+		final float halfTapSquareSize = 20f;
+		final float tapCountInterval = 0.4f;
+		final float longPressDuration = 1.1f;
+		final float maxFlingDelay = 0.05f;
+		final ActorGestureListener listener = new ActorGestureListener(halfTapSquareSize, tapCountInterval, longPressDuration, maxFlingDelay) {
 			@Override
 			public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				MovableSquare2dObject.this.clearMomentumAction();
@@ -54,7 +57,8 @@ public class MovableSquare2dObject extends Square2dObject {
 				PrioritizableAction action = Square2dActionUtlls.momentumMove(MovableSquare2dObject.this, deceleration, velocityX, velocityY);
 				MovableSquare2dObject.this.addMainAction(action);
 			}
-		});
+		};
+		this.addListener(listener);
 	}
 
 	/**
