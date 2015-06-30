@@ -24,7 +24,7 @@ import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
  */
 public class SleepAction extends AbstractPrioritizableAction {
 
-	private static final double tirednessRecoveryPointPerMinute = 0.1f;
+	private static final double tirednessRecoveryAmountPerMinute = 0.1f;
 	private static final int secondsPerMinute = 60;
 
 	private float desiredSleepTime; // use if policy is FIX_TIME
@@ -55,7 +55,7 @@ public class SleepAction extends AbstractPrioritizableAction {
 		final LifeObject sleeper = this.getSleeper();
 		if (oldSleepedTimeMinutes != newSleepedTimeMinutes) {
 			final int differenceOfMinutes = newSleepedTimeMinutes - oldSleepedTimeMinutes;
-			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(differenceOfMinutes * tirednessRecoveryPointPerMinute);
+			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(differenceOfMinutes * tirednessRecoveryAmountPerMinute);
 			sleeper.applyStatusInfluence(tirednessInfluence);
 		}
 

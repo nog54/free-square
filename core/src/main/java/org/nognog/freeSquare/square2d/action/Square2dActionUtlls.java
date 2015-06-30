@@ -18,6 +18,7 @@ import org.nognog.freeSquare.activity.main.MainActivity;
 import org.nognog.freeSquare.square2d.Direction;
 import org.nognog.freeSquare.square2d.Square2d;
 import org.nognog.freeSquare.square2d.action.activity.ChangeSquareAction;
+import org.nognog.freeSquare.square2d.action.object.ConstantlyTireAction;
 import org.nognog.freeSquare.square2d.action.object.DelayNextStopTimeAction;
 import org.nognog.freeSquare.square2d.action.object.DoNothingAction;
 import org.nognog.freeSquare.square2d.action.object.EatAction;
@@ -268,6 +269,16 @@ public class Square2dActionUtlls {
 	 */
 	public static DoNothingAction doNothing() {
 		final DoNothingAction action = Actions.action(DoNothingAction.class);
+		return action;
+	}
+
+	/**
+	 * @param tirednessIncreaseAmountPerMinute 
+	 * @return action
+	 */
+	public static ConstantlyTireAction constantlyTired(float tirednessIncreaseAmountPerMinute) {
+		final ConstantlyTireAction action = Actions.action(ConstantlyTireAction.class);
+		action.setTirednessIncreaseAmountPerMinute(tirednessIncreaseAmountPerMinute);
 		return action;
 	}
 }

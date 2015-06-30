@@ -53,7 +53,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
  */
 public abstract class LifeObject extends MovableSquare2dObject implements TargetPositionGenerator {
 
+	static final float tirednessAmountPerMinute = 0.125f;
 	private static final Texture frameTexture = new Texture(Gdx.files.internal(Resources.frame1Path));
+	
 	protected static final StopTimeGenerator defaultStopTimeGenerator = new StopTimeGenerator() {
 		@Override
 		public float nextStopTime() {
@@ -82,9 +84,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		frame.setWidth(this.getIcon().getWidth());
 		frame.setHeight(this.getIcon().getHeight());
 		this.getIcon().addActor(frame);
-		this.addMainAction(Square2dActionUtlls.foreverTryToEat(this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT_EAT_OBJECT));
-		this.freeRunningAction = Square2dActionUtlls.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
-		this.addMainAction(this.freeRunningAction);
+		this.addConstantActions();
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
@@ -109,6 +109,13 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 				return count == 3;
 			}
 		});
+	}
+
+	private void addConstantActions() {
+		this.addMainAction(Square2dActionUtlls.foreverTryToEat(this.getEatAmountPerSecond(), EatAction.UNTIL_RUN_OUT_EAT_OBJECT));
+		this.freeRunningAction = Square2dActionUtlls.freeRunning(this.stopTime, this, LifeObject.toMoveSpeed(this));
+		this.addMainAction(this.freeRunningAction);
+		this.addSubAction(Square2dActionUtlls.constantlyTired(tirednessAmountPerMinute));
 	}
 
 	/**
