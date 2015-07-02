@@ -51,8 +51,7 @@ public class FlyingLifeObjectSerializer implements Json.Serializer<FlyingLifeObj
 	@Override
 	public FlyingLifeObject read(Json json, JsonValue jsonData, Class type) {
 		final Life life = json.readValue("life", Life.class, jsonData); //$NON-NLS-1$
-		final LifeObjectType lifeObjectType = LifeObjectTypeManager.getInstance().getBindingLifeObjectType(life);
-		final FlyingLifeObject result = new FlyingLifeObject(lifeObjectType);
+		final FlyingLifeObject result = new FlyingLifeObject(life);
 		result.setX(json.readValue("positionX", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 		result.setY(json.readValue("positionY", Float.class, jsonData).floatValue()); //$NON-NLS-1$
 		return result;

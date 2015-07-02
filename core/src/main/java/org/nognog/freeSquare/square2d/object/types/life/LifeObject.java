@@ -88,11 +88,12 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 		this.addListener(new ActorGestureListener() {
 			@Override
 			public void tap(InputEvent event, float x, float y, int count, int button) {
+				System.out.println(LifeObject.this.getLife().getStatusString());
 				if (this.isTripleTapped(count)) {
 					if (LifeObject.this.isSleeping()) {
 						LifeObject.this.wakeUp();
 					} else {
-						LifeObject.this.sleep(5);
+						LifeObject.this.sleep();
 					}
 					// LifeObject.this.getSquare().notifyEventListeners(new
 					// CollectObjectRequestEvent(LifeObject.this));
