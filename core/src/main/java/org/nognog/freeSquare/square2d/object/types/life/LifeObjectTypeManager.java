@@ -98,7 +98,8 @@ public class LifeObjectTypeManager extends ExternalSquare2dObjectTypeManager<Ext
 	/**
 	 * @return prepared types
 	 */
-	public static LifeObjectType[] getPreparedLifeObjectTypes() {
+	@SuppressWarnings("static-method")
+	public LifeObjectType[] getPreparedLifeObjectTypes() {
 		return PreparedLifeObjectType.values();
 	}
 

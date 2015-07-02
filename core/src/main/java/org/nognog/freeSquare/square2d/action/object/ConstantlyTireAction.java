@@ -26,9 +26,9 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 public class ConstantlyTireAction extends Action {
 
 	private double tirednessIncreaseAmountPerMinute;
-	private static int secondsPerMinute = 60;
+	private static final int secondsPerMinute = 60;
 
-	private float timeToNextTiredness = 0;
+	private float timeToNextTiredness = secondsPerMinute;
 
 	/**
 	 * 
@@ -49,10 +49,14 @@ public class ConstantlyTireAction extends Action {
 		if (lifeObject.isSleeping()) {
 			return false;
 		}
+		if (delta <= 0) {
+			return false;
+		}
+
 		this.timeToNextTiredness -= delta;
 		if (this.timeToNextTiredness <= 0) {
-			final int elapsedMinute = (int) (this.timeToNextTiredness / secondsPerMinute) + 1;
-			this.timeToNextTiredness += elapsedMinute * secondsPerMinute;
+			final int elapsedMinute = Math.round(-this.timeToNextTiredness / secondsPerMinute + 1);
+			this.timeToNextTiredness = secondsPerMinute - this.timeToNextTiredness % secondsPerMinute;
 			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(elapsedMinute * this.tirednessIncreaseAmountPerMinute);
 			lifeObject.applyStatusInfluence(tirednessInfluence);
 		}
@@ -68,6 +72,7 @@ public class ConstantlyTireAction extends Action {
 
 	@Override
 	public void restart() {
+		this.timeToNextTiredness = secondsPerMinute;
 		this.tirednessIncreaseAmountPerMinute = 0;
 	}
 
@@ -86,4 +91,10 @@ public class ConstantlyTireAction extends Action {
 		this.tirednessIncreaseAmountPerMinute = tirednessIncreaseAmountPerMinute;
 	}
 
+	/**
+	 * @return the timeToNextTiredness
+	 */
+	public float getTimeToNextTiredness() {
+		return this.timeToNextTiredness;
+	}
 }

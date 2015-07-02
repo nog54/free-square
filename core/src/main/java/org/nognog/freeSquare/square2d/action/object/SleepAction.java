@@ -24,12 +24,14 @@ import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
  */
 public class SleepAction extends AbstractPrioritizableAction {
 
-	private static final double tirednessRecoveryAmountPerMinute = 0.1f;
+	static final double tirednessRecoveryAmountPerMinute = 0.125f;
 	private static final int secondsPerMinute = 60;
+
+	private float totalSleepedTime;
 
 	private float desiredSleepTime; // use if policy is FIX_TIME
 
-	private float sleepedTime;
+	private float timeToNextInfluence = secondsPerMinute;
 
 	private SleepPolicy policy = SleepPolicy.FIX_TIME;
 
@@ -48,14 +50,21 @@ public class SleepAction extends AbstractPrioritizableAction {
 
 	@Override
 	public boolean act(float delta) {
-		final int oldSleepedTimeMinutes = ((int) this.sleepedTime) % secondsPerMinute;
-		this.sleepedTime += delta;
-		final int newSleepedTimeMinutes = ((int) this.sleepedTime) % secondsPerMinute;
-
 		final LifeObject sleeper = this.getSleeper();
-		if (oldSleepedTimeMinutes != newSleepedTimeMinutes) {
-			final int differenceOfMinutes = newSleepedTimeMinutes - oldSleepedTimeMinutes;
-			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(differenceOfMinutes * tirednessRecoveryAmountPerMinute);
+		if (sleeper.isSleeping() == false) {
+			return true;
+		}
+		if (delta <= 0) {
+			return false;
+		}
+
+		this.totalSleepedTime += delta;
+		this.timeToNextInfluence -= delta;
+
+		if (this.timeToNextInfluence <= 0) {
+			final int elapsedMinute = Math.round(-this.timeToNextInfluence / secondsPerMinute + 1);
+			this.timeToNextInfluence = secondsPerMinute - this.timeToNextInfluence % secondsPerMinute;
+			final TirednessInfluence tirednessInfluence = InfluencesUtils.tiredness(-tirednessRecoveryAmountPerMinute * elapsedMinute);
 			sleeper.applyStatusInfluence(tirednessInfluence);
 		}
 
@@ -72,7 +81,7 @@ public class SleepAction extends AbstractPrioritizableAction {
 	 */
 	private boolean satisfiesEndCondition() {
 		final LifeObject sleeper = this.getSleeper();
-		if (this.policy == SleepPolicy.FIX_TIME && this.sleepedTime >= this.desiredSleepTime) {
+		if (this.policy == SleepPolicy.FIX_TIME && this.totalSleepedTime >= this.desiredSleepTime) {
 			return true;
 		}
 		if (this.policy == SleepPolicy.COMPLETE_RECOVERY && sleeper.getLife().getStatus().getTiredness() == 0) {
@@ -89,6 +98,21 @@ public class SleepAction extends AbstractPrioritizableAction {
 	}
 
 	/**
+	 * @return the totalSleepedTime
+	 */
+	public float getTotalSleepedTime() {
+		return this.totalSleepedTime;
+	}
+
+	/**
+	 * @param totalSleepedTime
+	 *            the totalSleepedTime to set
+	 */
+	public void setTotalSleepedTime(float totalSleepedTime) {
+		this.totalSleepedTime = totalSleepedTime;
+	}
+
+	/**
 	 * @return the desired sleep time
 	 */
 	public float getDesiredSleepTime() {
@@ -100,6 +124,13 @@ public class SleepAction extends AbstractPrioritizableAction {
 	 */
 	public void setDesiredSleepTime(float desiredSleepTime) {
 		this.desiredSleepTime = desiredSleepTime;
+	}
+
+	/**
+	 * @return the timeToNextInfluence
+	 */
+	public float getTimeToNextInfluence() {
+		return this.timeToNextInfluence;
 	}
 
 	/**
@@ -123,7 +154,8 @@ public class SleepAction extends AbstractPrioritizableAction {
 
 	@Override
 	public void restart() {
-		this.sleepedTime = 0;
+		this.timeToNextInfluence = secondsPerMinute;
+		this.totalSleepedTime = 0;
 		this.desiredSleepTime = 0;
 		this.policy = SleepPolicy.FIX_TIME;
 	}
