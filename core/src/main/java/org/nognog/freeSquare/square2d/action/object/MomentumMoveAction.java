@@ -39,6 +39,17 @@ public class MomentumMoveAction extends AbstractPrioritizableAction {
 	}
 
 	/**
+	 * @param deceleration
+	 * @param velocityX
+	 * @param velocityY
+	 */
+	public MomentumMoveAction(float deceleration, float velocityX, float velocityY) {
+		this.velocityX = velocityX;
+		this.velocityY = velocityY;
+		this.setDeceleration(deceleration);
+	}
+
+	/**
 	 * @param movable
 	 * @param deceleration
 	 * @param velocityX
@@ -64,15 +75,15 @@ public class MomentumMoveAction extends AbstractPrioritizableAction {
 	 * @param delta
 	 */
 	private void calcCameraMomentum(float delta) {
-		this.calcCameraMomentumX(delta);
-		this.calcCameraMomentumY(delta);
+		this.calcMomentumX(delta);
+		this.calcMomentumY(delta);
 	}
 
-	private void calcCameraMomentumX(float delta) {
+	private void calcMomentumX(float delta) {
 		if (this.velocityX == 0) {
 			return;
 		}
-		this.movable.move(delta * this.velocityX, 0);
+		this.getMovable().move(delta * this.velocityX, 0);
 		final float decreaseAmountX = Math.abs(this.deceleration * delta * MathUtils.cos(MathUtils.atan2(this.velocityY, this.velocityX)));
 		if (Math.abs(this.velocityX) < decreaseAmountX) {
 			this.velocityX = 0;
@@ -82,11 +93,11 @@ public class MomentumMoveAction extends AbstractPrioritizableAction {
 		this.velocityX += -signum * decreaseAmountX;
 	}
 
-	private void calcCameraMomentumY(float delta) {
+	private void calcMomentumY(float delta) {
 		if (this.velocityY == 0) {
 			return;
 		}
-		this.movable.move(0, delta * this.velocityY);
+		this.getMovable().move(0, delta * this.velocityY);
 		final float decreateAmountY = Math.abs(this.deceleration * delta * MathUtils.sin(MathUtils.atan2(this.velocityY, this.velocityX)));
 		if (Math.abs(this.velocityY) < decreateAmountY) {
 			this.velocityY = 0;
@@ -174,6 +185,11 @@ public class MomentumMoveAction extends AbstractPrioritizableAction {
 	 * @return the movable
 	 */
 	public Movable getMovable() {
+		if (this.movable == null) {
+			if (this.getActor() instanceof Movable) {
+				return (Movable) this.getActor();
+			}
+		}
 		return this.movable;
 	}
 
@@ -190,4 +206,14 @@ public class MomentumMoveAction extends AbstractPrioritizableAction {
 		return true;
 	}
 
+	@Override
+	public void restart() {
+		super.restart();
+		this.movable = null;
+		this.deceleration = 0;
+		this.decelerationX = 0;
+		this.decelerationY = 0;
+		this.velocityX = 0;
+		this.velocityY = 0;
+	}
 }

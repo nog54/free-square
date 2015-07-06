@@ -204,6 +204,20 @@ public class Square2dActionUtlls {
 		changeSquareAction.setDirection(direction);
 		return changeSquareAction;
 	}
+	
+	/**
+	 * @param deceleration
+	 * @param velocityX
+	 * @param velocityY
+	 * @return momentum move action
+	 */
+	public static MomentumMoveAction momentumMove(float deceleration, float velocityX, float velocityY) {
+		final MomentumMoveAction momentumMoveAction = Actions.action(MomentumMoveAction.class);
+		momentumMoveAction.setDeceleration(deceleration);
+		momentumMoveAction.setVelocity(velocityX, velocityY);
+		return momentumMoveAction;
+	}
+
 
 	/**
 	 * @param target

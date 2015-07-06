@@ -42,8 +42,11 @@ public class MainActivityInputProcessor extends InputMultiplexer {
 	 * @param activity
 	 */
 	public MainActivityInputProcessor(MainActivity activity) {
-		this.gestureDetector = new GestureDetector(this.createFreeSquareGestureListener(activity));
-		this.gestureDetector.setLongPressSeconds(0.2f);
+		final float halfTapSquareSize = 20f;
+		final float tapCountInterval = 0.4f;
+		final float longPressDuration = 0.2f;
+		final float maxFlingDelay = 0.05f;
+		this.gestureDetector = new GestureDetector(halfTapSquareSize, tapCountInterval, longPressDuration, maxFlingDelay, this.createFreeSquareGestureListener(activity));
 		this.longTouchTapCanceller = new InputAdapter() {
 
 			@Override

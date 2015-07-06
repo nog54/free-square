@@ -54,7 +54,7 @@ public class MovableSquare2dObject extends Square2dObject {
 			@Override
 			public void fling(InputEvent event, float velocityX, float velocityY, int button) {
 				final float deceleration = 2000;
-				PrioritizableAction action = Square2dActionUtlls.momentumMove(MovableSquare2dObject.this, deceleration, velocityX, velocityY);
+				PrioritizableAction action = Square2dActionUtlls.momentumMove(deceleration, velocityX, velocityY);
 				MovableSquare2dObject.this.addMainAction(action);
 			}
 		};
