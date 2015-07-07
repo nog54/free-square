@@ -14,7 +14,7 @@ allprojects {
 	ext {
 		appName = 'FreeSquare'
 		gdxVersion = '1.5.5'
-		libgdxUtilsVersion = '0.10.0'
+		libgdxUtilsVersion = '0.11.0'
 		roboVMVersion = '1.0.0-alpha-02'
 	}
 

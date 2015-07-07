@@ -190,69 +190,73 @@ public class MainActivity extends FreeSquareActivity implements CameraObserver, 
 				MainActivity.this.showSquareOnly();
 			}
 		};
+		FileChooser.Listener listener = null;
+		try {
+			listener = new FileChooser.Listener() {
+				@Override
+				public void choose(Array<FileHandle> files) {
+					MainActivity.this.showSquareOnly();
+				}
 
-		final FileChooser.Listener listener = new FileChooser.Listener() {
-			@Override
-			public void choose(Array<FileHandle> files) {
-				MainActivity.this.showSquareOnly();
-			}
+				@Override
+				public void choose(final FileHandle file) {
+					MainActivity.this.showSquareOnly();
+					final SimpleDialogListener createNewExternalTypeDialogListener = new SimpleDialogListener() {
+						@Override
+						public void leftButtonClicked() {
+							final OtherObjectTypeManager otherObjectTypeManager = OtherObjectTypeManager.getInstance();
+							final ExternalOtherObjectType newType = otherObjectTypeManager.createExternalOtherObjectType(file.path());
+							MainActivity.this.showSquareOnly();
+							MainActivity.this.inputName(newType, "Please input decoration name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
+										@Override
+										public void afterInputName() {
+											otherObjectTypeManager.register(newType);
+											MainActivity.this.saveDictionary(otherObjectTypeManager.getDictionary());
+										}
+									});
+						}
 
-			@Override
-			public void choose(final FileHandle file) {
-				MainActivity.this.showSquareOnly();
-				final SimpleDialogListener createNewExternalTypeDialogListener = new SimpleDialogListener() {
-					@Override
-					public void leftButtonClicked() {
-						final OtherObjectTypeManager otherObjectTypeManager = OtherObjectTypeManager.getInstance();
-						final ExternalOtherObjectType newType = otherObjectTypeManager.createExternalOtherObjectType(file.path());
-						MainActivity.this.showSquareOnly();
-						MainActivity.this.inputName(newType, "Please input decoration name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
-									@Override
-									public void afterInputName() {
-										otherObjectTypeManager.register(newType);
-										MainActivity.this.saveDictionary(otherObjectTypeManager.getDictionary());
-									}
-								});
-					}
+						@Override
+						public void rightButtonClicked() {
+							final SimpleDialogListener createExternelLifeObjectTypeDialogLister = new SimpleDialogListener() {
+								@Override
+								public void leftButtonClicked() {
+									this.addNewLifeObject(LandingLifeObject.class);
+								}
 
-					@Override
-					public void rightButtonClicked() {
-						final SimpleDialogListener createExternelLifeObjectTypeDialogLister = new SimpleDialogListener() {
-							@Override
-							public void leftButtonClicked() {
-								this.addNewLifeObject(LandingLifeObject.class);
-							}
+								@Override
+								public void rightButtonClicked() {
+									this.addNewLifeObject(FlyingLifeObject.class);
+								}
 
-							@Override
-							public void rightButtonClicked() {
-								this.addNewLifeObject(FlyingLifeObject.class);
-							}
+								private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
+									final LifeObjectTypeManager lifeObjectTypeManager = LifeObjectTypeManager.getInstance();
+									final ExternalLifeObjectType newType = lifeObjectTypeManager.createExternalLifeObjectType(file.path(), 100, 5, newLifeObjectClass);
+									MainActivity.this.showSquareOnly();
+									MainActivity.this.inputName(newType, "Please input name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
+												@Override
+												public void afterInputName() {
+													lifeObjectTypeManager.register(newType);
+													MainActivity.this.saveDictionary(lifeObjectTypeManager.getDictionary());
+												}
+											});
+								}
+							};
+							MainActivity.this.showDialog("Please select Landing or Flying", "Landing", "Flying", createExternelLifeObjectTypeDialogLister); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						}
+					};
+					MainActivity.this.showDialog("Please select object type.", "Decoration", "Life", createNewExternalTypeDialogListener); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-							private <T extends LifeObject> void addNewLifeObject(Class<T> newLifeObjectClass) {
-								final LifeObjectTypeManager lifeObjectTypeManager = LifeObjectTypeManager.getInstance();
-								final ExternalLifeObjectType newType = lifeObjectTypeManager.createExternalLifeObjectType(file.path(), 100, 5, newLifeObjectClass);
-								MainActivity.this.showSquareOnly();
-								MainActivity.this.inputName(newType, "Please input name", new FreeSquare.InputTextListener() { //$NON-NLS-1$
-											@Override
-											public void afterInputName() {
-												lifeObjectTypeManager.register(newType);
-												MainActivity.this.saveDictionary(lifeObjectTypeManager.getDictionary());
-											}
-										});
-							}
-						};
-						MainActivity.this.showDialog("Please select Landing or Flying", "Landing", "Flying", createExternelLifeObjectTypeDialogLister); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					}
-				};
-				MainActivity.this.showDialog("Please select object type.", "Decoration", "Life", createNewExternalTypeDialogListener); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
 
-			}
-
-			@Override
-			public void cancel() {
-				MainActivity.this.showSquareOnly();
-			}
-		};
+				@Override
+				public void cancel() {
+					MainActivity.this.showSquareOnly();
+				}
+			};
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 		this.fileChooser = new CameraFitFileChooser(freeSquare.getCamera(), font, listener);
 		this.dialog = new CameraFitSimpleDialog(freeSquare.getCamera(), font);
 	}

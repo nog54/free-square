@@ -60,6 +60,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -256,11 +257,13 @@ public class FreeSquare extends ApplicationAdapter {
 		Gdx.input.getTextInput(new TextInputListener() {
 			@Override
 			public void input(String text) {
+				final GlyphLayout layout = new GlyphLayout();
 				final BitmapFont listFont = FreeSquare.this.getFont();
 				String inputText = text;
 				for (int i = inputText.length(); i > 0; i--) {
 					inputText = inputText.substring(0, i);
-					final float inputTextDrawWidth = listFont.getBounds(inputText).width;
+					layout.setText(listFont, inputText);
+					final float inputTextDrawWidth = layout.width;
 					if (inputTextDrawWidth <= maxTextDrawWidth) {
 						break;
 					}

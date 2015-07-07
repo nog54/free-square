@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
@@ -27,6 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
  *            element type
  */
 public abstract class ImageIncludedItemList<T> extends List<T> {
+	private static final GlyphLayout glyphLayout = new GlyphLayout();
+
 	/**
 	 * @param style
 	 */
@@ -84,7 +87,8 @@ public abstract class ImageIncludedItemList<T> extends List<T> {
 		final float drawImageInterval = itemHeight * 0.05f;
 		final float imageDrawX = x + textOffsetX + this.getWidth() - itemHeight - rightSpace;
 		final float imageDrawY = y + itemY - itemHeight + drawImageInterval / 2;
-		if (font.getBounds(drawString).width < imageDrawX) {
+		glyphLayout.setText(font, drawString);
+		if (glyphLayout.width < imageDrawX) {
 			final Texture drawTexture = this.getTextureOf(listItem);
 			if (drawTexture != null) {
 				final float textureWidth = drawTexture.getWidth();
