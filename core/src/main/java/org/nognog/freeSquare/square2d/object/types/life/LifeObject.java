@@ -30,6 +30,7 @@ import org.nognog.freeSquare.square2d.action.object.StopTimeGenerator;
 import org.nognog.freeSquare.square2d.action.object.TargetPositionGenerator;
 import org.nognog.freeSquare.square2d.event.AddObjectEvent;
 import org.nognog.freeSquare.square2d.event.ChangeStatusEvent;
+import org.nognog.freeSquare.square2d.event.CollectObjectRequestEvent;
 import org.nognog.freeSquare.square2d.event.EatEvent;
 import org.nognog.freeSquare.square2d.event.RenameRequestEvent;
 import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
@@ -55,7 +56,7 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 
 	static final float tirednessAmountPerMinute = 0.125f;
 	private static final Texture frameTexture = new Texture(Gdx.files.internal(Resources.frame1Path));
-	
+
 	protected static final StopTimeGenerator defaultStopTimeGenerator = new StopTimeGenerator() {
 		@Override
 		public float nextStopTime() {
@@ -90,13 +91,12 @@ public abstract class LifeObject extends MovableSquare2dObject implements Target
 			public void tap(InputEvent event, float x, float y, int count, int button) {
 				System.out.println(LifeObject.this.getLife().getStatusString());
 				if (this.isTripleTapped(count)) {
-					if (LifeObject.this.isSleeping()) {
-						LifeObject.this.wakeUp();
-					} else {
-						LifeObject.this.sleep();
-					}
-					// LifeObject.this.getSquare().notifyEventListeners(new
-					// CollectObjectRequestEvent(LifeObject.this));
+					// if (LifeObject.this.isSleeping()) {
+					// LifeObject.this.wakeUp();
+					// } else {
+					// LifeObject.this.sleep();
+					// }
+					LifeObject.this.getSquare().notifyEventListeners(new CollectObjectRequestEvent(LifeObject.this));
 				}
 			}
 

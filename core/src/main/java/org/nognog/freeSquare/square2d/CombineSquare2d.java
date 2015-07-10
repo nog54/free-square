@@ -1051,11 +1051,6 @@ public class CombineSquare2d extends Square2d {
 		throw new RuntimeException("Invalid argument is passed to CombinedSquare$removeActor."); //$NON-NLS-1$
 	}
 
-	@Override
-	public String toString() {
-		return this.getName();
-	}
-
 	void disposeAndFreeSquares() {
 		for (Actor actor : this.getChildren().<Actor> toArray(Actor.class)) {
 			super.removeActorForce(actor);

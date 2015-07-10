@@ -29,7 +29,7 @@ import org.nognog.freeSquare.square2d.item.Square2dItem;
 import org.nognog.freeSquare.square2d.item.Square2dObjectItem;
 import org.nognog.freeSquare.square2d.object.Square2dObject;
 import org.nognog.freeSquare.square2d.object.types.eatable.EatableObject;
-import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
+import org.nognog.freeSquare.ui.PlayerItemListAllowingToFetchElementAsActor;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
@@ -42,7 +42,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 /**
  * @author goshi 2015/02/22
  */
-public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<PossessedItem<?>, Actor> {
+public class PlayersItemList extends PlayerItemListAllowingToFetchElementAsActor<PossessedItem<?>, Actor> {
 
 	private final MainActivity mainActivity;
 
@@ -75,12 +75,12 @@ public class PlayersItemList extends FetchableAsActorPlayerLinkingScrollList<Pos
 	}
 
 	@Override
-	protected PossessedItem<?>[] getShowListItemsFromPlayer(Player setupPlayer) {
+	protected PossessedItem<?>[] getListItemsFromPlayer(Player setupPlayer) {
 		return setupPlayer.getItemBox().toItemArray();
 	}
 
 	@Override
-	protected Actor transformToFetchActorType(PossessedItem<?> listItem) {
+	protected Actor transformToFetchedActorTypeIfFetchable(PossessedItem<?> listItem) {
 		Item<?, ?> item = listItem.getItem();
 		if (item instanceof Square2dObjectItem && this.mainActivity.getSquare() != null) {
 			return ((Square2dObjectItem) item).createSquare2dObject();

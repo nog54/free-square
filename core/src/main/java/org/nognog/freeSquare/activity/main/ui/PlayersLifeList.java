@@ -25,7 +25,7 @@ import org.nognog.freeSquare.square2d.event.UpdateSquareObjectEvent;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObject;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectType;
 import org.nognog.freeSquare.square2d.object.types.life.LifeObjectTypeManager;
-import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
+import org.nognog.freeSquare.ui.PlayerItemListAllowingToFetchElementAsActor;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
@@ -37,7 +37,7 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * @author goshi 2015/02/22
  */
-public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Life, LifeObject> {
+public class PlayersLifeList extends PlayerItemListAllowingToFetchElementAsActor<Life, LifeObject> {
 
 	// TODO extract Presenter, extract super class
 
@@ -66,12 +66,12 @@ public class PlayersLifeList extends FetchableAsActorPlayerLinkingScrollList<Lif
 	}
 
 	@Override
-	protected Life[] getShowListItemsFromPlayer(Player setupPlayer) {
+	protected Life[] getListItemsFromPlayer(Player setupPlayer) {
 		return setupPlayer.getLifes();
 	}
 
 	@Override
-	protected LifeObject transformToFetchActorType(Life listItem) {
+	protected LifeObject transformToFetchedActorTypeIfFetchable(Life listItem) {
 		if (this.mainActivity.getSquare() != null) {
 			return LifeObject.create(listItem);
 		}

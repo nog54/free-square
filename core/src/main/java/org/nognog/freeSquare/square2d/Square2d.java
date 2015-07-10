@@ -587,6 +587,11 @@ public abstract class Square2d extends Group implements Square<Square2dObject>, 
 	protected boolean isRequestedDrawOrderUpdate() {
 		return this.requestedDrawOrderUpdate;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 
 	/**
 	 * @return vertices string

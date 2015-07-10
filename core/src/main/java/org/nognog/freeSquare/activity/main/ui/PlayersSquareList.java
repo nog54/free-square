@@ -21,7 +21,7 @@ import org.nognog.freeSquare.model.player.Player;
 import org.nognog.freeSquare.model.square.Square;
 import org.nognog.freeSquare.square2d.CombineSquare2d;
 import org.nognog.freeSquare.square2d.Square2d;
-import org.nognog.freeSquare.ui.FetchableAsActorPlayerLinkingScrollList;
+import org.nognog.freeSquare.ui.PlayerItemListAllowingToFetchElementAsActor;
 import org.nognog.gdx.util.camera.Camera;
 import org.nognog.gdx.util.camera.ObservableOrthographicCamera;
 
@@ -34,7 +34,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * @author goshi 2015/02/22
  */
-public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<Square<?>, Square2d> {
+public class PlayersSquareList extends PlayerItemListAllowingToFetchElementAsActor<Square<?>, Square2d> {
 
 	// TODO extract Presenter, extract super class
 
@@ -64,7 +64,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 	}
 
 	@Override
-	protected Square<?>[] getShowListItemsFromPlayer(Player setupPlayer) {
+	protected Square<?>[] getListItemsFromPlayer(Player setupPlayer) {
 		Array<Square<?>> playersSquares = new Array<>(setupPlayer.getSquares());
 		if (this.mainActivity != null) {
 			playersSquares.removeValue(this.mainActivity.getSquare(), true);
@@ -73,7 +73,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 	}
 
 	@Override
-	protected Square2d transformToFetchActorType(Square<?> listItem) {
+	protected Square2d transformToFetchedActorTypeIfFetchable(Square<?> listItem) {
 		return (Square2d) listItem;
 	}
 
@@ -83,7 +83,7 @@ public class PlayersSquareList extends FetchableAsActorPlayerLinkingScrollList<S
 		final float squareX = stageCoodinateXY.x - (beFetchedSquare.getMostLeftVertex().x + beFetchedSquare.getMostRightVertex().x) / 2;
 		final float squareY = stageCoodinateXY.y - (beFetchedSquare.getMostTopVertex().y + beFetchedSquare.getMostBottomVertex().y) / 2;
 		beFetchedSquare.setPosition(squareX, squareY);
-		if (!(this.mainActivity.getSquare() instanceof CombineSquare2d)) {
+		if (this.mainActivity.getSquare() != null && !(this.mainActivity.getSquare() instanceof CombineSquare2d)) {
 			this.mainActivity.convertThisSquareToCombineSquare2d();
 		}
 		if (this.mainActivity.getSquare() != null) {

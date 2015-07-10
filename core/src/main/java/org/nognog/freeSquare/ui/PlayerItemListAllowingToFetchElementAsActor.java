@@ -30,7 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * @param <T2>
  *            actor type of be fetched list item
  */
-public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Actor> extends PlayerLinkingScrollList<T1> implements CameraObserver {
+public abstract class PlayerItemListAllowingToFetchElementAsActor<T1, T2 extends Actor> extends PlayerItemScrollList<T1> implements CameraObserver {
 
 	private static final float cameraMoveAmountBase = 10;
 	private static final float cameraMoveThresholdBase = 50;
@@ -51,11 +51,11 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 	 * @param player
 	 * @param font
 	 */
-	public FetchableAsActorPlayerLinkingScrollList(float width, float height, Player player, BitmapFont font) {
+	public PlayerItemListAllowingToFetchElementAsActor(float width, float height, Player player, BitmapFont font) {
 		super(width, height, player, font);
 	}
 
-	protected abstract T2 transformToFetchActorType(T1 listItem);
+	protected abstract T2 transformToFetchedActorTypeIfFetchable(T1 listItem);
 
 	protected abstract void beginFetchActor(float x, float y, T2 beFetchedActor, T1 beFetchedItem);
 
@@ -76,7 +76,7 @@ public abstract class FetchableAsActorPlayerLinkingScrollList<T1, T2 extends Act
 		}
 		if (this.fetchingActor == null) {
 			this.fetchingItem = pannedItem;
-			this.fetchingActor = this.transformToFetchActorType(pannedItem);
+			this.fetchingActor = this.transformToFetchedActorTypeIfFetchable(pannedItem);
 			if (this.fetchingActor == null) {
 				return;
 			}

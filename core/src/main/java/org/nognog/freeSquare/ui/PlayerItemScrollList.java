@@ -35,7 +35,7 @@ import com.badlogic.gdx.utils.TimeUtils;
  * @author goshi 2015/01/17
  * @param <T>
  */
-public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements PlayerObserver {
+public abstract class PlayerItemScrollList<T> extends ScrollPane implements PlayerObserver {
 
 	private Player player;
 	private final BitmapFont font;
@@ -48,7 +48,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 	 * @param player
 	 * @param font
 	 */
-	public PlayerLinkingScrollList(float width, float height, Player player, BitmapFont font) {
+	public PlayerItemScrollList(float width, float height, Player player, BitmapFont font) {
 		super(null);
 		this.setPlayer(player);
 		this.setWidget(this.createList(font));
@@ -59,7 +59,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 		final ActorGestureListener listener = new ActorGestureListener() {
 
-			private List<T> list = PlayerLinkingScrollList.this.getList();
+			private List<T> list = PlayerItemScrollList.this.getList();
 			private T lastTouchDownedItem;
 			private T lastSelectedItem;
 			private boolean isSameItemTouch;
@@ -72,10 +72,10 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 				this.isSameItemTouch = this.lastTouchDownedItem == this.list.getSelected();
 				this.lastTouchDownedItem = this.list.getSelected();
 				if (this.isSameItemTouch) {
-					PlayerLinkingScrollList.this.setFlickScroll(false);
+					PlayerItemScrollList.this.setFlickScroll(false);
 					return;
 				}
-				PlayerLinkingScrollList.this.setFlickScroll(true);
+				PlayerItemScrollList.this.setFlickScroll(true);
 				if (this.lastSelectedItem == null) {
 					this.list.setSelectedIndex(-1);
 				} else {
@@ -86,7 +86,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			@Override
 			public boolean longPress(Actor actor, float x, float y) {
 				if (this.isSameItemTouch) {
-					PlayerLinkingScrollList.this.selectedItemLongPressed(this.lastTouchDownedItem, x, y);
+					PlayerItemScrollList.this.selectedItemLongPressed(this.lastTouchDownedItem, x, y);
 					return true;
 				}
 				return false;
@@ -95,7 +95,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 			@Override
 			public void pan(InputEvent event, float x, float y, float deltaX, float deltaY) {
 				if (this.isSameItemTouch) {
-					PlayerLinkingScrollList.this.selectedItemPanned(this.lastTouchDownedItem, x, y, deltaX, deltaY);
+					PlayerItemScrollList.this.selectedItemPanned(this.lastTouchDownedItem, x, y, deltaX, deltaY);
 				}
 			}
 
@@ -110,7 +110,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 					} else {
 						this.sameItemSuccessiveTapCount = 1;
 					}
-					PlayerLinkingScrollList.this.selectedItemTapped(this.lastTouchDownedItem, this.sameItemSuccessiveTapCount);
+					PlayerItemScrollList.this.selectedItemTapped(this.lastTouchDownedItem, this.sameItemSuccessiveTapCount);
 					return;
 				}
 				this.sameItemSuccessiveTapCount = 0;
@@ -120,7 +120,7 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				PlayerLinkingScrollList.this.touchUp(x, y);
+				PlayerItemScrollList.this.touchUp(x, y);
 			}
 		};
 		listener.getGestureDetector().setTapCountInterval(tapCountInterval);
@@ -132,16 +132,16 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 			@Override
 			protected Texture getTextureOf(T item) {
-				return PlayerLinkingScrollList.this.getDrawTextureOf(item);
+				return PlayerItemScrollList.this.getDrawTextureOf(item);
 			}
 
 			@Override
 			protected Color getColorOf(T item) {
-				return PlayerLinkingScrollList.this.getDrawTextureColorOf(item);
+				return PlayerItemScrollList.this.getDrawTextureColorOf(item);
 			}
 
 		};
-		list.setItems(this.getShowListItemsFromPlayer(this.getPlayer()));
+		list.setItems(this.getListItemsFromPlayer(this.getPlayer()));
 		list.setSelectedIndex(-1);
 		return list;
 	}
@@ -206,14 +206,14 @@ public abstract class PlayerLinkingScrollList<T> extends ScrollPane implements P
 
 	@Override
 	public void updatePlayer() {
-		this.getList().setItems(this.getShowListItemsFromPlayer(this.getPlayer()));
+		this.getList().setItems(this.getListItemsFromPlayer(this.getPlayer()));
 	}
 
 	protected abstract Texture getDrawTextureOf(T item);
 
 	protected abstract Color getDrawTextureColorOf(T item);
 
-	protected abstract T[] getShowListItemsFromPlayer(Player setupPlayer);
+	protected abstract T[] getListItemsFromPlayer(Player setupPlayer);
 
 	/**
 	 * dispose
